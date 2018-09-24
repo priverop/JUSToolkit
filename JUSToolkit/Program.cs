@@ -20,12 +20,13 @@
                     case "-extractText":
                         tm.LoadFile(args[1]);
                         tm.ExportPO();
+                        Console.WriteLine("Exportación correcta: " + args[1] + ".po");
                         break;
 
                     case "-insertText":
                         tm.LoadFile(args[1]);
-                        //tm.ImportPO(args[2]);
-                        //tm.ExportBin();
+                        tm.ImportPO(args[2]);
+                        tm.ExportBin();
                         break;
 
                     default:
