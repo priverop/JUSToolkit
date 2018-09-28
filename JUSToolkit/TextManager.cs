@@ -143,13 +143,15 @@
 
                 for (int i = 0; i < this.Pointers.Count; i++)
                 {
-                    if (this.Pointers[i] > 0x0D && this.Pointers[i] < 0x010000)
+                    if (this.Pointers[i] > 0x18 && this.Pointers[i] < 0x010000 && this.Pointers[i] != 0xB4 && this.Pointers[i] != 0x78 && this.Pointers[i] != 0x64)
                     {
                         exportedFileWriter.Write(this.newPointers[pointerCount]);
+                        //Console.WriteLine(pointerCount + " - punteroNuevo "+ this.newPointers[pointerCount]);
                         pointerCount++;
                     }
                     else{
                         exportedFileWriter.Write(this.Pointers[i]);
+                        //Console.WriteLine(i + " - puntero " + this.Pointers[i]);
                     }
 
                 }

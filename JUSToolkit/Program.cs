@@ -27,6 +27,7 @@
                         tm.LoadFile(args[1]);
                         tm.ImportPO(args[2]);
                         tm.ExportBin();
+                        Console.WriteLine("Exportación correcta: " + args[1] + "_new");
                         break;
 
                     default:
