@@ -10,22 +10,24 @@
     public class TextManager
     {
         public string FileName { get; set; }
-        public Byte[] Header { get; set; }
-        private const int HEADERSIZE = 24;
-        public List<int> Pointers { get; }
-        public List<string> Text { get; }
+
+        public Dictionary<int, int> Pointers { get; } // Pointer - Offset
+        public Queue<int> FillPointers { get; }
+        public int FirstPointer { get; set; } 
+        public Dictionary<string, int> Text { get; } // String - Pointer
 
         // Import PO
-        private List<string> newText;
-        private List<int> newPointers;
+        public Queue<string> newText { get; set; } // Translated text
+        public Queue<int> newPointers { get; set; } // New pointers
 
         // Write
         private Dictionary<Char, Char> spanishChars;
 
         public TextManager()
         {
-            this.Pointers = new List<int>();
-            this.Text = new List<string>();
+            this.Pointers = new Dictionary<int, int>();
+            this.Text = new Dictionary<string, int>();
+            this.FillPointers = new Queue<int>();
             this.spanishChars = new Dictionary<Char, Char>
             {
                 { '¡', '{' },
@@ -37,7 +39,6 @@
                 { 'í', '$' },
                 { 'ñ', '}' }
             };
-            Header = new Byte[HEADERSIZE];
         }
 
         public void LoadFile(string fileToExtractName)
@@ -51,28 +52,40 @@
 
                 this.FileName = fileToExtractName;
 
+                this.FirstPointer = fileToExtractReader.ReadInt32();
+
                 long currentPosition = fileToExtractStream.Position;
-                int firstPointer = fileToExtractReader.ReadInt32();
                 int secondPointer = fileToExtractReader.ReadInt32();
                 fileToExtractStream.Position = currentPosition;
 
-                // Read header
-                this.Header = fileToExtractReader.ReadBytes(HEADERSIZE);
+                // Tutorials start with a big pointer for the first string
+                if(this.FirstPointer > secondPointer){
 
-                // Read pointers
-                while (fileToExtractStream.Position < firstPointer)
-                {
-                    int pointer = fileToExtractReader.ReadInt32();
-                    this.Pointers.Add(pointer);
-                }
+                    // Read Strings and calculate pointers
 
-                if(firstPointer > secondPointer){
-                    fileToExtractStream.Position = firstPointer;
+                    fileToExtractStream.Position = this.FirstPointer;
 
-                    while(!fileToExtractReader.Stream.EndOfStream){
-                        this.Text.Add(fileToExtractReader.ReadString());
+                    int actualPointer = 0;
+                    while (!fileToExtractReader.Stream.EndOfStream)
+                    {
+                        string sentence = fileToExtractReader.ReadString();
+                        actualPointer += sentence.Length +1 ; // \0 char 
+                        this.Text.Add(sentence, actualPointer);
                     }
 
+                    fileToExtractStream.Position = 4; // skip first pointer
+
+                    // Read pointers
+                    while (fileToExtractStream.Position < this.FirstPointer)
+                    {
+                        int offset = (int)fileToExtractStream.Position;
+                        int pointer = fileToExtractReader.ReadInt32();
+
+                        if (this.Text.ContainsValue(pointer) && !this.Pointers.ContainsKey(pointer))
+                            this.Pointers.Add(pointer, offset);
+                        else
+                            this.FillPointers.Enqueue(pointer);
+                    }
                 }
             }
         }
@@ -87,9 +100,10 @@
                 }
             };
 
-            for (int i = 0; i < this.Text.Count; i++)
+            int i = 0;
+            foreach (KeyValuePair<string, int> entry in this.Text)
             {
-                string sentence = this.Text[i];
+                string sentence = entry.Key;
                 if (string.IsNullOrEmpty(sentence))
                     sentence = "<!empty>";
                 poExport.Add(new PoEntry(sentence) { Context = i.ToString() });
@@ -105,8 +119,8 @@
             Po newPO = binaryFile.ConvertTo<Po>();
             inputPO.Dispose();
 
-            this.newText = new List<string>();
-            this.newPointers = new List<int>();
+            this.newText = new Queue<string>();
+            this.newPointers = new Queue<int>();
 
             int longCounter = 0;
 
@@ -114,20 +128,18 @@
             {
                 string sentence = string.IsNullOrEmpty(entry.Translated) ?
                     entry.Original : entry.Translated;
+
                 if (sentence == "<!empty>")
                     sentence = string.Empty;
+
                 if(this.CheckCorrectLong(sentence)){
                     sentence = this.ReplaceSpecialChars(sentence);
-                    this.newText.Add(sentence);
-
                     longCounter += sentence.Length + 1; // byte \0
-                    this.newPointers.Add(longCounter);
+                    this.newText.Enqueue(sentence);
+                    this.newPointers.Enqueue(longCounter);
                 }
-                else{
+                else
                     Console.WriteLine("Tamaño de frase excedido, máximo 36 caracteres: "+sentence);
-                }
-
-
             }
         }
 
@@ -137,28 +149,25 @@
             {
                 DataWriter exportedFileWriter = new DataWriter(exportedFileStream);
 
-                exportedFileWriter.Write(Header);
+                exportedFileWriter.Write(this.FirstPointer);
 
-                int pointerCount = 0;
+                int offset = 4;
 
-                for (int i = 0; i < this.Pointers.Count; i++)
+                for (; offset < this.FirstPointer; offset += 4)
                 {
-                    if (this.Pointers[i] > 0x18 && this.Pointers[i] < 0x010000 && this.Pointers[i] != 0xB4 && this.Pointers[i] != 0x78 && this.Pointers[i] != 0x64)
+                    if (this.Pointers.ContainsValue(offset))
                     {
-                        exportedFileWriter.Write(this.newPointers[pointerCount]);
-                        //Console.WriteLine(pointerCount + " - punteroNuevo "+ this.newPointers[pointerCount]);
-                        pointerCount++;
+                        exportedFileWriter.Write(this.newPointers.Dequeue());
                     }
-                    else{
-                        exportedFileWriter.Write(this.Pointers[i]);
-                        //Console.WriteLine(i + " - puntero " + this.Pointers[i]);
-                    }
-
+                    else
+                        exportedFileWriter.Write(this.FillPointers.Dequeue());
                 }
 
-                foreach (var sentence in this.newText)
+                exportedFileStream.Position = this.FirstPointer;
+
+                while (this.newText.Count > 0)
                 {
-                    exportedFileWriter.Write(this.ReplaceSpanishChars(sentence));
+                    exportedFileWriter.Write(this.ReplaceSpanishChars(this.newText.Dequeue()));
                 }
 
             }
