@@ -6,42 +6,22 @@
     {
         public static void Main(string[] args)
         {
-            if (args.Length > 3 && args.Length < 2)
+            if (args.Length > 1)
             {
                 Console.Write("Wrong arguments.");
                 showUsage();
             }
             else
             {
-                TextManager tm = new TextManager();
-
-                switch (args[0])
-                {
-                    case "-extractText":
-                        tm.LoadFile(args[1]);
-                        tm.ExportPO();
-                        Console.WriteLine("Exportación correcta: " + args[1] + ".po");
-                        break;
-
-                    case "-insertText":
-                        tm.LoadFile(args[1]);
-                        tm.ImportPO(args[2]);
-                        tm.ExportBin();
-                        Console.WriteLine("Exportación correcta: " + args[1] + "_new");
-                        break;
-
-                    default:
-                        Console.WriteLine("Wrong arguments.");
-                        showUsage();
-                        break;
-                }
+                /*
+                 * Identify -> get Format -> call Converter
+                 */
             }
         }
 
         private static void showUsage()
         {
-            Console.WriteLine("Usage: JUSToolkit.exe -extractText <fileToExtract>");
-            Console.WriteLine("Usage: JUSToolkit.exe -insertText <originalFile> <po>");
+            Console.WriteLine("Usage: JUSToolkit.exe <fileToExtract>");
         }
 
         private static void showCredits()
