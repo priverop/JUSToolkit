@@ -44,6 +44,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Identify.cs" />
+    <Compile Include="Formats\ALAR2.cs" />
+    <Compile Include="Formats\BINFILENAME.cs" />
+    <Compile Include="Formats\BINTUTORIAL.cs" />
+    <Compile Include="Formats\ALAR3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />

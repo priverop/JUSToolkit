@@ -1,6 +1,7 @@
 ﻿namespace JUSToolkit
 {
     using System;
+    using Yarhl.FileFormat;
 
     class MainClass
     {
@@ -16,6 +17,15 @@
                 /*
                  * Identify -> get Format -> call Converter
                  */
+
+                Identify i = new Identify();
+
+                // Aquí casi mejor usar Node?
+
+                Format input = i.GetFormat(args[1]);
+
+                // Switch para los conversores
+                // input.convertwith...
             }
         }
 
