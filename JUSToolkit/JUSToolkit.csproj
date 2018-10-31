@@ -39,19 +39,24 @@
     <Reference Include="Yarhl.Media">
       <HintPath>lib\Yarhl.Media.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>lib\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Identify.cs" />
     <Compile Include="Formats\ALAR2.cs" />
-    <Compile Include="Formats\BINFILENAME.cs" />
-    <Compile Include="Formats\BINTUTORIAL.cs" />
+    <Compile Include="Formats\BinFilename.cs" />
+    <Compile Include="Formats\BinTutorial.cs" />
     <Compile Include="Formats\ALAR3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
     <Folder Include="Formats\" />
+    <Folder Include="Converters\Bin\" />
+    <Folder Include="Converters\Alar\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

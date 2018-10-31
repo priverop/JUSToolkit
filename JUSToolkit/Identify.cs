@@ -28,8 +28,8 @@ namespace JUSToolkit
 
             binDictionary = new Dictionary<String, Format>
             {
-                { "TUTORIAL", new BINTUTORIAL() },
-                { "FILENAME", new BINFILENAME() },
+                { "TUTORIAL", new BinTutorial() },
+                { "FILENAME", new BinFilename() },
             };
 
             alarDictionary = new Dictionary<int, Format>
@@ -105,7 +105,6 @@ namespace JUSToolkit
          * Si es 02 -> Format ALAR2.
          * Si es 03 -> Format ALAR3.
          * 
-         * Dudas: ¿Format DSCP?
          * 
          */
 

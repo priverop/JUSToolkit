@@ -2,43 +2,55 @@
 {
     using System;
     using Yarhl.FileFormat;
+    using log4net;
+    using log4net.Config;
 
     class MainClass
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(MainClass));
+
         public static void Main(string[] args)
         {
-            if (args.Length > 1)
+            BasicConfigurator.Configure();
+
+            if (args.Length != 1)
             {
-                Console.Write("Wrong arguments.");
+                log.Error("Wrong arguments.");
                 showUsage();
             }
             else
             {
+                showCredits();
                 /*
                  * Identify -> get Format -> call Converter
                  */
 
                 Identify i = new Identify();
 
+                log.Info("Identifying file " + args[0]);
+
                 // Aquí casi mejor usar Node?
 
-                Format input = i.GetFormat(args[1]);
+                Format input = i.GetFormat(args[0]);
+
+                log.Info("Format detected: " + input.ToString());
 
                 // Switch para los conversores
+
                 // input.convertwith...
             }
         }
 
         private static void showUsage()
         {
-            Console.WriteLine("Usage: JUSToolkit.exe <fileToExtract>");
+            log.Info("Usage: JUSToolkit.exe <fileToExtract>");
         }
 
         private static void showCredits()
         {
-            Console.WriteLine("=========================");
-            Console.WriteLine("== JUS TOOLKIT by Nex ==");
-            Console.WriteLine("=========================");
+            log.Info("=========================");
+            log.Info("== JUS TOOLKIT by Nex ==");
+            log.Info("=========================");
         }
     }
 }

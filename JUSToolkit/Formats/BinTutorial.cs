@@ -2,9 +2,9 @@
 {
     using System;
     using Yarhl.FileFormat;
-    public class BINTUTORIAL : Format
+    public class BinTutorial : Format
     {
-        public BINTUTORIAL()
+        public BinTutorial()
         {
         }
     }
