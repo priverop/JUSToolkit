@@ -4,10 +4,15 @@
     using Yarhl.FileFormat;
     using log4net;
     using log4net.Config;
+    using Formats;
+    using Converters.Bin;
+    using Yarhl.FileSystem;
+    using Yarhl.Media.Text;
 
     class MainClass
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(MainClass));
+        public static readonly ILog log = LogManager.GetLogger(typeof(MainClass));
+        private const String FORMATPREFIX = "JUSToolkit.Formats.";
 
         public static void Main(string[] args)
         {
@@ -29,15 +34,25 @@
 
                 log.Info("Identifying file " + args[0]);
 
-                // Aquí casi mejor usar Node?
+                Format inputFormat = i.GetFormat(args[0]);
 
-                Format input = i.GetFormat(args[0]);
+                log.Info("Format detected: " + inputFormat.ToString());
 
-                log.Info("Format detected: " + input.ToString());
+                Node n = NodeFactory.FromFile(args[0]);
 
-                // Switch para los conversores
+                switch (inputFormat.ToString())
+                {
+                    case FORMATPREFIX + "BinTutorial":
+                        n.Transform<BinaryFormat2BinTutorial, BinaryFormat, BinTutorial>()
+                        .Transform<Bin2Po, BinTutorial, Po>()
+                        .Transform<Po2Binary, Po, BinaryFormat>().Stream.WriteTo(args[0] + ".po");
+                        break;
+                }
 
-                // input.convertwith...
+                log.Info("Program completed.");
+
+
+
             }
         }
 

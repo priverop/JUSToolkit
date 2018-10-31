@@ -2,9 +2,9 @@
 {
     using System;
     using Yarhl.FileFormat;
-    public class BINFILENAME : Format
+    public class BinFilename : Format
     {
-        public BINFILENAME()
+        public BinFilename()
         {
         }
     }

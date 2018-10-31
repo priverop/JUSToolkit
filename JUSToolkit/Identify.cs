@@ -7,6 +7,8 @@ namespace JUSToolkit
     using System.Collections.Generic;
     using Formats;
     using System.IO;
+    using log4net;
+    using log4net.Config;
 
     /// <summary>
     /// Identify allow us to Identify which Format are we entering to the program.
@@ -14,6 +16,8 @@ namespace JUSToolkit
     /// </summary>
     public class Identify
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
+
         public Dictionary<String, Delegate> extensionDictionary { get; set; }
         public Dictionary<String, Format> binDictionary { get; set; }
         public Dictionary<int, Format> alarDictionary { get;set;}
@@ -46,6 +50,8 @@ namespace JUSToolkit
         public Format GetFormat(String filename)
         {
             String extension = Path.GetExtension(filename);
+
+            log.Info("Extension: " + extension);
 
             if(extensionDictionary.ContainsKey(extension)){
                 return (Format)extensionDictionary[extension].DynamicInvoke(filename);
