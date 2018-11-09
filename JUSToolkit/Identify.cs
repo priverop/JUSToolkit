@@ -8,7 +8,7 @@ namespace JUSToolkit
     using Formats;
     using System.IO;
     using log4net;
-    using log4net.Config;
+    using System.Text;
 
     /// <summary>
     /// Identify allow us to Identify which Format are we entering to the program.
@@ -111,7 +111,6 @@ namespace JUSToolkit
          * Si es 02 -> Format ALAR2.
          * Si es 03 -> Format ALAR3.
          * 
-         * 
          */
 
         public Format GetAlarFormat(String filename)
@@ -120,12 +119,19 @@ namespace JUSToolkit
             {
                 DataReader fileToReadReader = new DataReader(fileToReadStream);
 
-                string magic = fileToReadReader.ReadInt32().ToString();
+                byte[] magicBytes = fileToReadReader.ReadBytes(4);
+
+                string magic = new String(Encoding.ASCII.GetChars(magicBytes));
+
                 byte type = 00;
 
                 if (magic == "ALAR")
+                {
+                    log.Info("Alar Format");
                     type = fileToReadReader.ReadByte();
+                }
                 else if (magic == "DSCP"){
+                    log.Info("Alar Compressed Format (DSCP)");
                     // Descomprimir
                     // Nuevo reader y demás seguramente
                     type = fileToReadReader.ReadByte();

@@ -54,6 +54,11 @@
     <Compile Include="Converters\Bin\BinaryFormat2BinTutorial.cs" />
     <Compile Include="Converters\Bin\Bin2Po.cs" />
     <Compile Include="Formats\Bin.cs" />
+    <Compile Include="Converters\Bin\BinaryFormat2BinFilename.cs" />
+    <Compile Include="Converters\Alar\BinaryFormat2Alar2.cs" />
+    <Compile Include="Converters\Alar\Alar2Nodes.cs" />
+    <Compile Include="Formats\ALAR.cs" />
+    <Compile Include="Converters\Alar\BinaryFormat2Alar3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />

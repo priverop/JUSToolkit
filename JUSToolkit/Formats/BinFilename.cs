@@ -2,7 +2,7 @@
 {
     using System;
     using Yarhl.FileFormat;
-    public class BinFilename : Format
+    public class BinFilename : Bin
     {
         public BinFilename()
         {
