@@ -42,6 +42,9 @@
     <Reference Include="log4net">
       <HintPath>lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Texim">
+      <HintPath>lib\Texim.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -59,6 +62,7 @@
     <Compile Include="Converters\Alar\Alar2Nodes.cs" />
     <Compile Include="Formats\ALAR.cs" />
     <Compile Include="Converters\Alar\BinaryFormat2Alar3.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
