@@ -16,14 +16,5 @@
         public ushort EndFileIndex { get; set; }
         public ushort[] FileTableIndex { get; set; }
 
-
-        // ** O QUIZA MEJOR UNA LISTA O ALGO CON OFFSET y FILENAME (Dictionary?)
-        // Así a la hora de hacer el ALAR2Nodes solamente tiene que ir a esos offsets 
-        // Y ya está. Teniendo Nodes quizá sea menos eficiente, no lo sé
-
-        public ALAR3()
-        {
-
-        }
     }
 }

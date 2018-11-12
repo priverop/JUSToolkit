@@ -11,10 +11,6 @@
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(BinaryFormat2Alar3));
 
-        public BinaryFormat2Alar3()
-        {
-        }
-
         public ALAR3 Convert(BinaryFormat input){
 
             if (input == null)
@@ -22,7 +18,10 @@
 
             input.Stream.Seek(0, SeekMode.Start); // Just in case
 
-            DataReader br = new DataReader(input.Stream);
+            DataReader br = new DataReader(input.Stream)
+            {
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEnconding("ascii")
+            };
 
             var aar = new ALAR3
             {
