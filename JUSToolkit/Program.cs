@@ -57,19 +57,27 @@
 
                         var folder = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>()
                             .Transform<Alar2Nodes, ALAR3, NodeContainerFormat>();
-
-                        log.Info("Transformado " + n.Name);
-
+                            
                         SaveToDir(folder, outputPath);
 
-                        log.Info("Guardada exportación en " + outputPath);
+                        break;
+
+                    case FORMATPREFIX + "ALAR2":
+
+                        var root = n.Transform<BinaryFormat2Alar2, BinaryFormat, ALAR2>()
+                            .Transform<Alar2Nodes, ALAR3, NodeContainerFormat>();
+
+                        SaveToDir(root, outputPath);
 
                         break;
+
                 }
 
+                log.Info("Transformado " + n.Name);
+
+                log.Info("Guardada exportación en " + outputPath);
+
                 log.Info("Program completed.");
-
-
 
             }
         }

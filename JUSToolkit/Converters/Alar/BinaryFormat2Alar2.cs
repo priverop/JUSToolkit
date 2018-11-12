@@ -7,11 +7,15 @@
 
     public class BinaryFormat2Alar2 : IConverter<BinaryFormat, ALAR2>
     {
-        public BinaryFormat2Alar2()
-        {
-        }
-
         public ALAR2 Convert(BinaryFormat input){
+
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
+
+            input.Stream.Seek(0, SeekMode.Start); // Just in case
+
+            DataReader br = new DataReader(input.Stream);
+
             return new ALAR2();
         }
     }
