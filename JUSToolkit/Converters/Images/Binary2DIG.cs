@@ -6,9 +6,12 @@
     using Yarhl.IO;
     using Texim.Media.Image;
     using System.Drawing;
+    using log4net;
 
     public class Binary2DIG : IConverter<BinaryFormat, DIG>
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
+
         public DIG Convert(BinaryFormat source)
         {
             if (source == null)
@@ -25,7 +28,23 @@
             reader.ReadInt16(); // Unk
             reader.ReadInt16(); // Unk
 
-            dig.Palette = new Palette(reader.ReadBytes(0x200).ToBgr555Colors());
+            long startPalette = reader.Stream.Position;
+
+            log.Debug("Start Palette: " + startPalette);
+
+            while (reader.ReadInt32() != 0){}
+
+            long endPalette = reader.Stream.Position - 4;
+
+            log.Debug("End Palette: " + endPalette);
+
+            long paletteSize = endPalette - startPalette;
+
+            log.Debug("Size Palette: " + paletteSize);
+
+            reader.Stream.Position = startPalette;
+
+            dig.Palette = new Palette(reader.ReadBytes((int)paletteSize).ToBgr555Colors());
 
             dig.Pixels = new PixelArray
             {
@@ -33,14 +52,20 @@
                 Height = 192,
             };
 
-            reader.Stream.Position = 0x20C;
+            long bytesUntilEnd = reader.Stream.Length - reader.Stream.Position;
+
+            log.Debug("Bytes until the end: " + bytesUntilEnd);
 
             dig.Pixels.SetData(
-                reader.ReadBytes((int)reader.Stream.Length - 0x20C),
+                reader.ReadBytes((int) bytesUntilEnd),
                 PixelEncoding.HorizontalTiles,
                 ColorFormat.Indexed_8bpp,
                 new Size(8, 8));
-                
+
+            if(paletteSize == 64){
+                dig.Pixels.Format = ColorFormat.Indexed_4bpp;
+                log.Debug("Color Format: " + dig.Pixels.Format);
+            }
 
             return dig;
         }
