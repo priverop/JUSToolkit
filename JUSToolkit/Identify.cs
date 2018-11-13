@@ -28,6 +28,7 @@ namespace JUSToolkit
             {
                 { ".aar", new Func<String, Format>(GetAlarFormat) },
                 { ".bin", new Func<String, Format>(GetBinFormat) },
+                { ".dig", new Func<String, Format>(GetDigFormat) },
             };
 
             binDictionary = new Dictionary<String, Format>
@@ -142,6 +143,10 @@ namespace JUSToolkit
 
                 return alarDictionary[type];
             }
+        }
+
+        public Format GetDigFormat(String filename){
+            return new DIG();
         }
 
     }

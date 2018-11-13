@@ -42,6 +42,7 @@
     <Reference Include="log4net">
       <HintPath>lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="Texim">
       <HintPath>lib\Texim.dll</HintPath>
     </Reference>
@@ -63,12 +64,15 @@
     <Compile Include="Formats\ALAR.cs" />
     <Compile Include="Converters\Alar\BinaryFormat2Alar3.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Formats\DIG.cs" />
+    <Compile Include="Converters\Images\Binary2DIG.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
     <Folder Include="Formats\" />
     <Folder Include="Converters\Bin\" />
     <Folder Include="Converters\Alar\" />
+    <Folder Include="Converters\Images\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

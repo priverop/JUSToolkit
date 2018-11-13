@@ -7,9 +7,12 @@
     using Formats;
     using Converters.Bin;
     using Converters.Alar;
+    using Converters.Images;
     using Yarhl.FileSystem;
     using Yarhl.Media.Text;
     using System.IO;
+    using Texim.Media.Image;
+    using Texim.Media.Image.Processing;
 
     class MainClass
     {
@@ -68,6 +71,16 @@
                             .Transform<Alar2Nodes, ALAR3, NodeContainerFormat>();
 
                         SaveToDir(root, outputPath);
+
+                        break;
+
+                    case FORMATPREFIX + "DIG":
+
+                        DIG dig = n.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
+
+                        var img = dig.Pixels.CreateBitmap(dig.Palette, 0);
+
+                        img.Save(inputFileName + ".png");
 
                         break;
 
