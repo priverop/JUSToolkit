@@ -56,15 +56,19 @@
 
             log.Debug("Bytes until the end: " + bytesUntilEnd);
 
-            dig.Pixels.SetData(
-                reader.ReadBytes((int) bytesUntilEnd),
+            if(paletteSize == 64){
+                dig.Pixels.SetData(
+                reader.ReadBytes((int)bytesUntilEnd),
+                PixelEncoding.HorizontalTiles,
+                ColorFormat.Indexed_4bpp,
+                new Size(8, 8));
+            }
+            else{
+                dig.Pixels.SetData(
+                reader.ReadBytes((int)bytesUntilEnd),
                 PixelEncoding.HorizontalTiles,
                 ColorFormat.Indexed_8bpp,
                 new Size(8, 8));
-
-            if(paletteSize == 64){
-                dig.Pixels.Format = ColorFormat.Indexed_4bpp;
-                log.Debug("Color Format: " + dig.Pixels.Format);
             }
 
             return dig;
