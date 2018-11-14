@@ -1,7 +1,8 @@
-﻿using System;
-namespace JUSToolkit.Formats
+﻿namespace JUSToolkit.Formats
 {
-    public class DSCP : Formats
+    using Yarhl.FileFormat;
+
+    public class DSCP : Format
     {
         public DSCP()
         {

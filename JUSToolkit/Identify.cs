@@ -9,6 +9,7 @@ namespace JUSToolkit
     using System.IO;
     using log4net;
     using System.Text;
+    using Yarhl.FileSystem;
 
     /// <summary>
     /// Identify allow us to Identify which Format are we entering to the program.
@@ -26,9 +27,9 @@ namespace JUSToolkit
 
             extensionDictionary = new Dictionary<String, Delegate>
             {
-                { ".aar", new Func<String, Format>(GetAlarFormat) },
-                { ".bin", new Func<String, Format>(GetBinFormat) },
-                { ".dig", new Func<String, Format>(GetDigFormat) },
+                { ".aar", new Func<Node, Format>(GetAlarFormat) },
+                { ".bin", new Func<Node, Format>(GetBinFormat) },
+                { ".dig", new Func<Node, Format>(GetDigFormat) },
             };
 
             binDictionary = new Dictionary<String, Format>
@@ -48,20 +49,36 @@ namespace JUSToolkit
         /// Gets the Format of the file passed.
         /// </summary>
         /// <returns>The format of the file passed by argument.</returns>
-        public Format GetFormat(String filename)
+        public Format GetFormat(Node n)
         {
-            String extension = Path.GetExtension(filename);
+            String extension = Path.GetExtension(n.Name);
 
             log.Info("Extension: " + extension);
 
-            if(extensionDictionary.ContainsKey(extension)){
-                return (Format)extensionDictionary[extension].DynamicInvoke(filename);
-            }
-            else{
+            if(!extensionDictionary.ContainsKey(extension)){
                 throw new System.ArgumentException("Extension is not known.", extension);
             }
+
+            if(IsCompressed(n)){
+                log.Info("Compressed file.");
+                return (Format)new DSCP();
+            }
+            else{
+                log.Info("Not compressed");
+            }
+
+            return (Format)extensionDictionary[extension].DynamicInvoke(n);
+            
         }
 
+        private bool IsCompressed(Node node)
+        {
+
+            DataReader fileToReadReader = new DataReader(node.Stream);
+
+            return fileToReadReader.ReadString(4) == "DSCP" ? true : false;
+
+        }
 
         /*
         * BIN:
@@ -75,19 +92,18 @@ namespace JUSToolkit
         * Tendríamos un Format por cada tipo.
         */
 
-        public Format GetBinFormat(String filename)
+        public Format GetBinFormat(Node node)
         {
-            using (DataStream fileToReadStream = new DataStream(filename, FileOpenMode.Read))
-            {
-                DataReader fileToReadReader = new DataReader(fileToReadStream);
 
-                int firstPointer = fileToReadReader.ReadInt32();
-                int secondPointer = fileToReadReader.ReadInt32();
+            DataReader fileToReadReader = new DataReader(node.Stream);
 
-                string fileCase = PrepareCases(firstPointer, secondPointer);
+            int firstPointer = fileToReadReader.ReadInt32();
+            int secondPointer = fileToReadReader.ReadInt32();
 
-                return binDictionary[fileCase];
-            }
+            string fileCase = PrepareCases(firstPointer, secondPointer);
+
+            return binDictionary[fileCase];
+
         }
 
         private static string PrepareCases(int firstPointer, int secondPointer)
@@ -105,7 +121,6 @@ namespace JUSToolkit
          * Magic ALAR | DSCP
          * 
          * Si es ALAR -> Leemos tipo.
-         * Si es DSCP -> Descomprimimos LZSS offset 4 -> ALAR -> Leemos tipo.
          * 
          * Tipo -> 02 | 03.
          * 
@@ -114,39 +129,48 @@ namespace JUSToolkit
          * 
          */
 
-        public Format GetAlarFormat(String filename)
+        public Format GetAlarFormat(Node node)
         {
-            using (DataStream fileToReadStream = new DataStream(filename, FileOpenMode.Read))
+
+            DataReader fileToReadReader = new DataReader(node.Stream);
+
+            byte[] magicBytes = fileToReadReader.ReadBytes(4);
+
+            string magic = new String(Encoding.ASCII.GetChars(magicBytes));
+
+            byte type = 00;
+
+            if (magic == "ALAR")
             {
-                DataReader fileToReadReader = new DataReader(fileToReadStream);
-
-                byte[] magicBytes = fileToReadReader.ReadBytes(4);
-
-                string magic = new String(Encoding.ASCII.GetChars(magicBytes));
-
-                byte type = 00;
-
-                if (magic == "ALAR")
-                {
-                    log.Info("Alar Format");
-                    type = fileToReadReader.ReadByte();
-                }
-                else if (magic == "DSCP"){
-                    log.Info("Alar Compressed Format (DSCP)");
-                    // Descomprimir
-                    // Nuevo reader y demás seguramente
-                    type = fileToReadReader.ReadByte();
-                }
-                else{
-                    throw new System.ArgumentException("Magic is not known.", magic);
-                }
-
-                return alarDictionary[type];
+                log.Info("Alar Format");
+                type = fileToReadReader.ReadByte();
             }
+            else{
+                throw new System.ArgumentException("Magic is not known.", magic);
+            }
+
+            return alarDictionary[type];
+
         }
 
-        public Format GetDigFormat(String filename){
-            return new DIG();
+        public Format GetDigFormat(Node node){
+
+            DataReader reader = new DataReader(node.Stream);
+
+            reader.Stream.Position = 0;
+
+            string magic = reader.ReadString(4);
+
+            if (magic == "DSIG")
+            {
+                return new DIG();
+            }
+            else
+            {
+                throw new System.ArgumentException("Magic is not known.", magic);
+            }
+
+
         }
 
     }

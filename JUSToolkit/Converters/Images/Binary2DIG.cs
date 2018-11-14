@@ -18,6 +18,7 @@
                 throw new ArgumentNullException(nameof(source));
 
             DataReader reader = new DataReader(source.Stream);
+            reader.Stream.Position = 0;
 
             DIG dig = new DIG();
             reader.ReadBytes(4); // Magic
@@ -30,17 +31,11 @@
 
             long startPalette = reader.Stream.Position;
 
-            log.Debug("Start Palette: " + startPalette);
-
             while (reader.ReadInt32() != 0){}
 
             long endPalette = reader.Stream.Position - 4;
 
-            log.Debug("End Palette: " + endPalette);
-
             long paletteSize = endPalette - startPalette;
-
-            log.Debug("Size Palette: " + paletteSize);
 
             reader.Stream.Position = startPalette;
 
@@ -54,22 +49,14 @@
 
             long bytesUntilEnd = reader.Stream.Length - reader.Stream.Position;
 
-            log.Debug("Bytes until the end: " + bytesUntilEnd);
+            ColorFormat format = paletteSize == 64 
+                ? ColorFormat.Indexed_4bpp : ColorFormat.Indexed_8bpp;
 
-            if(paletteSize == 64){
-                dig.Pixels.SetData(
+            dig.Pixels.SetData(
                 reader.ReadBytes((int)bytesUntilEnd),
                 PixelEncoding.HorizontalTiles,
-                ColorFormat.Indexed_4bpp,
+                format,
                 new Size(8, 8));
-            }
-            else{
-                dig.Pixels.SetData(
-                reader.ReadBytes((int)bytesUntilEnd),
-                PixelEncoding.HorizontalTiles,
-                ColorFormat.Indexed_8bpp,
-                new Size(8, 8));
-            }
 
             return dig;
         }

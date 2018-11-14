@@ -39,11 +39,17 @@
 
                 log.Info("Identifying file " + inputFileName);
 
-                Format inputFormat = i.GetFormat(inputFileName);
+                Node n = NodeFactory.FromFile(inputFileName);
+
+                Format inputFormat = i.GetFormat(n);
+
+                // Compressed file
+                if(inputFormat.ToString() == FORMATPREFIX + "DSCP"){
+                    n = Utils.DecompressLzss(n);
+                    inputFormat = i.GetFormat(n);
+                }
 
                 log.Info("Format detected: " + inputFormat.ToString());
-
-                Node n = NodeFactory.FromFile(inputFileName);
 
                 switch (inputFormat.ToString())
                 {

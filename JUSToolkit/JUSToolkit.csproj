@@ -66,6 +66,7 @@
     <Compile Include="Utils.cs" />
     <Compile Include="Formats\DIG.cs" />
     <Compile Include="Converters\Images\Binary2DIG.cs" />
+    <Compile Include="Formats\DSCP.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
