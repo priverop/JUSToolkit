@@ -1,9 +1,5 @@
 ﻿namespace JUSToolkit.Formats
 {
-    using System;
-    using System.Collections.Generic;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
 
     public class ALAR3 : ALAR
     {

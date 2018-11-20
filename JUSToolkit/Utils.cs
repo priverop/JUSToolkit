@@ -47,31 +47,5 @@
             return new Node(node.Name, new BinaryFormat(memoryStream));
         }
 
-        public static String DecompressLzssTemp(string file)
-        {
-            string tempFile = Path.GetTempFileName();
-            File.Copy(file, tempFile, true);
-
-            string program = "lzss.exe"; //*** Falta ruta no??
-            string arguments = "-d " + tempFile;
-            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-            {
-                program = "lzss";
-            }
-
-            Process process = new Process();
-            process.StartInfo.FileName = program;
-            process.StartInfo.Arguments = arguments;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.ErrorDialog = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.Start();
-
-            process.WaitForExit();
-
-            return tempFile;
-        }
-
     }
 }

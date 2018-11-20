@@ -7,11 +7,14 @@
     using Yarhl.FileSystem;
     using log4net;
 
-    public class BinaryFormat2Alar3 : IConverter<BinaryFormat, ALAR3>
+    public class BinaryFormat2Alar3 :
+        IConverter<BinaryFormat, ALAR3>,
+        IConverter<ALAR3, BinaryFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(BinaryFormat2Alar3));
 
-        public ALAR3 Convert(BinaryFormat input){
+        public ALAR3 Convert(BinaryFormat input)
+        {
 
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -64,6 +67,11 @@
             br.Stream.Dispose();
 
             return aar;
+        }
+
+        public BinaryFormat Convert(ALAR3 input)
+        {
+            return new BinaryFormat();
         }
     }
 }

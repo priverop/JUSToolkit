@@ -1,12 +1,11 @@
 ﻿namespace JUSToolkit.Formats
 {
-    using System;
-    using Yarhl.FileFormat;
-
-    public class ALAR2 : Format
+    public class ALAR2 : ALAR
     {
-        public ALAR2()
-        {
-        }
+        public char[] Header { get; set; }
+        public byte Type { get; set; }
+        public byte Unk { get; set; }
+        public ushort Num_files { get; set; }
+        public byte[] IDs { get; set; }
     }
 }

@@ -96,6 +96,7 @@ namespace JUSToolkit
         {
 
             DataReader fileToReadReader = new DataReader(node.Stream);
+            fileToReadReader.Stream.Position = 0;
 
             int firstPointer = fileToReadReader.ReadInt32();
             int secondPointer = fileToReadReader.ReadInt32();
@@ -131,8 +132,9 @@ namespace JUSToolkit
 
         public Format GetAlarFormat(Node node)
         {
-
             DataReader fileToReadReader = new DataReader(node.Stream);
+
+            fileToReadReader.Stream.Position = 0;
 
             byte[] magicBytes = fileToReadReader.ReadBytes(4);
 
