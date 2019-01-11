@@ -13,6 +13,7 @@
     using System.IO;
     using Texim.Media.Image;
     using Texim.Media.Image.Processing;
+    using JUSToolkit.Formats.ALAR;
 
     class MainClass
     {
@@ -26,18 +27,19 @@
             if (args.Length < 3 || args.Length > 4)
             {
                 log.Error("Wrong arguments.");
-                showUsage();
+                ShowUsage();
             }
             else
             {
-                showCredits();
+                ShowCredits();
 
                 string type = args[0];
                 string inputFileName = args[1];
                 string outputPath = args[2];
+                string dirToSave = null;
 
-                if(args[0] == "-i"){
-                    string dirToInsert = args[3];
+                if (args[0] == "-i"){
+                    dirToSave = args[3];
                 }
 
                 Identify i = new Identify();
@@ -60,6 +62,10 @@
                     case "-e":
                         Export(inputFormat.ToString(), n, outputPath, inputFileName);
                     break;
+
+                    case "-i":
+                        Import(inputFormat.ToString(), n, outputPath, inputFileName, dirToSave);
+                    break;
                 }
 
                 log.Info("Program completed.");
@@ -68,7 +74,7 @@
         }
 
         private static void Export(string format, Node n, string outputPath, string inputFileName){
-            log.Info("Exporting");
+            log.Info("Exporting...");
             switch (format)
             {
                 case FORMATPREFIX + "BinTutorial":
@@ -80,19 +86,19 @@
 
                     break;
 
-                case FORMATPREFIX + "ALAR3":
+                case FORMATPREFIX + "ALAR.ALAR3":
 
                     var folder = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>()
-                        .Transform<Alar2Nodes, ALAR3, NodeContainerFormat>();
+                        .Transform<Alar3ToNodes, ALAR3, NodeContainerFormat>();
 
                     SaveToDir(folder, outputPath);
 
                     break;
 
-                case FORMATPREFIX + "ALAR2":
+                case FORMATPREFIX + "ALAR.ALAR2":
 
                     var root = n.Transform<BinaryFormat2Alar2, BinaryFormat, ALAR2>()
-                        .Transform<Alar2Nodes, ALAR2, NodeContainerFormat>();
+                        .Transform<Alar2ToNodes, ALAR2, NodeContainerFormat>();
 
                     SaveToDir(root, outputPath);
 
@@ -109,44 +115,48 @@
                     break;
 
             }
-            log.Info("Transformed " + n.Name);
 
-            log.Info("Saved in " + outputPath);
+            log.Info("Finished exporting");
+
         }
 
-        private static void Import(string format, Node n, string outputPath, string inputFileName, string dirToInsert)
+        private static void Import(string format, Node n, string dirWithFilesToInsert, string inputFileName, string dirToSave)
         {
-            log.Info("Importing");
+            log.Info("Importing...");
 
             switch (format)
             {
-                case FORMATPREFIX + "ALAR3":
+                case FORMATPREFIX + "ALAR.ALAR3":
 
                     // Alar original
                     Node original = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>();
 
                     // Contenedor con los ficheros a insertar
-                    Node container = NodeFactory.FromDirectory(dirToInsert); //*** We should exclude .DS files and thumb
+                    var newAlar = NodeFactory.FromDirectory(dirWithFilesToInsert)//*** We should exclude .DS files and thumb
+                        .Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
 
-                    // Deberíamos convertir ese container en ALAR3 pasándole el alar original
-                    container.Transform<Alar2Nodes, NodeContainerFormat, ALAR>()
-                        .Transform<BinaryFormat2Alar3, ALAR3, BinaryFormat>()
-                        .Stream.WriteTo(outputPath + Path.PathSeparator + inputFileName + ".aar");
+                    // Modificamos el Alar original con los nuevos ficheros a insertar
+                    original.GetFormatAs<ALAR3>().InsertModification(newAlar.GetFormatAs<ALAR3>()); 
 
-                    break;
+                    original.Transform<BinaryFormat2Alar3, ALAR3, BinaryFormat>()
+                        .Stream.WriteTo(dirToSave + Path.PathSeparator + inputFileName + ".aar");
+
+                break;
             }
+            log.Info("Finished importing");
         }
 
-        private static void showUsage()
+        private static void ShowUsage()
         {
             log.Info("Usage: JUSToolkit.exe -e <fileToExtract> <dirToExtractTo>");
-            log.Info("Usage: JUSToolkit.exe -i <originalFile> <dirToExtractTo> <dirToInsert>");
+            log.Info("Usage: JUSToolkit.exe -i <originalFile> <dirWithFilesToInsert> <dirToSave>");
         }
 
-        private static void showCredits()
+        private static void ShowCredits()
         {
             log.Info("=========================");
             log.Info("== JUS TOOLKIT by Nex ==");
+            log.Info("== Using YARHL by Pleonex ==");
             log.Info("=========================");
         }
 
@@ -158,6 +168,8 @@
                 log.Info("Saving " + outputFile);
                 child.GetFormatAs<BinaryFormat>().Stream.WriteTo(outputFile);
             }
+
+            log.Info("Saved in " + output);
         }
     }
 }

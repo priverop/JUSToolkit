@@ -10,6 +10,7 @@ namespace JUSToolkit
     using log4net;
     using System.Text;
     using Yarhl.FileSystem;
+    using JUSToolkit.Formats.ALAR;
 
     /// <summary>
     /// Identify allow us to Identify which Format are we entering to the program.
@@ -144,7 +145,6 @@ namespace JUSToolkit
 
             if (magic == "ALAR")
             {
-                log.Info("Alar Format");
                 type = fileToReadReader.ReadByte();
             }
             else{

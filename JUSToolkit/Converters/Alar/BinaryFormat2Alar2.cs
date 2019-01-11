@@ -5,6 +5,7 @@
     using Yarhl.IO;
     using JUSToolkit.Formats;
     using Yarhl.FileSystem;
+    using JUSToolkit.Formats.ALAR;
 
     public class BinaryFormat2Alar2 : IConverter<BinaryFormat, ALAR2>
     {
@@ -36,6 +37,7 @@
             uint name_offset = (uint)(0x10 + aar.Num_files * 0x10);
             for (int i = 0; i < aar.Num_files; i++)
             {
+                var aarFile = new ALAR2File();
                 uint unk1 = br.ReadUInt32();
                 uint offset = br.ReadUInt32();
                 uint size = br.ReadUInt32();
@@ -49,7 +51,10 @@
                 name_offset += size + 0x24;
                 br.Stream.Position = curPos;
 
-                aar.Files.Add(new Node(filename, new BinaryFormat(fileStream)));
+                aarFile.File = new Node(filename, new BinaryFormat(fileStream));
+
+                aar.AlarFiles.Add(aarFile);
+
             }
 
             br.Stream.Dispose();

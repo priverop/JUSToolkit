@@ -51,22 +51,24 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Identify.cs" />
-    <Compile Include="Formats\ALAR2.cs" />
     <Compile Include="Formats\BinFilename.cs" />
     <Compile Include="Formats\BinTutorial.cs" />
-    <Compile Include="Formats\ALAR3.cs" />
     <Compile Include="Converters\Bin\BinaryFormat2BinTutorial.cs" />
     <Compile Include="Converters\Bin\Bin2Po.cs" />
     <Compile Include="Formats\Bin.cs" />
     <Compile Include="Converters\Bin\BinaryFormat2BinFilename.cs" />
     <Compile Include="Converters\Alar\BinaryFormat2Alar2.cs" />
-    <Compile Include="Converters\Alar\Alar2Nodes.cs" />
-    <Compile Include="Formats\ALAR.cs" />
+    <Compile Include="Converters\Alar\Alar2ToNodes.cs" />
     <Compile Include="Converters\Alar\BinaryFormat2Alar3.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Formats\DIG.cs" />
     <Compile Include="Converters\Images\Binary2DIG.cs" />
     <Compile Include="Formats\DSCP.cs" />
+    <Compile Include="Formats\ALAR\ALAR2.cs" />
+    <Compile Include="Formats\ALAR\ALAR3.cs" />
+    <Compile Include="Formats\ALAR\ALAR3File.cs" />
+    <Compile Include="Formats\ALAR\ALAR2File.cs" />
+    <Compile Include="Converters\Alar\Alar3ToNodes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
@@ -74,6 +76,7 @@
     <Folder Include="Converters\Bin\" />
     <Folder Include="Converters\Alar\" />
     <Folder Include="Converters\Images\" />
+    <Folder Include="Formats\ALAR\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

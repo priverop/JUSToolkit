@@ -3,9 +3,11 @@
     using System;
     using Yarhl.FileFormat;
     using Yarhl.IO;
-    using JUSToolkit.Formats;
+    using JUSToolkit.Formats.ALAR;
     using Yarhl.FileSystem;
     using log4net;
+    using JUSToolkit.Formats;
+    using System.Linq;
 
     public class BinaryFormat2Alar3 :
         IConverter<BinaryFormat, ALAR3>,
@@ -46,32 +48,78 @@
             // Index table
             foreach (ushort filePosition in aar.FileTableIndex)
             {
-                br.Stream.Position = filePosition;
+                input.Stream.Position = filePosition;
 
-                ushort fileID = br.ReadUInt16();
-                ushort unk3 = br.ReadUInt16();
-                uint offset = br.ReadUInt32();
-                uint size = br.ReadUInt32();
+                var aarFile = new ALAR3File
+                {
+                    FileID = br.ReadUInt16(),
+                    Unk3 = br.ReadUInt16(),
+                    Offset = br.ReadUInt32(),
+                    Size = br.ReadUInt32(),
+                    Unk4 = br.ReadUInt16(),
+                    Unk5 = br.ReadUInt16(),
+                    Unk6 = br.ReadUInt16()
+                };
 
-                DataStream fileStream = new DataStream(input.Stream, offset, size);
-
-                ushort unk4 = br.ReadUInt16();
-                ushort unk5 = br.ReadUInt16();
-                ushort unk6 = br.ReadUInt16();
+                DataStream fileStream = new DataStream(input.Stream, aarFile.Offset, aarFile.Size);
 
                 string filename = br.ReadString().Replace("/", "-");
 
-                aar.Files.Add(new Node(filename, new BinaryFormat(fileStream)));
+                aarFile.File = new Node(filename, new BinaryFormat(fileStream));
+
+                aar.AlarFiles.Add(aarFile);
             }
 
-            br.Stream.Dispose();
+            //br.Stream.Dispose();
 
             return aar;
         }
 
-        public BinaryFormat Convert(ALAR3 input)
+        public BinaryFormat Convert(ALAR3 aar)
         {
-            return new BinaryFormat();
+            if (aar == null)
+                throw new ArgumentNullException(nameof(aar));
+
+            BinaryFormat binary = new BinaryFormat();
+            DataWriter writer = new DataWriter(binary.Stream)
+            {
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEnconding("ascii")
+            };
+
+            writer.Write(aar.Header);
+            writer.Write(aar.Type);
+            writer.Write(aar.Unk);
+            writer.Write(aar.Num_files);
+            writer.Write(aar.Unk2);
+            writer.Write(aar.Array_count);
+            writer.Write(aar.EndFileIndex);
+
+            for (int i = 0; i < aar.Array_count + 1; i++)
+            {
+                writer.Write(aar.FileTableIndex[i]);
+            }
+
+            foreach (ALAR3File aarFile in aar.AlarFiles)
+            {
+                writer.Write(aarFile.FileID);
+                writer.Write(aarFile.Unk3);
+                writer.Write(aarFile.Offset);
+                writer.Write(aarFile.Size);
+                writer.Write(aarFile.Unk4);
+                writer.Write(aarFile.Unk5);
+                writer.Write(aarFile.Unk6);
+
+                writer.Write(aarFile.File.Name.Replace("-", "/"));
+
+            }
+
+            // Primero Cabeceras y luego ficheros
+            foreach (ALAR3File aarFile in aar.AlarFiles)
+            {
+                aarFile.File.Stream.WriteTo(writer.Stream);
+            }
+
+            return binary;
         }
     }
 }
