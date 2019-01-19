@@ -25,7 +25,7 @@
 
             DataReader br = new DataReader(input.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEnconding("ascii")
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
             var aar = new ALAR3
@@ -83,7 +83,7 @@
             BinaryFormat binary = new BinaryFormat();
             DataWriter writer = new DataWriter(binary.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEnconding("ascii")
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
             writer.Write(aar.Header);

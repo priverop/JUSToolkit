@@ -18,7 +18,7 @@
 
             DataReader br = new DataReader(input.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEnconding("ascii")
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
             var aar = new ALAR2

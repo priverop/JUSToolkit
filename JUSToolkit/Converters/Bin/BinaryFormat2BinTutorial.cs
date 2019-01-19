@@ -15,7 +15,7 @@
 
             DataReader reader = new DataReader(source.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEnconding("ascii")
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
             BinTutorial bin = new BinTutorial

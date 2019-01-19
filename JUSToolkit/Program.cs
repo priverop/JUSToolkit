@@ -11,8 +11,6 @@
     using Yarhl.FileSystem;
     using Yarhl.Media.Text;
     using System.IO;
-    using Texim.Media.Image;
-    using Texim.Media.Image.Processing;
     using JUSToolkit.Formats.ALAR;
 
     class MainClass
@@ -74,13 +72,24 @@
         }
 
         private static void Export(string format, Node n, string outputPath, string inputFileName){
+
             log.Info("Exporting...");
+
             switch (format)
             {
                 case FORMATPREFIX + "BinTutorial":
 
                     n.Transform<BinaryFormat2BinTutorial, BinaryFormat, BinTutorial>()
                     .Transform<Bin2Po, BinTutorial, Po>()
+                    .Transform<Po2Binary, Po, BinaryFormat>()
+                    .Stream.WriteTo(outputPath + Path.PathSeparator + inputFileName + ".po");
+
+                    break;
+
+                case FORMATPREFIX + "BinQuiz":
+
+                    n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()
+                    .Transform<Bin2Po, BinQuiz, Po>()
                     .Transform<Po2Binary, Po, BinaryFormat>()
                     .Stream.WriteTo(outputPath + Path.PathSeparator + inputFileName + ".po");
 

@@ -37,6 +37,7 @@ namespace JUSToolkit
             {
                 { "TUTORIAL", new BinTutorial() },
                 { "FILENAME", new BinFilename() },
+                { "QUIZ", new BinQuiz() },
             };
 
             alarDictionary = new Dictionary<int, Format>
@@ -75,9 +76,12 @@ namespace JUSToolkit
         private bool IsCompressed(Node node)
         {
 
-            DataReader fileToReadReader = new DataReader(node.Stream);
-
-            return fileToReadReader.ReadString(4) == "DSCP" ? true : false;
+            DataReader reader = new DataReader(node.Stream)
+            {
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+            };
+            reader.Stream.Position = 0;
+            return reader.ReadString(4) == "DSCP" ? true : false;
 
         }
 
@@ -110,7 +114,10 @@ namespace JUSToolkit
 
         private static string PrepareCases(int firstPointer, int secondPointer)
         {
-            if (firstPointer > secondPointer)
+            if (secondPointer == 255) {
+                return "QUIZ";
+            }
+            else if (firstPointer > secondPointer)
                 return "TUTORIAL";
             else
                 return "FILENAME";

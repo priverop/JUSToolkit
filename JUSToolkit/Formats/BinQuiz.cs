@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
-
-namespace JUSToolkit.Formats
+﻿namespace JUSToolkit.Formats
 {
-    public class BinFilename : Bin
+    using System.Collections.Generic;
+    public class BinQuiz : Bin
     {
         public Queue<int> Offsets { get; } // Offsets where real pointers are
         public Queue<int> Pointers { get; }
-        public Queue<int> FillPointers { get; } // Trash pointers
+
+        public Queue<int> FillPointers { get; }
+
+        public int Uknown { get; set; }
+        public int Uknown2 { get; set; }
         public int FirstPointer { get; set; }
 
-        public BinFilename()
+        public BinQuiz()
         {
             Pointers = new Queue<int>();
             FillPointers = new Queue<int>();

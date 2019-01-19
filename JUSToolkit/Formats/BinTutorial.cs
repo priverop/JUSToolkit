@@ -1,7 +1,5 @@
 ﻿namespace JUSToolkit.Formats
 {
-    using System;
-    using Yarhl.FileFormat;
     using System.Collections.Generic;
 
     public class BinTutorial : Bin

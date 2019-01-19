@@ -30,21 +30,34 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Mono.Addins">
-      <HintPath>lib\Mono.Addins.dll</HintPath>
-    </Reference>
-    <Reference Include="Yarhl">
-      <HintPath>lib\Yarhl.dll</HintPath>
-    </Reference>
-    <Reference Include="Yarhl.Media">
-      <HintPath>lib\Yarhl.Media.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="Texim">
       <HintPath>lib\Texim.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Composition.AttributedModel">
+      <HintPath>packages\System.Composition.AttributedModel.1.2.0\lib\netstandard2.0\System.Composition.AttributedModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Composition.Convention">
+      <HintPath>packages\System.Composition.Convention.1.2.0\lib\netstandard2.0\System.Composition.Convention.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Composition.Runtime">
+      <HintPath>packages\System.Composition.Runtime.1.2.0\lib\netstandard2.0\System.Composition.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Composition.Hosting">
+      <HintPath>packages\System.Composition.Hosting.1.2.0\lib\netstandard2.0\System.Composition.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Composition.TypedParts">
+      <HintPath>packages\System.Composition.TypedParts.1.2.0\lib\netstandard2.0\System.Composition.TypedParts.dll</HintPath>
+    </Reference>
+    <Reference Include="Yarhl">
+      <HintPath>packages\Yarhl.2.0.0-alpha.2\lib\netstandard2.0\Yarhl.dll</HintPath>
+    </Reference>
+    <Reference Include="Yarhl.Media">
+      <HintPath>packages\Yarhl.Media.2.0.0-alpha.2\lib\netstandard2.0\Yarhl.Media.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -56,7 +69,7 @@
     <Compile Include="Converters\Bin\BinaryFormat2BinTutorial.cs" />
     <Compile Include="Converters\Bin\Bin2Po.cs" />
     <Compile Include="Formats\Bin.cs" />
-    <Compile Include="Converters\Bin\BinaryFormat2BinFilename.cs" />
+    <Compile Include="Converters\Bin\Binary2BinFilename.cs" />
     <Compile Include="Converters\Alar\BinaryFormat2Alar2.cs" />
     <Compile Include="Converters\Alar\Alar2ToNodes.cs" />
     <Compile Include="Converters\Alar\BinaryFormat2Alar3.cs" />
@@ -69,6 +82,8 @@
     <Compile Include="Formats\ALAR\ALAR3File.cs" />
     <Compile Include="Formats\ALAR\ALAR2File.cs" />
     <Compile Include="Converters\Alar\Alar3ToNodes.cs" />
+    <Compile Include="Formats\BinQuiz.cs" />
+    <Compile Include="Converters\Bin\Binary2BinQuiz.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
@@ -77,6 +92,9 @@
     <Folder Include="Converters\Alar\" />
     <Folder Include="Converters\Images\" />
     <Folder Include="Formats\ALAR\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
