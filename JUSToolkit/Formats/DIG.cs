@@ -17,6 +17,6 @@
         public byte Unknown { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
-        public uint PaletteStart { get; set; } 
+        public uint PaletteStart { get; set; }
     }
 }

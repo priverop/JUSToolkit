@@ -3,6 +3,7 @@
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Text;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
@@ -13,10 +14,22 @@
         {
             string tempFile = Path.GetTempFileName();
 
-            using (var substream = new DataStream(bf.Stream, 4, bf.Stream.Length - 4))
+            if (mode == "-d")
             {
-                substream.WriteTo(tempFile);
+                using (var substream = new DataStream(bf.Stream, 4, bf.Stream.Length - 4))
+                {
+                    substream.WriteTo(tempFile);
+                }
             }
+            else
+            {
+                using (var substream = new DataStream(bf.Stream, 0, bf.Stream.Length))
+                {
+                    substream.WriteTo(tempFile);
+                }
+            }
+
+
 
             string program = System.IO.Path.GetFullPath(@"..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
 
@@ -39,6 +52,12 @@
 
             DataStream fileStream = new DataStream(tempFile, FileOpenMode.Read);
             DataStream memoryStream = new DataStream();
+            if (mode != "-d")
+            {
+                memoryStream.Seek(0);
+                memoryStream.Write(Encoding.ASCII.GetBytes("DSCP"), 0, 4);
+            }
+
             fileStream.WriteTo(memoryStream);
 
             fileStream.Dispose();

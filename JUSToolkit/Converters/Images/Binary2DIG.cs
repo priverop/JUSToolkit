@@ -92,10 +92,10 @@
                 Height = dig.Height,
             };
 
-            long bytesUntilEnd = reader.Stream.Length - reader.Stream.Position;
+            int bytesUntilEnd = (int) (reader.Stream.Length - reader.Stream.Position);
 
             dig.Pixels.SetData(
-                reader.ReadBytes((int)bytesUntilEnd),
+                reader.ReadBytes(bytesUntilEnd),
                 PixelEncoding.HorizontalTiles,
                 format,
                 new Size(8, 8));
@@ -123,7 +123,13 @@
             writer.Write(dig.Width);
             writer.Write(dig.Height);
 
-            writer.Write(dig.Palette.GetPalette(0).ToBgr555());
+            writer.WriteUntilLength(00, dig.PaletteStart);
+
+            foreach (Color[] c in dig.Palette.GetPalettes())
+            {
+                writer.Write(c.ToBgr555());
+            }
+
             writer.Write(dig.Pixels.GetData());
 
             return binary;

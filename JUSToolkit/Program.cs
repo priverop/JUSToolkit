@@ -15,6 +15,7 @@
     using System.Drawing;
     using Texim.Media.Image.Processing;
     using Texim.Media.Image;
+    using System.Text;
 
     class MainClass
     {
@@ -163,7 +164,6 @@
 
                     DIG originalDig = n.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
 
-
                     // Import the new PNG file
                     Bitmap newImage = (Bitmap)Image.FromFile(dataToInsert);
                     var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
@@ -178,7 +178,6 @@
                     originalDig.Pixels = pixelInfo;
 
                     BinaryFormat b = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
-                    b.Stream.WriteTo(dirToSave + Path.PathSeparator + n.Name + "__.dig");
 
                     //-d.....decodifica un fichero
                     //-evn...codifica un fichero, compatible con VRAM, modo normal
@@ -188,7 +187,10 @@
                     //- evo...codifica un fichero, compatible con VRAM, modo Ûptimo
                     //- ewo...codifica un fichero, compatible con WRAM, modo Ûptimo
 
-                    Utils.Lzss(b, "-evn").Stream.WriteTo(dirToSave + Path.PathSeparator + n.Name + ".dig");
+                    Utils.Lzss(b, "-evn").Stream.WriteTo(dirToSave + Path.PathSeparator + n.Name + "evn.dig");
+
+
+
 
                     break;
             }
