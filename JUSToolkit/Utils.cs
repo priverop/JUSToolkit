@@ -9,18 +9,18 @@
 
     public static class Utils
     {
-        public static Node DecompressLzss(Node node)
+        public static BinaryFormat Lzss(BinaryFormat bf, string mode)
         {
             string tempFile = Path.GetTempFileName();
 
-            using (var substream = new DataStream(node.Stream, 4, node.Stream.Length - 4))
+            using (var substream = new DataStream(bf.Stream, 4, bf.Stream.Length - 4))
             {
                 substream.WriteTo(tempFile);
             }
 
             string program = System.IO.Path.GetFullPath(@"..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
 
-            string arguments = "-d " + tempFile;
+            string arguments = mode + " " + tempFile;
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
             {
                 program = System.IO.Path.GetFullPath(@"../../") + "/lib/NDS_Compressors_CUE/lzss";
@@ -44,7 +44,7 @@
             fileStream.Dispose();
             File.Delete(tempFile);
 
-            return new Node(node.Name, new BinaryFormat(memoryStream));
+            return new BinaryFormat(memoryStream);
         }
 
     }

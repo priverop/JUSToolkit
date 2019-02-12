@@ -12,10 +12,11 @@
 
         public byte[] Magic { get; set; }
         public byte Type { get; set; }
-        public byte Type_alt { get; set; }
-        public byte PaletteNumber { get; set; }
+        public byte PaletteType { get; set; }
+        public byte PaletteSize { get; set; } // PaletteSize * 32 + 12 = First Pixel
         public byte Unknown { get; set; }
-        public ushort Unk { get; set; }
-        public ushort Unk2 { get; set; }
+        public ushort Width { get; set; }
+        public ushort Height { get; set; }
+        public uint PaletteStart { get; set; } 
     }
 }
