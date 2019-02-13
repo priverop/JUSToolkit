@@ -149,7 +149,7 @@
                     Node original = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>();
 
                     // Contenedor con los ficheros a insertar
-                    var newAlar = NodeFactory.FromDirectory(dataToInsert)//*** We should exclude .DS files and thumb
+                    var newAlar = NodeFactory.FromDirectory(dataToInsert, "*.*")//*** We should exclude .DS files and thumb
                         .Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
 
                     // Modificamos el Alar original con los nuevos ficheros a insertar
@@ -179,18 +179,7 @@
 
                     BinaryFormat b = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
 
-                    //-d.....decodifica un fichero
-                    //-evn...codifica un fichero, compatible con VRAM, modo normal
-                    //- ewn...codifica un fichero, compatible con WRAM, modo normal
-                    //- evf...codifica un fichero, compatible con VRAM, modo r·pido(fast)
-                    //- ewf...codifica un fichero, compatible con WRAM, modo r·pido(fast)
-                    //- evo...codifica un fichero, compatible con VRAM, modo Ûptimo
-                    //- ewo...codifica un fichero, compatible con WRAM, modo Ûptimo
-
                     Utils.Lzss(b, "-evn").Stream.WriteTo(dirToSave + Path.PathSeparator + n.Name + "evn.dig");
-
-
-
 
                     break;
             }

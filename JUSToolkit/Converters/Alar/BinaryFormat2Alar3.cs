@@ -38,9 +38,9 @@
                 Array_count = br.ReadUInt32(),
                 EndFileIndex = br.ReadUInt16()
             };
-            aar.FileTableIndex = new ushort[aar.Array_count + 1];
+            aar.FileTableIndex = new ushort[aar.Array_count + 1]; //= Num_files
 
-            for (int i = 0; i < aar.Array_count + 1; i++)
+            for (int i = 0; i < (aar.Array_count + 1); i++)
             {
                 aar.FileTableIndex[i] = br.ReadUInt16();
             }
@@ -99,23 +99,28 @@
                 writer.Write(aar.FileTableIndex[i]);
             }
 
+
+
             foreach (ALAR3File aarFile in aar.AlarFiles)
             {
-                writer.Write(aarFile.FileID);
-                writer.Write(aarFile.Unk3);
-                writer.Write(aarFile.Offset);
-                writer.Write(aarFile.Size);
-                writer.Write(aarFile.Unk4);
-                writer.Write(aarFile.Unk5);
-                writer.Write(aarFile.Unk6);
+                writer.WritePadding(0, 04);
 
-                writer.Write(aarFile.File.Name.Replace("-", "/"));
+                writer.Write(aarFile.FileID); // 2
+                writer.Write(aarFile.Unk3); // 2
+                writer.Write(aarFile.Offset); // 4
+                writer.Write(aarFile.Size); //4
+                writer.Write(aarFile.Unk4); //2
+                writer.Write(aarFile.Unk5); //2
+                writer.Write(aarFile.Unk6); //2
+
+                writer.Write(aarFile.File.Name.Replace("-", "/"), true);
 
             }
 
             // Primero Cabeceras y luego ficheros
             foreach (ALAR3File aarFile in aar.AlarFiles)
             {
+                writer.WritePadding(0, 04);
                 aarFile.File.Stream.WriteTo(writer.Stream);
             }
 

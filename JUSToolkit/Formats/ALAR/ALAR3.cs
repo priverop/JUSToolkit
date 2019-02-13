@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Yarhl.FileFormat;
+    using Yarhl.FileSystem;
 
     public class ALAR3 : Format
     {
@@ -22,16 +23,18 @@
 
         public void InsertModification(ALAR3 newAlar)
         {
-            for (int i = 0; i < AlarFiles.Count; i++)
+            foreach (ALAR3File newFile in newAlar.AlarFiles)
             {
-                foreach (ALAR3File n in newAlar.AlarFiles)
-                {
-                    if (n.File.Name == AlarFiles[i].File.Name)
+                for (int i = 0; i < AlarFiles.Count; i++) {
+                    if (AlarFiles[i].File.Name == newFile.File.Name)
                     {
-                        AlarFiles[i] = n;
+                        Node newNode = new Node(newFile.File.Name, new BinaryFormat(newFile.File.Stream));
+                        AlarFiles[i].File = newNode;
+                        AlarFiles[i].Size = (uint)newNode.Stream.Length;
                     }
                 }
             }
+            
         }
 
     }
