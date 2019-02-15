@@ -96,10 +96,15 @@
 
                 case FORMATPREFIX + "BinQuiz":
 
-                    n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()
-                    .Transform<Bin2Po, BinQuiz, Po>()
-                    .Transform<Po2Binary, Po, BinaryFormat>()
-                    .Stream.WriteTo(outputPath + Path.PathSeparator + n.Name + ".po");
+                    var quizs = n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()
+                    .Transform<Quiz2Po, BinQuiz, NodeContainerFormat>();
+
+                    foreach (Node po in quizs.Children) {
+                        string outputFile = Path.Combine(outputPath, po.Name + ".po");
+                        log.Info("Saving " + outputFile);
+                        po.Transform<Po2Binary, Po, BinaryFormat>()
+                        .Stream.WriteTo(outputFile);
+                    }
 
                     break;
 

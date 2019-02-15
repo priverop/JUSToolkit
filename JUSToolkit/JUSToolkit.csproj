@@ -84,6 +84,7 @@
     <Compile Include="Converters\Alar\Alar3ToNodes.cs" />
     <Compile Include="Formats\BinQuiz.cs" />
     <Compile Include="Converters\Bin\Binary2BinQuiz.cs" />
+    <Compile Include="Converters\Bin\Quiz2Po.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
