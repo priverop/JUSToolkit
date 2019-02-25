@@ -46,36 +46,75 @@
                     dataToInsert = args[3];
                 }
 
-                Identify i = new Identify();
-
-                log.Info("Identifying file " + inputFileName);
-
-                Node n = NodeFactory.FromFile(inputFileName);
-
-                Format inputFormat = i.GetFormat(n);
-
-                // Compressed file
-                if(inputFormat.ToString() == FORMATPREFIX + "DSCP"){
-                    BinaryFormat binary = Utils.Lzss(new BinaryFormat(n.Stream), "-d");
-                    n = new Node(n.Name, binary);
-                    inputFormat = i.GetFormat(n);
+                if (inputFileName == ".")
+                {
+                    ProcessDir(type, dirToSave, dataToInsert);
                 }
-
-                log.Info("Format detected: " + inputFormat.ToString());
-
-                switch(type)
-                {// inputFilename - dirtosave - (dir/file to insert)
-                    case "-e":
-                        Export(inputFormat.ToString(), n, dirToSave);
-                    break;
-
-                    case "-i":
-                        Import(inputFormat.ToString(), n, dirToSave, dataToInsert);
-                    break;
+                else
+                {
+                    ProcessFile(type, inputFileName, dirToSave, dataToInsert);
                 }
 
                 log.Info("Program completed.");
 
+            }
+        }
+
+        private static void ProcessDir(string type, string dirToSave, string dataToInsert)
+        {
+            switch (type)
+            {
+                case "-exportdtx":
+
+                    Node dtx = NodeFactory.FromDirectory(dataToInsert, "*.dtx");
+                    Node arm = NodeFactory.FromFile(Path.Combine(dataToInsert, "arm9.bin"));
+                    Node koma = NodeFactory.FromFile(Path.Combine(dataToInsert, "koma.bin"));
+                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "komashape.bin"));
+
+                    BinaryDTX2PNG converter = new BinaryDTX2PNG
+                    {
+                        Arm = arm,
+                        Koma = koma,
+                        Komashape = komashape
+                    };
+
+                    dtx.Transform<NodeContainerFormat, NodeContainerFormat>(converter);
+
+                    SaveToDir(dtx, dirToSave);
+
+                    break;
+            }
+        }
+
+        private static void ProcessFile(string type, string inputFileName, string dirToSave, string dataToInsert)
+        {
+            Identify i = new Identify();
+
+            log.Info("Identifying file " + inputFileName);
+
+            Node n = NodeFactory.FromFile(inputFileName);
+
+            Format inputFormat = i.GetFormat(n);
+
+            // Compressed file
+            if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
+            {
+                BinaryFormat binary = Utils.Lzss(new BinaryFormat(n.Stream), "-d");
+                n = new Node(n.Name, binary);
+                inputFormat = i.GetFormat(n);
+            }
+
+            log.Info("Format detected: " + inputFormat.ToString());
+
+            switch (type)
+            {// inputFilename - dirtosave - (dir/file to insert)
+                case "-e":
+                    Export(inputFormat.ToString(), n, dirToSave);
+                    break;
+
+                case "-i":
+                    Import(inputFormat.ToString(), n, dirToSave, dataToInsert);
+                    break;
             }
         }
 
