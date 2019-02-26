@@ -15,7 +15,8 @@
     using System.Drawing;
     using Texim.Media.Image.Processing;
     using Texim.Media.Image;
-    using System.Text;
+    using System.Collections.Generic;
+    using Yarhl.IO;
 
     class MainClass
     {
@@ -69,13 +70,14 @@
                     Node dtx = NodeFactory.FromDirectory(dataToInsert, "*.dtx");
                     Node arm = NodeFactory.FromFile(Path.Combine(dataToInsert, "arm9.bin"));
                     Node koma = NodeFactory.FromFile(Path.Combine(dataToInsert, "koma.bin"));
-                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "komashape.bin"));
+                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "kshape.bin"));
 
                     BinaryDTX2PNG converter = new BinaryDTX2PNG
                     {
                         Arm = arm,
                         Koma = koma,
-                        Komashape = komashape
+                        Komashape = komashape,
+                        Directory = dataToInsert
                     };
 
                     dtx.Transform<NodeContainerFormat, NodeContainerFormat>(converter);

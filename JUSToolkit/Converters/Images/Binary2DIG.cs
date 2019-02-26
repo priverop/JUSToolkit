@@ -34,6 +34,7 @@
             };
 
             long paletteEnd = dig.PaletteSize * 32 + reader.Stream.Position;
+            dig.PixelsStart = (uint)paletteEnd; // *** 
             log.Debug("Palette End: " + paletteEnd);
 
             long startPalette = reader.Stream.Position;
@@ -41,7 +42,6 @@
             int returningBytes = 8;
 
             // Si hay bytes vacios antes de empezar la paleta
-            //*** Revisar
             if(reader.ReadInt32() == 0)
             {
                 while (reader.ReadInt32() == 0) { }
