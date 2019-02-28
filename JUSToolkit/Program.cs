@@ -46,36 +46,65 @@
                     dataToInsert = args[3];
                 }
 
-                Identify i = new Identify();
-
-                log.Info("Identifying file " + inputFileName);
-
-                Node n = NodeFactory.FromFile(inputFileName);
-
-                Format inputFormat = i.GetFormat(n);
-
-                // Compressed file
-                if(inputFormat.ToString() == FORMATPREFIX + "DSCP"){
-                    BinaryFormat binary = Utils.Lzss(new BinaryFormat(n.Stream), "-d");
-                    n = new Node(n.Name, binary);
-                    inputFormat = i.GetFormat(n);
+                if (inputFileName == ".")
+                {
+                    ProcessDir(type, dirToSave, dataToInsert);
                 }
+                else
+                {
+                    log.Info("Identifying file " + inputFileName);
 
-                log.Info("Format detected: " + inputFormat.ToString());
-
-                switch(type)
-                {// inputFilename - dirtosave - (dir/file to insert)
-                    case "-e":
-                        Export(inputFormat.ToString(), n, dirToSave);
-                    break;
-
-                    case "-i":
-                        Import(inputFormat.ToString(), n, dirToSave, dataToInsert);
-                    break;
+                    Node n = NodeFactory.FromFile(inputFileName);
+                    ProcessFile(type, n, dirToSave, dataToInsert);
                 }
 
                 log.Info("Program completed.");
 
+            }
+        }
+
+        private static void ProcessDir(string type, string dirToSave, string dataToInsert)
+        {
+            switch (type)
+            {
+                case "-exportdig":
+
+                    Node digContainer = NodeFactory.FromDirectory(dataToInsert, "*.dig");
+
+                    foreach (Node n in digContainer.Children) 
+                    {
+                        ProcessFile("-e", n, dirToSave, dataToInsert);
+                    }
+
+                    break;
+            }
+        }
+
+        private static void ProcessFile(string type, Node n, string dirToSave, string dataToInsert)
+        {
+            Identify i = new Identify();
+
+            Format inputFormat = i.GetFormat(n);
+
+            // Compressed file
+            if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
+            {
+                BinaryFormat binary = Utils.Lzss(new BinaryFormat(n.Stream), "-d");
+                n = new Node(n.Name, binary);
+                inputFormat = i.GetFormat(n);
+            }
+
+            log.Info("Format detected: " + inputFormat.ToString());
+
+            switch (type)
+            {// inputFilename - dirtosave - (dir/file to insert)
+                case "-e":
+                    Export(inputFormat.ToString(), n, dirToSave);
+                    break;
+
+                case "-i":
+                    Import(inputFormat.ToString(), n, dirToSave, dataToInsert);
+                    break;
             }
         }
 
@@ -132,7 +161,7 @@
 
                     var img = dig.Pixels.CreateBitmap(dig.Palette, 0);
 
-                    img.Save(n.Name + ".png");
+                    img.Save(Path.Combine(outputPath, n.Name + ".png"));
 
                     break;
 
