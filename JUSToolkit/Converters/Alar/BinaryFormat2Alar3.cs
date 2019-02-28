@@ -99,7 +99,8 @@
                 writer.Write(aar.FileTableIndex[i]);
             }
 
-
+            long[] offsetPositions = new long[aar.AlarFiles.Count];
+            int[] paddings = new int[aar.AlarFiles.Count];
 
             foreach (ALAR3File aarFile in aar.AlarFiles)
             {
@@ -107,6 +108,8 @@
 
                 writer.Write(aarFile.FileID); // 2
                 writer.Write(aarFile.Unk3); // 2
+                offsetPositions[aarFile.FileID] = writer.Stream.Position;
+                log.Debug("Offset: "+ writer.Stream.Position.ToString("X"));
                 writer.Write(aarFile.Offset); // 4
                 writer.Write(aarFile.Size); //4
                 writer.Write(aarFile.Unk4); //2
@@ -117,13 +120,44 @@
 
             }
 
+            writer.WritePadding(0, 04);
+
             // Primero Cabeceras y luego ficheros
             foreach (ALAR3File aarFile in aar.AlarFiles)
             {
-                writer.WritePadding(0, 04);
+                if (aarFile.FileID != 0)
+                {
+                    long initPadding = writer.Stream.Position;
+                    writer.WritePadding(0, 04);
+                    long endPadding = writer.Stream.Position;
+                    int paddingSize = (int)(endPadding - initPadding);
+
+                    paddings[aarFile.FileID] = paddingSize;
+                }
+
                 aarFile.File.Stream.WriteTo(writer.Stream);
+
             }
 
+            // Ajustamos offsets
+
+            int newOffset = 0;
+            foreach (ALAR3File aarFile in aar.AlarFiles)
+            {
+
+                if (aarFile.FileID == 0)
+                {
+                    newOffset = (int)aarFile.Offset;
+                }
+                if (aarFile.FileID != aar.AlarFiles.Count -1)
+                {
+                    newOffset += (int)(aarFile.Size + paddings[aarFile.FileID+1]);
+                    writer.Stream.RunInPosition(
+                        () => writer.Write(newOffset),
+                    offsetPositions[aarFile.FileID + 1]);
+                    log.Debug("Written " + newOffset.ToString("X") + " at " + offsetPositions[aarFile.FileID + 1].ToString("X"));
+                }
+            }
             return binary;
         }
     }

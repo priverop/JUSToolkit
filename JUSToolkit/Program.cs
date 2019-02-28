@@ -90,7 +90,7 @@
                     n.Transform<BinaryFormat2BinTutorial, BinaryFormat, BinTutorial>()
                     .Transform<Bin2Po, BinTutorial, Po>()
                     .Transform<Po2Binary, Po, BinaryFormat>()
-                    .Stream.WriteTo(outputPath + Path.PathSeparator + n.Name + ".po");
+                    .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
 
                     break;
 
@@ -154,14 +154,14 @@
                     Node original = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>();
 
                     // Contenedor con los ficheros a insertar
-                    var newAlar = NodeFactory.FromDirectory(dataToInsert, "*.*")//*** We should exclude .DS files and thumb
+                    var newAlar = NodeFactory.FromDirectory(dataToInsert, "*.*")
                         .Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
 
                     // Modificamos el Alar original con los nuevos ficheros a insertar
                     original.GetFormatAs<ALAR3>().InsertModification(newAlar.GetFormatAs<ALAR3>()); 
 
                     original.Transform<BinaryFormat2Alar3, ALAR3, BinaryFormat>()
-                        .Stream.WriteTo(dirToSave + Path.PathSeparator + n.Name + ".aar");
+                        .Stream.WriteTo(Path.Combine(dirToSave, n.Name + "new.aar"));
 
                 break;
 
@@ -184,7 +184,7 @@
 
                     BinaryFormat b = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
 
-                    Utils.Lzss(b, "-evn").Stream.WriteTo(dirToSave + Path.PathSeparator + n.Name + "evn.dig");
+                    Utils.Lzss(b, "-evn").Stream.WriteTo(Path.Combine(dirToSave, n.Name + "evn.dig"));
 
                     break;
             }

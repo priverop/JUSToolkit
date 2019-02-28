@@ -1,5 +1,6 @@
 ﻿namespace JUSToolkit.Formats.ALAR
 {
+    using System;
     using System.Collections.Generic;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
@@ -23,18 +24,31 @@
 
         public void InsertModification(ALAR3 newAlar)
         {
+
             foreach (ALAR3File newFile in newAlar.AlarFiles)
             {
+                uint newOffset = 0;
                 for (int i = 0; i < AlarFiles.Count; i++) {
+                    if (newOffset > 0)
+                    {
+                        AlarFiles[i].Offset = newOffset;
+                        newOffset = GetNewOffset(i);
+                    }
                     if (AlarFiles[i].File.Name == newFile.File.Name)
                     {
                         Node newNode = new Node(newFile.File.Name, new BinaryFormat(newFile.File.Stream));
                         AlarFiles[i].File = newNode;
                         AlarFiles[i].Size = (uint)newNode.Stream.Length;
+                       
+                        newOffset = GetNewOffset(i);
                     }
                 }
             }
-            
+        }
+
+        private uint GetNewOffset(int i)
+        {
+            return AlarFiles[i].Offset + AlarFiles[i].Size;
         }
 
     }
