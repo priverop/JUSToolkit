@@ -4,7 +4,7 @@
     using Yarhl.FileFormat;
     using JUSToolkit.Formats;
     using Yarhl.IO;
-    using Texim.Media.Image;
+    using Texim;
     using System.Drawing;
     using log4net;
 
@@ -13,6 +13,7 @@
     IConverter<DIG, BinaryFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
+        public bool IgnoreFirstTile { get; set; } = false;
 
         public DIG Convert(BinaryFormat source)
         {
@@ -35,7 +36,6 @@
 
             long paletteEnd = dig.PaletteSize * 32 + reader.Stream.Position;
 
-
             long startPalette = reader.Stream.Position;
 
             int returningBytes = 8;
@@ -55,7 +55,6 @@
             dig.PaletteStart = (uint) startPalette;
 
             long paletteActualSize = paletteEnd - dig.PaletteStart;
-
 
             reader.Stream.Position = dig.PaletteStart;
 
@@ -90,6 +89,11 @@
                 Width = dig.Width,
                 Height = dig.Height,
             };
+
+            if (IgnoreFirstTile) {
+                reader.Stream.Position += 32;
+            }
+
 
             int bytesUntilEnd = (int) (reader.Stream.Length - reader.Stream.Position);
 

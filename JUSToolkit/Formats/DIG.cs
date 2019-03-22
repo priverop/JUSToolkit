@@ -2,7 +2,7 @@
 {
     using System;
     using Yarhl.FileFormat;
-    using Texim.Media.Image;
+    using Texim;
 
     public class DIG : Format
     {

@@ -13,8 +13,8 @@
     using System.IO;
     using JUSToolkit.Formats.ALAR;
     using System.Drawing;
-    using Texim.Media.Image.Processing;
-    using Texim.Media.Image;
+    using Texim.Processing;
+    using Texim;
     using System.Text;
 
     class MainClass
@@ -62,7 +62,7 @@
 
             }
         }
-
+       
         private static void ProcessDir(string type, string dirToSave, string dataToInsert)
         {
             switch (type)
@@ -70,12 +70,27 @@
                 case "-exportdig":
 
                     Node digContainer = NodeFactory.FromDirectory(dataToInsert, "*.dig");
+                    Node almtContainer = NodeFactory.FromDirectory(dataToInsert, "*.atm");
 
-                    foreach (Node n in digContainer.Children) 
+                    foreach (Node d in digContainer.Children)
                     {
-                        ProcessFile("-e", n, dirToSave, dataToInsert);
-                    }
+                        Identify i = new Identify();
+                        Format inputFormat = i.GetFormat(d);
+                        Node dig = d;
 
+                        // Compressed file
+                        if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
+                        {
+                            BinaryFormat binary = Utils.Lzss(new BinaryFormat(dig.Stream), "-d");
+                            dig = new Node(dig.Name, binary);
+                        }
+
+                        Node atm = almtContainer.Children[Path.GetFileNameWithoutExtension(dig.Name) + ".atm"];
+                        if (atm != null) {
+                            ExportDig(dig, atm, dirToSave);
+                        }
+                    }
+                    log.Info("Finished exporting");
                     break;
             }
         }
@@ -106,6 +121,25 @@
                     Import(inputFormat.ToString(), n, dirToSave, dataToInsert);
                     break;
             }
+        }
+
+        private static void ExportDig(Node nDIG, Node nATM, string outputPath)
+        {
+            log.Info("Exporting "+ nDIG.Name);
+
+            Binary2DIG converterDig = new Binary2DIG();
+            converterDig.IgnoreFirstTile = false;
+
+            DIG dig = nDIG.Transform<BinaryFormat, DIG>(converterDig).GetFormatAs<DIG>();
+
+            ALMT atm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
+
+            Bitmap img = atm.CreateBitmap(dig.Pixels,dig.Palette);
+
+            string path = Path.Combine(outputPath, nDIG.Name + ".png");
+            img.Save(path);
+
+            log.Info("Saved into "+path);
         }
 
         private static void Export(string format, Node n, string outputPath){
@@ -155,16 +189,6 @@
 
                     break;
 
-                case FORMATPREFIX + "DIG":
-
-                    DIG dig = n.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
-
-                    var img = dig.Pixels.CreateBitmap(dig.Palette, 0);
-
-                    img.Save(Path.Combine(outputPath, n.Name + ".png"));
-
-                    break;
-
             }
 
             log.Info("Finished exporting");
@@ -201,7 +225,7 @@
                     // Import the new PNG file
                     Bitmap newImage = (Bitmap)Image.FromFile(dataToInsert);
                     var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
-                    Texim.Media.Image.ImageConverter importer = new Texim.Media.Image.ImageConverter {
+                    Texim.ImageConverter importer = new Texim.ImageConverter {
                         Format = ColorFormat.Indexed_4bpp,
                         PixelEncoding = PixelEncoding.HorizontalTiles,
                         Quantization = quantization

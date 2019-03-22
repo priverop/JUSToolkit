@@ -85,6 +85,8 @@
     <Compile Include="Formats\BinQuiz.cs" />
     <Compile Include="Converters\Bin\Binary2BinQuiz.cs" />
     <Compile Include="Converters\Bin\Quiz2Po.cs" />
+    <Compile Include="Formats\ALMT.cs" />
+    <Compile Include="Converters\Images\Binary2ALMT.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
