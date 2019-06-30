@@ -13,7 +13,6 @@
     IConverter<DIG, BinaryFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
-        public bool IgnoreFirstTile { get; set; } = false;
 
         public DIG Convert(BinaryFormat source)
         {
@@ -38,15 +37,11 @@
 
             long startPalette = reader.Stream.Position;
 
-            int returningBytes = 8;
-
             // Si hay bytes vacios antes de empezar la paleta
-            //*** Revisar
             if(reader.ReadInt32() == 0)
             {
                 while (reader.ReadInt32() == 0) { }
                 startPalette = reader.Stream.Position - 4;
-                returningBytes += 4;
             }
             else{
                 reader.Stream.Position = startPalette;
@@ -89,11 +84,6 @@
                 Width = dig.Width,
                 Height = dig.Height,
             };
-
-            if (IgnoreFirstTile) {
-                reader.Stream.Position += 32;
-            }
-
 
             int bytesUntilEnd = (int) (reader.Stream.Length - reader.Stream.Position);
 

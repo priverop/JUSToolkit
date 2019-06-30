@@ -46,7 +46,7 @@
                     dataToInsert = args[3];
                 }
 
-                if (inputFileName == ".")
+                if (inputFileName == "dir")
                 {
                     ProcessDir(type, dirToSave, dataToInsert);
                 }
@@ -63,37 +63,59 @@
             }
         }
        
-        private static void ProcessDir(string type, string dirToSave, string dataToInsert)
+        private static void ProcessDir(string type, string dirToSave, string inputDir)
         {
+            log.Info("Processing Dir");
             switch (type)
             {
                 case "-exportdig":
-
-                    Node digContainer = NodeFactory.FromDirectory(dataToInsert, "*.dig");
-                    Node almtContainer = NodeFactory.FromDirectory(dataToInsert, "*.atm");
-
-                    foreach (Node d in digContainer.Children)
-                    {
-                        Identify i = new Identify();
-                        Format inputFormat = i.GetFormat(d);
-                        Node dig = d;
-
-                        // Compressed file
-                        if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
-                        {
-                            BinaryFormat binary = Utils.Lzss(new BinaryFormat(dig.Stream), "-d");
-                            dig = new Node(dig.Name, binary);
-                        }
-
-                        Node atm = almtContainer.Children[Path.GetFileNameWithoutExtension(dig.Name) + ".atm"];
-                        if (atm != null) {
-                            ExportDig(dig, atm, dirToSave);
-                        }
-                    }
-                    log.Info("Finished exporting");
+                case "-importdig":
+                    ProcessDig(type, dirToSave, inputDir);
                     break;
             }
         }
+
+        private static void ProcessDig(string type, string outputFolder, string inputFolder) 
+        {
+
+            foreach (Node d in NodeFactory.FromDirectory(inputFolder, "*.dig").Children)
+            {
+                Identify i = new Identify();
+                Format inputFormat = i.GetFormat(d);
+                Node dig = d;
+
+                // Compressed file
+                if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
+                {
+                    BinaryFormat binary = Utils.Lzss(new BinaryFormat(dig.Stream), "-d");
+                    dig = new Node(dig.Name, binary);
+                }
+
+                Node atm = NodeFactory.FromDirectory(inputFolder, "*.atm")
+                    .Children[Path.GetFileNameWithoutExtension(dig.Name) + ".atm"];
+
+                if (atm == null)
+                {
+                    throw new Exception("ATM not found: "+ 
+                        Path.GetFileNameWithoutExtension(dig.Name) + ".atm"); 
+                }
+                if (type == "-exportdig")
+                {
+                    ExportDig(dig, atm, outputFolder);
+                }
+                else
+                {
+                    Node png = NodeFactory.FromDirectory(inputFolder, "*.png")
+                        .Children[Path.GetFileNameWithoutExtension(dig.Name) + ".png"];
+                    if (png != null) 
+                    {
+                        ImportDig(dig, atm, png, outputFolder);
+                    }
+
+                }
+            }
+        }
+
 
         private static void ProcessFile(string type, Node n, string dirToSave, string dataToInsert)
         {
@@ -123,14 +145,42 @@
             }
         }
 
+        private static void ImportDig(Node nDIG, Node nATM, Node nPNG, string outputPath)
+        {
+            log.Info("Importing " + nDIG.Name + ", " + nATM.Name + " and " + nPNG.Name);
+
+            DIG originalDig = nDIG.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
+            ALMT originalAtm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
+
+            // Import the new PNG file
+            Bitmap newImage = (Bitmap)Image.FromStream(nPNG.Stream.BaseStream);
+
+            var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
+            Texim.ImageMapConverter importer = new Texim.ImageMapConverter
+            {
+                Format = ColorFormat.Indexed_4bpp,
+                PixelEncoding = PixelEncoding.HorizontalTiles,
+                Quantization = quantization,
+                //Mapable = new MatchMapping(originalDig.Pixels.GetPixels())
+            };
+
+            (Palette _, PixelArray pixelInfo, MapInfo[] mapInfos) = importer.Convert(newImage);
+
+            originalDig.Pixels = pixelInfo;
+            originalAtm.Info = mapInfos;
+
+            BinaryFormat bDig = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
+            BinaryFormat bAtm = originalAtm.ConvertWith<Binary2ALMT, ALMT, BinaryFormat>();
+
+            Utils.Lzss(bDig, "-evn").Stream.WriteTo(Path.Combine(outputPath, nDIG.Name + ".evn.dig"));
+            bAtm.Stream.WriteTo(Path.Combine(outputPath, nATM.Name + ".atm"));
+        }
+
         private static void ExportDig(Node nDIG, Node nATM, string outputPath)
         {
             log.Info("Exporting "+ nDIG.Name);
 
-            Binary2DIG converterDig = new Binary2DIG();
-            converterDig.IgnoreFirstTile = false;
-
-            DIG dig = nDIG.Transform<BinaryFormat, DIG>(converterDig).GetFormatAs<DIG>();
+            DIG dig = nDIG.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
 
             ALMT atm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
 
@@ -247,8 +297,10 @@
         private static void ShowUsage()
         {
             log.Info("Usage: JUSToolkit.exe -e <fileToExtract> <dirToSave>");
-            log.Info("Usage: JUSToolkit.exe -iDir <inputFileName> <dirToSave> <dirWithFilesToInsert>");
             log.Info("Usage: JUSToolkit.exe -i <inputFileName> <dirToSave> <fileToInsert>");
+            // -i alar/demo.aar . alar/insertDemo
+            log.Info("Usage: JUSToolkit.exe -importdig dir <dirToSave> <dirWithFilesToInsert>");
+            //-importdig dir comic/import/new comic/import
         }
 
         private static void ShowCredits()

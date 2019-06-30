@@ -4,6 +4,24 @@
     public class ALMT : Map
     {
 
+        public uint Magic
+        {
+            get;
+            set;
+        }
+
+        public uint Unknown
+        {
+            get;
+            set;
+        }
+
+        public uint Unknown2
+        {
+            get;
+            set;
+        }
+
         public ushort TileSizeW
         {
             get;
@@ -28,7 +46,7 @@
             set;
         }
 
-        public uint Unknown
+        public uint Unknown3
         {
             get;
             set;

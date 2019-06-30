@@ -6,7 +6,9 @@
     using Yarhl.FileFormat;
     using Yarhl.IO;
 
-    public class Binary2ALMT : IConverter<BinaryFormat, ALMT>
+    public class Binary2ALMT : 
+        IConverter<BinaryFormat, ALMT>,
+        IConverter<ALMT, BinaryFormat>
     {
 
         public ALMT Convert(BinaryFormat source)
@@ -15,7 +17,10 @@
 
             DataReader reader = new DataReader(source.Stream);
 
-            reader.Stream.Position = 0xC;
+            almt.Magic = reader.ReadUInt32();
+
+            almt.Unknown = reader.ReadUInt32();
+            almt.Unknown2 = reader.ReadUInt32();
 
             almt.TileSizeW = reader.ReadUInt16();
             almt.TileSizeH = reader.ReadUInt16();
@@ -23,7 +28,7 @@
             almt.NumTileW = reader.ReadUInt16();
             almt.NumTileH = reader.ReadUInt16();
 
-            almt.Unknown = reader.ReadUInt32();
+            almt.Unknown3 = reader.ReadUInt32();
 
             almt.TileSize = new System.Drawing.Size(almt.TileSizeW, almt.TileSizeH);
 
@@ -48,6 +53,31 @@
 
             return almt;
 
+        }
+
+        public BinaryFormat Convert(ALMT source)
+        {
+            var b = new BinaryFormat();
+
+            DataWriter writer = new DataWriter(b.Stream);
+
+            writer.Write(source.Magic);
+            writer.Write(source.Unknown);
+            writer.Write(source.Unknown2);
+            writer.Write(source.TileSizeW);
+            writer.Write(source.TileSizeH);
+            writer.Write(source.NumTileW);
+            writer.Write(source.NumTileH);
+            writer.Write(source.Unknown3);
+            foreach (MapInfo info in source.Info)
+            {
+                if (source.BgMode == BgMode.Affine)
+                    writer.Write(info.ToByte());
+                else
+                    writer.Write(info.ToUInt16());
+            }
+
+            return b;
         }
     }
 }

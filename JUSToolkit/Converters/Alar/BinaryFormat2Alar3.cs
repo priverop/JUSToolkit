@@ -109,7 +109,6 @@
                 writer.Write(aarFile.FileID); // 2
                 writer.Write(aarFile.Unk3); // 2
                 offsetPositions[aarFile.FileID] = writer.Stream.Position;
-                log.Debug("Offset: "+ writer.Stream.Position.ToString("X"));
                 writer.Write(aarFile.Offset); // 4
                 writer.Write(aarFile.Size); //4
                 writer.Write(aarFile.Unk4); //2
@@ -155,7 +154,6 @@
                     writer.Stream.RunInPosition(
                         () => writer.Write(newOffset),
                     offsetPositions[aarFile.FileID + 1]);
-                    log.Debug("Written " + newOffset.ToString("X") + " at " + offsetPositions[aarFile.FileID + 1].ToString("X"));
                 }
             }
             return binary;
