@@ -42,7 +42,7 @@
 
                 // inputFilename - dirtosave - (dir/file to insert)
 
-                if (args[0] != "-e"){
+                if (type != "-e"){
                     dataToInsert = args[3];
                 }
 
@@ -63,14 +63,14 @@
             }
         }
        
-        private static void ProcessDir(string type, string dirToSave, string inputDir)
+        private static void ProcessDir(string type, string outputFolder, string inputFolder)
         {
             log.Info("Processing Dir");
             switch (type)
             {
                 case "-exportdig":
                 case "-importdig":
-                    ProcessDig(type, dirToSave, inputDir);
+                    ProcessDig(type, outputFolder, inputFolder);
                     break;
             }
         }
@@ -156,9 +156,19 @@
             Bitmap newImage = (Bitmap)Image.FromStream(nPNG.Stream.BaseStream);
 
             var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
+            ColorFormat format;
+            if (originalDig.PaletteType == 16)
+            {
+                format = ColorFormat.Indexed_4bpp;
+            }
+            else
+            {
+                format = ColorFormat.Indexed_8bpp;
+            }
+
             Texim.ImageMapConverter importer = new Texim.ImageMapConverter
             {
-                Format = ColorFormat.Indexed_4bpp,
+                Format = format,
                 PixelEncoding = PixelEncoding.HorizontalTiles,
                 Quantization = quantization,
                 //Mapable = new MatchMapping(originalDig.Pixels.GetPixels())
@@ -298,9 +308,8 @@
         {
             log.Info("Usage: JUSToolkit.exe -e <fileToExtract> <dirToSave>");
             log.Info("Usage: JUSToolkit.exe -i <inputFileName> <dirToSave> <fileToInsert>");
-            // -i alar/demo.aar . alar/insertDemo
             log.Info("Usage: JUSToolkit.exe -importdig dir <dirToSave> <dirWithFilesToInsert>");
-            //-importdig dir comic/import/new comic/import
+            log.Info("Usage: JUSToolkit.exe -exportdig dir <dirToSave> <dirWithFilesToInsert>");
         }
 
         private static void ShowCredits()
