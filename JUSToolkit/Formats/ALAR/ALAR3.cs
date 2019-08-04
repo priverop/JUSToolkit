@@ -2,11 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using log4net;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
 
     public class ALAR3 : Format
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
+
         public char[] Header { get; set; }
         public byte Type { get; set; }
         public byte Unk { get; set; }
@@ -15,12 +18,7 @@
         public uint Array_count { get; set; }
         public ushort EndFileIndex { get; set; }
         public ushort[] FileTableIndex { get; set; }
-        public List<ALAR3File> AlarFiles { get; set; }
-
-        public ALAR3()
-        {
-            AlarFiles = new List<ALAR3File>();
-        }
+        public NodeContainerFormat AlarFiles { get; set; }
 
         public void InsertModification(ALAR3 newAlar)
         {
@@ -36,6 +34,7 @@
                     }
                     if (AlarFiles[i].File.Name == newFile.File.Name)
                     {
+                        log.Debug("Overriding "+ newFile.File.Name);
                         Node newNode = new Node(newFile.File.Name, new BinaryFormat(newFile.File.Stream));
                         AlarFiles[i].File = newNode;
                         AlarFiles[i].Size = (uint)newNode.Stream.Length;

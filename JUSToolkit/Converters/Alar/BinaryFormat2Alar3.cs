@@ -63,6 +63,9 @@
 
                 DataStream fileStream = new DataStream(input.Stream, aarFile.Offset, aarFile.Size);
 
+                // ToDo:
+                // Example database/comic/db.atm
+                // Create directories if has them
                 string filename = br.ReadString().Replace("/", "-");
 
                 aarFile.File = new Node(filename, new BinaryFormat(fileStream));
