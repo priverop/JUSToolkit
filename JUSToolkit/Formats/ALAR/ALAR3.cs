@@ -20,34 +20,42 @@
         public ushort[] FileTableIndex { get; set; }
         public NodeContainerFormat AlarFiles { get; set; }
 
-        public void InsertModification(ALAR3 newAlar)
+        public ALAR3()
         {
-
-            foreach (ALAR3File newFile in newAlar.AlarFiles)
-            {
-                uint newOffset = 0;
-                for (int i = 0; i < AlarFiles.Count; i++) {
-                    if (newOffset > 0)
-                    {
-                        AlarFiles[i].Offset = newOffset;
-                        newOffset = GetNewOffset(i);
-                    }
-                    if (AlarFiles[i].File.Name == newFile.File.Name)
-                    {
-                        log.Debug("Overriding "+ newFile.File.Name);
-                        Node newNode = new Node(newFile.File.Name, new BinaryFormat(newFile.File.Stream));
-                        AlarFiles[i].File = newNode;
-                        AlarFiles[i].Size = (uint)newNode.Stream.Length;
-                       
-                        newOffset = GetNewOffset(i);
-                    }
-                }
-            }
+            AlarFiles = new NodeContainerFormat();
         }
 
-        private uint GetNewOffset(int i)
+        public void InsertModification(Node filesToInsert)
         {
-            return AlarFiles[i].Offset + AlarFiles[i].Size;
+
+            foreach (Node nNew in filesToInsert.Children)
+            {
+                uint newOffset = 0;
+                foreach (Node n in Navigator.IterateNodes(AlarFiles.Root)) {
+
+                    if (!n.IsContainer)
+                    {
+                        ALAR3File alarFile = n.GetFormatAs<ALAR3File>();
+
+                        if (newOffset > 0)
+                        {
+                            alarFile.Offset = newOffset;
+                            newOffset = alarFile.Offset + alarFile.Size;
+                        }
+                        if (n.Name == nNew.Name)
+                        {
+                            log.Debug("Overriding " + nNew.Name);
+                            Node newNode = new Node(nNew.Name, new ALAR3File(nNew.Stream));
+
+                            //***AlarFiles.Children[AlarFiles.Children.IndexOf(n)] = newNode;
+                            n.GetFormatAs<ALAR3File>().Size = (uint)newNode.Stream.Length;
+
+                            newOffset = alarFile.Offset + alarFile.Size;
+                        }
+                    }
+                    
+                }
+            }
         }
 
     }

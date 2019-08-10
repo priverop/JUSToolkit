@@ -267,11 +267,15 @@
                     Node original = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>();
 
                     // Contenedor con los ficheros a insertar
-                    var newAlar = NodeFactory.FromDirectory(dataToInsert, "*.*")
-                        .Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
+                    Node newContainer = NodeFactory.FromDirectory(dataToInsert, "*.*");
+                    foreach (var child in newContainer.Children)
+                    {
+                        log.Info("Importing " + child.Name);
+                    }
+                    //var newAlar = newContainer.Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
 
                     // Modificamos el Alar original con los nuevos ficheros a insertar
-                    original.GetFormatAs<ALAR3>().InsertModification(newAlar.GetFormatAs<ALAR3>()); 
+                    original.GetFormatAs<ALAR3>().InsertModification(newContainer); 
 
                     original.Transform<BinaryFormat2Alar3, ALAR3, BinaryFormat>()
                         .Stream.WriteTo(Path.Combine(dirToSave, n.Name + "new.aar"));

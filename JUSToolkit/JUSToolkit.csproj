@@ -56,9 +56,6 @@
     <Reference Include="Yarhl.Media">
       <HintPath>packages\Yarhl.Media.2.0.0-alpha.2\lib\netstandard2.0\Yarhl.Media.dll</HintPath>
     </Reference>
-    <Reference Include="Texim">
-      <HintPath>lib\Texim.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -87,6 +84,25 @@
     <Compile Include="Converters\Bin\Quiz2Po.cs" />
     <Compile Include="Formats\ALMT.cs" />
     <Compile Include="Converters\Images\Binary2ALMT.cs" />
+    <Compile Include="Texim\BgMode.cs" />
+    <Compile Include="Texim\ColorExtension.cs" />
+    <Compile Include="Texim\ColorFormat.cs" />
+    <Compile Include="Texim\CompressMapping.cs" />
+    <Compile Include="Texim\Map.cs" />
+    <Compile Include="Texim\MapInfo.cs" />
+    <Compile Include="Texim\Mapable.cs" />
+    <Compile Include="Texim\MatchMapping.cs" />
+    <Compile Include="Texim\Palette.cs" />
+    <Compile Include="Texim\Pixel.cs" />
+    <Compile Include="Texim\PixelArray.cs" />
+    <Compile Include="Texim\PixelEncoding.cs" />
+    <Compile Include="Texim\Converters\ImageConverter.cs" />
+    <Compile Include="Texim\Converters\ImageMapConverter.cs" />
+    <Compile Include="Texim\Processing\BasicQuantization.cs" />
+    <Compile Include="Texim\Processing\ColorQuantization.cs" />
+    <Compile Include="Texim\Processing\ExhaustiveSearch.cs" />
+    <Compile Include="Texim\Processing\FixedPaletteQuantization.cs" />
+    <Compile Include="Texim\Processing\NearestNeighbour.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
