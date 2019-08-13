@@ -6,7 +6,7 @@
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
 
-    public class ALAR3 : Format
+    public class ALAR3 : IFormat
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
 
@@ -47,6 +47,9 @@
                             log.Debug("Overriding " + nNew.Name);
                             Node newNode = new Node(nNew.Name, new ALAR3File(nNew.Stream));
 
+                            // TODO:
+                            // Update Yarhl for DeleteNode
+                            // .Parent.Add
                             //***AlarFiles.Children[AlarFiles.Children.IndexOf(n)] = newNode;
                             n.GetFormatAs<ALAR3File>().Size = (uint)newNode.Stream.Length;
 

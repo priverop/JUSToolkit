@@ -3,7 +3,7 @@
     using Yarhl.FileFormat;
     using System;
     using System.Collections.Generic;
-    public class Bin : Format
+    public class Bin : IFormat
     {
         public Dictionary<string, int> Text { get; set; } // String - Pointer
 

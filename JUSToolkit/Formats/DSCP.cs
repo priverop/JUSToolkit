@@ -2,7 +2,7 @@
 {
     using Yarhl.FileFormat;
 
-    public class DSCP : Format
+    public class DSCP : IFormat
     {
         public DSCP()
         {

@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Yarhl.FileFormat;
 
-    public class ALAR2 : Format
+    public class ALAR2 : IFormat
     {
         public char[] Header { get; set; }
         public byte Type { get; set; }

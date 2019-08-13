@@ -4,7 +4,7 @@
     using Yarhl.FileFormat;
     using Texim;
 
-    public class DIG : Format
+    public class DIG : IFormat
     {
         public PixelArray Pixels { get; set; }
 
