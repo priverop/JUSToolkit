@@ -168,7 +168,7 @@
 
             Texim.ImageMapConverter importer = new Texim.ImageMapConverter
             {
-                IFormat = format,
+                Format = format,
                 PixelEncoding = PixelEncoding.HorizontalTiles,
                 Quantization = quantization,
                 //Mapable = new MatchMapping(originalDig.Pixels.GetPixels())
@@ -290,7 +290,7 @@
                     Bitmap newImage = (Bitmap)Image.FromFile(dataToInsert);
                     var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
                     Texim.ImageConverter importer = new Texim.ImageConverter {
-                        IFormat = ColorFormat.Indexed_4bpp,
+                        Format = ColorFormat.Indexed_4bpp,
                         PixelEncoding = PixelEncoding.HorizontalTiles,
                         Quantization = quantization
                     };
