@@ -1,10 +1,9 @@
 ﻿namespace JUSToolkit.Formats.ALAR
 {
-    using System;
-    using System.Collections.Generic;
     using log4net;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
+    using Yarhl.IO;
 
     public class ALAR3 : IFormat
     {
@@ -31,34 +30,45 @@
             foreach (Node nNew in filesToInsert.Children)
             {
                 uint newOffset = 0;
-                foreach (Node n in Navigator.IterateNodes(AlarFiles.Root)) {
+                foreach (Node nOld in Navigator.IterateNodes(AlarFiles.Root)) {
 
-                    if (!n.IsContainer)
+                    if (!nOld.IsContainer)
                     {
-                        ALAR3File alarFile = n.GetFormatAs<ALAR3File>();
+                        ALAR3File alarFileOld = nOld.GetFormatAs<ALAR3File>();
 
                         if (newOffset > 0)
                         {
-                            alarFile.Offset = newOffset;
-                            newOffset = alarFile.Offset + alarFile.Size;
+                            alarFileOld.Offset = newOffset;
+                            newOffset = alarFileOld.Offset + alarFileOld.Size;
                         }
-                        if (n.Name == nNew.Name)
+                        if (nOld.Name == nNew.Name)
                         {
                             log.Debug("Overriding " + nNew.Name);
-                            Node newNode = new Node(nNew.Name, new ALAR3File(nNew.Stream));
 
-                            // TODO:
-                            // Update Yarhl for DeleteNode
-                            // .Parent.Add
-                            //***AlarFiles.Children[AlarFiles.Children.IndexOf(n)] = newNode;
-                            n.GetFormatAs<ALAR3File>().Size = (uint)newNode.Stream.Length;
+                            alarFileOld = ReplaceStream(alarFileOld, nNew.Stream);
 
-                            newOffset = alarFile.Offset + alarFile.Size;
+                            newOffset = alarFileOld.Offset + alarFileOld.Size;
                         }
                     }
                     
                 }
             }
+        }
+
+        private ALAR3File ReplaceStream(ALAR3File old, DataStream stream)
+        {
+            ALAR3File newAlar = new ALAR3File(stream);
+
+
+            newAlar.FileID = old.FileID;
+            newAlar.Offset = old.Offset;
+            newAlar.Unk3 = old.Unk3;
+            newAlar.Unk4 = old.Unk4;
+            newAlar.Unk5 = old.Unk5;
+            newAlar.Unk6 = old.Unk6;
+            newAlar.Size = (uint)stream.Length;
+
+            return newAlar;
         }
 
     }

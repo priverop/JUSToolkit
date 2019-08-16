@@ -87,6 +87,8 @@
     <Compile Include="Converters\Bin\Quiz2Po.cs" />
     <Compile Include="Formats\ALMT.cs" />
     <Compile Include="Converters\Images\Binary2ALMT.cs" />
+    <Compile Include="IntegrationTests\Alar\Alar3ConverterTest.cs" />
+    <Compile Include="IntegrationTests\TestData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
@@ -95,6 +97,10 @@
     <Folder Include="Converters\Alar\" />
     <Folder Include="Converters\Images\" />
     <Folder Include="Formats\ALAR\" />
+    <Folder Include="IntegrationTests\" />
+    <Folder Include="IntegrationTests\Resources\" />
+    <Folder Include="IntegrationTests\Alar\" />
+    <Folder Include="IntegrationTests\Resources\Alar\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
