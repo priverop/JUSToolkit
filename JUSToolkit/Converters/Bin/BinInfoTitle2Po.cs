@@ -17,6 +17,7 @@ namespace JUSToolkit.Converters.Bin
                 }
             };
 
+            //Escribir las entradas del Po a partir de la lista de textos
             for(int i = 0; i < source.Text.Count; i++)
             {
                 exportPo.Add(new PoEntry(source.Text.ElementAt(i)) { Context = i.ToString()});

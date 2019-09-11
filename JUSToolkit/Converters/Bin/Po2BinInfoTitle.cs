@@ -10,6 +10,7 @@ namespace JUSToolkit.Converters.Bin
         {
             var bin = new BinInfoTitle();
 
+            //Escribir en la lista cada una de las entradas del Po
             foreach(PoEntry entry in source.Entries)
             {
                 bin.Text.Add(entry.Text);
