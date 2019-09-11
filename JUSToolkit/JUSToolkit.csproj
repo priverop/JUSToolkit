@@ -62,7 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\Bin\Binary2BinInfoTitle.cs" />
+    <Compile Include="Converters\Bin\BinInfoTitle2Bin.cs" />
     <Compile Include="Converters\Bin\BinInfoTitle2Po.cs" />
+    <Compile Include="Converters\Bin\Po2BinInfoTitle.cs" />
     <Compile Include="Formats\BinInfoTitle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
