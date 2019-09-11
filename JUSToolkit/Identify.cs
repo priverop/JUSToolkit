@@ -36,7 +36,7 @@ namespace JUSToolkit
             binDictionary = new Dictionary<String, Format>
             {
                 { "TUTORIAL", new BinTutorial() },
-                { "FILENAME", new BinFilename() },
+                { "FILENAME", new BinInfoTitle() },
                 { "QUIZ", new BinQuiz() },
             };
 
