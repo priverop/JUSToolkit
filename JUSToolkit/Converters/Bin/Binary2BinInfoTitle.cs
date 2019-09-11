@@ -1,9 +1,4 @@
 ﻿using System;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Yarhl.FileFormat;
 using JUSToolkit.Formats;
 using Yarhl.IO;
@@ -19,18 +14,16 @@ namespace JUSToolkit.Converters.Bin
 
             DataReader reader = new DataReader(source.Stream)
             {
-                DefaultEncoding = Encoding.GetEncoding(932),
-
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
             var bin = new BinInfoTitle();
 
             reader.Stream.Position = 0x00;
-            
+
             //Posicionar el reader al comienzo del texto
             int firstPointer = reader.ReadInt32();
             reader.Stream.Position = firstPointer;
-            Console.WriteLine(firstPointer);
 
             //Guardar todo el texto en bin
             while (!reader.Stream.EndOfStream)
