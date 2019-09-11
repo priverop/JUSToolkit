@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Yarhl.FileFormat;
 
 namespace JUSToolkit.Formats
 {
-    class BinInfoTitle
+    class BinInfoTitle : Format
     {
         public List<string> Text;
 

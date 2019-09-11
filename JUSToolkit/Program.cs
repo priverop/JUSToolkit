@@ -123,6 +123,15 @@
 
                     break;
 
+                case FORMATPREFIX + "BinInfoTitle":
+
+                    n.Transform<Binary2BinInfoTitle, BinaryFormat, BinInfoTitle>()
+                    .Transform<BinInfoTitle2Po, BinInfoTitle, Po>()
+                    .Transform<Po2Binary, Po, BinaryFormat>()
+                    .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
+
+                    break;
+
                 case FORMATPREFIX + "BinQuiz":
 
                     var quizs = n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()

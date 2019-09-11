@@ -19,6 +19,8 @@ namespace JUSToolkit.Converters.Bin
 
             var bin = new BinInfoTitle();
 
+            reader.Stream.Position = 0x00;
+
             //Posicionar el reader al comienzo del texto
             int firstPointer = reader.ReadInt32();
             reader.Stream.Position = firstPointer;
