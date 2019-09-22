@@ -9,6 +9,7 @@ namespace JUSToolkit
     using System.IO;
     using log4net;
     using System.Text;
+    using System.Text.RegularExpressions;
     using Yarhl.FileSystem;
     using JUSToolkit.Formats.ALAR;
 
@@ -35,9 +36,32 @@ namespace JUSToolkit
 
             binDictionary = new Dictionary<String, Format>
             {
-                { "TUTORIAL", new BinTutorial() },
-                { "FILENAME", new BinInfoTitle() },
-                { "QUIZ", new BinQuiz() },
+                { "tutorial0.bin", new BinTutorial() },
+                { "tutorial1.bin", new BinTutorial() },
+                { "tutorial2.bin", new BinTutorial() },
+                { "tutorial3.bin", new BinTutorial() },
+                { "tutorial4.bin", new BinTutorial() },
+                { "tutorial5.bin", new BinTutorial() },
+                { "tutorial.bin", new BinTutorial() },
+
+                { "ability_t.bin", new BinInfoTitle() },
+                { "bgm.bin", new BinInfoTitle() },
+                { "chr_b_t.bin", new BinInfoTitle() },
+                { "chr_s_t.bin", new BinInfoTitle() },
+                { "clearlst.bin", new BinInfoTitle() },
+                { "demo.bin", new BinInfoTitle() },
+                { "infoname.bin", new BinInfoTitle() },
+                { "komatxt.bin", new BinInfoTitle() },
+                { "location.bin", new BinInfoTitle() },
+                { "piece.bin", new BinInfoTitle() },
+                { "rulemess.bin", new BinInfoTitle() },
+                { "stage.bin", new BinInfoTitle() },
+                { "title.bin", new BinInfoTitle() },
+                { "commwin.bin", new BinInfoTitle() },
+                { "pname.bin", new BinInfoTitle() },
+                { "bin-InfoDeck", new BinInfoTitle() },
+
+                { "jquiz.bin", new BinQuiz() },
             };
 
             alarDictionary = new Dictionary<int, Format>
@@ -99,28 +123,12 @@ namespace JUSToolkit
 
         public Format GetBinFormat(Node node)
         {
-
-            DataReader fileToReadReader = new DataReader(node.Stream);
-            fileToReadReader.Stream.Position = 0;
-
-            int firstPointer = fileToReadReader.ReadInt32();
-            int secondPointer = fileToReadReader.ReadInt32();
-
-            string fileCase = PrepareCases(firstPointer, secondPointer);
-
-            return binDictionary[fileCase];
-
-        }
-
-        private static string PrepareCases(int firstPointer, int secondPointer)
-        {
-            if (secondPointer == 255) {
-                return "QUIZ";
+            Regex regex = new Regex("^bin-.*-.*.bin$");
+            if (regex.IsMatch(node.Name))
+            {
+                return binDictionary["bin-InfoDeck"];
             }
-            else if (firstPointer > secondPointer)
-                return "TUTORIAL";
-            else
-                return "FILENAME";
+            return binDictionary[node.Name];
         }
 
         /*

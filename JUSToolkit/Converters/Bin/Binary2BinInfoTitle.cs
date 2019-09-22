@@ -2,6 +2,7 @@
 using Yarhl.FileFormat;
 using JUSToolkit.Formats;
 using Yarhl.IO;
+using System.Text;
 
 namespace JUSToolkit.Converters.Bin
 {
@@ -14,24 +15,48 @@ namespace JUSToolkit.Converters.Bin
 
             DataReader reader = new DataReader(source.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+                DefaultEncoding = Encoding.GetEncoding(932)
             };
-
+            string sentence;
             var bin = new BinInfoTitle();
 
-            reader.Stream.Position = 0x00;
+            Go2Text(reader);
 
-            //Posicionar el reader al comienzo del texto
-            int firstPointer = reader.ReadInt32();
-            reader.Stream.Position = firstPointer;
-
-            //Guardar todo el texto en bin
             while (!reader.Stream.EndOfStream)
             {
-                bin.Text.Add(reader.ReadString());
+                sentence = reader.ReadString();
+                if (string.IsNullOrEmpty(sentence))
+                {
+                    sentence = "<!empty>";
+                }
+                bin.Text.Add(sentence);
             }
 
             return bin;
+        }
+
+        public void Go2Text(DataReader reader)
+        {
+            reader.Stream.Position = 0x00;
+            int PointerValue = reader.ReadInt16();
+
+            switch (PointerValue)
+            {
+                case 0x0029:
+                case 0x005B:
+                case 0x0034:
+                case 0x0032:
+                case 0x0D04:
+                case 0x0059:
+                    reader.Stream.Position += 2;
+                    PointerValue = reader.ReadInt16();
+                    break;
+                default:
+                    break;
+            }
+
+            reader.Stream.Position += PointerValue - 2;
+
         }
     }
 }

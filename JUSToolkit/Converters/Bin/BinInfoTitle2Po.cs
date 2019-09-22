@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using JUSToolkit.Formats;
+﻿using JUSToolkit.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
+using System.Collections.Generic;
 
 namespace JUSToolkit.Converters.Bin
 {
@@ -17,10 +17,13 @@ namespace JUSToolkit.Converters.Bin
                 }
             };
 
-            //Escribir las entradas del Po a partir de la lista de textos
-            for(int i = 0; i < source.Text.Count; i++)
+            int i = 0;
+            //Escribo las entradas del Po a partir de la lista de textos
+            foreach(string entry in source.Text)
             {
-                exportPo.Add(new PoEntry(source.Text.ElementAt(i)) { Context = i.ToString()});
+                
+                exportPo.Add(new PoEntry(entry) { Context = i.ToString() });
+                i++;
             }
 
             return exportPo;
