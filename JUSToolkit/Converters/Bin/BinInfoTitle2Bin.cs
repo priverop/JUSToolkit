@@ -3,6 +3,8 @@ using System.Linq;
 using JUSToolkit.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
+using System.Collections.Generic;
+using System.Text;
 
 namespace JUSToolkit.Converters.Bin
 {
@@ -10,31 +12,23 @@ namespace JUSToolkit.Converters.Bin
     {
         public BinaryFormat Convert(BinInfoTitle source)
         {
+            var bin = new BinaryFormat();
 
-            var binary = new BinaryFormat();
-
-            DataWriter writer = new DataWriter(binary.Stream)
+            DataWriter writer = new DataWriter(bin.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+                DefaultEncoding = Encoding.GetEncoding(932)
             };
 
-            //Calculo del puntero inicial
-            int offset = source.Text.Count * 4;
-
-            //Escritura de cada uno de los punteros
-            for(int i = 0; i < source.Text.Count; i++)
+            foreach(int pointer in source.Pointers)
             {
-                writer.WriteOfType<Int32>(offset);
-                offset = offset - 4 + writer.DefaultEncoding.GetByteCount(source.Text.ElementAt(i));
+                writer.WriteOfType<Int16>((Int16)pointer);
+            }
+            foreach(string text in source.Text)
+            {
+                writer.Write(text);
             }
 
-            //Escritura del texto
-            foreach(string sentence in source.Text)
-            {
-                writer.Write(sentence);
-            }
-
-            return binary;
+            return bin;
         }
     }
 }
