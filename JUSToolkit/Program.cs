@@ -123,6 +123,15 @@
 
                     break;
 
+                case FORMATPREFIX + "BinInfoTitle":
+
+                    n.Transform<Binary2BinInfoTitle, BinaryFormat, BinInfoTitle>()
+                    .Transform<BinInfoTitle2Po, BinInfoTitle, Po>()
+                    .Transform<Po2Binary, Po, BinaryFormat>()
+                    .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
+
+                    break;
+
                 case FORMATPREFIX + "BinQuiz":
 
                     var quizs = n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()
@@ -177,6 +186,24 @@
 
             switch (format)
             {
+                case FORMATPREFIX + "BinInfoTitle":
+
+                    Po2BinInfoTitle p2b = new Po2BinInfoTitle()
+                    {
+                        OriginalFile = new Yarhl.IO.DataReader(n.Stream)
+                        {
+                            DefaultEncoding = Encoding.GetEncoding(932)
+                        }
+                    };
+                    Node nodePo = NodeFactory.FromFile(dataToInsert);
+
+                    nodePo.Transform<Po2Binary, BinaryFormat, Po>();
+                    Node nodeBin = nodePo.Transform<Po, BinInfoTitle>(p2b)
+                        .Transform<BinInfoTitle2Bin, BinInfoTitle, BinaryFormat>();
+                    nodeBin.Stream.WriteTo(Path.Combine(dirToSave, n.Name.Remove(n.Name.Length - 4) + "_new.bin"));
+
+                    break;
+
                 case FORMATPREFIX + "ALAR.ALAR3":
 
                     // Alar original
