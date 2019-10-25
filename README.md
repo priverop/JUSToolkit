@@ -6,14 +6,14 @@ Romhacking tools for Jump Ultimate Stars! (NDS)
 Coming soon
 
 ## Tinke
-There is a plugin with this tools in Tinke by PleoNex.
+There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleonex/tinke).
 
 ## Stack
 - C#
-- YARHL by PleoNex
+- [YARHL by PleoNex](https://github.com/SceneGate/Yarhl)
 - Log4Net
 
 # Credits
-Special thanks to PleoNex for his help. IntegrationTests of this project are based on SceneGate Lemon.
-Thanks to TraduSquare for the inspiration and support.
+Special thanks to (PleoNex)[https://github.com/pleonex] for his help. IntegrationTests of this project are based on [SceneGate Lemon](https://github.com/SceneGate/Lemon).
+Thanks to [TraduSquare](https://tradusquare.es) for the inspiration and support.
 Thanks to the Jump Ultimate Stars! devs for this amazing game.
