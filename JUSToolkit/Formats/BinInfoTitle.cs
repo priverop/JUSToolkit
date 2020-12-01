@@ -3,7 +3,7 @@ using Yarhl.FileFormat;
 
 namespace JUSToolkit.Formats
 {
-    class BinInfoTitle : Format
+    class BinInfoTitle : IFormat
     {
         public List<string> Text;
         public List<int> Pointers;

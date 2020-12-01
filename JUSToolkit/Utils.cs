@@ -4,8 +4,6 @@
     using System.Diagnostics;
     using System.IO;
     using System.Text;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
     using Yarhl.IO;
 
     public static class Utils
@@ -50,7 +48,7 @@
 
             process.WaitForExit();
 
-            DataStream fileStream = new DataStream(tempFile, FileOpenMode.Read);
+            DataStream fileStream = DataStreamFactory.FromFile(tempFile, FileOpenMode.Read);
             DataStream memoryStream = new DataStream();
             if (mode != "-d")
             {

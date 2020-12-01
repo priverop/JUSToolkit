@@ -95,7 +95,7 @@ namespace JUSToolkit.Converters.Images
 
                 BinaryFormat bfDIG = new BinaryFormat(dtx.Stream, (long)digPointer, (dtx.Stream.Length - (long)digPointer));
 
-                DIG dig = bfDIG.ConvertWith<Binary2DIG, BinaryFormat, DIG>();
+                DIG dig = (DIG) ConvertFormat.With<Binary2DIG>(bfDIG);
 
                 // Iterate KomaShape
 

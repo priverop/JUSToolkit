@@ -15,6 +15,8 @@
     using Texim.Processing;
     using Texim;
     using Yarhl.IO;
+    using Yarhl.FileFormat;
+    using System.Text;
 
     class MainClass
     {
@@ -98,7 +100,7 @@
                         Directory = inputFolder
                     };
 
-                    dtx.Transform<NodeContainerFormat, NodeContainerFormat>(converter);
+                    dtx.TransformWith(converter);
 
                     SaveToDir(dtx, outputFolder);
 
@@ -250,9 +252,9 @@
 
                 case FORMATPREFIX + "BinInfoTitle":
 
-                    n.Transform<Binary2BinInfoTitle, BinaryFormat, BinInfoTitle>()
-                    .Transform<BinInfoTitle2Po, BinInfoTitle, Po>()
-                    .Transform<Po2Binary, Po, BinaryFormat>()
+                    n.TransformWith<Binary2BinInfoTitle>()
+                    .TransformWith<BinInfoTitle2Po>()
+                    .TransformWith<Po2Binary>()
                     .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
 
                     break;
@@ -312,9 +314,9 @@
                     };
                     Node nodePo = NodeFactory.FromFile(dataToInsert);
 
-                    nodePo.Transform<Po2Binary, BinaryFormat, Po>();
-                    Node nodeBin = nodePo.Transform<Po, BinInfoTitle>(p2b)
-                        .Transform<BinInfoTitle2Bin, BinInfoTitle, BinaryFormat>();
+                    nodePo.TransformWith<Po2Binary>();
+                    Node nodeBin = nodePo.TransformWith(p2b)
+                        .TransformWith<BinInfoTitle2Bin>();
                     nodeBin.Stream.WriteTo(Path.Combine(dirToSave, n.Name.Remove(n.Name.Length - 4) + "_new.bin"));
 
                     break;
