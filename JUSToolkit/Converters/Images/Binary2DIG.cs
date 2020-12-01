@@ -4,7 +4,7 @@
     using Yarhl.FileFormat;
     using JUSToolkit.Formats;
     using Yarhl.IO;
-    using Texim.Media.Image;
+    using Texim;
     using System.Drawing;
     using log4net;
 
@@ -39,14 +39,11 @@
 
             long startPalette = reader.Stream.Position;
 
-            int returningBytes = 8;
-
             // Si hay bytes vacios antes de empezar la paleta
             if(reader.ReadInt32() == 0)
             {
                 while (reader.ReadInt32() == 0) { }
                 startPalette = reader.Stream.Position - 4;
-                returningBytes += 4;
             }
             else{
                 reader.Stream.Position = startPalette;
@@ -61,6 +58,8 @@
             reader.Stream.Position = dig.PaletteStart;
 
             ColorFormat format;
+
+            log.Debug("PaletteType: " +dig.PaletteType);
 
             if (dig.PaletteType == 16)
             {
@@ -85,7 +84,7 @@
                 dig.Palette = new Palette(reader.ReadBytes((int)paletteActualSize).ToBgr555Colors());
 
             }
-
+            log.Debug("ColorFormat: "+format);
             dig.Pixels = new PixelArray
             {
                 Width = dig.Width,

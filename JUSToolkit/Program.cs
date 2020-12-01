@@ -13,10 +13,8 @@
     using System.IO;
     using JUSToolkit.Formats.ALAR;
     using System.Drawing;
-    using Texim.Media.Image.Processing;
-    using Texim.Media.Image;
-    using System.Collections.Generic;
-    using Yarhl.IO;
+    using Texim.Processing;
+    using Texim;
     using System.Text;
 
     class MainClass
@@ -44,11 +42,11 @@
 
                 // inputFilename - dirtosave - (dir/file to insert)
 
-                if (args[0] != "-e"){
+                if (type != "-e"){
                     dataToInsert = args[3];
                 }
 
-                if (inputFileName == ".")
+                if (inputFileName == "dir")
                 {
                     ProcessDir(type, dirToSave, dataToInsert);
                 }
@@ -64,44 +62,60 @@
 
             }
         }
-
-        private static void ProcessDir(string type, string dirToSave, string dataToInsert)
+       
+        private static void ProcessDir(string type, string outputFolder, string inputFolder)
         {
+            log.Info("Processing Dir");
             switch (type)
             {
                 case "-exportdig":
-
-                    Node digContainer = NodeFactory.FromDirectory(dataToInsert, "*.dig");
-
-                    foreach (Node n in digContainer.Children)
-                    {
-                        ProcessFile("-e", n, dirToSave, dataToInsert);
-                    }
-
-                    break;
-
-                case "-exportdtx":
-
-                    Node dtx = NodeFactory.FromDirectory(dataToInsert, "*.dtx");
-                    Node arm = NodeFactory.FromFile(Path.Combine(dataToInsert, "arm9.bin"));
-                    Node koma = NodeFactory.FromFile(Path.Combine(dataToInsert, "koma.bin"));
-                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "kshape.bin"));
-
-                    BinaryDTX2PNG converter = new BinaryDTX2PNG
-                    {
-                        Arm = arm,
-                        Koma = koma,
-                        Komashape = komashape,
-                        Directory = dataToInsert
-                    };
-
-                    dtx.Transform<NodeContainerFormat, NodeContainerFormat>(converter);
-
-                    SaveToDir(dtx, dirToSave);
-
+                case "-importdig":
+                    ProcessDig(type, outputFolder, inputFolder);
                     break;
             }
         }
+
+        private static void ProcessDig(string type, string outputFolder, string inputFolder) 
+        {
+
+            foreach (Node d in NodeFactory.FromDirectory(inputFolder, "*.dig").Children)
+            {
+                Identify i = new Identify();
+                Format inputFormat = i.GetFormat(d);
+                Node dig = d;
+
+                // Compressed file
+                if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
+                {
+                    BinaryFormat binary = Utils.Lzss(new BinaryFormat(dig.Stream), "-d");
+                    dig = new Node(dig.Name, binary);
+                }
+
+                Node atm = NodeFactory.FromDirectory(inputFolder, "*.atm")
+                    .Children[Path.GetFileNameWithoutExtension(dig.Name) + ".atm"];
+
+                if (atm == null)
+                {
+                    throw new Exception("ATM not found: "+ 
+                        Path.GetFileNameWithoutExtension(dig.Name) + ".atm"); 
+                }
+                if (type == "-exportdig")
+                {
+                    ExportDig(dig, atm, outputFolder);
+                }
+                else
+                {
+                    Node png = NodeFactory.FromDirectory(inputFolder, "*.png")
+                        .Children[Path.GetFileNameWithoutExtension(dig.Name) + ".png"];
+                    if (png != null) 
+                    {
+                        ImportDig(dig, atm, png, outputFolder);
+                    }
+
+                }
+            }
+        }
+
 
         private static void ProcessFile(string type, Node n, string dirToSave, string dataToInsert)
         {
@@ -131,6 +145,63 @@
             }
         }
 
+        private static void ImportDig(Node nDIG, Node nATM, Node nPNG, string outputPath)
+        {
+            log.Info("Importing " + nDIG.Name + ", " + nATM.Name + " and " + nPNG.Name);
+
+            DIG originalDig = nDIG.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
+            ALMT originalAtm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
+
+            // Import the new PNG file
+            Bitmap newImage = (Bitmap)Image.FromStream(nPNG.Stream.BaseStream);
+
+            var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
+            ColorFormat format;
+            if (originalDig.PaletteType == 16)
+            {
+                format = ColorFormat.Indexed_4bpp;
+            }
+            else
+            {
+                format = ColorFormat.Indexed_8bpp;
+            }
+
+            Texim.ImageMapConverter importer = new Texim.ImageMapConverter
+            {
+                Format = format,
+                PixelEncoding = PixelEncoding.HorizontalTiles,
+                Quantization = quantization,
+                //Mapable = new MatchMapping(originalDig.Pixels.GetPixels())
+            };
+
+            (Palette _, PixelArray pixelInfo, MapInfo[] mapInfos) = importer.Convert(newImage);
+
+            originalDig.Pixels = pixelInfo;
+            originalAtm.Info = mapInfos;
+
+            BinaryFormat bDig = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
+            BinaryFormat bAtm = originalAtm.ConvertWith<Binary2ALMT, ALMT, BinaryFormat>();
+
+            Utils.Lzss(bDig, "-evn").Stream.WriteTo(Path.Combine(outputPath, nDIG.Name + ".evn.dig"));
+            bAtm.Stream.WriteTo(Path.Combine(outputPath, nATM.Name + ".atm"));
+        }
+
+        private static void ExportDig(Node nDIG, Node nATM, string outputPath)
+        {
+            log.Info("Exporting "+ nDIG.Name);
+
+            DIG dig = nDIG.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
+
+            ALMT atm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
+
+            Bitmap img = atm.CreateBitmap(dig.Pixels,dig.Palette);
+
+            string path = Path.Combine(outputPath, nDIG.Name + ".png");
+            img.Save(path);
+
+            log.Info("Saved into "+path);
+        }
+
         private static void Export(string format, Node n, string outputPath){
 
             log.Info("Exporting...");
@@ -141,15 +212,6 @@
 
                     n.Transform<BinaryFormat2BinTutorial, BinaryFormat, BinTutorial>()
                     .Transform<Bin2Po, BinTutorial, Po>()
-                    .Transform<Po2Binary, Po, BinaryFormat>()
-                    .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
-
-                    break;
-
-                case FORMATPREFIX + "BinInfoTitle":
-
-                    n.Transform<Binary2BinInfoTitle, BinaryFormat, BinInfoTitle>()
-                    .Transform<BinInfoTitle2Po, BinInfoTitle, Po>()
                     .Transform<Po2Binary, Po, BinaryFormat>()
                     .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
 
@@ -187,16 +249,6 @@
 
                     break;
 
-                case FORMATPREFIX + "DIG":
-
-                    DIG dig = n.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
-
-                    var img = dig.Pixels.CreateBitmap(dig.Palette, 0);
-
-                    img.Save(Path.Combine(outputPath, n.Name + ".png"));
-
-                    break;
-
             }
 
             log.Info("Finished exporting");
@@ -209,24 +261,6 @@
 
             switch (format)
             {
-                case FORMATPREFIX + "BinInfoTitle":
-
-                    Po2BinInfoTitle p2b = new Po2BinInfoTitle()
-                    {
-                        OriginalFile = new Yarhl.IO.DataReader(n.Stream)
-                        {
-                            DefaultEncoding = Encoding.GetEncoding(932)
-                        }
-                    };
-                    Node nodePo = NodeFactory.FromFile(dataToInsert);
-
-                    nodePo.Transform<Po2Binary, BinaryFormat, Po>();
-                    Node nodeBin = nodePo.Transform<Po, BinInfoTitle>(p2b)
-                        .Transform<BinInfoTitle2Bin, BinInfoTitle, BinaryFormat>();
-                    nodeBin.Stream.WriteTo(Path.Combine(dirToSave, n.Name.Remove(n.Name.Length - 4) + "_new.bin"));
-
-                    break;
-
                 case FORMATPREFIX + "ALAR.ALAR3":
 
                     // Alar original
@@ -251,7 +285,7 @@
                     // Import the new PNG file
                     Bitmap newImage = (Bitmap)Image.FromFile(dataToInsert);
                     var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
-                    Texim.Media.Image.ImageConverter importer = new Texim.Media.Image.ImageConverter {
+                    Texim.ImageConverter importer = new Texim.ImageConverter {
                         Format = ColorFormat.Indexed_4bpp,
                         PixelEncoding = PixelEncoding.HorizontalTiles,
                         Quantization = quantization
@@ -273,8 +307,9 @@
         private static void ShowUsage()
         {
             log.Info("Usage: JUSToolkit.exe -e <fileToExtract> <dirToSave>");
-            log.Info("Usage: JUSToolkit.exe -iDir <inputFileName> <dirToSave> <dirWithFilesToInsert>");
             log.Info("Usage: JUSToolkit.exe -i <inputFileName> <dirToSave> <fileToInsert>");
+            log.Info("Usage: JUSToolkit.exe -importdig dir <dirToSave> <dirWithFilesToInsert>");
+            log.Info("Usage: JUSToolkit.exe -exportdig dir <dirToSave> <dirWithFilesToInsert>");
         }
 
         private static void ShowCredits()

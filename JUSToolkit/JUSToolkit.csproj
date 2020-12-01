@@ -91,6 +91,16 @@
     <Compile Include="Formats\BinQuiz.cs" />
     <Compile Include="Converters\Bin\Binary2BinQuiz.cs" />
     <Compile Include="Converters\Bin\Quiz2Po.cs" />
+    <Compile Include="Formats\ALMT.cs" />
+    <Compile Include="Converters\Images\Binary2ALMT.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Converters\" />
+    <Folder Include="Formats\" />
+    <Folder Include="Converters\Bin\" />
+    <Folder Include="Converters\Alar\" />
+    <Folder Include="Converters\Images\" />
+    <Folder Include="Formats\ALAR\" />
     <Compile Include="Converters\Images\BinaryDTX2PNG.cs" />
   </ItemGroup>
   <ItemGroup />
