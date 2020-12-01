@@ -91,6 +91,7 @@
     <Compile Include="Formats\BinQuiz.cs" />
     <Compile Include="Converters\Bin\Binary2BinQuiz.cs" />
     <Compile Include="Converters\Bin\Quiz2Po.cs" />
+    <Compile Include="Converters\Images\BinaryDTX2PNG.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -34,14 +34,14 @@
             };
 
             long paletteEnd = dig.PaletteSize * 32 + reader.Stream.Position;
-
+            dig.PixelsStart = (uint)paletteEnd; // *** 
+            log.Debug("Palette End: " + paletteEnd);
 
             long startPalette = reader.Stream.Position;
 
             int returningBytes = 8;
 
             // Si hay bytes vacios antes de empezar la paleta
-            //*** Revisar
             if(reader.ReadInt32() == 0)
             {
                 while (reader.ReadInt32() == 0) { }
@@ -53,9 +53,10 @@
             }
 
             dig.PaletteStart = (uint) startPalette;
+            log.Debug("Palette Start: " + dig.PaletteStart);
 
             long paletteActualSize = paletteEnd - dig.PaletteStart;
-
+            log.Debug("Palette Size: " + paletteActualSize);
 
             reader.Stream.Position = dig.PaletteStart;
 
@@ -68,7 +69,7 @@
                 format = ColorFormat.Indexed_4bpp;
                 Color[][] palettes;
                 decimal paletteNumber = Math.Ceiling((decimal)paletteActualSize / paletteSize);
-
+                log.Debug("Palette Number: " + paletteNumber);
                 palettes = new Color[(int)paletteNumber][];
 
                 for(int i = 0; i < paletteNumber; i++)

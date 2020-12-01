@@ -15,7 +15,8 @@
     using System.Drawing;
     using Texim.Media.Image.Processing;
     using Texim.Media.Image;
-    using System.Text;
+    using System.Collections.Generic;
+    using Yarhl.IO;
 
     class MainClass
     {
@@ -45,6 +46,31 @@
                 if (args[0] != "-e"){
                     dataToInsert = args[3];
                 }
+
+                if (inputFileName == ".")
+                {
+                    ProcessDir(type, dirToSave, dataToInsert);
+                }
+                else
+                {
+                    ProcessFile(type, inputFileName, dirToSave, dataToInsert);
+                }
+
+                log.Info("Program completed.");
+
+            }
+        }
+
+        private static void ProcessDir(string type, string dirToSave, string dataToInsert)
+        {
+            switch (type)
+            {
+                case "-exportdtx":
+
+                    Node dtx = NodeFactory.FromDirectory(dataToInsert, "*.dtx");
+                    Node arm = NodeFactory.FromFile(Path.Combine(dataToInsert, "arm9.bin"));
+                    Node koma = NodeFactory.FromFile(Path.Combine(dataToInsert, "koma.bin"));
+                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "kshape.bin"));
 
                 if (inputFileName == ".")
                 {
