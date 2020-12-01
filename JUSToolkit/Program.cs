@@ -72,6 +72,38 @@
                 case "-importdig":
                     ProcessDig(type, outputFolder, inputFolder);
                     break;
+
+               /* case "-exportdig":
+
+                    Node digContainer = NodeFactory.FromDirectory(dataToInsert, "*.dig");
+
+                    foreach (Node n in digContainer.Children)
+                    {
+                        ProcessFile("-e", n, dirToSave, dataToInsert);
+                    }
+
+                    break; */
+
+                case "-exportdtx":
+
+                    Node dtx = NodeFactory.FromDirectory(inputFolder, "*.dtx");
+                    Node arm = NodeFactory.FromFile(Path.Combine(inputFolder, "arm9.bin"));
+                    Node koma = NodeFactory.FromFile(Path.Combine(inputFolder, "koma.bin"));
+                    Node komashape = NodeFactory.FromFile(Path.Combine(inputFolder, "kshape.bin"));
+
+                    BinaryDTX2PNG converter = new BinaryDTX2PNG
+                    {
+                        Arm = arm,
+                        Koma = koma,
+                        Komashape = komashape,
+                        Directory = inputFolder
+                    };
+
+                    dtx.Transform<NodeContainerFormat, NodeContainerFormat>(converter);
+
+                    SaveToDir(dtx, outputFolder);
+
+                    break;
             }
         }
 
@@ -217,6 +249,15 @@
 
                     break;
 
+                case FORMATPREFIX + "BinInfoTitle":
+
+                    n.Transform<Binary2BinInfoTitle, BinaryFormat, BinInfoTitle>()
+                    .Transform<BinInfoTitle2Po, BinInfoTitle, Po>()
+                    .Transform<Po2Binary, Po, BinaryFormat>()
+                    .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
+
+                    break;
+
                 case FORMATPREFIX + "BinQuiz":
 
                     var quizs = n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()
@@ -261,6 +302,24 @@
 
             switch (format)
             {
+                case FORMATPREFIX + "BinInfoTitle":
+
+                    Po2BinInfoTitle p2b = new Po2BinInfoTitle()
+                    {
+                        OriginalFile = new Yarhl.IO.DataReader(n.Stream)
+                        {
+                            DefaultEncoding = Encoding.GetEncoding(932)
+                        }
+                    };
+                    Node nodePo = NodeFactory.FromFile(dataToInsert);
+
+                    nodePo.Transform<Po2Binary, BinaryFormat, Po>();
+                    Node nodeBin = nodePo.Transform<Po, BinInfoTitle>(p2b)
+                        .Transform<BinInfoTitle2Bin, BinInfoTitle, BinaryFormat>();
+                    nodeBin.Stream.WriteTo(Path.Combine(dirToSave, n.Name.Remove(n.Name.Length - 4) + "_new.bin"));
+
+                    break;
+
                 case FORMATPREFIX + "ALAR.ALAR3":
 
                     // Alar original
@@ -276,7 +335,7 @@
                     original.Transform<BinaryFormat2Alar3, ALAR3, BinaryFormat>()
                         .Stream.WriteTo(Path.Combine(dirToSave, n.Name + "new.aar"));
 
-                break;
+                    break;
 
                 case FORMATPREFIX + "DIG":
 
