@@ -17,6 +17,7 @@
     using Texim.Media.Image;
     using System.Collections.Generic;
     using Yarhl.IO;
+    using System.Text;
 
     class MainClass
     {
@@ -53,31 +54,6 @@
                 }
                 else
                 {
-                    ProcessFile(type, inputFileName, dirToSave, dataToInsert);
-                }
-
-                log.Info("Program completed.");
-
-            }
-        }
-
-        private static void ProcessDir(string type, string dirToSave, string dataToInsert)
-        {
-            switch (type)
-            {
-                case "-exportdtx":
-
-                    Node dtx = NodeFactory.FromDirectory(dataToInsert, "*.dtx");
-                    Node arm = NodeFactory.FromFile(Path.Combine(dataToInsert, "arm9.bin"));
-                    Node koma = NodeFactory.FromFile(Path.Combine(dataToInsert, "koma.bin"));
-                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "kshape.bin"));
-
-                if (inputFileName == ".")
-                {
-                    ProcessDir(type, dirToSave, dataToInsert);
-                }
-                else
-                {
                     log.Info("Identifying file " + inputFileName);
 
                     Node n = NodeFactory.FromFile(inputFileName);
@@ -97,10 +73,31 @@
 
                     Node digContainer = NodeFactory.FromDirectory(dataToInsert, "*.dig");
 
-                    foreach (Node n in digContainer.Children) 
+                    foreach (Node n in digContainer.Children)
                     {
                         ProcessFile("-e", n, dirToSave, dataToInsert);
                     }
+
+                    break;
+
+                case "-exportdtx":
+
+                    Node dtx = NodeFactory.FromDirectory(dataToInsert, "*.dtx");
+                    Node arm = NodeFactory.FromFile(Path.Combine(dataToInsert, "arm9.bin"));
+                    Node koma = NodeFactory.FromFile(Path.Combine(dataToInsert, "koma.bin"));
+                    Node komashape = NodeFactory.FromFile(Path.Combine(dataToInsert, "kshape.bin"));
+
+                    BinaryDTX2PNG converter = new BinaryDTX2PNG
+                    {
+                        Arm = arm,
+                        Koma = koma,
+                        Komashape = komashape,
+                        Directory = dataToInsert
+                    };
+
+                    dtx.Transform<NodeContainerFormat, NodeContainerFormat>(converter);
+
+                    SaveToDir(dtx, dirToSave);
 
                     break;
             }
