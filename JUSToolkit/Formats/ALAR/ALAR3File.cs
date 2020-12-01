@@ -1,10 +1,11 @@
 ﻿namespace JUSToolkit.Formats.ALAR
 {
-    using Yarhl.FileSystem;
+    using Yarhl.IO;
 
-    public class ALAR3File
+    public class ALAR3File : BinaryFormat
     {
-        public Node File { get; set; }
+        public ALAR3File(DataStream fileStream) : base(fileStream){}
+
         public ushort FileID { get; set; }
         public ushort Unk3 { get; set; }
         public uint Offset { get; set; }

@@ -1,12 +1,14 @@
 ﻿namespace JUSToolkit.Formats.ALAR
 {
-    using System;
-    using System.Collections.Generic;
+    using log4net;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
+    using Yarhl.IO;
 
-    public class ALAR3 : Format
+    public class ALAR3 : IFormat
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
+
         public char[] Header { get; set; }
         public byte Type { get; set; }
         public byte Unk { get; set; }
@@ -15,40 +17,58 @@
         public uint Array_count { get; set; }
         public ushort EndFileIndex { get; set; }
         public ushort[] FileTableIndex { get; set; }
-        public List<ALAR3File> AlarFiles { get; set; }
+        public NodeContainerFormat AlarFiles { get; set; }
 
         public ALAR3()
         {
-            AlarFiles = new List<ALAR3File>();
+            AlarFiles = new NodeContainerFormat();
         }
 
-        public void InsertModification(ALAR3 newAlar)
+        public void InsertModification(Node filesToInsert)
         {
 
-            foreach (ALAR3File newFile in newAlar.AlarFiles)
+            foreach (Node nNew in filesToInsert.Children)
             {
                 uint newOffset = 0;
-                for (int i = 0; i < AlarFiles.Count; i++) {
-                    if (newOffset > 0)
+                foreach (Node nOld in Navigator.IterateNodes(AlarFiles.Root)) {
+
+                    if (!nOld.IsContainer)
                     {
-                        AlarFiles[i].Offset = newOffset;
-                        newOffset = GetNewOffset(i);
+                        ALAR3File alarFileOld = nOld.GetFormatAs<ALAR3File>();
+
+                        if (newOffset > 0)
+                        {
+                            alarFileOld.Offset = newOffset;
+                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                        }
+                        if (nOld.Name == nNew.Name)
+                        {
+                            log.Debug("Overriding " + nNew.Name);
+
+                            alarFileOld = ReplaceStream(alarFileOld, nNew.Stream);
+
+                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                        }
                     }
-                    if (AlarFiles[i].File.Name == newFile.File.Name)
-                    {
-                        Node newNode = new Node(newFile.File.Name, new BinaryFormat(newFile.File.Stream));
-                        AlarFiles[i].File = newNode;
-                        AlarFiles[i].Size = (uint)newNode.Stream.Length;
-                       
-                        newOffset = GetNewOffset(i);
-                    }
+                    
                 }
             }
         }
 
-        private uint GetNewOffset(int i)
+        private ALAR3File ReplaceStream(ALAR3File old, DataStream stream)
         {
-            return AlarFiles[i].Offset + AlarFiles[i].Size;
+            ALAR3File newAlar = new ALAR3File(stream);
+
+
+            newAlar.FileID = old.FileID;
+            newAlar.Offset = old.Offset;
+            newAlar.Unk3 = old.Unk3;
+            newAlar.Unk4 = old.Unk4;
+            newAlar.Unk5 = old.Unk5;
+            newAlar.Unk6 = old.Unk6;
+            newAlar.Size = (uint)stream.Length;
+
+            return newAlar;
         }
 
     }

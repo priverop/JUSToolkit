@@ -9,6 +9,8 @@
         IConverter<ALAR3, NodeContainerFormat>,
         IConverter<NodeContainerFormat, ALAR3>
     {
+
+        // *** TODO: Replace this to return aar.AlarFiles?
         public NodeContainerFormat Convert(ALAR3 aar)
         {
             if (aar == null)
@@ -16,9 +18,9 @@
 
             var container = new NodeContainerFormat();
 
-            foreach (ALAR3File f in aar.AlarFiles)
+            foreach (Node n in aar.AlarFiles.Root.Children)
             {
-                container.Root.Add(f.File);
+                container.Root.Add(n);
             }
 
             return container;
@@ -31,9 +33,9 @@
             foreach(Node n in container.Root.Children){
 
                 // New node to avoid Disposal
-                Node newNode = new Node(n.Name, new BinaryFormat(n.Stream));
+                Node newNode = new Node(n.Name, new ALAR3File(n.Stream));
 
-                aar.AlarFiles.Add(new ALAR3File{ File = newNode });
+                aar.AlarFiles.Root.Add(newNode);
             }
 
             return aar;

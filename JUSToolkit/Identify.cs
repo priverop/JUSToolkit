@@ -14,27 +14,27 @@ namespace JUSToolkit
     using JUSToolkit.Formats.ALAR;
 
     /// <summary>
-    /// Identify allow us to Identify which Format are we entering to the program.
-    /// It reads the extension and returns the Format of the file.
+    /// Identify allow us to Identify which IFormat are we entering to the program.
+    /// It reads the extension and returns the IFormat of the file.
     /// </summary>
     public class Identify
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
 
         public Dictionary<String, Delegate> extensionDictionary { get; set; }
-        public Dictionary<String, Format> binDictionary { get; set; }
-        public Dictionary<int, Format> alarDictionary { get;set;}
+        public Dictionary<String, IFormat> binDictionary { get; set; }
+        public Dictionary<int, IFormat> alarDictionary { get;set;}
 
         public Identify(){
 
             extensionDictionary = new Dictionary<String, Delegate>
             {
-                { ".aar", new Func<Node, Format>(GetAlarFormat) },
-                { ".bin", new Func<Node, Format>(GetBinFormat) },
-                { ".dig", new Func<Node, Format>(GetDigFormat) },
+                { ".aar", new Func<Node, IFormat>(GetAlarFormat) },
+                { ".bin", new Func<Node, IFormat>(GetBinFormat) },
+                { ".dig", new Func<Node, IFormat>(GetDigFormat) },
             };
 
-            binDictionary = new Dictionary<String, Format>
+            binDictionary = new Dictionary<String, IFormat>
             {
                 { "tutorial0.bin", new BinTutorial() },
                 { "tutorial1.bin", new BinTutorial() },
@@ -64,7 +64,7 @@ namespace JUSToolkit
                 { "jquiz.bin", new BinQuiz() },
             };
 
-            alarDictionary = new Dictionary<int, Format>
+            alarDictionary = new Dictionary<int, IFormat>
             {
                 { 02, new ALAR2() },
                 { 03, new ALAR3() },
@@ -72,10 +72,10 @@ namespace JUSToolkit
         }
 
         /// <summary>
-        /// Gets the Format of the file passed.
+        /// Gets the IFormat of the file passed.
         /// </summary>
         /// <returns>The format of the file passed by argument.</returns>
-        public Format GetFormat(Node n)
+        public IFormat GetFormat(Node n)
         {
             String extension = Path.GetExtension(n.Name);
 
@@ -87,13 +87,13 @@ namespace JUSToolkit
 
             if(IsCompressed(n)){
                 log.Info("Compressed file.");
-                return (Format)new DSCP();
+                return (IFormat)new DSCP();
             }
             else{
                 log.Info("Not compressed");
             }
 
-            return (Format)extensionDictionary[extension].DynamicInvoke(n);
+            return (IFormat)extensionDictionary[extension].DynamicInvoke(n);
             
         }
 
@@ -118,10 +118,10 @@ namespace JUSToolkit
         * 
         * Switch.
         * 
-        * Tendríamos un Format por cada tipo.
+        * Tendríamos un IFormat por cada tipo.
         */
 
-        public Format GetBinFormat(Node node)
+        public IFormat GetBinFormat(Node node)
         {
             Regex regex = new Regex("^bin-.*-.*.bin$");
             if (regex.IsMatch(node.Name))
@@ -141,12 +141,12 @@ namespace JUSToolkit
          * 
          * Tipo -> 02 | 03.
          * 
-         * Si es 02 -> Format ALAR2.
-         * Si es 03 -> Format ALAR3.
+         * Si es 02 -> IFormat ALAR2.
+         * Si es 03 -> IFormat ALAR3.
          * 
          */
 
-        public Format GetAlarFormat(Node node)
+        public IFormat GetAlarFormat(Node node)
         {
             DataReader fileToReadReader = new DataReader(node.Stream);
 
@@ -170,7 +170,7 @@ namespace JUSToolkit
 
         }
 
-        public Format GetDigFormat(Node node){
+        public IFormat GetDigFormat(Node node){
 
             DataReader reader = new DataReader(node.Stream);
 

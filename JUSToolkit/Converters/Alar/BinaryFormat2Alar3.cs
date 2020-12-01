@@ -8,6 +8,7 @@
     using log4net;
     using JUSToolkit.Formats;
     using System.Linq;
+    using System.IO;
 
     public class BinaryFormat2Alar3 :
         IConverter<BinaryFormat, ALAR3>,
@@ -50,27 +51,33 @@
             {
                 input.Stream.Position = filePosition;
 
-                var aarFile = new ALAR3File
+                ushort FileID = br.ReadUInt16();
+                ushort Unk3 = br.ReadUInt16();
+                uint Offset = br.ReadUInt32();
+                uint Size = br.ReadUInt32();
+
+                DataStream fileStream = new DataStream(input.Stream, Offset, Size);
+
+                var aarFile = new ALAR3File(fileStream)
                 {
-                    FileID = br.ReadUInt16(),
-                    Unk3 = br.ReadUInt16(),
-                    Offset = br.ReadUInt32(),
-                    Size = br.ReadUInt32(),
+                    FileID = FileID,
+                    Unk3 = Unk3,
+                    Offset = Offset,
+                    Size = Size,
                     Unk4 = br.ReadUInt16(),
                     Unk5 = br.ReadUInt16(),
                     Unk6 = br.ReadUInt16()
                 };
 
-                DataStream fileStream = new DataStream(input.Stream, aarFile.Offset, aarFile.Size);
+                string fullFilename = br.ReadString();
+                string filename = Path.GetFileName(fullFilename);
+                fullFilename = fullFilename.Remove(fullFilename.IndexOf(filename, StringComparison.CurrentCulture), filename.Length);
 
-                string filename = br.ReadString().Replace("/", "-");
+                var child = new Node(filename, aarFile);
 
-                aarFile.File = new Node(filename, new BinaryFormat(fileStream));
+                NodeFactory.CreateContainersForChild(aar.AlarFiles.Root, fullFilename, child);
 
-                aar.AlarFiles.Add(aarFile);
             }
-
-            //br.Stream.Dispose();
 
             return aar;
         }
@@ -99,64 +106,80 @@
                 writer.Write(aar.FileTableIndex[i]);
             }
 
-            long[] offsetPositions = new long[aar.AlarFiles.Count];
-            int[] paddings = new int[aar.AlarFiles.Count];
+            long[] offsetPositions = new long[aar.AlarFiles.Root.Children.Count];
+            int[] paddings = new int[aar.AlarFiles.Root.Children.Count];
 
-            foreach (ALAR3File aarFile in aar.AlarFiles)
+            foreach (Node aarFile in aar.AlarFiles.Root.Children)
             {
-                writer.WritePadding(0, 04);
+                if (!aarFile.IsContainer)
+                {
+                    ALAR3File alarChild = aarFile.GetFormatAs<ALAR3File>();
 
-                writer.Write(aarFile.FileID); // 2
-                writer.Write(aarFile.Unk3); // 2
-                offsetPositions[aarFile.FileID] = writer.Stream.Position;
-                writer.Write(aarFile.Offset); // 4
-                writer.Write(aarFile.Size); //4
-                writer.Write(aarFile.Unk4); //2
-                writer.Write(aarFile.Unk5); //2
-                writer.Write(aarFile.Unk6); //2
+                    writer.WritePadding(0, 04);
 
-                writer.Write(aarFile.File.Name.Replace("-", "/"), true);
+                    writer.Write(alarChild.FileID); // 2
+                    writer.Write(alarChild.Unk3); // 2
+                    offsetPositions[alarChild.FileID] = writer.Stream.Position;
+                    writer.Write(alarChild.Offset); // 4
+                    writer.Write(alarChild.Size); //4
+                    writer.Write(alarChild.Unk4); //2
+                    writer.Write(alarChild.Unk5); //2
+                    writer.Write(alarChild.Unk6); //2
 
+                    // ToDo
+                    // directories?
+                    writer.Write(aarFile.Name, true);
+                }
             }
 
             writer.WritePadding(0, 04);
 
             // Primero Cabeceras y luego ficheros
-            foreach (ALAR3File aarFile in aar.AlarFiles)
+            foreach (Node n in aar.AlarFiles.Root.Children)
             {
-                if (aarFile.FileID != 0)
+                if (!n.IsContainer)
                 {
-                    long initPadding = writer.Stream.Position;
-                    writer.WritePadding(0, 04);
-                    long endPadding = writer.Stream.Position;
-                    int paddingSize = (int)(endPadding - initPadding);
+                    ALAR3File aarFile = n.GetFormatAs<ALAR3File>();
 
-                    paddings[aarFile.FileID] = paddingSize;
+                    if (aarFile.FileID != 0)
+                    {
+                        long initPadding = writer.Stream.Position;
+                        writer.WritePadding(0, 04);
+                        long endPadding = writer.Stream.Position;
+                        int paddingSize = (int)(endPadding - initPadding);
+
+                        paddings[aarFile.FileID] = paddingSize;
+                    }
+
+                    aarFile.Stream.WriteTo(writer.Stream);
                 }
-
-                aarFile.File.Stream.WriteTo(writer.Stream);
 
             }
 
             // Ajustamos offsets
 
             int newOffset = 0;
-            foreach (ALAR3File aarFile in aar.AlarFiles)
+            foreach (Node n in aar.AlarFiles.Root.Children)
             {
+                if (!n.IsContainer)
+                {
+                    ALAR3File aarFile = n.GetFormatAs<ALAR3File>();
 
-                if (aarFile.FileID == 0)
-                {
-                    newOffset = (int)aarFile.Offset;
-                }
-                if (aarFile.FileID != aar.AlarFiles.Count -1)
-                {
-                    newOffset += (int)(aarFile.Size + paddings[aarFile.FileID+1]);
-                    writer.Stream.RunInPosition(
-                        () => writer.Write(newOffset),
-                    offsetPositions[aarFile.FileID + 1]);
+                    if (aarFile.FileID == 0)
+                    {
+                        newOffset = (int)aarFile.Offset;
+                    }
+                    if (aarFile.FileID != aar.AlarFiles.Root.Children.Count - 1)
+                    {
+                        newOffset += (int)(aarFile.Size + paddings[aarFile.FileID + 1]);
+                        writer.Stream.RunInPosition(
+                            () => writer.Write(newOffset),
+                        offsetPositions[aarFile.FileID + 1]);
+                    }
                 }
             }
             return binary;
         }
+
     }
 }

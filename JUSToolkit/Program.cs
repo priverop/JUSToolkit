@@ -14,7 +14,7 @@
     using System.Drawing;
     using Texim.Processing;
     using Texim;
-    using System.Text;
+    using Yarhl.IO;
 
     class MainClass
     {
@@ -112,7 +112,7 @@
             foreach (Node d in NodeFactory.FromDirectory(inputFolder, "*.dig").Children)
             {
                 Identify i = new Identify();
-                Format inputFormat = i.GetFormat(d);
+                IFormat inputFormat = i.GetFormat(d);
                 Node dig = d;
 
                 // Compressed file
@@ -152,7 +152,7 @@
         {
             Identify i = new Identify();
 
-            Format inputFormat = i.GetFormat(n);
+            IFormat inputFormat = i.GetFormat(n);
 
             // Compressed file
             if (inputFormat.ToString() == FORMATPREFIX + "DSCP")
@@ -162,7 +162,7 @@
                 inputFormat = i.GetFormat(n);
             }
 
-            log.Info("Format detected: " + inputFormat.ToString());
+            log.Info("IFormat detected: " + inputFormat.ToString());
 
             switch (type)
             {// inputFilename - dirtosave - (dir/file to insert)
@@ -180,8 +180,8 @@
         {
             log.Info("Importing " + nDIG.Name + ", " + nATM.Name + " and " + nPNG.Name);
 
-            DIG originalDig = nDIG.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
-            ALMT originalAtm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
+            DIG originalDig = nDIG.TransformWith<Binary2DIG>().GetFormatAs<DIG>();
+            ALMT originalAtm = nATM.TransformWith<Binary2ALMT>().GetFormatAs<ALMT>();
 
             // Import the new PNG file
             Bitmap newImage = (Bitmap)Image.FromStream(nPNG.Stream.BaseStream);
@@ -210,8 +210,8 @@
             originalDig.Pixels = pixelInfo;
             originalAtm.Info = mapInfos;
 
-            BinaryFormat bDig = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
-            BinaryFormat bAtm = originalAtm.ConvertWith<Binary2ALMT, ALMT, BinaryFormat>();
+            BinaryFormat bDig = (BinaryFormat)ConvertFormat.With<Binary2DIG>(originalDig);
+            BinaryFormat bAtm = (BinaryFormat)ConvertFormat.With<Binary2ALMT>(originalAtm);
 
             Utils.Lzss(bDig, "-evn").Stream.WriteTo(Path.Combine(outputPath, nDIG.Name + ".evn.dig"));
             bAtm.Stream.WriteTo(Path.Combine(outputPath, nATM.Name + ".atm"));
@@ -221,9 +221,9 @@
         {
             log.Info("Exporting "+ nDIG.Name);
 
-            DIG dig = nDIG.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
+            DIG dig = nDIG.TransformWith<Binary2DIG>().GetFormatAs<DIG>();
 
-            ALMT atm = nATM.Transform<Binary2ALMT, BinaryFormat, ALMT>().GetFormatAs<ALMT>();
+            ALMT atm = nATM.TransformWith<Binary2ALMT>().GetFormatAs<ALMT>();
 
             Bitmap img = atm.CreateBitmap(dig.Pixels,dig.Palette);
 
@@ -241,9 +241,9 @@
             {
                 case FORMATPREFIX + "BinTutorial":
 
-                    n.Transform<BinaryFormat2BinTutorial, BinaryFormat, BinTutorial>()
-                    .Transform<Bin2Po, BinTutorial, Po>()
-                    .Transform<Po2Binary, Po, BinaryFormat>()
+                    n.TransformWith<BinaryFormat2BinTutorial>()
+                    .TransformWith<Bin2Po>()
+                    .TransformWith<Po2Binary>()
                     .Stream.WriteTo(Path.Combine(outputPath, n.Name + ".po"));
 
                     break;
@@ -259,13 +259,13 @@
 
                 case FORMATPREFIX + "BinQuiz":
 
-                    var quizs = n.Transform<Binary2BinQuiz, BinaryFormat, BinQuiz>()
-                    .Transform<Quiz2Po, BinQuiz, NodeContainerFormat>();
+                    var quizs = n.TransformWith<Binary2BinQuiz>()
+                    .TransformWith<Quiz2Po>();
 
                     foreach (Node po in quizs.Children) {
                         string outputFile = Path.Combine(outputPath, po.Name + ".po");
                         log.Info("Saving " + outputFile);
-                        po.Transform<Po2Binary, Po, BinaryFormat>()
+                        po.TransformWith<Po2Binary>()
                         .Stream.WriteTo(outputFile);
                     }
 
@@ -273,8 +273,8 @@
 
                 case FORMATPREFIX + "ALAR.ALAR3":
 
-                    var folder = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>()
-                        .Transform<Alar3ToNodes, ALAR3, NodeContainerFormat>();
+                    var folder = n.TransformWith<BinaryFormat2Alar3>()
+                        .TransformWith<Alar3ToNodes>();
 
                     SaveToDir(folder, outputPath);
 
@@ -282,8 +282,8 @@
 
                 case FORMATPREFIX + "ALAR.ALAR2":
 
-                    var root = n.Transform<BinaryFormat2Alar2, BinaryFormat, ALAR2>()
-                        .Transform<Alar2ToNodes, ALAR2, NodeContainerFormat>();
+                    var root = n.TransformWith<BinaryFormat2Alar2>()
+                        .TransformWith<Alar2ToNodes>();
 
                     SaveToDir(root, outputPath);
 
@@ -322,23 +322,27 @@
                 case FORMATPREFIX + "ALAR.ALAR3":
 
                     // Alar original
-                    Node original = n.Transform<BinaryFormat2Alar3, BinaryFormat, ALAR3>();
+                    Node original = n.TransformWith<BinaryFormat2Alar3>();
 
                     // Contenedor con los ficheros a insertar
-                    var newAlar = NodeFactory.FromDirectory(dataToInsert, "*.*")
-                        .Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
+                    Node newContainer = NodeFactory.FromDirectory(dataToInsert, "*.*");
+                    foreach (var child in newContainer.Children)
+                    {
+                        log.Info("Importing " + child.Name);
+                    }
+                    //var newAlar = newContainer.Transform<Alar3ToNodes, NodeContainerFormat, ALAR3>();
 
                     // Modificamos el Alar original con los nuevos ficheros a insertar
-                    original.GetFormatAs<ALAR3>().InsertModification(newAlar.GetFormatAs<ALAR3>()); 
+                    original.GetFormatAs<ALAR3>().InsertModification(newContainer); 
 
-                    original.Transform<BinaryFormat2Alar3, ALAR3, BinaryFormat>()
+                    original.TransformWith<BinaryFormat2Alar3>()
                         .Stream.WriteTo(Path.Combine(dirToSave, n.Name + "new.aar"));
 
                     break;
 
                 case FORMATPREFIX + "DIG":
 
-                    DIG originalDig = n.Transform<Binary2DIG, BinaryFormat, DIG>().GetFormatAs<DIG>();
+                    DIG originalDig = n.TransformWith<Binary2DIG>().GetFormatAs<DIG>();
 
                     // Import the new PNG file
                     Bitmap newImage = (Bitmap)Image.FromFile(dataToInsert);
@@ -353,7 +357,7 @@
 
                     originalDig.Pixels = pixelInfo;
 
-                    BinaryFormat b = originalDig.ConvertWith<Binary2DIG, DIG, BinaryFormat>();
+                    BinaryFormat b = (BinaryFormat)ConvertFormat.With<Binary2DIG>(originalDig);
 
                     Utils.Lzss(b, "-evn").Stream.WriteTo(Path.Combine(dirToSave, n.Name + "evn.dig"));
 
