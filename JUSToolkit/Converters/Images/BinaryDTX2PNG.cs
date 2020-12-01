@@ -4,7 +4,7 @@ using System.Drawing;
 using System.IO;
 using JUSToolkit.Formats;
 using log4net;
-using Texim.Media.Image;
+using Texim;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -73,7 +73,7 @@ namespace JUSToolkit.Converters.Images
                 log.Debug("komaShapeOffset:" + komaShapeOffset);
 
                 // DTX File
-                Node dtx = Navigator.SearchFile<Node>(source.Root, Path.Combine("/"+Directory, "koma-"+dtxName + ".dtx"));
+                Node dtx = Navigator.SearchNode<Node>(source.Root, Path.Combine("/"+Directory, "koma-"+dtxName + ".dtx"));
 
                 DataReader dtxReader = new DataReader(dtx.Stream);
 

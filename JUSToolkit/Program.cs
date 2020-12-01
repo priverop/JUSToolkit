@@ -1,7 +1,6 @@
 ﻿namespace JUSToolkit
 {
     using System;
-    using Yarhl.FileFormat;
     using log4net;
     using log4net.Config;
     using Formats;
