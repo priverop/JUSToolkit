@@ -171,7 +171,7 @@ namespace JUSToolkit.Converters.Images
                 img.Save("test.png");
 
                 // Add to container
-                var n = new Node(dtxName, new BinaryFormat(new DataStream(s)));
+                var n = new Node(dtxName, new BinaryFormat(DataStreamFactory.FromStream(s)));
                 output.Root.Add(n);
 
             }

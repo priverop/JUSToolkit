@@ -185,8 +185,15 @@
             DIG originalDig = nDIG.TransformWith<Binary2DIG>().GetFormatAs<DIG>();
             ALMT originalAtm = nATM.TransformWith<Binary2ALMT>().GetFormatAs<ALMT>();
 
+            // New stream
+            var stream = new MemoryStream();
+            var dataStream = DataStreamFactory.FromStreamKeepingOwnership(stream, 0, 0);
+
+            // Copy the png to the bitmap stream
+            nPNG.Stream.WriteTo(dataStream);
+
             // Import the new PNG file
-            Bitmap newImage = (Bitmap)Image.FromStream(nPNG.Stream.BaseStream);
+            Bitmap newImage = (Bitmap)Image.FromStream(stream);
 
             var quantization = new FixedPaletteQuantization(originalDig.Palette.GetPalette(0));
             ColorFormat format;
