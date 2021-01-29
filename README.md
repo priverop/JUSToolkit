@@ -3,7 +3,8 @@ Romhacking tools for Jump Ultimate Stars! (NDS)
 [![GPL v3 License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?style=flat)](http://www.gnu.org/copyleft/gpl.html)
 
 ## Features
-Coming soon
+- Pack and unpack .aar (ALAR2 and ALAR3).
+- 
 
 ## Tinke
 There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleonex/tinke).
@@ -13,7 +14,26 @@ There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleon
 - [YARHL by PleoNex](https://github.com/SceneGate/Yarhl)
 - Log4Net
 
-# Docs
+# How To Use
+
+- JUSToolkit.exe -e <fileToExtract> <dirToSave>");
+- JUSToolkit.exe -i <inputFileName> <dirToSave> <fileToInsert>");
+- JUSToolkit.exe -importdig dir <dirToSave> <dirWithFilesToInsert>");
+- JUSToolkit.exe -exportdig dir <dirToSave> <dirWithFilesToInsert>
+
+## Batch export dig & almt to png. Folder to folder.
+`-exportdig dir ruleselect/out ruleselect/out`
+
+## Batch import files (dig & altm with the same name) from comic/import to comic/import/new
+`-importdig dir comic/import/new comic/import`
+
+## Unpack files from demo.aar
+`-e alar/demo.aar demo`
+
+## Pack files from insertDemo into demo.aar and save it in root (.)
+`-i alar/demo.aar . alar/insertDemo`
+
+# External
 - DIRECTO ROM Hacking: Triple reto de imágenes: https://www.youtube.com/watch?v=r1Rsx6RRe1U
 - DIRECTO Domingos de desensamblador: imágenes de Devil Survivor y JUS y ordenar textos de MetalMax 3: https://www.youtube.com/watch?v=R2h-UEcO_-k
 - DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS: https://www.youtube.com/watch?v=1KT4u_Kvaws 
@@ -26,26 +46,6 @@ Thanks to the Jump Ultimate Stars! devs for this amazing game.
 ___
 
 # WIP WORK
-
-## Branches
-
-Ahora mismo hay 4 ramas:
-
-- master: la principal, la que usa Darkc0m.
-- komas: añadida funcionalidad de descomprimir .dtx. Hay que mergearla asap. Bug #1
-
-- ALMT: añadida funcionalidad para utilizar los mapas .almt. Hay que mergearla asap. Bug #2
-
-- ALAR: refactor de los ficheros .aar. Estos ficheros son contenedores de un montón de ficheros. La cosa es que yo originalmente sudaba de las carpetas internas y los hacía únicos, es decir:
-
-carpeta root -> carpeta comic -> carpeta bb -> fichero bb00.dig
-
-Lo extraía como un fichero llamado root-comic-bb-bb0.dig
-
-Lo que habría que hacer es que se descompriman con todas las carpetas.
-
-Está ya hecho pero falta depurar, arreglar fallos, etc. No se debe mergear hasta que esté 100% testeado para evitar que rompa la estable.
-Empecé a meter tests de integración pero se me complicó la cosa
 
 ## DTX
 
