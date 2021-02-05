@@ -16,10 +16,10 @@ There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleon
 
 # How To Use
 
-- JUSToolkit.exe -e <fileToExtract> <dirToSave>");
-- JUSToolkit.exe -i <inputFileName> <dirToSave> <fileToInsert>");
-- JUSToolkit.exe -importdig dir <dirToSave> <dirWithFilesToInsert>");
-- JUSToolkit.exe -exportdig dir <dirToSave> <dirWithFilesToInsert>
+- JUSToolkit.exe `-e <fileToExtract> <dirToSave>`
+- JUSToolkit.exe `-i <inputFileName> <dirToSave> <fileToInsert>`
+- JUSToolkit.exe `-importdig dir <dirToSave> <dirWithFilesToInsert>`
+- JUSToolkit.exe `-exportdig dir <dirToSave> <dirWithFilesToInsert>`
 
 ## Batch export dig & almt to png. Folder to folder.
 `-exportdig dir ruleselect/out ruleselect/out`

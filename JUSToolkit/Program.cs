@@ -17,6 +17,7 @@
     using Yarhl.IO;
     using Yarhl.FileFormat;
     using System.Text;
+    using System.Threading;
 
     class MainClass
     {
@@ -40,6 +41,11 @@
                 string inputFileName = args[1];
                 string dirToSave = args[2];
                 string dataToInsert = null;
+
+                if (!Directory.Exists(dirToSave))
+                {
+                    Directory.CreateDirectory(dirToSave);
+                }                    
 
                 // inputFilename - dirtosave - (dir/file to insert)
 
@@ -237,9 +243,10 @@
             Bitmap img = atm.CreateBitmap(dig.Pixels,dig.Palette);
 
             string path = Path.Combine(outputPath, nDIG.Name + ".png");
+            
             img.Save(path);
 
-            log.Info("Saved into "+path);
+            log.Info("Saved into " + path);
         }
 
         private static void Export(string format, Node n, string outputPath){
