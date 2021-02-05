@@ -102,7 +102,7 @@
 
                     dtx.TransformWith(converter);
 
-                    SaveToDir(dtx, outputFolder);
+                    SaveNodeToDir(dtx, outputFolder);
 
                     break;
             }
@@ -282,10 +282,10 @@
 
                 case FORMATPREFIX + "ALAR.ALAR3":
 
-                    var folder = n.TransformWith<BinaryFormat2Alar3>()
-                        .TransformWith<Alar3ToNodes>();
+                    NodeContainerFormat folder = n.TransformWith<BinaryFormat2Alar3>()
+                        .TransformWith<Alar3ToNodes>().GetFormatAs<NodeContainerFormat>();
 
-                    SaveToDir(folder, outputPath);
+                    SaveContainerToDir(folder, outputPath);
 
                     break;
 
@@ -294,7 +294,7 @@
                     var root = n.TransformWith<BinaryFormat2Alar2>()
                         .TransformWith<Alar2ToNodes>();
 
-                    SaveToDir(root, outputPath);
+                    SaveNodeToDir(root, outputPath);
 
                     break;
 
@@ -391,13 +391,35 @@
             log.Info("=========================");
         }
 
-        private static void SaveToDir(Node folder, string output){
+        private static void SaveNodeToDir(Node folder, string output){
             Directory.CreateDirectory(output);
             foreach (var child in folder.Children)
             {
                 string outputFile = Path.Combine(output, child.Name);
                 log.Info("Saving " + outputFile);
                 child.GetFormatAs<BinaryFormat>().Stream.WriteTo(outputFile);
+            }
+
+            log.Info("Saved in " + output);
+        }
+
+        private static void SaveContainerToDir(NodeContainerFormat folder, string output)
+        {
+            // PROBLEMA ACTUAL
+            // Tenemos un string llamado output con el nombre de la carpeta destino
+            // child.Path tiene la ruta del fichero a extraer
+            // QUeremos combinar output con child.Path, pero no funciona!
+            // outputFile debería valer "/output/demo.aar/demo"
+
+            Directory.CreateDirectory(output);
+            foreach (var child in Navigator.IterateNodes(folder.Root))
+            {
+                string outputFile = output + child.Path;
+                if (!child.IsContainer)
+                {
+                    child.GetFormatAs<BinaryFormat>().Stream.WriteTo(outputFile);
+                    log.Info("Saving " + outputFile);
+                }
             }
 
             log.Info("Saved in " + output);

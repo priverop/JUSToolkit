@@ -10,20 +10,12 @@
         IConverter<NodeContainerFormat, ALAR3>
     {
 
-        // *** TODO: Replace this to return aar.AlarFiles?
         public NodeContainerFormat Convert(ALAR3 aar)
         {
             if (aar == null)
                 throw new ArgumentNullException(nameof(aar));
 
-            var container = new NodeContainerFormat();
-
-            foreach (Node n in aar.AlarFiles.Root.Children)
-            {
-                container.Root.Add(n);
-            }
-
-            return container;
+            return aar.AlarFiles;
         }
 
         public ALAR3 Convert(NodeContainerFormat container)

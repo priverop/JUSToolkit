@@ -57,16 +57,16 @@
 
         private ALAR3File ReplaceStream(ALAR3File old, DataStream stream)
         {
-            ALAR3File newAlar = new ALAR3File(stream);
-
-
-            newAlar.FileID = old.FileID;
-            newAlar.Offset = old.Offset;
-            newAlar.Unk3 = old.Unk3;
-            newAlar.Unk4 = old.Unk4;
-            newAlar.Unk5 = old.Unk5;
-            newAlar.Unk6 = old.Unk6;
-            newAlar.Size = (uint)stream.Length;
+            ALAR3File newAlar = new ALAR3File(stream)
+            {
+                FileID = old.FileID,
+                Offset = old.Offset,
+                Unk3 = old.Unk3,
+                Unk4 = old.Unk4,
+                Unk5 = old.Unk5,
+                Unk6 = old.Unk6,
+                Size = (uint)stream.Length
+            };
 
             return newAlar;
         }
