@@ -73,106 +73,109 @@ namespace JUSToolkit.Converters.Images
                 log.Debug("komaShapeOffset:" + komaShapeOffset);
 
                 // DTX File
-                Node dtx = Navigator.SearchNode<Node>(source.Root, Path.Combine("/"+Directory, "koma-"+dtxName + ".dtx"));
+                Node dtx = Navigator.SearchNode<Node>(source.Root, dtxName + ".dtx");
 
-                DataReader dtxReader = new DataReader(dtx.Stream);
-
-                int magicid = dtxReader.ReadInt32();
-                byte type = dtxReader.ReadByte();
-                byte type_alt = dtxReader.ReadByte();
-                short totalFramesNumber = dtxReader.ReadInt16();
-                short digPointer = dtxReader.ReadInt16();
-                short unknown = dtxReader.ReadInt16();
-                byte[] width = new byte[totalFramesNumber];
-                byte[] height = new byte[totalFramesNumber];
-                short[] frameIndex = new short[totalFramesNumber];
-                for (int j = 0; j < totalFramesNumber; j++)
+                if (dtx != null)
                 {
-                    width[j] = dtxReader.ReadByte();
-                    height[j] = dtxReader.ReadByte();
-                    frameIndex[j] = dtxReader.ReadInt16();
-                }
+                    DataReader dtxReader = new DataReader(dtx.Stream);
 
-                BinaryFormat bfDIG = new BinaryFormat(dtx.Stream, (long)digPointer, (dtx.Stream.Length - (long)digPointer));
-
-                DIG dig = (DIG) ConvertFormat.With<Binary2DIG>(bfDIG);
-
-                // Iterate KomaShape
-
-                komaShapeReader.Stream.Position = komaShapeOffset;
-                // Fichero Dig tiene 08 de ancho y 872 de alto
-                // 08 * 872 / 2 = 3488 bytes
-                byte[] dtxPixels = new byte[192*240/2]; // *** REVISAR
-
-                int x = 0;
-                int y = 0;
-
-                log.Debug("==KOMASHAPE==");
-
-                // Iterate kshape
-                for (int k = 0; k < 0x14; k++)
-                {
-                    byte blockDTX = komaShapeReader.ReadByte();
-                    log.Debug(k+" - Byte: "+blockDTX);
-
-                    if (blockDTX > 00)
+                    int magicid = dtxReader.ReadInt32();
+                    byte type = dtxReader.ReadByte();
+                    byte type_alt = dtxReader.ReadByte();
+                    short totalFramesNumber = dtxReader.ReadInt16();
+                    short digPointer = dtxReader.ReadInt16();
+                    short unknown = dtxReader.ReadInt16();
+                    byte[] width = new byte[totalFramesNumber];
+                    byte[] height = new byte[totalFramesNumber];
+                    short[] frameIndex = new short[totalFramesNumber];
+                    for (int j = 0; j < totalFramesNumber; j++)
                     {
-                        blockDTX -= 1;
-                        // Empieza el primer bloque en el dtx
-                        long startIndex = frameIndex[blockDTX] * 0x20 + dig.PixelsStart + 32;
-                        log.Debug("startIndex:" + startIndex);
+                        width[j] = dtxReader.ReadByte();
+                        height[j] = dtxReader.ReadByte();
+                        frameIndex[j] = dtxReader.ReadInt16();
+                    }
 
-                        int blockSize = width[blockDTX] * 8 * height[blockDTX] * 8;
+                    BinaryFormat bfDIG = new BinaryFormat(dtx.Stream, (long)digPointer, (dtx.Stream.Length - (long)digPointer));
 
-                        for (int l = 0; l < blockSize; l++)
+                    DIG dig = (DIG)ConvertFormat.With<Binary2DIG>(bfDIG);
+
+                    // Iterate KomaShape
+
+                    komaShapeReader.Stream.Position = komaShapeOffset;
+                    // Fichero Dig tiene 08 de ancho y 872 de alto
+                    // 08 * 872 / 2 = 3488 bytes
+                    byte[] dtxPixels = new byte[192 * 240 / 2]; // *** REVISAR
+
+                    int x = 0;
+                    int y = 0;
+                    /*
+                    log.Debug("==KOMASHAPE==");
+
+                    // Iterate kshape
+                    for (int k = 0; k < 0x14; k++)
+                    {
+                        byte blockDTX = komaShapeReader.ReadByte();
+                        log.Debug(k + " - Byte: " + blockDTX);
+
+                        if (blockDTX > 00)
                         {
-                            int position = GetIndex(PixelEncoding.Lineal, x, y, 192, 240, new Size(8, 8));
+                            blockDTX -= 1;
+                            // Empieza el primer bloque en el dtx
+                            long startIndex = frameIndex[blockDTX] * 0x20 + dig.PixelsStart + 32;
+                            log.Debug("startIndex:" + startIndex);
 
-                            dtxPixels[position] = dig.Pixels.GetData()[startIndex + l];
-                            log.Debug(l + " - dtxPixels:"+ dtxPixels[l]);
+                            int blockSize = width[blockDTX] * 8 * height[blockDTX] * 8;
 
-                            x += 1;
-                            if (x >= 192)
+                            for (int l = 0; l < blockSize; l++)
                             {
-                                x = 0;
-                                y += 1;
+                                int position = GetIndex(PixelEncoding.Lineal, x, y, 192, 240, new Size(8, 8));
+
+                                dtxPixels[position] = dig.Pixels.GetData()[startIndex + l];
+                                log.Debug(l + " - dtxPixels:" + dtxPixels[l]);
+
+                                x += 1;
+                                if (x >= 192)
+                                {
+                                    x = 0;
+                                    y += 1;
+                                }
+                                log.Debug("x: " + x);
+                                log.Debug("y: " + y);
                             }
-                            log.Debug("x: " + x);
-                            log.Debug("y: " + y);
+
                         }
+                        x += 48;
+                        if (x >= 192)
+                        {
+                            x = 0;
+                            y += 48;
+                        }
+                        log.Debug("x: " + x);
+                        log.Debug("y: " + y);
 
                     }
-                    x += 48;
-                    if (x >= 192)
+                    log.Debug("====");
+                    */
+
+                    // Generate new image
+                    PixelArray extractedDTX = new PixelArray
                     {
-                        x = 0;
-                        y += 48;
-                    }
-                    log.Debug("x: " + x);
-                    log.Debug("y: " + y);
+                        Width = 192,
+                        Height = 240,
+                    };
+                    Palette palette = dig.Palette;
 
-                }
-                log.Debug("====");
+                    extractedDTX.SetData(dtxPixels, PixelEncoding.Lineal, ColorFormat.Indexed_8bpp);
 
+                    var img = extractedDTX.CreateBitmap(palette, 0);
+                    var s = new MemoryStream();
+                    img.Save(s, System.Drawing.Imaging.ImageFormat.Png);
+                    img.Save("test.png");
 
-                // Generate new image
-                PixelArray extractedDTX = new PixelArray
-                {
-                    Width = 192,
-                    Height = 240,
-                };
-                Palette palette = dig.Palette;
-
-                extractedDTX.SetData(dtxPixels, PixelEncoding.Lineal, ColorFormat.Indexed_8bpp);
-
-                var img = extractedDTX.CreateBitmap(palette, 0);
-                var s = new MemoryStream();
-                img.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-                img.Save("test.png");
-
-                // Add to container
-                var n = new Node(dtxName, new BinaryFormat(DataStreamFactory.FromStream(s)));
-                output.Root.Add(n);
+                    // Add to container
+                    var n = new Node(dtxName, new BinaryFormat(DataStreamFactory.FromStream(s)));
+                    output.Root.Add(n);
+                }                
 
             }
 
