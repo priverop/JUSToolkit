@@ -3,8 +3,20 @@ Romhacking tools for Jump Ultimate Stars! (NDS)
 [![GPL v3 License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?style=flat)](http://www.gnu.org/copyleft/gpl.html)
 
 ## Features
-- Pack and unpack .aar (ALAR2 and ALAR3).
-- 
+
+Done ✔️
+To test / with issues ⚠️
+Not done 🛑
+
+- Extract and reinsert texts (.bin) ✔️
+- Pack .aar ALAR3 ⚠️
+- Unpack .aar ALAR3 ✔️
+- Pack .aar ALAR2 🛑
+- Unpack .aar ALAR2 🛑
+- Extract ALMT + DIG ✔️
+- Import ALMT + DIG ⚠️
+- Extract DTX ⚠️
+- Import DTX 🛑
 
 ## Tinke
 There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleonex/tinke).
