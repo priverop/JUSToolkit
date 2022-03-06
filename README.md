@@ -15,7 +15,7 @@ Not done 🛑
 - Unpack .aar ALAR2 🛑
 - Extract ALMT + DIG ✔️
 - Import ALMT + DIG ⚠️
-- Extract DTX ⚠️
+- Extract DTX 🛑 Half way there
 - Import DTX 🛑
 
 ## Tinke
@@ -54,6 +54,6 @@ There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleon
 - DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS: https://www.youtube.com/watch?v=1KT4u_Kvaws 
 
 # Credits
-Special thanks to (PleoNex)[https://github.com/pleonex] for his help. IntegrationTests of this project are based on [SceneGate Lemon](https://github.com/SceneGate/Lemon).
+Special thanks to [PleoNex](https://github.com/pleonex) for his help. IntegrationTests of this project are based on [SceneGate Lemon](https://github.com/SceneGate/Lemon).
 Thanks to [TraduSquare](https://tradusquare.es) for the inspiration and support.
 Thanks to the Jump Ultimate Stars! devs for this amazing game.
