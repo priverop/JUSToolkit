@@ -1,59 +1,47 @@
-# JUSToolkit
-Romhacking tools for Jump Ultimate Stars! (NDS)
-[![GPL v3 License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?style=flat)](http://www.gnu.org/copyleft/gpl.html)
+# .NET Project template [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://choosealicense.com/licenses/mit/) ![Build and release](https://github.com/pleonex/template-csharp/workflows/Build%20and%20release/badge.svg)
 
-## Features
+This is a template repository for .NET projects. It uses the build system and
+DevOps pipeline [PleOps.Cake](https://github.com/pleonex/PleOps.Cake).
 
-Done ✔️
-To test / with issues ⚠️
-Not done 🛑
+<!-- prettier-ignore -->
+| Release | Package                                                           |
+| ------- | ----------------------------------------------------------------- |
+| Stable  | [![Azure Artifacts](https://feeds.dev.azure.com/benito356/339c91a8-9d6c-4082-8b1a-93c2ae76b637/_apis/public/Packaging/Feeds/e3acf8ba-ec70-46f0-b1a5-da1ce3dd5d9f/Packages/b8696a32-e71a-4479-9b0e-002997b8d8ef/Badge)](https://dev.azure.com/benito356/NetDevOpsTest/_packaging?_a=package&feed=e3acf8ba-ec70-46f0-b1a5-da1ce3dd5d9f&package=b8696a32-e71a-4479-9b0e-002997b8d8ef&preferRelease=true) |
+| Preview | [Azure Artifacts](https://dev.azure.com/SceneGate/SceneGate/_packaging?_a=feed&feed=SceneGate-Preview) |
 
-- Extract and reinsert texts (.bin) ✔️
-- Pack .aar ALAR3 ⚠️
-- Unpack .aar ALAR3 ✔️
-- Pack .aar ALAR2 🛑
-- Unpack .aar ALAR2 🛑
-- Extract ALMT + DIG ✔️
-- Import ALMT + DIG ⚠️
-- Extract DTX 🛑 Half way there
-- Import DTX 🛑
+## Setup
 
-## Tinke
-There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleonex/tinke).
+Follow the
+[checklist in PleOps.Cake](https://github.com/pleonex/PleOps.Cake/blob/develop/docs/guides/Project%20setup.md)
+to adapt this template to your project.
 
-## Stack
-- C#
-- [YARHL by PleoNex](https://github.com/SceneGate/Yarhl)
-- Log4Net
+## Documentation
 
-# How To Use
+Feel free to ask any question in the
+[project Discussion site!](https://github.com/pleonex/template-csharp/discussions)
 
-- JUSToolkit.exe `-e <fileToExtract> <dirToSave>`
-- JUSToolkit.exe `-i <inputFileName> <dirToSave> <fileToInsert>`
-- JUSToolkit.exe `-importdig dir <dirToSave> <dirWithFilesToInsert>`
-- JUSToolkit.exe `-exportdig dir <dirToSave> <dirWithFilesToInsert>`
-- JUSToolkit.exe `-exportdtx dir <dirToSave> <dirWithFilesToInsert>`
+Check our on-line [documentation](https://www.pleonex.dev/PleOps.Cake/).
 
-## Batch export dig & almt to png. Folder to folder.
-`-exportdig dir ruleselect/out ruleselect/out`
+## Build
 
-## Batch import files (dig & altm with the same name) from comic/import to comic/import/new
-`-importdig dir comic/import/new comic/import`
+The project requires to build .NET 6.0 SDK (Linux and MacOS require also Mono).
+If you open the project with VS Code and you did install the
+[VS Code Remote Containers](https://code.visualstudio.com/docs/remote/containers)
+extension, you can have an already pre-configured development environment with
+Docker or Podman.
 
-## Unpack files from demo.aar
-`-e alar/demo.aar demo`
+To build, test and generate artifacts run:
 
-## Pack files from insertDemo into demo.aar and save it in root (.)
-`-i alar/demo.aar . alar/insertDemo`
+```sh
+# Only required the first time
+dotnet tool restore
 
-# Research
-- [FileFormats by Uknown Hacker](FileFormats.md)
-- [DTX Research by PleoNex](dtx-research.md)
-- DIRECTO ROM Hacking: Triple reto de imágenes: https://www.youtube.com/watch?v=r1Rsx6RRe1U
-- DIRECTO Domingos de desensamblador: imágenes de Devil Survivor y JUS y ordenar textos de MetalMax 3: https://www.youtube.com/watch?v=R2h-UEcO_-k
-- DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS: https://www.youtube.com/watch?v=1KT4u_Kvaws 
+# Default target is Stage-Artifacts
+dotnet cake
+```
 
-# Credits
-Special thanks to [PleoNex](https://github.com/pleonex) for his help. IntegrationTests of this project are based on [SceneGate Lemon](https://github.com/SceneGate/Lemon).
-Thanks to [TraduSquare](https://tradusquare.es) for the inspiration and support.
-Thanks to the Jump Ultimate Stars! devs for this amazing game.
+To just build and test quickly, run:
+
+```sh
+dotnet cake --target=BuildTest
+```
