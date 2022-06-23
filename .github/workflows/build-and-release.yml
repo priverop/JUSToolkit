@@ -34,11 +34,6 @@ jobs:
       - name: "Install build tools"
         run: dotnet tool restore
 
-      - name: "Generate release notes"
-        run: dotnet cake --target=Generate-ReleaseNotes --verbosity=diagnostic
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-
       - name: "Build, test and stage"
         run: dotnet cake --target=Stage-Artifacts --configuration=Release --verbosity=diagnostic
 
