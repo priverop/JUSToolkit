@@ -47,8 +47,8 @@ There is a plugin with this tools in [Tinke by PleoNex](https://github.com/pleon
 `-i alar/demo.aar . alar/insertDemo`
 
 # Research
-- [FileFormats by Uknown Hacker](FileFormats.md)
-- [DTX Research by PleoNex](dtx-research.md)
+- FileFormats by Uknown Hacker(FileFormats.md)
+- DTX Research by PleoNex(dtx-research.md)
 - DIRECTO ROM Hacking: Triple reto de imágenes: https://www.youtube.com/watch?v=r1Rsx6RRe1U
 - DIRECTO Domingos de desensamblador: imágenes de Devil Survivor y JUS y ordenar textos de MetalMax 3: https://www.youtube.com/watch?v=R2h-UEcO_-k
 - DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS: https://www.youtube.com/watch?v=1KT4u_Kvaws 
