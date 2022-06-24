@@ -1,10 +1,10 @@
-﻿namespace JUSToolkit.Formats
-{
-    using System;
-    using Yarhl.FileFormat;
-    using Texim;
+﻿using System;
+using Texim;
+using Yarhl.FileFormat;
 
-    public class DIG : IFormat
+namespace JUSToolkit.Formats
+{
+    public class Dig : IFormat
     {
         public PixelArray Pixels { get; set; }
 

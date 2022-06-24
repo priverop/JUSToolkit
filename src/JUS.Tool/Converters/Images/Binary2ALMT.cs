@@ -7,13 +7,13 @@
     using Yarhl.IO;
 
     public class Binary2ALMT : 
-        IConverter<BinaryFormat, ALMT>,
-        IConverter<ALMT, BinaryFormat>
+        IConverter<BinaryFormat, Almt>,
+        IConverter<Almt, BinaryFormat>
     {
 
-        public ALMT Convert(BinaryFormat source)
+        public Almt Convert(BinaryFormat source)
         {
-            var almt = new ALMT();
+            var almt = new Almt();
 
             DataReader reader = new DataReader(source.Stream);
 
@@ -40,22 +40,22 @@
             long mapInfoSize = reader.Stream.Length - reader.Stream.Position;
             uint numInfos = (uint)((almt.BgMode == BgMode.Affine) ? mapInfoSize : mapInfoSize / 2);
 
-            almt.Info = new MapInfo[numInfos];
-            for (int i = 0; i < almt.Info.Length; i++)
+            almt.Maps = new MapInfo[numInfos];
+            for (int i = 0; i < almt.Maps.Length; i++)
             {
                 if (almt.BgMode == BgMode.Affine)
-                    almt.Info[i] = new MapInfo(reader.ReadByte());
+                    almt.Maps[i] = new MapInfo(reader.ReadByte());
                 else
-                    almt.Info[i] = new MapInfo(reader.ReadUInt16());
+                    almt.Maps[i] = new MapInfo(reader.ReadUInt16());
             }
 
-            almt.SetMapInfo(almt.Info);
+            almt.SetMapInfo(almt.Maps);
 
             return almt;
 
         }
 
-        public BinaryFormat Convert(ALMT source)
+        public BinaryFormat Convert(Almt source)
         {
             var b = new BinaryFormat();
 
@@ -69,7 +69,7 @@
             writer.Write(source.NumTileW);
             writer.Write(source.NumTileH);
             writer.Write(source.Unknown3);
-            foreach (MapInfo info in source.Info)
+            foreach (MapInfo info in source.Maps)
             {
                 if (source.BgMode == BgMode.Affine)
                     writer.Write(info.ToByte());

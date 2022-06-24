@@ -1,15 +1,12 @@
-﻿namespace JUSToolkit.Converters.Alar
+﻿using System;
+using JUSToolkit.Formats.ALAR;
+using Yarhl.FileFormat;
+using Yarhl.FileSystem;
+
+namespace JUSToolkit.Converters.Alar
 {
-    using System;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
-    using JUSToolkit.Formats.ALAR;
-
-    public class Alar3ToNodes : 
-        IConverter<ALAR3, NodeContainerFormat>,
-        IConverter<NodeContainerFormat, ALAR3>
+    public class Alar3ToNodes : IConverter<ALAR3, NodeContainerFormat>, IConverter<NodeContainerFormat, ALAR3>
     {
-
         public NodeContainerFormat Convert(ALAR3 aar)
         {
             if (aar == null)
@@ -20,12 +17,11 @@
 
         public ALAR3 Convert(NodeContainerFormat container)
         {
-            ALAR3 aar = new ALAR3();
+            var aar = new ALAR3();
 
-            foreach(Node n in container.Root.Children){
-
+            foreach (Node n in container.Root.Children) {
                 // New node to avoid Disposal
-                Node newNode = new Node(n.Name, new ALAR3File(n.Stream));
+                var newNode = new Node(n.Name, new ALAR3File(n.Stream));
 
                 aar.AlarFiles.Root.Add(newNode);
             }

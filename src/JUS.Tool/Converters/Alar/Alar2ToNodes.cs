@@ -1,22 +1,29 @@
-﻿namespace JUSToolkit.Converters.Alar
-{
-    using System;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
-    using JUSToolkit.Formats.ALAR;
+﻿using System;
+using JUSToolkit.Formats.ALAR;
+using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 
-    public class Alar2ToNodes : 
-        IConverter<ALAR2, NodeContainerFormat>,
-        IConverter<NodeContainerFormat, ALAR2>
+namespace JUSToolkit.Converters.Alar
+{
+    /// <summary>
+    /// Converter for ALAR files to Nodes.
+    /// </summary>
+    public class Alar2ToNodes : IConverter<ALAR2, NodeContainerFormat>, IConverter<NodeContainerFormat, ALAR2>
     {
-        public NodeContainerFormat Convert(ALAR2 aar)
+         /// <summary>
+        /// Converta an Alar2 container to a NodeContainerFormat.
+        /// </summary>
+        /// <param name="source">The Alar2 node.</param>
+        /// <returns>The NodeContainerFormat.</returns>
+        public NodeContainerFormat Convert(ALAR2 source)
         {
-            if (aar == null)
-                throw new ArgumentNullException(nameof(aar));
+            if (source == null) {
+                throw new ArgumentNullException(nameof(source));
+            }
 
             var container = new NodeContainerFormat();
 
-            foreach (ALAR2File f in aar.AlarFiles)
+            foreach (ALAR2File f in source.AlarFiles)
             {
                 container.Root.Add(f.File);
             }
@@ -24,12 +31,17 @@
             return container;
         }
 
+        /// <summary>
+        /// Converts a NodeContainerFormat to an Alar2 container.
+        /// </summary>
+        /// <param name="container">The NodeContainerFormat.</param>
+        /// <returns>The Alar2 container.</returns>
         public ALAR2 Convert(NodeContainerFormat container)
         {
-            ALAR2 aar = new ALAR2();
+            var aar = new ALAR2();
 
-            foreach(Node n in container.Root.Children){
-                aar.AlarFiles.Add(new ALAR2File{ File = n });
+            foreach (Node n in container.Root.Children) {
+                aar.AlarFiles.Add(new ALAR2File { File = n });
             }
 
             return aar;

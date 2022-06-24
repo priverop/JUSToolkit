@@ -11,7 +11,7 @@ using Yarhl.IO;
 
 namespace JUSToolkit.Converters.Images
 {
-    public class BinaryDTX2PNG: IConverter<NodeContainerFormat, NodeContainerFormat>
+    public class BinaryDTX2PNG : IConverter<NodeContainerFormat, NodeContainerFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
         public Node Arm { get; set; }
@@ -31,10 +31,9 @@ namespace JUSToolkit.Converters.Images
 
             DataReader komaReader = new DataReader(Koma.Stream);
 
-            int komaEntryNumber = (int) (komaReader.Stream.Length / KOMA_ENTRY_SIZE);
+            int komaEntryNumber = (int)(komaReader.Stream.Length / KOMA_ENTRY_SIZE);
 
-            for (int i = 0; i < komaEntryNumber; i++) 
-            {
+            for (int i = 0; i < komaEntryNumber; i++) {
                 byte[] entry = komaReader.ReadBytes(KOMA_ENTRY_SIZE);
 
                 // DTX NAME FROM ARM9
@@ -47,12 +46,11 @@ namespace JUSToolkit.Converters.Images
                 armReader.Stream.RunInPosition(
                 () => {
                     dtxName = armReader.ReadString();
-                    },
-                (KOMA_NAME_TABLE_OFFSET + letterKomaName * 4 ));
+                },
+                (KOMA_NAME_TABLE_OFFSET + letterKomaName * 4));
 
                 dtxName += "_" + numberKomaName;
-                if (numberKomaName == 0)
-                {
+                if (numberKomaName == 0) {
                     dtxName += 0;
                 }
 
@@ -75,8 +73,7 @@ namespace JUSToolkit.Converters.Images
                 // DTX File
                 Node dtx = Navigator.SearchNode<Node>(source.Root, dtxName + ".dtx");
 
-                if (dtx != null)
-                {
+                if (dtx != null) {
                     DataReader dtxReader = new DataReader(dtx.Stream);
 
                     int magicid = dtxReader.ReadInt32();
@@ -88,8 +85,7 @@ namespace JUSToolkit.Converters.Images
                     byte[] width = new byte[totalFramesNumber];
                     byte[] height = new byte[totalFramesNumber];
                     short[] frameIndex = new short[totalFramesNumber];
-                    for (int j = 0; j < totalFramesNumber; j++)
-                    {
+                    for (int j = 0; j < totalFramesNumber; j++) {
                         width[j] = dtxReader.ReadByte();
                         height[j] = dtxReader.ReadByte();
                         frameIndex[j] = dtxReader.ReadInt16();
@@ -97,7 +93,7 @@ namespace JUSToolkit.Converters.Images
 
                     BinaryFormat bfDIG = new BinaryFormat(dtx.Stream, (long)digPointer, (dtx.Stream.Length - (long)digPointer));
 
-                    DIG dig = (DIG)ConvertFormat.With<Binary2DIG>(bfDIG);
+                    Dig dig = (Dig)ConvertFormat.With<Binary2DIG>(bfDIG);
 
                     // Iterate KomaShape
 
@@ -158,8 +154,7 @@ namespace JUSToolkit.Converters.Images
                     */
 
                     // Generate new image
-                    PixelArray extractedDTX = new PixelArray
-                    {
+                    PixelArray extractedDTX = new PixelArray {
                         Width = 192,
                         Height = 240,
                     };
@@ -175,7 +170,7 @@ namespace JUSToolkit.Converters.Images
                     // Add to container
                     var n = new Node(dtxName, new BinaryFormat(DataStreamFactory.FromStream(s)));
                     output.Root.Add(n);
-                }                
+                }
 
             }
 
@@ -199,7 +194,7 @@ namespace JUSToolkit.Converters.Images
             int index = 0;
 
             if (pxEnc == PixelEncoding.HorizontalTiles)
-                index = tilePos.Y * numTilesX * tileLength + tilePos.X * tileLength;    // Absolute tile pos.
+                index = tilePos.Y * numTilesX * tileLength + (tilePos.X * tileLength);    // Absolute tile pos.
             else if (pxEnc == PixelEncoding.VerticalTiles)
                 index = tilePos.X * numTilesY * tileLength + tilePos.Y * tileLength;    // Absolute tile pos.
 

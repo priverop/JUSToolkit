@@ -9,12 +9,12 @@
     using log4net;
 
     public class Binary2DIG : 
-    IConverter<BinaryFormat, DIG>, 
-    IConverter<DIG, BinaryFormat>
+    IConverter<BinaryFormat, Dig>, 
+    IConverter<Dig, BinaryFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
 
-        public DIG Convert(BinaryFormat source)
+        public Dig Convert(BinaryFormat source)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -22,7 +22,7 @@
             DataReader reader = new DataReader(source.Stream);
             reader.Stream.Position = 0;
 
-            DIG dig = new DIG
+            Dig dig = new Dig
             {
                 Magic = reader.ReadBytes(4),
                 Type = reader.ReadByte(),
@@ -102,7 +102,7 @@
             return dig;
         }
 
-        public BinaryFormat Convert(DIG dig)
+        public BinaryFormat Convert(Dig dig)
         {
             if (dig == null)
                 throw new ArgumentNullException(nameof(dig));
