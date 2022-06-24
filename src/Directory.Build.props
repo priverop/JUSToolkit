@@ -11,6 +11,7 @@
              when packing apps if the SelfContained value is in the csproj
              instead in the CLI command. -->
         <NoWarn>NETSDK1179</NoWarn>
+        <NoWarn>NU1507</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
