@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 Benito Palacios Sánchez
+﻿// Copyright (c) 2020 Pablo Rivero
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
 // SOFTWARE.
 using System;
 
-namespace MyConsole
+namespace JUS.CLI
 {
     /// <summary>
     /// Main program class.
@@ -35,7 +35,7 @@ namespace MyConsole
             string consoleVersion = typeof(Program).Assembly.GetName().Version.ToString();
             Console.WriteLine($"Console version: {consoleVersion}");
 
-            string libVersion = MyLibrary.LibVersion.GetVersion();
+            string libVersion = JUS.Tool.LibVersion.GetVersion();
             Console.WriteLine($"Library version: {libVersion}");
         }
     }

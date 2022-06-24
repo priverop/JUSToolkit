@@ -5,9 +5,9 @@ Task("Define-Project")
     .Description("Fill specific project information")
     .Does<BuildInfo>(info =>
 {
-    info.AddLibraryProjects("MyLibrary");
-    info.AddApplicationProjects("src/MyConsole/MyConsole.csproj");
-    info.AddTestProjects("MyTests");
+    info.AddLibraryProjects("JUS.CLI");
+    info.AddApplicationProjects("JUS.Tool");
+    info.AddTestProjects("JUS.Tests");
 
     info.PreviewNuGetFeed = "https://pkgs.dev.azure.com/SceneGate/SceneGate/_packaging/SceneGate-Preview/nuget/v3/index.json";
 

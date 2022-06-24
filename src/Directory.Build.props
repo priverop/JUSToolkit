@@ -1,9 +1,9 @@
 <Project>
     <PropertyGroup>
-        <Product>PleOps</Product>
-        <Authors>pleonex</Authors>
+        <Product>JUSToolkit</Product>
+        <Authors>Pablo Rivero</Authors>
         <Company>None</Company>
-        <Copyright>Copyright (C) 2020 Benito Palacios Sánchez</Copyright>
+        <Copyright>Copyright (C) 2022 Pablo Rivero</Copyright>
 
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
@@ -16,10 +16,10 @@
 
     <PropertyGroup>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/pleonex/template-csharp</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/pleonex/template-csharp</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/priverop/JUSToolkit</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/priverop/JUSToolkit</RepositoryUrl>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageTags>net;csharp;devops;pipeline;github</PackageTags>
+        <PackageTags>videogames,romhacking,translating</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 

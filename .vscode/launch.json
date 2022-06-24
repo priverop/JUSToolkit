@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Cake: Run Build",
-            "program": "${workspaceFolder}/src/MyConsole/bin/Debug/net6.0/MyConsole.dll",
+            "program": "${workspaceFolder}/src/JUS.CLI/bin/Debug/net6.0/JUS.CLI.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

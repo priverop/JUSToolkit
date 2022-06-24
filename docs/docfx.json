@@ -4,7 +4,7 @@
         "src": [
           {
             "files": [
-              "MyLibrary/bin/**/MyLibrary.dll"
+              "JUS.Tool/bin/**/JUS.Tool.dll"
             ],
             "src": "../src"
           }

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLibrary", "MyLibrary\MyLibrary.csproj", "{07E6EBB9-380D-4813-AFCD-E5856501929A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JUS.Tool", "JUS.Tool\JUS.Tool.csproj", "{07E6EBB9-380D-4813-AFCD-E5856501929A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyConsole", "MyConsole\MyConsole.csproj", "{CB7B12D4-90B6-4564-8ECC-B6954E61A11F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JUS.CLI", "JUS.CLI\JUS.CLI.csproj", "{CB7B12D4-90B6-4564-8ECC-B6954E61A11F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTests", "MyTests\MyTests.csproj", "{276997DA-06FC-4C8A-AA82-92C3373C69A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JUS.Tests", "JUS.Tests\JUS.Tests.csproj", "{276997DA-06FC-4C8A-AA82-92C3373C69A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
