@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="Yarhl" />
+    <PackageReference Include="Texim" />
+    <PackageReference Include="log4net" />
   </ItemGroup>
 
 </Project>
