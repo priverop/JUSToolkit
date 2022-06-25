@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Collections.Generic;
+using System.Linq;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
 
@@ -42,13 +43,12 @@ namespace JUSToolkit.Texts.Converters
             };
 
             int i = 0;
-            foreach (KeyValuePair<string, int> entry in source.Text) {
-                string sentence = entry.Key;
-                if (string.IsNullOrEmpty(sentence)) {
-                    sentence = "<!empty>";
-                }
+            foreach (string sentence in from KeyValuePair<string, int> entry in source.Text
+                                     let sentence = entry.Key
+                                     select sentence) {
+                string cleanSentence = string.IsNullOrEmpty(sentence) ? "<!empty>" : sentence;
 
-                poExport.Add(new PoEntry(sentence) { Context = i.ToString() });
+                poExport.Add(new PoEntry(cleanSentence) { Context = i.ToString() });
                 i++;
             }
 

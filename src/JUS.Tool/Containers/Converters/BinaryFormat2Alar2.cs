@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.IO;
 using JUSToolkit.Formats.ALAR;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -41,7 +42,7 @@ namespace JUSToolkit.Converters.Alar
                 throw new ArgumentNullException(nameof(input));
             }
 
-            input.Stream.Seek(0, SeekMode.Start); // Just in case
+            _ = input.Stream.Seek(0, SeekOrigin.Begin); // Just in case
 
             var br = new DataReader(input.Stream)
             {
@@ -79,6 +80,8 @@ namespace JUSToolkit.Converters.Alar
                 br.Stream.Position = curPos;
 
                 aarFile.File = new Node(filename, new BinaryFormat(fileStream));
+                aarFile.Unknown1 = unk1;
+                aarFile.Unknown2 = unk2;
 
                 aar.AlarFiles.Add(aarFile);
             }

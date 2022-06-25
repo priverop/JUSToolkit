@@ -48,7 +48,10 @@ namespace JUSToolkit.Converters.Images
 
             // Si hay bytes vacios antes de empezar la paleta
             if (reader.ReadInt32() == 0) {
-                while (reader.ReadInt32() == 0);
+                while (reader.ReadInt32() == 0) {
+                    _ = "Don't do anything";
+                }
+
                 startPalette = reader.Stream.Position - 4;
             } else {
                 reader.Stream.Position = startPalette;
@@ -79,6 +82,8 @@ namespace JUSToolkit.Converters.Images
                 dig.Palettes = new PaletteCollection(new Palette(reader.ReadColors<Bgr555>((int)paletteActualSize)));
             }
 
+            dig.ColorFormat = format;
+            #pragma warning disable S125
             /*
             dig.Pixels = new IndexedPixel {
                 Width = dig.Width,
@@ -93,6 +98,8 @@ namespace JUSToolkit.Converters.Images
                 new Size(8, 8));
 
             */
+            #pragma warning restore
+
             return dig;
         }
 
@@ -123,6 +130,8 @@ namespace JUSToolkit.Converters.Images
             writer.Write(dig.Height);
 
             writer.WriteUntilLength(00, dig.PaletteStart);
+
+            #pragma warning disable S125
             /*
             foreach (IPalette c in dig.Palettes.Palettes) {
                 writer.Write(c.ToBgr555());
@@ -130,6 +139,8 @@ namespace JUSToolkit.Converters.Images
 
             writer.Write(dig.Pixels.GetData());
             */
+            #pragma warning restore
+
             return binary;
         }
     }

@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.Media.Text;
@@ -63,28 +64,20 @@ namespace JUSToolkit.Texts.Converters
                     LanguageTeam = "TranScene",
                 },
             };
+            foreach (string sentence in from KeyValuePair<string, int> entry in source.Text
+                                     let sentence = entry.Key
+                                     select sentence) {
+                string cleanSentence = string.IsNullOrEmpty(sentence) ? "<!empty>" : sentence;
 
-            foreach (KeyValuePair<string, int> entry in source.Text)
-            {
-                string sentence = entry.Key;
-                if (string.IsNullOrEmpty(sentence))
-                {
-                    sentence = "<!empty>";
-                }
-
-                if (sentence.Length == 4 && sagas.ContainsKey(CleanName(sentence)))
-                {
-                    container.Root.Add(new Node(sentence, poExport));
-                    poExport = new Po
-                    {
-                        Header = new PoHeader("Jump Ultimate Stars", "TranScene", "es")
-                        {
+                if (cleanSentence.Length == 4 && sagas.ContainsKey(CleanName(cleanSentence))) {
+                    container.Root.Add(new Node(cleanSentence, poExport));
+                    poExport = new Po {
+                        Header = new PoHeader("Jump Ultimate Stars", "TranScene", "es") {
                             LanguageTeam = "TranScene",
                         },
                     };
-                }
-                else {
-                    poExport.Add(new PoEntry(sentence) { Context = i.ToString() });
+                } else {
+                    poExport.Add(new PoEntry(cleanSentence) { Context = i.ToString() });
                     i++;
                 }
             }

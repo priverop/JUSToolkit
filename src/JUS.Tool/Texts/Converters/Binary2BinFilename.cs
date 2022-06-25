@@ -49,7 +49,7 @@ namespace JUSToolkit.Texts.Converters
             // Guardamos estos dos para compararlos y sacar el tipo, no haría falta
             long currentPosition = reader.Stream.Position;
             int firstPointer = reader.ReadInt32();
-            int secondPointer = reader.ReadInt32();
+            _ = reader.ReadInt32(); // Second pointer
             reader.Stream.Position = currentPosition;
 
             // Vamos al primer puntero (donde está la primera palabra)
@@ -58,24 +58,8 @@ namespace JUSToolkit.Texts.Converters
 
             // Volvemos al principio y leemos los punteros
             reader.Stream.Position = 0;
-            this.ReadPointers(reader);
 
             return bin;
-        }
-
-        /// <summary>
-        /// Read all the strings until the end of the stream
-        /// and save them into Text Dictionary with its additional Length +1 (null char).
-        /// ActualPointer saves up the total length.
-        /// </summary>
-        private void ReadStringsAddingLength(DataReader fileToExtractReader)
-        {
-            int actualPointer = 0;
-            while (!fileToExtractReader.Stream.EndOfStream) {
-                string sentence = fileToExtractReader.ReadString();
-                actualPointer += sentence.Length + 1; // \0 char
-                //Text.Add(sentence, actualPointer);
-            }
         }
 
         /// <summary>
@@ -85,37 +69,12 @@ namespace JUSToolkit.Texts.Converters
         private static void ReadStringsAddingOffset(DataReader fileToExtractReader)
         {
             int offset = 0;
-            // int basePointer = this.FirstPointer;
 
             while (!fileToExtractReader.Stream.EndOfStream) {
-                string sentence = fileToExtractReader.ReadString();
+                _ = fileToExtractReader.ReadString();
 
-                // Text.Add(sentence, basePointer - offset);
-
-                // basePointer += sentence.Length + 1;
                 offset += 4;
             }
-        }
-
-        /// <summary>
-        /// Read all the pointers until the firstPointer
-        /// and save them into Pointers Dictionary with its offset.
-        /// </summary>
-        private void ReadPointers(DataReader fileToExtractReader)
-        {
-            //while (fileToExtractReader.Stream.Position < FirstPointer)
-            //{
-            //    int offset = (int)fileToExtractReader.Stream.Position;
-            //    int pointer = fileToExtractReader.ReadInt32();
-
-            //    if (Text.ContainsValue(pointer))
-            //    {
-            //        Pointers.Enqueue(pointer);
-            //        Offsets.Enqueue(offset);
-            //    }
-            //    else
-            //        FillPointers.Enqueue(pointer);
-            //}
         }
     }
 }

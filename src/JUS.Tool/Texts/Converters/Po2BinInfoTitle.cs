@@ -103,7 +103,7 @@ namespace JUSToolkit.Texts.Converters
                 updatedOffset += OriginalFile.DefaultEncoding.GetByteCount(sentence) + 1;
 
                 // Me muevo a la siguiente cadena
-                OriginalFile.ReadString();
+                _ = OriginalFile.ReadString();
             }
 
             // Vuelvo al comienzo del fichero para escribir los nuevos punteros

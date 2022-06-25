@@ -4,21 +4,70 @@ using Yarhl.FileFormat;
 
 namespace JUSToolkit.Formats
 {
-     public enum ColorFormat {
+    /// <summary>
+    /// Texture NDS formats from http://nocash.emubase.de/gbatek.htm#ds3dtextureformats.
+    /// </summary>
+    public enum ColorFormat
+    {
+        /// <summary>
+        /// Unknown Color Format.
+        /// </summary>
         Unknown,
-        // Texture NDS formats from http://nocash.emubase.de/gbatek.htm#ds3dtextureformats
-        Indexed_A3I5  = 1,    // 8  bits-> 0-4: index; 5-7: alpha
-        Indexed_2bpp  = 2,    // 2  bits for 4   colors
-        Indexed_4bpp  = 3,    // 4  bits for 16  colors
-        Indexed_8bpp  = 4,    // 8  bits for 256 colors
-        Texeled_4x4   = 5,    // 32 bits-> 2 bits per texel (only in textures)
-        Indexed_A5I3  = 6,    // 8  bits-> 0-2: index; 3-7: alpha
-        ABGR555_16bpp = 7,    // 16 bits BGR555 color with alpha component
-        // Also common formats
-        Indexed_1bpp,         // 1  bit  for 2   colors
-        Indexed_A4I4,         // 8  bits-> 0-3: index; 4-7: alpha
-        BGRA_32bpp,           // 32 bits BGRA color
-        ABGR_32bpp,           // 32 bits ABGR color
+
+        /// <summary>
+        ///  8  bits-> 0-4: index; 5-7: alpha
+        /// </summary>
+        Indexed_A3I5 = 1,    // 8  bits-> 0-4: index; 5-7: alpha
+
+        /// <summary>
+        ///  2  bits for 4   colors
+        /// </summary>
+        Indexed_2bpp = 2,    // 2  bits for 4   colors
+
+        /// <summary>
+        ///  4  bits for 16  colors
+        /// </summary>
+        Indexed_4bpp = 3,
+
+        /// <summary>
+        ///  8  bits for 256 colors
+        /// </summary>
+        Indexed_8bpp = 4,
+
+        /// <summary>
+        ///  32 bits-> 2 bits per texel (only in textures)
+        /// </summary>
+        Texeled_4x4 = 5,
+
+        /// <summary>
+        ///  8  bits-> 0-2: index; 3-7: alpha
+        /// </summary>
+        Indexed_A5I3 = 6,
+
+        /// <summary>
+        ///  16 bits BGR555 color with alpha component
+        /// </summary>
+        ABGR555_16bpp = 7,
+
+        /// <summary>
+        ///  1  bit  for 2 colors
+        /// </summary>
+        Indexed_1bpp,
+
+        /// <summary>
+        ///  8  bits-> 0-3: index; 4-7: alpha
+        /// </summary>
+        Indexed_A4I4,
+
+        /// <summary>
+        ///  32 bits BGRA color
+        /// </summary>
+        BGRA_32bpp,
+
+        /// <summary>
+        ///  32 bits ABGR color
+        /// </summary>
+        ABGR_32bpp,
     }
 
     /// <summary>
@@ -80,5 +129,10 @@ namespace JUSToolkit.Formats
         /// Gets or sets the PixelsStart value.
         /// </summary>
         public uint PixelsStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ColorFormat value.
+        /// </summary>
+        public ColorFormat ColorFormat { get; set; }
     }
 }

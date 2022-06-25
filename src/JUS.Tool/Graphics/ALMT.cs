@@ -2,12 +2,27 @@
 
 namespace JUSToolkit.Formats
 {
+    /// <summary>
+    /// NDS Background Modes.
+    /// </summary>
     public enum NitroBackgroundMode
     {
+        /// <summary>
+        /// Text bg.
+        /// </summary>
         Text = 0,
-        Affine = 1, // Palette must be 8bpp
-        Extended = 2, // Extended mode -> Text | Affine, not bitmap
+
+        /// <summary>
+        /// Palette must be 8bpp.
+        /// </summary>
+        Affine = 1,
+
+        /// <summary>
+        /// Extended mode -> Text | Affine, not bitmap.
+        /// </summary>
+        Extended = 2,
     }
+
     /// <summary>
     /// Screen map with format Almt.
     /// </summary>
