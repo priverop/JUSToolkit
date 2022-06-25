@@ -25,9 +25,6 @@ namespace JUS.CLI
     public class VersionTests
     {
         [Test]
-        public void TestVersionNotNull()
-        {
-            Assert.That(LibVersion.GetVersion(), Is.Not.Null);
-        }
+        public void TestVersionNotNull() => Assert.That(LibVersion.GetVersion(), Is.Not.Null);
     }
 }
