@@ -1,23 +1,29 @@
-﻿namespace JUSToolkit.Converters.Images
-{
-    using System;
-    using Yarhl.FileFormat;
-    using JUSToolkit.Formats;
-    using Yarhl.IO;
-    using Texim;
-    using System.Drawing;
-    using log4net;
+﻿using System;
+using System.Drawing;
+using JUSToolkit.Formats;
+using Yarhl.FileFormat;
+using Yarhl.IO;
 
-    public class Binary2DIG :
-    IConverter<BinaryFormat, Dig>,
+namespace JUSToolkit.Converters.Images
+{
+    /// <summary>
+    /// Converts between BinaryFile and a <see cref="Dig"/> Node.
+    /// </summary>
+    public class Binary2Dig :
+    IConverter<IBinary, Dig>,
     IConverter<Dig, BinaryFormat>
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
-
-        public Dig Convert(BinaryFormat source)
+        /// <summary>
+        /// Converts BinaryFormat to a Dig Node.
+        /// </summary>
+        /// <param name="source">BinaryFormat Node.</param>
+        /// <returns>Dig Node.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
+        public Dig Convert(IBinary source)
         {
-            if (source == null)
+            if (source == null) {
                 throw new ArgumentNullException(nameof(source));
+            }
 
             DataReader reader = new DataReader(source.Stream);
             reader.Stream.Position = 0;
@@ -32,39 +38,34 @@
                 Height = reader.ReadUInt16(),
             };
 
-            long paletteEnd = dig.PaletteSize * 32 + reader.Stream.Position;
-            dig.PixelsStart = (uint)paletteEnd; // *** 
-            log.Debug("Palette End: " + paletteEnd);
+            long paletteEnd = (dig.PaletteSize * 32) + reader.Stream.Position;
+            dig.PixelsStart = (uint) paletteEnd;
 
             long startPalette = reader.Stream.Position;
 
             // Si hay bytes vacios antes de empezar la paleta
             if (reader.ReadInt32() == 0) {
-                while (reader.ReadInt32() == 0) { }
+                while (reader.ReadInt32() == 0);
                 startPalette = reader.Stream.Position - 4;
             } else {
                 reader.Stream.Position = startPalette;
             }
 
             dig.PaletteStart = (uint)startPalette;
-            log.Debug("Palette Start: " + dig.PaletteStart);
 
             long paletteActualSize = paletteEnd - dig.PaletteStart;
-            log.Debug("Palette Size: " + paletteActualSize);
 
             reader.Stream.Position = dig.PaletteStart;
 
             ColorFormat format;
 
-            log.Debug("PaletteType: " + dig.PaletteType);
-
             if (dig.PaletteType == 16) {
-                int paletteColors = 16;
-                int paletteSize = paletteColors * 2;
+                const int paletteColors = 16;
+                const int paletteSize = paletteColors * 2;
                 format = ColorFormat.Indexed_4bpp;
                 Color[][] palettes;
                 decimal paletteNumber = Math.Ceiling((decimal)paletteActualSize / paletteSize);
-                log.Debug("Palette Number: " + paletteNumber);
+
                 palettes = new Color[(int)paletteNumber][];
 
                 for (int i = 0; i < paletteNumber; i++) {
@@ -77,7 +78,7 @@
                 dig.Palette = new Palette(reader.ReadBytes((int)paletteActualSize).ToBgr555Colors());
 
             }
-            log.Debug("ColorFormat: " + format);
+
             dig.Pixels = new PixelArray {
                 Width = dig.Width,
                 Height = dig.Height,

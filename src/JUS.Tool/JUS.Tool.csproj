@@ -13,7 +13,6 @@
     <PackageReference Include="Yarhl" />
     <PackageReference Include="Yarhl.Media" />
     <PackageReference Include="Texim" />
-    <PackageReference Include="log4net" />
   </ItemGroup>
 
 </Project>
