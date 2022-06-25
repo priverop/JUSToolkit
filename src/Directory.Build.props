@@ -1,0 +1,53 @@
+<Project>
+    <PropertyGroup>
+        <Product>JUSToolkit</Product>
+        <Authors>Pablo Rivero</Authors>
+        <Company>None</Company>
+        <Copyright>Copyright (C) 2022 Pablo Rivero</Copyright>
+
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+        <!-- Due to known issues, .NET 6 SDK may give a false warning
+             when packing apps if the SelfContained value is in the csproj
+             instead in the CLI command. -->
+        <NoWarn>NETSDK1179</NoWarn>
+        <NoWarn>NU1507</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/priverop/JUSToolkit</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/priverop/JUSToolkit</RepositoryUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageTags>videogames,romhacking,translating</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <!-- Deterministic and source link -->
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <!-- Deterministic and source link -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+    </ItemGroup>
+
+    <!-- Code analyzers -->
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All"/>
+        <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="All"/>
+        <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All"/>
+    </ItemGroup>
+</Project>

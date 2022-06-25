@@ -1,0 +1,79 @@
+name: Build and release
+
+on:
+  # Dev
+  workflow_dispatch:
+  pull_request:
+  push:
+    # Preview
+    branches: [ main ]
+    # Stable
+    tags: [ "v*" ]
+  release:
+    types:
+      - published
+
+env:
+  NET_SDK: '6.0.200'
+
+jobs:
+  build_main:
+    name: "[ubuntu-latest] Build, test and stage"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # We need full history for version number
+
+      - name: "Setup .NET SDK"
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.NET_SDK }}
+
+      - name: "Install build tools"
+        run: dotnet tool restore
+
+      - name: "Build, test and stage"
+        run: dotnet cake --target=Stage-Artifacts --configuration=Release --verbosity=diagnostic
+
+      - name: "Publish test results"
+        uses: actions/upload-artifact@v2
+        with:
+          name: "Test results"
+          path: "./artifacts/test_results"
+          retention-days: 1
+
+      - name: "Publish artifacts to CI"
+        uses: actions/upload-artifact@v2
+        with:
+          name: "Artifacts"
+          path: |
+            ./artifacts/*.zip
+            ./artifacts/*.nupkg
+            ./artifacts/*.snupkg
+          retention-days: 2
+
+  build_sec:
+    name: "[${{ matrix.os }}] Build and test"
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # We need full history for version number
+
+      - name: "Setup .NET SDK"
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.NET_SDK }}
+
+      - name: "Install build tools"
+        run: dotnet tool restore
+
+      # No need to stage as one job can create the binaries for all platforms
+      - name: "Build and test"
+        run: dotnet cake --target=BuildTest --configuration=Release --verbosity=diagnostic
