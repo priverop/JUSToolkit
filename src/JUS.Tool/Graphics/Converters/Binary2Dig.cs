@@ -25,10 +25,10 @@ namespace JUSToolkit.Converters.Images
                 throw new ArgumentNullException(nameof(source));
             }
 
-            DataReader reader = new DataReader(source.Stream);
+            var reader = new DataReader(source.Stream);
             reader.Stream.Position = 0;
 
-            Dig dig = new Dig {
+            var dig = new Dig {
                 Magic = reader.ReadBytes(4),
                 Type = reader.ReadByte(),
                 PaletteType = reader.ReadByte(),
@@ -76,7 +76,6 @@ namespace JUSToolkit.Converters.Images
             } else {
                 format = ColorFormat.Indexed_8bpp;
                 dig.Palette = new Palette(reader.ReadBytes((int)paletteActualSize).ToBgr555Colors());
-
             }
 
             dig.Pixels = new PixelArray {

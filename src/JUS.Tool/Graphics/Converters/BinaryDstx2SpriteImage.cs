@@ -24,13 +24,21 @@ using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace Texim.Games.JumpUltimateStars {
+    /// <summary>
+    /// Converts between a BinaryFormat (a file) containing a Dstx Format and a SpriteImage.
+    /// </summary>
     public class BinaryDstx2SpriteImage : IConverter<IBinary, NodeContainerFormat>
     {
         private const string Stamp = "DSTX";
         private const int Type = 0x04;
 
-        private readonly BinaryDsig2IndexedPaletteImage dsigConverter = new();
+        private readonly BinaryDsig2IndexedPaletteImage dsigConverter = new ();
 
+        /// <summary>
+        /// Converts a BinaryFormat (file) to a NodeContainerFormat.
+        /// </summary>
+        /// <param name="source">File to convert.</param>
+        /// <returns>NodeContainerFormat Node.</returns>
         public NodeContainerFormat Convert(IBinary source)
         {
             if (source is null) {
@@ -56,13 +64,13 @@ namespace Texim.Games.JumpUltimateStars {
             int dsigOffset = reader.ReadInt16();
             reader.ReadInt16(); // unknown
 
-            var sprite = ReadSprite(reader, numSegments);
+            Sprite sprite = ReadSprite(reader, numSegments);
 
             using var dsigBinary = new BinaryFormat(
                 source.Stream,
                 dsigOffset,
                 source.Stream.Length - dsigOffset);
-            var image = dsigConverter.Convert(dsigBinary);
+            Images.IndexedPaletteImage image = dsigConverter.Convert(dsigBinary);
 
             var container = new NodeContainerFormat();
             container.Root.Add(new Node("sprite", sprite));

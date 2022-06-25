@@ -17,18 +17,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
+using Texim.Colors;
+using Texim.Images;
+using Texim.Palettes;
+using Texim.Pixels;
+using Yarhl.FileFormat;
+using Yarhl.IO;
+
 namespace Texim.Games.JumpUltimateStars
 {
-    using System;
-    using Texim.Colors;
-    using Texim.Images;
-    using Texim.Palettes;
-    using Texim.Pixels;
-    using Yarhl.FileFormat;
-    using Yarhl.IO;
-
+    /// <summary>
+    /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
+    /// </summary>
     public class BinaryDsig2IndexedPaletteImage : IConverter<IBinary, IndexedPaletteImage>
     {
+        /// <summary>
+        /// Converts a BinaryFormat (file) to a IndexedPaletteImage.
+        /// </summary>
+        /// <param name="source">File to convert.</param>
+        /// <returns>IndexedPaletteImage.</returns>
         public IndexedPaletteImage Convert(IBinary source)
         {
             if (source is null) {
@@ -55,7 +63,7 @@ namespace Texim.Games.JumpUltimateStars
             }
 
             IIndexedPixelEncoding pixelEncoding = is8Bpp ? Indexed8Bpp.Instance : Indexed4Bpp.Instance;
-            var pixels = pixelEncoding.Decode(source.Stream, width * height)
+            IndexedPixel[] pixels = pixelEncoding.Decode(source.Stream, width * height)
                 .UnswizzleWith(new TileSwizzling<IndexedPixel>(width));
 
             var image = new IndexedPaletteImage {

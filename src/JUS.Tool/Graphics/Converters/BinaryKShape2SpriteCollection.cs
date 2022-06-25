@@ -28,17 +28,50 @@ namespace Texim.Games.JumpUltimateStars
     /// </summary>
     public class BinaryKShape2SpriteCollection : IConverter<IBinary, KShapeSprites>
     {
+        /// <summary>
+        /// Counter for the number of groups.
+        /// </summary>
         internal const int NumGroups = 8;
-        internal const int GroupSizeOffset = NumGroups * 4; // after offset table, each offset 4 bytes
-        internal const int DataOffset = (NumGroups * 2) * 4;
 
+        /// <summary>
+        /// After offset table, each offset 4 bytes.
+        /// </summary>
+        internal const int GroupSizeOffset = NumGroups * 4;
+
+        /// <summary>
+        /// Where the data starts.
+        /// </summary>
+        internal const int DataOffset = NumGroups * 2 * 4;
+
+        /// <summary>
+        /// Size of every entry.
+        /// </summary>
         internal const int EntrySize = 0x18;
-        internal const int SpriteInfoSize = 0x14; // width * height / (blocksize * blocksize)
 
+        /// <summary>
+        /// Width * height / (blocksize * blocksize).
+        /// </summary>
+        internal const int SpriteInfoSize = 0x14;
+
+        /// <summary>
+        /// Width of the Sprite.
+        /// </summary>
         private const int Width = 240;
+
+        /// <summary>
+        /// Height of the Sprite.
+        /// </summary>
         private const int Height = 192;
+
+        /// <summary>
+        /// Dimension of the KShape.
+        /// </summary>
         private const int SegmentDimensions = 48;
-        private const int TilesPerSegment = SegmentDimensions * SegmentDimensions / 64; // tiles of 8x8
+
+        /// <summary>
+        /// Tiles of 8x8 per segment.
+        /// </summary>
+        private const int TilesPerSegment = SegmentDimensions * SegmentDimensions / 64;
 
         /// <summary>
         /// Converts a BinaryFile into a KShapeSprites collection.
@@ -63,7 +96,7 @@ namespace Texim.Games.JumpUltimateStars
 
                 for (int e = 0; e < numElements; e++) {
                     source.Stream.Position = DataOffset + ((firstElement + e) * EntrySize);
-                    var sprite = ReadSprite(reader);
+                    Sprite sprite = ReadSprite(reader);
                     kshape.AddSprite(i, e, sprite);
                 }
             }
@@ -71,6 +104,9 @@ namespace Texim.Games.JumpUltimateStars
             return kshape;
         }
 
+        /// <summary>
+        /// Reads a DataReader and converts it to a Sprite.
+        /// </summary>
         private static Sprite ReadSprite(DataReader reader)
         {
             byte[] info = reader.ReadBytes(SpriteInfoSize);

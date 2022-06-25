@@ -76,7 +76,6 @@ namespace JUSToolkit.Converters.Images
             almt.SetMapInfo(almt.Maps);
 
             return almt;
-
         }
 
         /// <summary>
@@ -98,11 +97,12 @@ namespace JUSToolkit.Converters.Images
             writer.Write(source.NumTileW);
             writer.Write(source.NumTileH);
             writer.Write(source.Unknown3);
-            foreach (var info in source.Maps) {
-                if (source.BgMode == BgMode.Affine)
+            foreach (Texim.Compressions.Nitro.MapInfo info in source.Maps) {
+                if (source.BgMode == BgMode.Affine) {
                     writer.Write(info.ToByte());
-                else
+                } else {
                     writer.Write(info.ToUInt16());
+                }
             }
 
             return b;

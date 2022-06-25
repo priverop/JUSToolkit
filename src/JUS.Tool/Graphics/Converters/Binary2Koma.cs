@@ -23,10 +23,18 @@ using Yarhl.IO;
 // SOFTWARE.
 namespace Texim.Games.JumpUltimateStars
 {
+    /// <summary>
+    /// Converts between BinaryFormat and Koma.
+    /// </summary>
     public class Binary2Koma : IConverter<BinaryFormat, Koma>
     {
         private const int EntrySize = 12;
 
+        /// <summary>
+        /// Converts a BinaryFormat (file) to a Koma Node.
+        /// </summary>
+        /// <param name="source">BinaryFormat (file) to convert.</param>
+        /// <returns>Koma Node.</returns>
         public Koma Convert(BinaryFormat source)
         {
             if (source is null) {

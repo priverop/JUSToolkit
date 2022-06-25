@@ -10,7 +10,7 @@ namespace JUSToolkit.Formats.ALAR
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar3File"/> class passing a DataStream.
         /// </summary>
-        /// <param name="fileStream">DataStream</param>
+        /// <param name="fileStream">DataStream.</param>
         public Alar3File(DataStream fileStream)
             : base(fileStream)
         {

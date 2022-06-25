@@ -17,28 +17,38 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
+using System.IO;
+using Yarhl.FileFormat;
+using Yarhl.FileSystem;
+using Yarhl.IO;
+
 namespace Texim.Games.JumpUltimateStars
 {
-    using System;
-    using System.IO;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
-    using Yarhl.IO;
-
+    /// <summary>
+    /// Converts between a <see cref="BinaryAlar2Container"/> and a BinaryFormat file.
+    /// </summary>
     public class BinaryAlar2Container : IConverter<IBinary, NodeContainerFormat>
     {
         private const string STAMP = "ALAR";
-        private static readonly Version SupportedVersion = new Version(3, 5);
+        private static readonly Version SupportedVersion = new (3, 5);
 
         private DataReader reader;
         private NodeContainerFormat container;
 
         private int numEntries;
 
+        /// <summary>
+        /// Converts BinaryFormat to NodeContainerFormat.
+        /// </summary>
+        /// <param name="source">File to transform.</param>
+        /// <returns>NodeContainerFormat.</returns>
+        /// <exception cref="ArgumentNullException">source is null.</exception>
         public NodeContainerFormat Convert(IBinary source)
         {
-            if (source is null)
+            if (source is null) {
                 throw new ArgumentNullException(nameof(source));
+            }
 
             reader = new DataReader(source.Stream);
             container = new NodeContainerFormat();
