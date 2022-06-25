@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using JUSToolkit.Formats;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;

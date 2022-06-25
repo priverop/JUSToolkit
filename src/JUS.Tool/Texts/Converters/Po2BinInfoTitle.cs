@@ -19,7 +19,6 @@
 // SOFTWARE.
 using System.Collections.Generic;
 using System.Linq;
-using JUSToolkit.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 using Yarhl.Media.Text;

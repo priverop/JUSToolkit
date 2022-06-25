@@ -18,12 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using Texim.Images;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace Texim.Games.JumpUltimateStars
+namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
     /// Converts between a BinaryFormat (a file) containing a Dstx Format and a SpriteImage.
@@ -71,7 +72,7 @@ namespace Texim.Games.JumpUltimateStars
                 source.Stream,
                 dsigOffset,
                 source.Stream.Length - dsigOffset);
-            Images.IndexedPaletteImage image = dsigConverter.Convert(dsigBinary);
+            IndexedPaletteImage image = dsigConverter.Convert(dsigBinary);
 
             var container = new NodeContainerFormat();
             container.Root.Add(new Node("sprite", sprite));

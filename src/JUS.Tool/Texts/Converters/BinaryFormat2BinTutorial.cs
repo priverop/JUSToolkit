@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using JUSToolkit.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 

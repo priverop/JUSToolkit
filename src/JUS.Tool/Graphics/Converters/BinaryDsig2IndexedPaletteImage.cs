@@ -25,7 +25,7 @@ using Texim.Pixels;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace Texim.Games.JumpUltimateStars
+namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
@@ -71,7 +71,7 @@ namespace Texim.Games.JumpUltimateStars
                 Height = height,
                 Pixels = pixels,
             };
-            image.Palettes.Add(palettes.Palettes);
+            image.Palettes.Add(palettes.Palettes as IPalette);
 
             return image;
         }
