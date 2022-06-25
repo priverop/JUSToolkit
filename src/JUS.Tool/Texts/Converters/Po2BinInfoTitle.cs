@@ -24,7 +24,7 @@ using Yarhl.FileFormat;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.Converters.Bin
+namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
     /// Converts between BinInfoTitle and Po.

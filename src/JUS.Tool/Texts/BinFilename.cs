@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JUSToolkit.Formats
+namespace JUSToolkit.Texts
 {
     /// <summary>
     /// Text Format for Filenames bin.

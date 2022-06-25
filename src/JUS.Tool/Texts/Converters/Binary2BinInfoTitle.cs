@@ -23,7 +23,7 @@ using JUSToolkit.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Converters.Bin
+namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
     /// Converts between BinaryFormat and BinInfoTitle.

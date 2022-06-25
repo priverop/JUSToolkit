@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Formats
+namespace JUSToolkit.Texts
 {
     /// <summary>
     /// Text Format BinInfoTitle (Titles of the Komas??).

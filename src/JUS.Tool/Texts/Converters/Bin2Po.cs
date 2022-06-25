@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.Converters.Bin
+namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
     /// Converts between Bin Format to Po Node.

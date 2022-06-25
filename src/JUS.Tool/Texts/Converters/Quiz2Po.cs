@@ -19,12 +19,11 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using JUSToolkit.Formats;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.Converters.Bin
+namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
     /// Converts between BinQuiz and Po.

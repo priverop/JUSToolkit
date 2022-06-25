@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JUSToolkit.Formats
+namespace JUSToolkit.Texts
 {
     /// <summary>
     /// Text Format of the Tutorials of the Game.
