@@ -1,15 +1,12 @@
-﻿namespace JUSToolkit.Converters.Alar
-{
-    using System;
-    using Yarhl.FileFormat;
-    using Yarhl.IO;
-    using JUSToolkit.Formats.ALAR;
-    using Yarhl.FileSystem;
-    using log4net;
-    using JUSToolkit.Formats;
-    using System.Linq;
-    using System.IO;
+﻿using System;
+using System.IO;
+using JUSToolkit.Formats.ALAR;
+using Yarhl.FileFormat;
+using Yarhl.FileSystem;
+using Yarhl.IO;
 
+namespace JUSToolkit.Converters.Alar
+{
     /// <summary>
     /// Converter between BinaryFormat and Alar3.
     /// </summary>
@@ -29,7 +26,7 @@
             input.Stream.Seek(0, SeekMode.Start); // Just in case
 
             DataReader br = new DataReader(input.Stream) {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
             var aar = new Alar3 {
@@ -90,9 +87,9 @@
             if (aar == null)
                 throw new ArgumentNullException(nameof(aar));
 
-            BinaryFormat binary = new BinaryFormat();
-            DataWriter writer = new DataWriter(binary.Stream) {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+            var binary = new BinaryFormat();
+            var writer = new DataWriter(binary.Stream) {
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
             writer.Write(aar.Header);

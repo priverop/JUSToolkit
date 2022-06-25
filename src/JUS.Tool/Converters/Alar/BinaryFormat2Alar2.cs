@@ -35,8 +35,7 @@ namespace JUSToolkit.Converters.Alar
         /// </summary>
         /// <param name="input">BinaryFormat node.</param>
         /// <returns>Alart2 NodeContainerFormat.</returns>
-        public Alar2 Convert(BinaryFormat input){
-
+        public Alar2 Convert(BinaryFormat input) {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
 
@@ -44,7 +43,7 @@ namespace JUSToolkit.Converters.Alar
 
             DataReader br = new DataReader(input.Stream)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
             var aar = new Alar2
