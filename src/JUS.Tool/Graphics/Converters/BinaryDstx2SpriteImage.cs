@@ -23,7 +23,8 @@ using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace Texim.Games.JumpUltimateStars {
+namespace Texim.Games.JumpUltimateStars
+{
     /// <summary>
     /// Converts between a BinaryFormat (a file) containing a Dstx Format and a SpriteImage.
     /// </summary>

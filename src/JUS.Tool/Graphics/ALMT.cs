@@ -1,6 +1,6 @@
 ﻿using Texim.Compressions.Nitro;
 
-namespace JUSToolkit.Formats
+namespace JUSToolkit.Graphics
 {
     /// <summary>
     /// NDS Background Modes.

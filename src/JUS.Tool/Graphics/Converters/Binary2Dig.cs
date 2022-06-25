@@ -7,7 +7,7 @@ using Texim.Pixels;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Converters.Images
+namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFile and a <see cref="Dig"/> Node.

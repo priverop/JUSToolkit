@@ -23,7 +23,7 @@ using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace Texim.Games.JumpUltimateStars
+namespace JUSToolkit.Containers.Converters
 {
     /// <summary>
     /// Converts between a <see cref="BinaryAlar2Container"/> and a BinaryFormat file.

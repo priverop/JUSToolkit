@@ -22,7 +22,7 @@ using Texim.Compressions.Nitro;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Converters.Images
+namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFormat and ALMT.

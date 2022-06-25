@@ -1,6 +1,6 @@
 ﻿using Yarhl.IO;
 
-namespace JUSToolkit.Formats.ALAR
+namespace JUSToolkit.Containers
 {
     /// <summary>
     /// Single file of an Alar3 Container.

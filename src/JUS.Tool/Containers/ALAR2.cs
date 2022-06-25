@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Formats.ALAR
+namespace JUSToolkit.Containers
 {
     /// <summary>
     /// Alar2 Container Format.

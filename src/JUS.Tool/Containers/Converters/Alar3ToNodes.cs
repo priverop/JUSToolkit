@@ -1,9 +1,8 @@
 ﻿using System;
-using JUSToolkit.Formats.ALAR;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 
-namespace JUSToolkit.Converters.Alar
+namespace JUSToolkit.Containers.Converters
 {
     /// <summary>
     /// Converts between ALAR3 and Nodes.

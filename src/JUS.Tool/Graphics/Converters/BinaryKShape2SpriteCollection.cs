@@ -21,7 +21,7 @@ using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace Texim.Games.JumpUltimateStars
+namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
     /// Converts between a <see cref="KShapeSprites"/> and a Binary File.

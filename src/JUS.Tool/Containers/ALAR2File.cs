@@ -1,6 +1,6 @@
 ﻿using Yarhl.FileSystem;
 
-namespace JUSToolkit.Formats.ALAR
+namespace JUSToolkit.Containers
 {
     /// <summary>
     /// Single file of an Alar2 Container.

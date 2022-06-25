@@ -19,12 +19,11 @@
 // SOFTWARE.
 using System;
 using System.IO;
-using JUSToolkit.Formats.ALAR;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.Converters.Alar
+namespace JUSToolkit.Containers.Converters
 {
     /// <summary>
     /// Converter between BinaryFormat and Alar2.

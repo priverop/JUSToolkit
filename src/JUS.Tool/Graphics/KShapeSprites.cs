@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 
-namespace Texim.Games.JumpUltimateStars
+namespace JUSToolkit.Graphics
 {
     /// <summary>
     /// Image Format - KShape defines the geometric shape of the Koma.

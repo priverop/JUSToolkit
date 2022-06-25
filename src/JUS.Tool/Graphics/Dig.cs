@@ -2,7 +2,7 @@
 using Texim.Pixels;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Formats
+namespace JUSToolkit.Graphics
 {
     /// <summary>
     /// Texture NDS formats from http://nocash.emubase.de/gbatek.htm#ds3dtextureformats.
