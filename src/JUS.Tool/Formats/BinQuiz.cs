@@ -1,6 +1,7 @@
-﻿namespace JUSToolkit.Formats
+﻿using System.Collections.Generic;
+
+namespace JUSToolkit.Formats
 {
-    using System.Collections.Generic;
     public class BinQuiz : Bin
     {
         public Queue<int> Offsets { get; } // Offsets where real pointers are

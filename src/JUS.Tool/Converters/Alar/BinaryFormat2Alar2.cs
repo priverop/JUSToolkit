@@ -25,9 +25,17 @@ using Yarhl.IO;
 
 namespace JUSToolkit.Converters.Alar
 {
-    public class BinaryFormat2Alar2 : IConverter<BinaryFormat, ALAR2>
+    /// <summary>
+    /// Converter between BinaryFormat and Alar2.
+    /// </summary>
+    public class BinaryFormat2Alar2 : IConverter<BinaryFormat, Alar2>
     {
-        public ALAR2 Convert(BinaryFormat input){
+        /// <summary>
+        /// Converts a BinaryFormat to an Alar2 container.
+        /// </summary>
+        /// <param name="input">BinaryFormat node.</param>
+        /// <returns>Alart2 NodeContainerFormat.</returns>
+        public Alar2 Convert(BinaryFormat input){
 
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -39,7 +47,7 @@ namespace JUSToolkit.Converters.Alar
                 DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
-            var aar = new ALAR2
+            var aar = new Alar2
             {
                 Header = br.ReadChars(4),
                 Type = br.ReadByte(),
@@ -55,7 +63,7 @@ namespace JUSToolkit.Converters.Alar
             uint name_offset = (uint)(0x10 + (aar.Num_files * 0x10));
             for (int i = 0; i < aar.Num_files; i++)
             {
-                var aarFile = new ALAR2File();
+                var aarFile = new Alar2File();
                 uint unk1 = br.ReadUInt32();
                 uint offset = br.ReadUInt32();
                 uint size = br.ReadUInt32();

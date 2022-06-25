@@ -1,8 +1,8 @@
-﻿namespace JUSToolkit.Formats
+﻿using System.Collections.Generic;
+using Yarhl.FileFormat;
+
+namespace JUSToolkit.Formats
 {
-    using Yarhl.FileFormat;
-    using System;
-    using System.Collections.Generic;
     public class Bin : IFormat
     {
         public Dictionary<string, int> Text { get; set; } // String - Pointer

@@ -6,16 +6,16 @@ using Yarhl.FileSystem;
 namespace JUSToolkit.Converters.Alar
 {
     /// <summary>
-    /// Converter for ALAR files to Nodes.
+    /// Converter between Alar2 and NodeFormatContainer.
     /// </summary>
-    public class Alar2ToNodes : IConverter<ALAR2, NodeContainerFormat>, IConverter<NodeContainerFormat, ALAR2>
+    public class Alar2ToNodes : IConverter<Alar2, NodeContainerFormat>, IConverter<NodeContainerFormat, Alar2>
     {
          /// <summary>
         /// Converta an Alar2 container to a NodeContainerFormat.
         /// </summary>
         /// <param name="source">The Alar2 node.</param>
         /// <returns>The NodeContainerFormat.</returns>
-        public NodeContainerFormat Convert(ALAR2 source)
+        public NodeContainerFormat Convert(Alar2 source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
@@ -23,7 +23,7 @@ namespace JUSToolkit.Converters.Alar
 
             var container = new NodeContainerFormat();
 
-            foreach (ALAR2File f in source.AlarFiles)
+            foreach (Alar2File f in source.AlarFiles)
             {
                 container.Root.Add(f.File);
             }
@@ -36,12 +36,12 @@ namespace JUSToolkit.Converters.Alar
         /// </summary>
         /// <param name="container">The NodeContainerFormat.</param>
         /// <returns>The Alar2 container.</returns>
-        public ALAR2 Convert(NodeContainerFormat container)
+        public Alar2 Convert(NodeContainerFormat container)
         {
-            var aar = new ALAR2();
+            var aar = new Alar2();
 
             foreach (Node n in container.Root.Children) {
-                aar.AlarFiles.Add(new ALAR2File { File = n });
+                aar.AlarFiles.Add(new Alar2File { File = n });
             }
 
             return aar;

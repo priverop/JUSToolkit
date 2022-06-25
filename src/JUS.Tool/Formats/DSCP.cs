@@ -1,10 +1,10 @@
-﻿namespace JUSToolkit.Formats
-{
-    using Yarhl.FileFormat;
+﻿using Yarhl.FileFormat;
 
-    public class DSCP : IFormat
+namespace JUSToolkit.Formats
+{
+    public class Dscp : IFormat
     {
-        public DSCP()
+        public Dscp()
         {
         }
     }

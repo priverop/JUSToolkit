@@ -11,7 +11,7 @@ using Yarhl.IO;
 
 namespace JUSToolkit.Converters.Images
 {
-    public class BinaryDTX2PNG : IConverter<NodeContainerFormat, NodeContainerFormat>
+    public class BinaryDtx2Png : IConverter<NodeContainerFormat, NodeContainerFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
         public Node Arm { get; set; }
@@ -41,12 +41,10 @@ namespace JUSToolkit.Converters.Images
                 byte numberKomaName = entry[05];
 
                 DataReader armReader = new DataReader(Arm.Stream);
-                string dtxName = "";
+                string dtxName = string.Empty;
 
                 armReader.Stream.RunInPosition(
-                () => {
-                    dtxName = armReader.ReadString();
-                },
+                () => dtxName = armReader.ReadString(),
                 (KOMA_NAME_TABLE_OFFSET + letterKomaName * 4));
 
                 dtxName += "_" + numberKomaName;
@@ -91,13 +89,13 @@ namespace JUSToolkit.Converters.Images
                         frameIndex[j] = dtxReader.ReadInt16();
                     }
 
-                    BinaryFormat bfDIG = new BinaryFormat(dtx.Stream, (long)digPointer, (dtx.Stream.Length - (long)digPointer));
+                    var bfDIG = new BinaryFormat(dtx.Stream, (long)digPointer, dtx.Stream.Length - (long)digPointer);
 
-                    Dig dig = (Dig)ConvertFormat.With<Binary2DIG>(bfDIG);
+                    var dig = (Dig)ConvertFormat.With<Binary2DIG>(bfDIG);
 
                     // Iterate KomaShape
-
                     komaShapeReader.Stream.Position = komaShapeOffset;
+
                     // Fichero Dig tiene 08 de ancho y 872 de alto
                     // 08 * 872 / 2 = 3488 bytes
                     byte[] dtxPixels = new byte[192 * 240 / 2]; // *** REVISAR
@@ -176,8 +174,6 @@ namespace JUSToolkit.Converters.Images
 
             return output;
         }
-
-
         // By PleoNeX
         public static int GetIndex(PixelEncoding pxEnc, int x, int y, int width, int height, Size tileSize)
         {

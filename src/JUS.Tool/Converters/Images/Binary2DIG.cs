@@ -8,8 +8,8 @@
     using System.Drawing;
     using log4net;
 
-    public class Binary2DIG : 
-    IConverter<BinaryFormat, Dig>, 
+    public class Binary2DIG :
+    IConverter<BinaryFormat, Dig>,
     IConverter<Dig, BinaryFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
@@ -22,15 +22,14 @@
             DataReader reader = new DataReader(source.Stream);
             reader.Stream.Position = 0;
 
-            Dig dig = new Dig
-            {
+            Dig dig = new Dig {
                 Magic = reader.ReadBytes(4),
                 Type = reader.ReadByte(),
                 PaletteType = reader.ReadByte(),
                 PaletteSize = reader.ReadByte(),
                 Unknown = reader.ReadByte(),
                 Width = reader.ReadUInt16(),
-                Height = reader.ReadUInt16()
+                Height = reader.ReadUInt16(),
             };
 
             long paletteEnd = dig.PaletteSize * 32 + reader.Stream.Position;
@@ -40,16 +39,14 @@
             long startPalette = reader.Stream.Position;
 
             // Si hay bytes vacios antes de empezar la paleta
-            if(reader.ReadInt32() == 0)
-            {
+            if (reader.ReadInt32() == 0) {
                 while (reader.ReadInt32() == 0) { }
                 startPalette = reader.Stream.Position - 4;
-            }
-            else{
+            } else {
                 reader.Stream.Position = startPalette;
             }
 
-            dig.PaletteStart = (uint) startPalette;
+            dig.PaletteStart = (uint)startPalette;
             log.Debug("Palette Start: " + dig.PaletteStart);
 
             long paletteActualSize = paletteEnd - dig.PaletteStart;
@@ -59,10 +56,9 @@
 
             ColorFormat format;
 
-            log.Debug("PaletteType: " +dig.PaletteType);
+            log.Debug("PaletteType: " + dig.PaletteType);
 
-            if (dig.PaletteType == 16)
-            {
+            if (dig.PaletteType == 16) {
                 int paletteColors = 16;
                 int paletteSize = paletteColors * 2;
                 format = ColorFormat.Indexed_4bpp;
@@ -71,27 +67,23 @@
                 log.Debug("Palette Number: " + paletteNumber);
                 palettes = new Color[(int)paletteNumber][];
 
-                for(int i = 0; i < paletteNumber; i++)
-                {
+                for (int i = 0; i < paletteNumber; i++) {
                     palettes[i] = reader.ReadBytes((int)paletteSize).ToBgr555Colors();
                 }
 
                 dig.Palette = new Palette(palettes);
-            }
-            else
-            {
+            } else {
                 format = ColorFormat.Indexed_8bpp;
                 dig.Palette = new Palette(reader.ReadBytes((int)paletteActualSize).ToBgr555Colors());
 
             }
-            log.Debug("ColorFormat: "+format);
-            dig.Pixels = new PixelArray
-            {
+            log.Debug("ColorFormat: " + format);
+            dig.Pixels = new PixelArray {
                 Width = dig.Width,
                 Height = dig.Height,
             };
 
-            int bytesUntilEnd = (int) (reader.Stream.Length - reader.Stream.Position);
+            int bytesUntilEnd = (int)(reader.Stream.Length - reader.Stream.Position);
 
             dig.Pixels.SetData(
                 reader.ReadBytes(bytesUntilEnd),
@@ -109,8 +101,7 @@
 
             var binary = new BinaryFormat();
 
-            DataWriter writer = new DataWriter(binary.Stream)
-            {
+            DataWriter writer = new DataWriter(binary.Stream) {
                 DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
             };
 
@@ -124,8 +115,7 @@
 
             writer.WriteUntilLength(00, dig.PaletteStart);
 
-            foreach (Color[] c in dig.Palette.GetPalettes())
-            {
+            foreach (Color[] c in dig.Palette.GetPalettes()) {
                 writer.Write(c.ToBgr555());
             }
 

@@ -1,7 +1,7 @@
-﻿namespace JUSToolkit.Formats
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+namespace JUSToolkit.Formats
+{
     public class BinTutorial : Bin
     {
         public Dictionary<int, int> Pointers { get; } // Pointer - Offset
@@ -10,10 +10,10 @@
 
         public int FirstPointer { get; set; }
 
-        public BinTutorial(){
+        public BinTutorial()
+        {
             Pointers = new Dictionary<int, int>();
             FillPointers = new Queue<int>();
         }
-
     }
 }

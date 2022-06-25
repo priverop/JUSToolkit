@@ -1,32 +1,61 @@
-﻿namespace JUSToolkit.Formats.ALAR
+﻿using System.Collections.Generic;
+using Yarhl.FileFormat;
+
+namespace JUSToolkit.Formats.ALAR
 {
-    using System.Collections.Generic;
-    using Yarhl.FileFormat;
-
-    public class ALAR2 : IFormat
+    /// <summary>
+    /// Alar2 Container Format.
+    /// </summary>
+    public class Alar2 : IFormat
     {
-        public char[] Header { get; set; }
-        public byte Type { get; set; }
-        public byte Unk { get; set; }
-        public ushort Num_files { get; set; }
-        public byte[] IDs { get; set; }
-        public List<ALAR2File> AlarFiles { get; set; }
-
-        public ALAR2()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Alar2" /> class with an empty list of <see cref="Alar2File" />.
+        /// </summary>
+        public Alar2()
         {
-            AlarFiles = new List<ALAR2File>();
+            AlarFiles = new List<Alar2File>();
         }
 
-        public void InsertModification(ALAR2 newAlar)
-        {
+        /// <summary>
+        /// Gets or sets the Header.
+        /// </summary>
+        public char[] Header { get; set; }
 
-            for (int i = 0; i < AlarFiles.Count; i++)
-            {
-                foreach (ALAR2File n in newAlar.AlarFiles)
-                {
-                    if (n.File.Name == AlarFiles[i].File.Name)
-                    {
-                        AlarFiles[i] = n;
+        /// <summary>
+        /// Gets or sets the Type.
+        /// </summary>
+        public byte Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ??.
+        /// </summary>
+        public byte Unk { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of files for the container.
+        /// </summary>
+        public ushort Num_files { get; set; }
+
+        /// <summary>
+        /// Gets or sets the IDs of the files.
+        /// </summary>
+        public byte[] IDs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of <see cref="Alar2File" />.
+        /// </summary>
+        public List<Alar2File> AlarFiles { get; set; }
+
+        /// <summary>
+        /// Replaces current <see cref="AlarFiles" /> with another list of <see cref="AlarFiles" />.
+        /// </summary>
+        /// <param name="newAlarContainer">Alar2 NodeContainerFormat.</param>
+        public void InsertModification(Alar2 newAlarContainer)
+        {
+            for (int i = 0; i < AlarFiles.Count; i++) {
+                foreach (Alar2File newAlarNode in newAlarContainer.AlarFiles) {
+                    if (newAlarNode.File.Name == AlarFiles[i].File.Name) {
+                        AlarFiles[i] = newAlarNode;
                     }
                 }
             }
