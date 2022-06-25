@@ -1,5 +1,4 @@
-﻿using log4net;
-using Yarhl.FileFormat;
+﻿using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 

@@ -1,5 +1,5 @@
-﻿using System;
-using Texim;
+﻿using Texim.Palettes;
+using Texim.Pixels;
 using Yarhl.FileFormat;
 
 namespace JUSToolkit.Formats
@@ -12,7 +12,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or sets the Pixels of the image.
         /// </summary>
-        public PixelArray Pixels { get; set; }
+        public IndexedPixel[] Pixels { get; set; }
 
         /// <summary>
         /// Gets or sets the Palette of the image.
