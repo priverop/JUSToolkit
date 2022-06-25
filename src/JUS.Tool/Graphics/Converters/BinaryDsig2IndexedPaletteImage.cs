@@ -50,7 +50,7 @@ namespace Texim.Games.JumpUltimateStars
                 throw new FormatException("Invalid stamp");
             }
 
-            reader.ReadByte();
+            _ = reader.ReadByte();
             bool is8Bpp = reader.ReadByte() != 0x10;
             short numPalettes = reader.ReadInt16();
             int width = reader.ReadUInt16();

@@ -42,7 +42,7 @@ namespace JUSToolkit.Converters.Images
             };
 
             long paletteEnd = (dig.PaletteSize * 32) + reader.Stream.Position;
-            dig.PixelsStart = (uint) paletteEnd;
+            dig.PixelsStart = (uint)paletteEnd;
 
             long startPalette = reader.Stream.Position;
 
@@ -66,26 +66,24 @@ namespace JUSToolkit.Converters.Images
                 const int paletteColors = 16;
                 const int paletteSize = paletteColors * 2;
                 format = ColorFormat.Indexed_4bpp;
-                Color[][] palettes;
+                var palettes = new PaletteCollection();
                 decimal paletteNumber = Math.Ceiling((decimal)paletteActualSize / paletteSize);
 
-                palettes = new Color[(int)paletteNumber][];
-
                 for (int i = 0; i < paletteNumber; i++) {
-                    palettes[i] = reader.ReadBytes((int)paletteSize).ToBgr555Colors();
+                    palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(paletteSize)));
                 }
 
-                dig.Palette = new Palette(palettes);
+                dig.Palettes = palettes;
             } else {
                 format = ColorFormat.Indexed_8bpp;
-                dig.Palette = new Palette(reader.ReadBytes((int)paletteActualSize).ToBgr555Colors());
+                dig.Palettes = new PaletteCollection(new Palette(reader.ReadColors<Bgr555>((int)paletteActualSize)));
             }
 
-            dig.Pixels = new PixelArray {
+            /*
+            dig.Pixels = new IndexedPixel {
                 Width = dig.Width,
                 Height = dig.Height,
             };
-
             int bytesUntilEnd = (int)(reader.Stream.Length - reader.Stream.Position);
 
             dig.Pixels.SetData(
@@ -94,6 +92,7 @@ namespace JUSToolkit.Converters.Images
                 format,
                 new Size(8, 8));
 
+            */
             return dig;
         }
 
@@ -124,13 +123,13 @@ namespace JUSToolkit.Converters.Images
             writer.Write(dig.Height);
 
             writer.WriteUntilLength(00, dig.PaletteStart);
-
-            foreach (Color[] c in dig.Palette.GetPalettes()) {
+            /*
+            foreach (IPalette c in dig.Palettes.Palettes) {
                 writer.Write(c.ToBgr555());
             }
 
             writer.Write(dig.Pixels.GetData());
-
+            */
             return binary;
         }
     }

@@ -4,6 +4,23 @@ using Yarhl.FileFormat;
 
 namespace JUSToolkit.Formats
 {
+     public enum ColorFormat {
+        Unknown,
+        // Texture NDS formats from http://nocash.emubase.de/gbatek.htm#ds3dtextureformats
+        Indexed_A3I5  = 1,    // 8  bits-> 0-4: index; 5-7: alpha
+        Indexed_2bpp  = 2,    // 2  bits for 4   colors
+        Indexed_4bpp  = 3,    // 4  bits for 16  colors
+        Indexed_8bpp  = 4,    // 8  bits for 256 colors
+        Texeled_4x4   = 5,    // 32 bits-> 2 bits per texel (only in textures)
+        Indexed_A5I3  = 6,    // 8  bits-> 0-2: index; 3-7: alpha
+        ABGR555_16bpp = 7,    // 16 bits BGR555 color with alpha component
+        // Also common formats
+        Indexed_1bpp,         // 1  bit  for 2   colors
+        Indexed_A4I4,         // 8  bits-> 0-3: index; 4-7: alpha
+        BGRA_32bpp,           // 32 bits BGRA color
+        ABGR_32bpp,           // 32 bits ABGR color
+    }
+
     /// <summary>
     /// Image format.
     /// </summary>
@@ -17,7 +34,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or sets the Palette of the image.
         /// </summary>
-        public Palette Palette { get; set; }
+        public PaletteCollection Palettes { get; set; }
 
         /// <summary>
         /// Gets or sets the Magic.

@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUSToolkit.Formats;
+using Texim.Compressions.Nitro;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
@@ -37,43 +38,33 @@ namespace JUSToolkit.Converters.Images
         /// <returns>Almt Node.</returns>
         public Almt Convert(BinaryFormat source)
         {
-            var almt = new Almt();
-
             var reader = new DataReader(source.Stream);
 
-            almt.Magic = reader.ReadUInt32();
-
-            almt.Unknown = reader.ReadUInt32();
-            almt.Unknown2 = reader.ReadUInt32();
-
-            almt.TileSizeW = reader.ReadUInt16();
-            almt.TileSizeH = reader.ReadUInt16();
-
-            almt.NumTileW = reader.ReadUInt16();
-            almt.NumTileH = reader.ReadUInt16();
-
-            almt.Unknown3 = reader.ReadUInt32();
+            var almt = new Almt {
+                Magic = reader.ReadUInt32(),
+                Unknown = reader.ReadUInt32(),
+                Unknown2 = reader.ReadUInt32(),
+                TileSizeW = reader.ReadUInt16(),
+                TileSizeH = reader.ReadUInt16(),
+                NumTileW = reader.ReadUInt16(),
+                NumTileH = reader.ReadUInt16(),
+                Unknown3 = reader.ReadUInt32(),
+            };
 
             almt.TileSize = new System.Drawing.Size(almt.TileSizeW, almt.TileSizeH);
 
-            almt.Width = (int)(almt.TileSizeW * almt.NumTileW);
-            almt.Height = (int)(almt.TileSizeH * almt.NumTileH) + 8;
+            almt.Width = almt.TileSizeW * almt.NumTileW;
+            almt.Height = (almt.TileSizeH * almt.NumTileH) + 8;
 
-            almt.BgMode = BgMode.Text;
+            almt.BgMode = NitroBackgroundMode.Text;
 
             long mapInfoSize = reader.Stream.Length - reader.Stream.Position;
-            uint numInfos = (uint)((almt.BgMode == BgMode.Affine) ? mapInfoSize : mapInfoSize / 2);
+            uint numInfos = (uint)((almt.BgMode == NitroBackgroundMode.Affine) ? mapInfoSize : mapInfoSize / 2);
 
             almt.Maps = new MapInfo[numInfos];
             for (int i = 0; i < almt.Maps.Length; i++) {
-                if (almt.BgMode == BgMode.Affine) {
-                    almt.Maps[i] = new MapInfo(reader.ReadByte());
-                } else {
-                    almt.Maps[i] = new MapInfo(reader.ReadUInt16());
-                }
+                almt.Maps[i] = almt.BgMode == NitroBackgroundMode.Affine ? new MapInfo(reader.ReadByte()) : new MapInfo(reader.ReadUInt16());
             }
-
-            almt.SetMapInfo(almt.Maps);
 
             return almt;
         }
@@ -97,11 +88,11 @@ namespace JUSToolkit.Converters.Images
             writer.Write(source.NumTileW);
             writer.Write(source.NumTileH);
             writer.Write(source.Unknown3);
-            foreach (Texim.Compressions.Nitro.MapInfo info in source.Maps) {
-                if (source.BgMode == BgMode.Affine) {
-                    writer.Write(info.ToByte());
+            foreach (MapInfo info in source.Maps) {
+                if (source.BgMode == NitroBackgroundMode.Affine) {
+                    writer.Write(info.TileIndex);
                 } else {
-                    writer.Write(info.ToUInt16());
+                    writer.Write(info.ToInt16());
                 }
             }
 

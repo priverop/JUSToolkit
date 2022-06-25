@@ -54,7 +54,7 @@ namespace Texim.Games.JumpUltimateStars {
                 throw new FormatException($"Invalid stamp '{stamp}'");
             }
 
-            reader.ReadByte(); // unknown
+            _ = reader.ReadByte(); // unknown
             byte type = reader.ReadByte();
             if (type != Type) {
                 throw new FormatException($"Invalid type: 0x{type:X2}");
@@ -62,7 +62,7 @@ namespace Texim.Games.JumpUltimateStars {
 
             int numSegments = reader.ReadInt16();
             int dsigOffset = reader.ReadInt16();
-            reader.ReadInt16(); // unknown
+            _ = reader.ReadInt16(); // unknown
 
             Sprite sprite = ReadSprite(reader, numSegments);
 

@@ -2,6 +2,12 @@
 
 namespace JUSToolkit.Formats
 {
+    public enum NitroBackgroundMode
+    {
+        Text = 0,
+        Affine = 1, // Palette must be 8bpp
+        Extended = 2, // Extended mode -> Text | Affine, not bitmap
+    }
     /// <summary>
     /// Screen map with format Almt.
     /// </summary>
@@ -10,8 +16,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public uint Magic
-        {
+        public uint Magic {
             get;
             set;
         }
@@ -19,8 +24,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public uint Unknown
-        {
+        public uint Unknown {
             get;
             set;
         }
@@ -28,8 +32,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public uint Unknown2
-        {
+        public uint Unknown2 {
             get;
             set;
         }
@@ -37,8 +40,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public ushort TileSizeW
-        {
+        public ushort TileSizeW {
             get;
             set;
         }
@@ -46,8 +48,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public ushort TileSizeH
-        {
+        public ushort TileSizeH {
             get;
             set;
         }
@@ -55,8 +56,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public ushort NumTileW
-        {
+        public ushort NumTileW {
             get;
             set;
         }
@@ -64,8 +64,7 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public ushort NumTileH
-        {
+        public ushort NumTileH {
             get;
             set;
         }
@@ -73,23 +72,37 @@ namespace JUSToolkit.Formats
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>
-        public uint Unknown3
-        {
+        public uint Unknown3 {
             get;
             set;
         }
 
         /// <inheritdoc/>
-        public MapInfo[] Maps
-        {
+        public MapInfo[] Maps {
             get;
             set;
         }
 
         /// <inheritdoc/>
-        public int Width { get; init; }
+        public int Width { get; set; }
 
         /// <inheritdoc/>
-        public int Height { get; init; }
+        public int Height { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of the tile.
+        /// </summary>
+        public System.Drawing.Size TileSize {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the mode of the background (NitroBackgroundMode).
+        /// </summary>
+        public NitroBackgroundMode BgMode {
+            get;
+            set;
+        }
     }
 }
