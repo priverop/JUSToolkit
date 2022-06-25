@@ -94,15 +94,22 @@
             return dig;
         }
 
+        /// <summary>
+        /// Converts a Dig Node to a BinaryFormat Node.
+        /// </summary>
+        /// <param name="dig">Dig Node.</param>
+        /// <returns>BinaryFormat Node.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="dig"/> is <c>null</c>.</exception>
         public BinaryFormat Convert(Dig dig)
         {
-            if (dig == null)
+            if (dig == null) {
                 throw new ArgumentNullException(nameof(dig));
+            }
 
             var binary = new BinaryFormat();
 
-            DataWriter writer = new DataWriter(binary.Stream) {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii")
+            var writer = new DataWriter(binary.Stream) {
+                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
             writer.Write(dig.Magic);

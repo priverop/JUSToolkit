@@ -11,6 +11,9 @@ using Yarhl.IO;
 
 namespace JUSToolkit.Converters.Images
 {
+    /// <summary>
+    /// Converts between a Binary DTX file and a PNG file.
+    /// </summary>
     public class BinaryDtx2Png : IConverter<NodeContainerFormat, NodeContainerFormat>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Identify));
@@ -72,7 +75,7 @@ namespace JUSToolkit.Converters.Images
                 Node dtx = Navigator.SearchNode<Node>(source.Root, dtxName + ".dtx");
 
                 if (dtx != null) {
-                    DataReader dtxReader = new DataReader(dtx.Stream);
+                    var dtxReader = new DataReader(dtx.Stream);
 
                     int magicid = dtxReader.ReadInt32();
                     byte type = dtxReader.ReadByte();
@@ -169,7 +172,6 @@ namespace JUSToolkit.Converters.Images
                     var n = new Node(dtxName, new BinaryFormat(DataStreamFactory.FromStream(s)));
                     output.Root.Add(n);
                 }
-
             }
 
             return output;

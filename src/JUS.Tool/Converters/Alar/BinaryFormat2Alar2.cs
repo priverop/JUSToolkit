@@ -35,28 +35,30 @@ namespace JUSToolkit.Converters.Alar
         /// </summary>
         /// <param name="input">BinaryFormat node.</param>
         /// <returns>Alart2 NodeContainerFormat.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
         public Alar2 Convert(BinaryFormat input) {
-            if (input == null)
+            if (input == null) {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             input.Stream.Seek(0, SeekMode.Start); // Just in case
 
-            DataReader br = new DataReader(input.Stream)
+            var br = new DataReader(input.Stream)
             {
                 DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
-            var aar = new Alar2
-            {
+            var aar = new Alar2 {
                 Header = br.ReadChars(4),
                 Type = br.ReadByte(),
                 Unk = br.ReadByte(),
                 Num_files = br.ReadUInt16(),
+                IDs = new byte[8],
             };
 
-            aar.IDs = new byte[8];
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++) {
                 aar.IDs[i] = br.ReadByte();
+            }
 
             // Index table
             uint name_offset = (uint)(0x10 + (aar.Num_files * 0x10));

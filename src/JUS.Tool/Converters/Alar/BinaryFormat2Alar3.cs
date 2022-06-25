@@ -25,7 +25,7 @@ namespace JUSToolkit.Converters.Alar
 
             input.Stream.Seek(0, SeekMode.Start); // Just in case
 
-            DataReader br = new DataReader(input.Stream) {
+            var br = new DataReader(input.Stream) {
                 DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
@@ -53,7 +53,7 @@ namespace JUSToolkit.Converters.Alar
                 uint offset = br.ReadUInt32();
                 uint size = br.ReadUInt32();
 
-                DataStream fileStream = new DataStream(input.Stream, offset, size);
+                var fileStream = new DataStream(input.Stream, offset, size);
 
                 var aarFile = new Alar3File(fileStream) {
                     FileID = fileID,
@@ -82,10 +82,12 @@ namespace JUSToolkit.Converters.Alar
         /// </summary>
         /// <param name="aar">Alar3 NodeContainerFormat.</param>
         /// <returns>BinaryFormat Node.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="aar"/> is <c>null</c>.</exception>
         public BinaryFormat Convert(Alar3 aar)
         {
-            if (aar == null)
+            if (aar == null) {
                 throw new ArgumentNullException(nameof(aar));
+            }
 
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream) {

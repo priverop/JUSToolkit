@@ -15,10 +15,12 @@ namespace JUSToolkit.Converters.Alar
         /// </summary>
         /// <param name="aar">Alar3 Node.</param>
         /// <returns>NodeContainerFormat Node.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="aar"/> is <c>null</c>.</exception>
         public NodeContainerFormat Convert(Alar3 aar)
         {
-            if (aar == null)
+            if (aar == null) {
                 throw new ArgumentNullException(nameof(aar));
+            }
 
             return aar.AlarFiles;
         }
@@ -26,7 +28,7 @@ namespace JUSToolkit.Converters.Alar
         /// <summary>
         /// Converts NodeContainerFormat Node to Alar3 Container.
         /// </summary>
-        /// <param name="container">NodeContainerFormat Node</param>
+        /// <param name="container">NodeContainerFormat Node.</param>
         /// <returns>Alar3 Container.</returns>
         public Alar3 Convert(NodeContainerFormat container)
         {
