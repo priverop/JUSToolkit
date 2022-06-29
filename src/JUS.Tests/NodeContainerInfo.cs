@@ -23,8 +23,11 @@ using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace SceneGate.Games.ProfessorLayton.Tests
+namespace JUSToolkit.Tests
 {
+    /// <summary>
+    /// Containers yaml file information.
+    /// </summary>
     public class NodeContainerInfo
     {
         public string Name { get; set; }
@@ -39,6 +42,11 @@ namespace SceneGate.Games.ProfessorLayton.Tests
 
         public Collection<NodeContainerInfo> Children { get; set; }
 
+        /// <summary>
+        /// Gets the info from the Yaml file into the NodeContainerInfo object.
+        /// </summary>
+        /// <param name="path">Path to the Yaml file.</param>
+        /// <returns>NodeContainerInfo.</returns>
         public static NodeContainerInfo FromYaml(string path)
         {
             string yaml = File.ReadAllText(path);

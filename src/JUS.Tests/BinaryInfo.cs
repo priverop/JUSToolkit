@@ -21,8 +21,11 @@ using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace SceneGate.Games.ProfessorLayton.Tests
+namespace JUSToolkit.Tests
 {
+    /// <summary>
+    /// Single file yaml information.
+    /// </summary>
     public class BinaryInfo
     {
         public long Offset { get; set; }
@@ -31,6 +34,11 @@ namespace SceneGate.Games.ProfessorLayton.Tests
 
         public string Sha256 { get; set; }
 
+        /// <summary>
+        /// Gets the info from the Yaml file into the BinaryInfo object.
+        /// </summary>
+        /// <param name="path">Path to the Yaml file.</param>
+        /// <returns>BinaryInfo.</returns>
         public static BinaryInfo FromYaml(string path)
         {
             string yaml = File.ReadAllText(path);

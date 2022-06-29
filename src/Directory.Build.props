@@ -12,6 +12,7 @@
              instead in the CLI command. -->
         <NoWarn>NETSDK1179</NoWarn>
         <NoWarn>NU1507</NoWarn>
+        <NoWarn>IDE0058</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

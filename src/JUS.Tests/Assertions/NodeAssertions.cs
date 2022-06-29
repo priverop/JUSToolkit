@@ -22,7 +22,7 @@ using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Yarhl.FileSystem;
 
-namespace SceneGate.Games.ProfessorLayton.Tests.Assertions
+namespace JUSToolkit.Tests.Assertions
 {
     public class NodeAssertions
         : ReferenceTypeAssertions<Node, NodeAssertions>
@@ -42,7 +42,7 @@ namespace SceneGate.Games.ProfessorLayton.Tests.Assertions
 
             if (info.Tags != null) {
                 // YAML deserializer always gets the value as a string
-                foreach (var entry in info.Tags) {
+                foreach (System.Collections.Generic.KeyValuePair<string, object> entry in info.Tags) {
                     Subject.Tags.Should().ContainKey(entry.Key);
                     Subject.Tags[entry.Key].ToString().Should().Be(entry.Value);
                 }

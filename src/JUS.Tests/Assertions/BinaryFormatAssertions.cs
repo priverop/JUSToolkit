@@ -21,7 +21,7 @@ using FluentAssertions;
 using FluentAssertions.Primitives;
 using Yarhl.IO;
 
-namespace SceneGate.Games.ProfessorLayton.Tests.Assertions
+namespace JUSToolkit.Tests.Assertions
 {
     public class BinaryFormatAssertions :
         ReferenceTypeAssertions<BinaryFormat, BinaryFormatAssertions>
