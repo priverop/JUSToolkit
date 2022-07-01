@@ -1,3 +1,6 @@
+# OS X Temp Files
+.DS_Store
+
 # Build outputs
 obj/
 bin/

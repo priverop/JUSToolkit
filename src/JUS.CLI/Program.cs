@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 Pablo Rivero Pulido
+﻿// Copyright (c) 2022 Pablo Rivero
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
+using System.CommandLine;
 
 namespace JUSToolkit.CLI
 {
@@ -30,18 +30,12 @@ namespace JUSToolkit.CLI
         /// Main entry-point.
         /// </summary>
         /// <param name="args">Application arguments.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> is <c>null</c>.</exception>
-        public static void Main(string[] args)
+        /// <returns>The return code.</returns>
+        public static int Main(string[] args)
         {
-            if (args == null) {
-                throw new ArgumentNullException(nameof(args));
-            }
-
-            string consoleVersion = typeof(Program).Assembly.GetName().Version.ToString();
-            Console.WriteLine($"Console version: {consoleVersion}");
-
-            string libVersion = JUS.Tool.LibVersion.GetVersion();
-            Console.WriteLine($"Library version: {libVersion}");
+            return new RootCommand("Convert files from Jump Ultimate Stars! game") {
+                JUS.CommandLine.CreateCommand(),
+            }.Invoke(args);
         }
     }
 }
