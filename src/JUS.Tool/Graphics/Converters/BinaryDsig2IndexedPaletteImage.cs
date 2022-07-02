@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using Texim;
 using Texim.Colors;
 using Texim.Images;
 using Texim.Palettes;
@@ -71,7 +72,7 @@ namespace JUSToolkit.Graphics.Converters
                 Height = height,
                 Pixels = pixels,
             };
-            image.Palettes.Add(palettes.Palettes as IPalette);
+            image.Palettes.Add(palettes.Palettes);
 
             return image;
         }
