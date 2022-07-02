@@ -44,15 +44,14 @@ namespace JUSToolkit.CLI.JUS
             }
 
             foreach (var node in Navigator.IterateNodes(files)) {
-                Console.WriteLine(node.Path);
-                Console.WriteLine(node.Name);
                 if (!node.IsContainer) {
-                    string outputFile = Path.Combine(output, node.Path);
+                    // Path.Combine ignores the relative path if there is an absolute path
+                    // so we remove the first slash of the node.Path
+                    string outputFile = Path.Combine(output, node.Path.Substring(1));
                     Console.WriteLine(outputFile);
                     node.Stream.WriteTo(outputFile);
                 }
             }
-            
         }
     }
 }
