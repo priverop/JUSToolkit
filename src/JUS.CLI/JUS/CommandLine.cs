@@ -22,8 +22,6 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
 using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
 using Texim.Formats;
 using Texim.Images;
 using Texim.Sprites;
@@ -42,77 +40,38 @@ namespace JUSToolkit.CLI.JUS
         /// <returns>The CLI command.</returns>
         public static Command CreateCommand()
         {
+
+            return new Command("jus", "Jump Ultimate Stars! game") {
+                CreateGraphicCommand(),
+                CreateContainerCommand(),
+            };
+        }
+
+        private static Command CreateGraphicCommand()
+        {
             var export = new Command("export-dtx", "Export dtx") {
                 new Option<string>("--container", "the input koma.aar container", ArgumentArity.ExactlyOne),
                 new Option<string>("--koma", "the koma.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--kshape", "the kshape.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string, string, string>(Export);
+            export.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.Export);
 
-            return new Command("jus", "Jump Ultimate Stars! game") {
+            return new Command("graphics", "Import/Export graphic files") {
                 export,
             };
         }
-
-        /// <summary>
-        /// Export a DTX into PNG komas.
-        /// </summary>
-        /// <param name="container">The koma.aar container.</param>
-        /// <param name="koma">The koma.bin file.</param>
-        /// <param name="kshape">The kshape.bin file.</param>
-        /// <param name="output">The output folder.</param>
-        private static void Export(string container, string koma, string kshape, string output)
+        private static Command CreateContainerCommand()
         {
-            Node images = NodeFactory.FromFile(container)
-                .TransformWith<BinaryAlar2Container>()
-                .Children["koma"];
-            if (images is null) {
-                throw new FormatException("Invalid container file");
-            }
+            var export = new Command("export-alar2", "Export alar2") {
+                new Option<string>("--container", "the input alar2 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar2);
 
-            var shapes = NodeFactory.FromFile(kshape)
-                .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>();
-
-            Koma komaFormat = NodeFactory.FromFile(koma)
-                .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>();
-            foreach (KomaElement komaElement in komaFormat) {
-                string filename = $"{komaElement.KomaName}.dtx";
-
-                Node dtx = images.Children[filename];
-                if (dtx is null) {
-                    Console.WriteLine("- Missing: " + filename);
-                    continue;
-                }
-
-                dtx.TransformWith<BinaryDstx2SpriteImage>();
-                var image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
-
-                // We ignore the sprite info from the DSTX and we take the one
-                // from the kshape
-                var sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
-
-                string outputFilePath = Path.Combine(
-                    output,
-                    $"{komaElement.KShapeGroupId}",
-                    komaElement.KomaName + ".png");
-
-                var spriteParams = new Sprite2IndexedImageParams {
-                    RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
-                    FullImage = image,
-                };
-                var indexedImageParams = new IndexedImageBitmapParams {
-                   Palettes = image,
-                };
-                new Node("sprite", sprite)
-                    .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
-                    .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
-                    .Stream.WriteTo(outputFilePath);
-            }
-
-            Console.WriteLine("Done!");
+            return new Command("containers", "Unpack/Repack container files") {
+                export,
+            };
         }
     }
 }
