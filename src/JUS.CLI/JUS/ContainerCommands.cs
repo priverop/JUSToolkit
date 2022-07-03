@@ -48,7 +48,6 @@ namespace JUSToolkit.CLI.JUS
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
                     string outputFile = Path.Combine(output, node.Path.Substring(1));
-                    Console.WriteLine(outputFile);
                     node.Stream.WriteTo(outputFile);
                 }
             }
