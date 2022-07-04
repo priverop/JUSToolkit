@@ -49,16 +49,24 @@ namespace JUSToolkit.CLI.JUS
 
         private static Command CreateGraphicCommand()
         {
-            var export = new Command("export-dtx", "Export dtx") {
+            var exportDtx = new Command("export-dtx", "Export dtx") {
                 new Option<string>("--container", "the input koma.aar container", ArgumentArity.ExactlyOne),
                 new Option<string>("--koma", "the koma.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--kshape", "the kshape.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.Export);
+            exportDtx.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportDtx);
+
+             var exportDsigAlmt = new Command("export-dsig-almt", "Export dsig+almt") {
+                new Option<string>("--dsig", "the input file.dig", ArgumentArity.ExactlyOne),
+                new Option<string>("--almt", "the input map.atm file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(GraphicCommands.ExportDsigAlmt);
 
             return new Command("graphics", "Import/Export graphic files") {
-                export,
+                exportDtx,
+                exportDsigAlmt,
             };
         }
         private static Command CreateContainerCommand()

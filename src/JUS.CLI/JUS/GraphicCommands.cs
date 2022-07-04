@@ -26,6 +26,9 @@ using Yarhl.FileSystem;
 using Texim.Formats;
 using Texim.Images;
 using Texim.Sprites;
+using Yarhl.IO;
+using Texim.Compressions.Nitro;
+using Texim.Palettes;
 
 namespace JUSToolkit.CLI.JUS
 {
@@ -35,13 +38,42 @@ namespace JUSToolkit.CLI.JUS
     public static class GraphicCommands
     {
         /// <summary>
+        /// Export a DSIG + ALMT into a PNG.
+        /// </summary>
+        /// <param name="dsig">The file.dig.</param>
+        /// <param name="almt">The map.atm file.</param>
+        /// <param name="output">The output folder.</param>
+        public static void ExportDsigAlmt(string dsig, string almt, string output)
+        {
+            // Pixels + Palette
+            using var pixelsPaletteNode = NodeFactory.FromFile(dsig, FileOpenMode.Read)
+                .TransformWith<BinaryDsig2IndexedPaletteImage>();
+            // Map
+            using var mapsNode = NodeFactory.FromFile(almt, FileOpenMode.Read)
+                .TransformWith<Binary2Almt>();
+
+            var mapsParams = new MapDecompressionParams {
+                Map = mapsNode.GetFormatAs<Almt>(),
+                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
+            };
+            var bitmapParams = new IndexedImageBitmapParams {
+                Palettes = pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>(),
+            };
+            pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
+                .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
+                .Stream.WriteTo(output + "export.png");
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
         /// Export a DTX into PNG komas.
         /// </summary>
         /// <param name="container">The koma.aar container.</param>
         /// <param name="koma">The koma.bin file.</param>
         /// <param name="kshape">The kshape.bin file.</param>
         /// <param name="output">The output folder.</param>
-        public static void Export(string container, string koma, string kshape, string output)
+        public static void ExportDtx(string container, string koma, string kshape, string output)
         {
             Node images = NodeFactory.FromFile(container)
                 .TransformWith<BinaryAlar2Container>()
