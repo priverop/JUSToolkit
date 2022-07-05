@@ -55,6 +55,7 @@ namespace JUSToolkit.Graphics.Converters
             bool is8Bpp = reader.ReadByte() != 0x10;
             short numPalettes = reader.ReadInt16();
             int width = reader.ReadUInt16();
+            Console.WriteLine(width);
             int height = reader.ReadUInt16();
 
             var palettes = new PaletteCollection();
