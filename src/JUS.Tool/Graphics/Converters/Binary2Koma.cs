@@ -1,9 +1,5 @@
 // Copyright (c) 2021 SceneGate
 
-using System;
-using Yarhl.FileFormat;
-using Yarhl.IO;
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -21,6 +17,10 @@ using Yarhl.IO;
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
+using Yarhl.FileFormat;
+using Yarhl.IO;
+
 namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>

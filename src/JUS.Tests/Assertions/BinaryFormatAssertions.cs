@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2022 Pablo Rivero
-//
+// Copyright (c) 2021 SceneGate
+
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//
+
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-//
+
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -17,25 +17,34 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.CommandLine;
+using FluentAssertions;
+using FluentAssertions.Primitives;
+using Yarhl.IO;
 
-namespace JUSToolkit.CLI
+namespace JUSToolkit.Tests.Assertions
 {
-    /// <summary>
-    /// Main program class.
-    /// </summary>
-    public static class Program
+    public class BinaryFormatAssertions :
+        ReferenceTypeAssertions<BinaryFormat, BinaryFormatAssertions>
     {
-        /// <summary>
-        /// Main entry-point.
-        /// </summary>
-        /// <param name="args">Application arguments.</param>
-        /// <returns>The return code.</returns>
-        public static int Main(string[] args)
+        public BinaryFormatAssertions(BinaryFormat instance)
+            : base(instance)
         {
-            return new RootCommand("Convert files from Jump Ultimate Stars! game") {
-                JUS.CommandLine.CreateCommand(),
-            }.Invoke(args);
+        }
+
+        protected override string Identifier => "binary";
+
+        [CustomAssertion]
+        public AndConstraint<BinaryFormatAssertions> MatchInfo(BinaryInfo info)
+        {
+            Subject.Stream.Should().MatchInfo(info);
+            return new AndConstraint<BinaryFormatAssertions>(this);
+        }
+
+        [CustomAssertion]
+        public AndConstraint<BinaryFormatAssertions> HaveSha256(string hash)
+        {
+            Subject.Stream.Should().HaveSha256(hash);
+            return new AndConstraint<BinaryFormatAssertions>(this);
         }
     }
 }

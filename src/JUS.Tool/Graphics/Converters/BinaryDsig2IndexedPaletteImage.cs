@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using Texim;
 using Texim.Colors;
 using Texim.Images;
 using Texim.Palettes;
@@ -54,6 +55,7 @@ namespace JUSToolkit.Graphics.Converters
             bool is8Bpp = reader.ReadByte() != 0x10;
             short numPalettes = reader.ReadInt16();
             int width = reader.ReadUInt16();
+            Console.WriteLine(width);
             int height = reader.ReadUInt16();
 
             var palettes = new PaletteCollection();
@@ -71,7 +73,7 @@ namespace JUSToolkit.Graphics.Converters
                 Height = height,
                 Pixels = pixels,
             };
-            image.Palettes.Add(palettes.Palettes as IPalette);
+            image.Palettes.Add(palettes.Palettes);
 
             return image;
         }

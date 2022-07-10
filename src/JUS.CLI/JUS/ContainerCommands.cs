@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2022 Pablo Rivero
-//
+// Copyright (c) 2022 Pablo Rivero
+
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//
+
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-//
+
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -17,25 +17,40 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.CommandLine;
+using System;
+using System.IO;
+using JUSToolkit.Containers.Converters;
+using Yarhl.FileSystem;
 
-namespace JUSToolkit.CLI
+namespace JUSToolkit.CLI.JUS
 {
     /// <summary>
-    /// Main program class.
+    /// Commands related to container files.
     /// </summary>
-    public static class Program
+    public static class ContainerCommands
     {
         /// <summary>
-        /// Main entry-point.
+        /// Export all the files from the Alar2 container.
         /// </summary>
-        /// <param name="args">Application arguments.</param>
-        /// <returns>The return code.</returns>
-        public static int Main(string[] args)
+        /// <param name="container">The path to the alar2 file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void ExportAlar2(string container, string output)
         {
-            return new RootCommand("Convert files from Jump Ultimate Stars! game") {
-                JUS.CommandLine.CreateCommand(),
-            }.Invoke(args);
+            Node files = NodeFactory.FromFile(container)
+                .TransformWith<BinaryAlar2Container>();
+
+            if (files is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            foreach (var node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
+                    // Path.Combine ignores the relative path if there is an absolute path
+                    // so we remove the first slash of the node.Path
+                    string outputFile = Path.Combine(output, node.Path.Substring(1));
+                    node.Stream.WriteTo(outputFile);
+                }
+            }
         }
     }
 }
