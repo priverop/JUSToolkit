@@ -22,13 +22,13 @@ using System.IO;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using Yarhl.FileSystem;
+using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
-using Texim.Sprites;
-using Yarhl.IO;
-using Texim.Compressions.Nitro;
 using Texim.Palettes;
+using Texim.Sprites;
+using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUSToolkit.CLI.JUS
 {
@@ -48,6 +48,7 @@ namespace JUSToolkit.CLI.JUS
             // Pixels + Palette
             using var pixelsPaletteNode = NodeFactory.FromFile(dsig, FileOpenMode.Read)
                 .TransformWith<BinaryDsig2IndexedPaletteImage>();
+
             // Map
             using var mapsNode = NodeFactory.FromFile(almt, FileOpenMode.Read)
                 .TransformWith<Binary2Almt>();

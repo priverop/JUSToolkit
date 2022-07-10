@@ -40,7 +40,6 @@ namespace JUSToolkit.CLI.JUS
         /// <returns>The CLI command.</returns>
         public static Command CreateCommand()
         {
-
             return new Command("jus", "Jump Ultimate Stars! game") {
                 CreateGraphicCommand(),
                 CreateContainerCommand(),
@@ -57,7 +56,7 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportDtx);
 
-             var exportDsigAlmt = new Command("export-dsig-almt", "Export dsig+almt") {
+            var exportDsigAlmt = new Command("export-dsig-almt", "Export dsig+almt") {
                 new Option<string>("--dsig", "the input file.dig", ArgumentArity.ExactlyOne),
                 new Option<string>("--almt", "the input map.atm file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
@@ -69,6 +68,7 @@ namespace JUSToolkit.CLI.JUS
                 exportDsigAlmt,
             };
         }
+
         private static Command CreateContainerCommand()
         {
             var export = new Command("export-alar2", "Export alar2") {

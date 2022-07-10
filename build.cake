@@ -8,6 +8,7 @@ Task("Define-Project")
     info.AddLibraryProjects("JUS.Tool");
     info.AddApplicationProjects("JUS.CLI");
     info.AddTestProjects("JUS.Tests");
+    info.CoverageTarget = 0;
 
     info.PreviewNuGetFeed = "https://pkgs.dev.azure.com/SceneGate/SceneGate/_packaging/SceneGate-Preview/nuget/v3/index.json";
 
