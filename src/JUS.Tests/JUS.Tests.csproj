@@ -11,7 +11,6 @@
     <PackageReference Include="nunit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="coverlet.collector" />
     <PackageReference Include="YamlDotNet" />
   </ItemGroup>
 
