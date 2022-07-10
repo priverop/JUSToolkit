@@ -1,5 +1,5 @@
 // Remember to fix a version with "&version=x.y.z"
-#load "nuget:?package=PleOps.Cake&prerelease"
+#load "nuget:?package=PleOps.Cake&version=0.7.0"
 
 Task("Define-Project")
     .Description("Fill specific project information")
