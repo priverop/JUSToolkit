@@ -18,21 +18,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using JUSToolkit.Graphics.Converters;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
 namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
-    /// Decompression algorithm for LZSS variant found in DENC formats.
+    /// Decompression algorithm for LZSS using CUE's implementation.
     /// </summary>
-    public class LzssCompression :
+    public class LzssDecompression :
         IConverter<IBinary, BinaryFormat>
     {
         /// <summary>
-        /// Decompress a LZSS-DENC compressed stream.
+        /// Decompress a LZSS compressed IBinary stream.
         /// </summary>
-        /// <param name="source">The compressed stream with LZSS-DENC.</param>
+        /// <param name="source">The compressed IBinary stream with LZSS.</param>
         /// <returns>The decompressed stream.</returns>
         public BinaryFormat Convert(IBinary source)
         {
@@ -40,7 +41,25 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            return new BinaryFormat(source.Stream);
+            var decompressedStream = Convert(source.Stream);
+
+            return new BinaryFormat(decompressedStream);
+        }
+
+        /// <summary>
+        /// Decompress a LZSS compressed DataStream.
+        /// </summary>
+        /// <param name="source">The compressed DataStream with LZSS.</param>
+        /// <returns>The decompressed DataStream.</returns>
+        public DataStream Convert(DataStream source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            // Discard the first 4 bytes of the header
+            source.Position = 4;
+
+            return LzssUtils.Lzss(source, "-d");
         }
     }
 }
