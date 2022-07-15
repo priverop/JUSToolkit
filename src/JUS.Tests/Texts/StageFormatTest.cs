@@ -27,7 +27,7 @@ namespace JUS.Tests.Texts
         }
 
         [Test]
-        public void BgmTest()
+        public void StageTest()
         {
             foreach (string filePath in Directory.GetFiles(resPath, "*.*", SearchOption.AllDirectories)) {
                 using (var node = NodeFactory.FromFile(filePath)) {
@@ -47,7 +47,7 @@ namespace JUS.Tests.Texts
                     try {
                         expectedPo = stage2Po.Convert(expectedStage);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception Bgm -> Po with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception Stage -> Po with {node.Path}\n{ex}");
                     }
 
                     // Po -> Stage
@@ -55,7 +55,7 @@ namespace JUS.Tests.Texts
                     try {
                         actualStage = stage2Po.Convert(expectedPo);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception Po -> Bgm with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception Po -> Stage with {node.Path}\n{ex}");
                     }
 
                     // Stage -> BinaryFormat

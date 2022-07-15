@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using JUS.Tool.Texts.Formats;
@@ -10,44 +9,45 @@ using Yarhl.IO;
 
 namespace JUS.Tool.Texts.Converters
 {
-    public class Binary2Stage :
-        IConverter<BinaryFormat, Stage>,
-        IConverter<Stage, BinaryFormat>
+    public class Binary2Location :
+        IConverter<BinaryFormat, Location>,
+        IConverter<Location, BinaryFormat>
     {
         private DataReader reader;
         private DataWriter writer;
 
-        public Stage Convert(BinaryFormat source)
+        public Location Convert(BinaryFormat source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var stage = new Stage();
+            var location = new Location();
             reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            int count = reader.ReadInt32() / StageEntry.EntrySize;
-            reader.Stream.Position = 0x00;
+            location.Count = reader.ReadInt32();
 
-            for (int i = 0; i < count; i++) {
-                stage.Entries.Add(ReadEntry());
+            for (int i = 0; i < location.Count; i++) {
+                location.Entries.Add(ReadEntry());
             }
 
-            return stage;
+            return location;
         }
 
-        public BinaryFormat Convert(Stage stage)
+        public BinaryFormat Convert(Location location)
         {
             var bin = new BinaryFormat();
             writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText(StageEntry.EntrySize * stage.Entries.Count);
+            var jit = new JusIndirectText((LocationEntry.EntrySize * location.Count) + 0x04);
 
-            foreach (StageEntry entry in stage.Entries) {
+            writer.Write(location.Count);
+
+            foreach (LocationEntry entry in location.Entries) {
                 JusText.WriteStringPointer(entry.Name, writer, jit);
                 writer.Write(entry.Unk1);
                 writer.Write(entry.Unk2);
@@ -59,12 +59,12 @@ namespace JUS.Tool.Texts.Converters
         }
 
         /// <summary>
-        /// Reads a single <see cref="StageEntry"/>.
+        /// Reads a single <see cref="LocationEntry"/>.
         /// </summary>
-        /// <returns>The read <see cref="StageEntry"/>.</returns>
-        private StageEntry ReadEntry()
+        /// <returns>The read <see cref="LocationEntry"/>.</returns>
+        private LocationEntry ReadEntry()
         {
-            var entry = new StageEntry();
+            var entry = new LocationEntry();
 
             entry.Name = JusText.ReadIndirectString(reader);
             entry.Unk1 = reader.ReadInt16();

@@ -13,7 +13,7 @@ using Yarhl.Media.Text;
 
 namespace JUS.Tests.Texts
 {
-    public class DemoFormatTest
+    public class LocationFormatTest
     {
         private string resPath;
 
@@ -21,53 +21,53 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Demo/");
+            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Location/");
 
             Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
         }
 
         [Test]
-        public void DemoTest()
+        public void LocationTest()
         {
             foreach (string filePath in Directory.GetFiles(resPath, "*.*", SearchOption.AllDirectories)) {
                 using (var node = NodeFactory.FromFile(filePath)) {
-                    // BinaryFormat -> Demo
+                    // BinaryFormat -> Location
                     var expectedBin = node.GetFormatAs<BinaryFormat>();
-                    var binary2Demo = new Binary2Demo();
-                    Demo expectedDemo = null;
+                    var binary2Location = new Binary2Location();
+                    Location expectedStage = null;
                     try {
-                        expectedDemo = binary2Demo.Convert(expectedBin);
+                        expectedStage = binary2Location.Convert(expectedBin);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception BinaryFormat -> Demo with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception BinaryFormat -> Location with {node.Path}\n{ex}");
                     }
 
-                    // Demo -> Po
-                    var demo2Po = new Demo2Po();
+                    // Location -> Po
+                    var location2Po = new Location2Po();
                     Po expectedPo = null;
                     try {
-                        expectedPo = demo2Po.Convert(expectedDemo);
+                        expectedPo = location2Po.Convert(expectedStage);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception Demo -> Po with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception Location -> Po with {node.Path}\n{ex}");
                     }
 
-                    // Po -> Demo
-                    Demo actualDemo = null;
+                    // Po -> Stage
+                    Location actualLocation = null;
                     try {
-                        actualDemo = demo2Po.Convert(expectedPo);
+                        actualLocation = location2Po.Convert(expectedPo);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception Po -> Demo with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception Po -> Location with {node.Path}\n{ex}");
                     }
 
-                    // Demo -> BinaryFormat
+                    // Location -> BinaryFormat
                     BinaryFormat actualBin = null;
                     try {
-                        actualBin = binary2Demo.Convert(actualDemo);
+                        actualBin = binary2Location.Convert(actualLocation);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception Demo -> BinaryFormat with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception Location -> BinaryFormat with {node.Path}\n{ex}");
                     }
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Demo are not identical: {node.Path}");
+                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Location is not identical: {node.Path}");
                 }
             }
         }

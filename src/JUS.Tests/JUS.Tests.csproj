@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Resources\Texts\Bgm\" />
     <Folder Include="Resources\Texts\Demo\" />
+    <Folder Include="Resources\Texts\Location\" />
   </ItemGroup>
 
 </Project>
