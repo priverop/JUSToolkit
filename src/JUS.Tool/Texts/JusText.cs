@@ -29,7 +29,7 @@ namespace JUS.Tool.Texts
             return new Po(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
         }
 
-        public static string[] SplitStringToFixedSize(string text, char separator, int size)
+        public static string[] SplitStringToFixedSizeArray(string text, char separator, int size)
         {
             string[] splitText = text.Split(separator, size);
 

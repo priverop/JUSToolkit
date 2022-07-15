@@ -9,19 +9,19 @@ using Yarhl.Media.Text;
 
 namespace JUS.Tool.Texts.Converters
 {
-    public class Bgm2Po :
-        IConverter<Bgm, Po>,
-        IConverter<Po, Bgm>
+    public class Demo2Po :
+        IConverter<Demo, Po>,
+        IConverter<Po, Demo>
     {
-        public Po Convert(Bgm bgm)
+        public Po Convert(Demo demo)
         {
             var po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (BgmEntry entry in bgm.Entries) {
+            foreach (DemoEntry entry in demo.Entries) {
                 po.Add(new PoEntry(entry.Title) {
                     Context = $"{i++}",
-                    ExtractedComments = $"{entry.Unk1}-{entry.Unk2}-{entry.Icon}",
+                    ExtractedComments = $"{entry.Id}-{entry.Icon}",
                 });
                 string description = $"{entry.Desc1}\n{entry.Desc2}\n{entry.Desc3}";
                 po.Add(new PoEntry(description) { Context = $"{i++}", });
@@ -30,17 +30,17 @@ namespace JUS.Tool.Texts.Converters
             return po;
         }
 
-        public Bgm Convert(Po po)
+        public Demo Convert(Po po)
         {
-            var bgm = new Bgm();
-            BgmEntry entry;
+            var demo = new Demo();
+            DemoEntry entry;
             string[] description;
             string[] metadata;
 
-            bgm.Count = po.Entries.Count / 2;
+            demo.Count = po.Entries.Count / 2;
 
-            for (int i = 0; i < bgm.Count; i++) {
-                entry = new BgmEntry();
+            for (int i = 0; i < demo.Count; i++) {
+                entry = new DemoEntry();
                 entry.Title = po.Entries[i * 2].Text;
 
                 description = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 2) + 1].Text, '\n', 3);
@@ -49,14 +49,13 @@ namespace JUS.Tool.Texts.Converters
                 entry.Desc3 = description[2];
 
                 metadata = JusText.ParseMetadata(po.Entries[i * 2].ExtractedComments);
-                entry.Unk1 = short.Parse(metadata[0]);
-                entry.Unk2 = short.Parse(metadata[1]);
-                entry.Icon = int.Parse(metadata[2]);
+                entry.Id = byte.Parse(metadata[0]);
+                entry.Icon = byte.Parse(metadata[1]);
 
-                bgm.Entries.Add(entry);
+                demo.Entries.Add(entry);
             }
 
-            return bgm;
+            return demo;
         }
     }
 }

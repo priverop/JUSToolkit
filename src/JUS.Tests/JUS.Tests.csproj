@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Resources\Texts\Bgm\" />
+    <Folder Include="Resources\Texts\Demo\" />
   </ItemGroup>
 
 </Project>
