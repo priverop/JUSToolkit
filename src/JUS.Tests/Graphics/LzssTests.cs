@@ -17,9 +17,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using JUSToolkit.Graphics.Converters;
 using NUnit.Framework;
 using Yarhl.FileSystem;
@@ -80,6 +82,23 @@ namespace JUSToolkit.Tests.Graphics
 
             decompressedFile.TransformWith<LzssCompression>()
                 .Stream.Should().MatchInfo(info);
+        }
+
+        [TestCaseSource(nameof(GetDecompressionFiles))]
+        public void TwoWaysCompression(string infoPath, string compressedPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(compressedPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+
+            using var compressedFile = NodeFactory.FromFile(compressedPath, FileOpenMode.Read);
+            var originalStream = new DataStream(compressedFile.Stream!, 0, compressedFile.Stream.Length);
+
+            var decompressed = compressedFile.TransformWith<LzssDecompression>();
+
+            var recompressed = decompressed.TransformWith<LzssCompression>();
+
+            recompressed.Stream.Length.Should().Be(originalStream.Length);
+            recompressed.Stream.Compare(originalStream).Should().BeTrue();
         }
     }
 }
