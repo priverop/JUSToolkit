@@ -1,1 +1,1 @@
-bg.yml,bg.atm
+bg.yml,bg_uncompressed.atm
