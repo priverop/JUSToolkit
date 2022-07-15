@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.Text;
 using JUSToolkit.Graphics.Converters;
 using Yarhl.FileFormat;
 using Yarhl.IO;
@@ -25,16 +26,16 @@ using Yarhl.IO;
 namespace JUSToolkit.Graphics.Converters
 {
     /// <summary>
-    /// Decompression algorithm for LZSS using CUE's implementation.
+    /// Compression algorithm for LZSS using CUE's implementation.
     /// </summary>
-    public class LzssDecompression :
+    public class LzssCompression :
         IConverter<IBinary, BinaryFormat>
     {
         /// <summary>
-        /// Decompress a LZSS compressed IBinary stream.
+        /// Compress a decompressed stream with LZSS and adds the DSCP header.
         /// </summary>
-        /// <param name="source">The compressed IBinary stream with LZSS.</param>
-        /// <returns>The decompressed stream.</returns>
+        /// <param name="source">The stream to compress.</param>
+        /// <returns>The compressed stream.</returns>
         public BinaryFormat Convert(IBinary source)
         {
             if (source == null) {
@@ -47,18 +48,26 @@ namespace JUSToolkit.Graphics.Converters
         }
 
         /// <summary>
-        /// Decompress a LZSS compressed DataStream.
+        /// Compress a DataStream with LZSS.
         /// </summary>
-        /// <param name="source">The compressed DataStream with LZSS.</param>
-        /// <returns>The decompressed DataStream.</returns>
+        /// <param name="source">The DataStream to compress.</param>
+        /// <returns>The compressed DataStream.</returns>
         public DataStream Convert(DataStream source)
         {
-            if (source == null) {
+            if (source == null)
                 throw new ArgumentNullException(nameof(source));
-            }
 
-            // Discard the first 4 bytes of the header (the DSCP magic ID)
-            return LzssUtils.Lzss(new DataStream(source, 4, source.Length - 4), "-d");
+            DataStream compressed = LzssUtils.Lzss(source, "-evn");
+
+            // Write the DSCP magic ID header
+            DataStream memoryStream = new DataStream();
+
+            memoryStream.Seek(0);
+            memoryStream.Write(Encoding.ASCII.GetBytes("DSCP"), 0, 4);
+
+            compressed.WriteTo(memoryStream);
+
+            return memoryStream;
         }
     }
 }

@@ -30,6 +30,9 @@ namespace JUSToolkit.Graphics.Converters
     /// </summary>
     public static class LzssUtils
     {
+        private static string programExe = System.IO.Path.GetFullPath(@"..\..\..\..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
+        private static string programUnix = System.IO.Path.GetFullPath(@"../../../../../") + "/lib/NDS_Compressors_CUE/lzss";
+
         /// <summary>
         /// Calls the external CUE's lzss library. It executes the unix binary.
         /// or the windows .exe.
@@ -39,31 +42,26 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns>The result DataStream.</returns>
         public static DataStream Lzss(DataStream input, string mode)
         {
+            // We need a temporary file to execute the external program
             string tempFile = Path.GetRandomFileName();
+            input.WriteTo(tempFile);
 
-            if (mode == "-d")
-            {
-                using (var substream = new DataStream(input, 4, input.Length - 4))
-                {
-                    substream.WriteTo(tempFile);
-                }
-            }
-            else
-            {
-                using (var substream = new DataStream(input, 0, input.Length))
-                {
-                    substream.WriteTo(tempFile);
-                }
-            }
-
-            string program = System.IO.Path.GetFullPath(@"..\..\..\..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
-
+            string program = Environment.OSVersion.Platform == PlatformID.Win32NT ? programExe : programUnix;
             string arguments = mode + " " + tempFile;
-            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-            {
-                program = System.IO.Path.GetFullPath(@"../../../../../") + "/lib/NDS_Compressors_CUE/lzss";
-            }
+            ExecuteExternalProcess(program, arguments);
 
+            // As the external program overwrites the file, we need to create a new Stream
+            DataStream fileStream = DataStreamFactory.FromFile(tempFile, FileOpenMode.Read);
+
+            return fileStream;
+        }
+
+        /// <summary>
+        /// Execute the external program.
+        /// </summary>
+        /// <param name="program">The program path.</param>
+        /// <param name="arguments">The arguments for the program.</param>
+        private static void ExecuteExternalProcess(string program, string arguments) {
             Process process = new Process();
             process.StartInfo.FileName = program;
             process.StartInfo.Arguments = arguments;
@@ -72,24 +70,7 @@ namespace JUSToolkit.Graphics.Converters
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.Start();
-
             process.WaitForExit();
-
-            DataStream fileStream = DataStreamFactory.FromFile(tempFile, FileOpenMode.Read);
-            DataStream memoryStream = new DataStream();
-
-            if (mode != "-d")
-            {
-                memoryStream.Seek(0);
-                memoryStream.Write(Encoding.ASCII.GetBytes("DSCP"), 0, 4);
-            }
-
-            fileStream.WriteTo(memoryStream);
-
-            fileStream.Dispose();
-            File.Delete(tempFile);
-
-            return memoryStream;
         }
     }
 }

@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FluentAssertions;
 using JUSToolkit.Graphics.Converters;
 using NUnit.Framework;
 using Yarhl.FileSystem;
@@ -31,10 +30,10 @@ namespace JUSToolkit.Tests.Graphics
     [TestFixture]
     public class LzssTests
     {
-        public static IEnumerable<TestCaseData> GetFiles()
+        public static IEnumerable<TestCaseData> GetDecompressionFiles()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
-            string listPath = Path.Combine(basePath, "lzss.txt");
+            string listPath = Path.Combine(basePath, "lzss_decompress.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
@@ -43,7 +42,19 @@ namespace JUSToolkit.Tests.Graphics
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
-        [TestCaseSource(nameof(GetFiles))]
+        public static IEnumerable<TestCaseData> GetCompressionFiles()
+        {
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
+            string listPath = Path.Combine(basePath, "lzss_compress.txt");
+            return TestDataBase.ReadTestListFile(listPath)
+                .Select(line => line.Split(','))
+                .Select(data => new TestCaseData(
+                    Path.Combine(basePath, data[0]),
+                    Path.Combine(basePath, data[1]))
+                    .SetName($"({data[0]}, {data[1]})"));
+        }
+
+        [TestCaseSource(nameof(GetDecompressionFiles))]
         public void DecompressAndCheckFileHash(string infoPath, string compressedPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(compressedPath);
@@ -54,6 +65,20 @@ namespace JUSToolkit.Tests.Graphics
             using var compressedFile = NodeFactory.FromFile(compressedPath, FileOpenMode.Read);
 
             compressedFile.TransformWith<LzssDecompression>()
+                .Stream.Should().MatchInfo(info);
+        }
+
+        [TestCaseSource(nameof(GetCompressionFiles))]
+        public void CompressAndCheckFileHash(string infoPath, string decompressedPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(decompressedPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+
+            var info = BinaryInfo.FromYaml(infoPath);
+
+            using var decompressedFile = NodeFactory.FromFile(decompressedPath, FileOpenMode.Read);
+
+            decompressedFile.TransformWith<LzssCompression>()
                 .Stream.Should().MatchInfo(info);
         }
     }
