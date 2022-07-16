@@ -27,9 +27,9 @@ namespace JUS.Tool.Texts.Formats
         public static readonly int NumInteractions = 3;
 
         /// <summary>
-        /// String used to represent an empty string.
+        /// String used to represent an empty ability.
         /// </summary>
-        public static readonly string EmptyString = "◇";
+        public static readonly string EmptyAbility = "◇";
 
         public BtlChrEntry()
         {

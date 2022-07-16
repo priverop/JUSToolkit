@@ -21,7 +21,7 @@ namespace JUS.Tool.Texts.Formats
         }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="StageEntry" />.
+        /// Gets or sets the list of <see cref="BtlChrEntry" />.
         /// </summary>
         public List<BtlChrEntry> Entries { get; set; }
     }
