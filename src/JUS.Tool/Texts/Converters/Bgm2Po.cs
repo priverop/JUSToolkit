@@ -34,7 +34,7 @@ namespace JUS.Tool.Texts.Converters
         {
             var bgm = new Bgm();
             BgmEntry entry;
-            string[] description;
+            List<string> description;
             string[] metadata;
 
             bgm.Count = po.Entries.Count / 2;
@@ -43,7 +43,7 @@ namespace JUS.Tool.Texts.Converters
                 entry = new BgmEntry();
                 entry.Title = po.Entries[i * 2].Text;
 
-                description = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 2) + 1].Text, '\n', 3);
+                description = JusText.SplitStringToList(po.Entries[(i * 2) + 1].Text, '\n', 3);
                 entry.Desc1 = description[0];
                 entry.Desc2 = description[1];
                 entry.Desc3 = description[2];

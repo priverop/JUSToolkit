@@ -55,38 +55,39 @@ namespace JUS.Tool.Texts.Converters
         {
             var btlChr = new BtlChr();
             BtlChrEntry entry;
-            string[] splitText;
+            List<string> splitText;
+            string[] metadata;
 
             for (int i = 0; i < po.Entries.Count / 26; i++) {
                 entry = new BtlChrEntry();
 
                 entry.ChrName = po.Entries[i * 26].Text;
-                splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 26) + 1].Text, '\n', 2);
+                splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 1].Text, '\n', 2);
                 entry.PassiveName = splitText[0];
                 entry.PassiveFurigana = splitText[1];
-                splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 26) + 2].Text, '\n', 2);
+                splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 2].Text, '\n', 2);
                 entry.PassiveDescription1 = splitText[0];
                 entry.PassiveDescription2 = splitText[1];
 
                 for (int j = 0; j < 10; j++) {
-                    splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 26) + 3 + (j * 2)].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 3 + (j * 2)].Text, '\n', 2);
                     entry.AbilityNames.Add(splitText[0]);
                     entry.AbilityFuriganas.Add(splitText[1]);
-                    splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 26) + 4 + (j * 2)].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 4 + (j * 2)].Text, '\n', 2);
                     entry.AbilityDescriptions.Add(splitText[0]);
                     entry.AbilityDescriptions.Add(splitText[1]);
                 }
 
                 for (int j = 23; j < 26; j++) {
-                    splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 26) + j].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(po.Entries[(i * 26) + j].Text, '\n', 2);
                     entry.Interactions.Add(splitText[0]);
                     entry.Interactions.Add(splitText[1]);
                 }
 
-                splitText = JusText.ParseMetadata(po.Entries[i * 26].ExtractedComments);
-                entry.Unk1 = short.Parse(splitText[0]);
-                entry.Unk2 = short.Parse(splitText[1]);
-                entry.Unk3 = short.Parse(splitText[2]);
+                metadata = JusText.ParseMetadata(po.Entries[i * 26].ExtractedComments);
+                entry.Unk1 = short.Parse(metadata[0]);
+                entry.Unk2 = short.Parse(metadata[1]);
+                entry.Unk3 = short.Parse(metadata[2]);
 
                 btlChr.Entries.Add(entry);
             }

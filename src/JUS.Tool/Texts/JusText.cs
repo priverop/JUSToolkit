@@ -29,17 +29,12 @@ namespace JUS.Tool.Texts
             return new Po(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
         }
 
-        public static string[] SplitStringToFixedSizeArray(string text, char separator, int size)
+        public static List<string> SplitStringToList(string text, char separator, int size)
         {
-            string[] splitText = text.Split(separator, size);
+            List<string> splitText = text.Split(separator).ToList();
 
-            if (splitText.Length < size) {
-                string[] fixedArray = new string[3];
-                for (int i = 0; i < splitText.Length; i++) {
-                    fixedArray[i] = splitText[i];
-                }
-
-                return fixedArray;
+            while (splitText.Count < size) {
+                splitText.Add(string.Empty);
             }
 
             return splitText;
@@ -54,7 +49,7 @@ namespace JUS.Tool.Texts
         /// Returns a string from current indirect stream position.
         /// </summary>
         /// <param name="reader">Reader to read from.</param>
-        /// <returns>String at indirect position.</returns>
+        /// <returns><see cref="string"/> at indirect position.</returns>
         public static string ReadIndirectString(DataReader reader)
         {
             reader.Stream.PushToPosition(reader.Stream.Position + reader.ReadInt32());
@@ -77,7 +72,7 @@ namespace JUS.Tool.Texts
         }
 
         /// <summary>
-        /// Writes all the strings in <see cref="JusIndirectText.Strings"/>.
+        /// Writes all the strings inside a <see cref="JusIndirectText.Strings"/>.
         /// </summary>
         /// <param name="writer">Writer to write to.</param>
         /// <param name="jit">JusIndirectText to get the strings from.</param>
@@ -86,6 +81,16 @@ namespace JUS.Tool.Texts
             foreach (string s in jit.Strings) {
                 writer.Write(s);
             }
+        }
+
+        public static string MergeStrings(List<string> strings)
+        {
+            var merged = new StringBuilder();
+            foreach (string s in strings) {
+                merged.Append($"{s}\n");
+            }
+
+            return merged.ToString()[..^1];
         }
     }
 }

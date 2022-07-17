@@ -34,18 +34,18 @@ namespace JUS.Tool.Texts.Converters
         {
             var suppChr = new SuppChr();
             SuppChrEntry entry;
-            string[] splitText;
+            List<string> splitText;
 
             for (int i = 0; i < po.Entries.Count / 5; i++) {
                 entry = new SuppChrEntry();
                 entry.chrName = po.Entries[i * 5].Text;
 
                 for (int j = 0; j < SuppChrEntry.NumAbilities; j++) {
-                    splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 5) + 1 + (j * 2)].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(po.Entries[(i * 5) + 1 + (j * 2)].Text, '\n', 2);
                     entry.Abilities.Add(splitText[0]);
                     entry.Abilities.Add(splitText[1]);
 
-                    splitText = JusText.SplitStringToFixedSizeArray(po.Entries[(i * 5) + 2 + (j * 2)].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(po.Entries[(i * 5) + 2 + (j * 2)].Text, '\n', 2);
                     entry.Descriptions.Add(splitText[0]);
                     entry.Descriptions.Add(splitText[1]);
                 }
