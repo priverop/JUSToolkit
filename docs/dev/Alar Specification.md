@@ -68,35 +68,88 @@ First file: koma/bb_00.dtx
 - koma.aar
 
 ## ALAR 2
-```
-struct ALAR_Type_2
-{
-    char                ID[4];
-    byte                Type;
-    byte                Unknown;
-    word                NumberFiles;
-    ubyte                ID1;
-    ubyte                ID2;
-    ubyte                ID3;
-    ubyte                ID4;
-    ubyte                ID5;
-    ubyte                ID6;
-    ubyte                ID7;
-    ubyte                ID8;
-    struct ALAR_2_Index        Index[NumberFiles];
-                    //Padding
-};
-```
 
-```
-struct ALAR_2_Index
-{
-    dword            Type;
-    dword            Start;
-    dword            Size;
-    ubyte            Unknown;
-    ubyte            Unknown;
-    ubyte            Unknown;
-    ubyte            Unknown;
-};
-```
+This format is useful to store few files. We have a small header, the info of the files and then the files one after another.
+
+| Offset | Type       | Description     |
+| ------ | ---------- | --------------- |
+| 0x00   | char[4]    | ALAR            |
+| 0x04   | byte       | Version (2)     |
+| 0x05   | byte       | Minor version   |
+| 0x06   | short      | Number of files |
+| 0x08   | byte[8]    | IDs?            |
+| 0x10   | FileInfo[] | File info list  |
+| ...    | FileData[] | File data       |
+
+### File Info
+
+| Offset | Type | Description      |
+| ------ | ---- | ---------------- |
+| 0x00   | int  | Unknown? Type?   |
+| 0x04   | int  | Absolute pointer |
+| 0x08   | int  | Size             |
+| 0x0A   | int  | Unknown          |
+
+### File Data
+
+| Offset | Type              | Description                         |
+| ------ | ----------------- | ----------------------------------- |
+| 0x00   | short             | Unknown, padding?                   |
+| 0x02   | string (32 bytes) | Null-terminated file path + padding |
+| ...    | short             | Unknown                             |
+| ...    | Stream            | File Data                           |
+
+### Example
+
+deck_obj.aar
+
+Header
+
+| Offset | Size | Hex               | Description     | Content (Hex) | Content (Decimal) |
+| ------ | ---- | ----------------- | --------------- | ------------- | ----------------- |
+| 0x00   | 4    | 414C4152          | ALAR            |
+| 0x04   | 1    | 02                | Version         |
+| 0x05   | 1    | 01                | Minor Version   |
+| 0x06   | 2    | 0200              | Number of Files | 2             | 2                 |
+| 0x08   | 8    | 00006800 09006800 | IDs             |
+
+File info #1
+
+| Offset | Size | Hex      | Description      | Content (Hex) | Content (Decimal) |
+| ------ | ---- | -------- | ---------------- | ------------- | ----------------- |
+| 0x10   | 4    | 00006840 | ID               |
+| 0x14   | 4    | 54000000 | Absolute Pointer | 54            |
+| 0x18   | 4    | DC010000 | Size             | 1DC           | 476               |
+| 0x1C   | 4    | 01000080 | Unknown          |
+
+File info #2
+
+| Offset | Size | Hex      | Description      | Content (Hex) | Content (Decimal) |
+| ------ | ---- | -------- | ---------------- | ------------- | ----------------- |
+| 0x20   | 4    | 00006840 | ID               |
+| 0x24   | 4    | 54020000 | Absolute Pointer | 254           |
+| 0x28   | 4    | 10010000 | Size             | 110           | 272               |
+| 0x2C   | 4    | 0A0000C0 | Unknown          |
+
+File data #1: deck_obj.dtx
+
+| Offset | Size | Hex                                   | Description      |
+| ------ | ---- | ------------------------------------- | ---------------- |
+| 0x30   | 2    | 0000                                  | Unkown, padding? |
+| 0x32   | 32   | 6465636B 5F6F626A 2E647478 + 20 zeros | deck_obj.dtx     |
+| 0x52   | 2    | 7A22                                  | Unknown          |
+| 0x54   | 476  | 44535458...                           | Stream           |
+
+File data #2: deck_obj.amt
+
+| Offset | Size | Hex                                   | Description      |
+| ------ | ---- | ------------------------------------- | ---------------- |
+| 0x230  | 2    | 0000                                  | Unkown, padding? |
+| 0x232  | 32   | 6465636B 5F6F626A 2E616D74 + 20 zeros | deck_obj.amt     |
+| 0x252  | 2    | 7A22                                  | Unknown          |
+| 0x254  | 272  | 44535458...                           | Stream           |
+
+### List of Alar2 Files
+
+- battle/deck_obj.aar
+- symbol02.aar
