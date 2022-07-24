@@ -22,8 +22,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using NUnit.Framework;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -32,10 +34,10 @@ namespace JUSToolkit.Tests.Containers
     [TestFixture]
     public class AlarTests
     {
-        public static IEnumerable<TestCaseData> GetAlar2Files()
+        public static IEnumerable<TestCaseData> GetAlar3Files()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers");
-            string listPath = Path.Combine(basePath, "alar2.txt");
+            string listPath = Path.Combine(basePath, "alar3.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
@@ -44,8 +46,8 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
-        [TestCaseSource(nameof(GetAlar2Files))]
-        public void DeserializeAlar2(string infoPath, string alarPath)
+        [TestCaseSource(nameof(GetAlar3Files))]
+        public void DeserializeAlar3(string infoPath, string alarPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
@@ -53,8 +55,24 @@ namespace JUSToolkit.Tests.Containers
             var expected = NodeContainerInfo.FromYaml(infoPath);
 
             using var alar = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
-            alar.Invoking(n => n.TransformWith<BinaryAlar2Container>()).Should().NotThrow();
+
+            alar.Invoking(n => n.TransformWith<Binary2Alar3>()).Should().NotThrow();
             alar.Should().MatchInfo(expected);
+        }
+
+        [TestCaseSource(nameof(GetAlar3Files))]
+        public void TwoWaysIdenticalAlar3Stream(string infoPath, string alarPath)
+        {
+            Assert.Ignore();
+            TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
+
+            using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
+
+            var alar = (NodeContainerFormat)ConvertFormat.With<BinaryAlar2Container>(node.Format!);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<BinaryAlar2Container>(alar);
+
+            generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
+            generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
         }
     }
 }

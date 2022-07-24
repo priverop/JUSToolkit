@@ -22,33 +22,33 @@ namespace JUSToolkit.Containers
         public ushort FileID { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unk3.
+        /// Gets or sets the Unknown.
         /// </summary>
-        public ushort Unk3 { get; set; }
+        public ushort Unknown { get; set; }
 
         /// <summary>
-        /// Gets or sets the Offset of the File.
+        /// Gets or sets the absolute pointer of the File.
         /// </summary>
         public uint Offset { get; set; }
 
         /// <summary>
-        /// Gets or sets the Size of the File.
+        /// Gets or sets the size of the File.
         /// </summary>
         public uint Size { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unk4.
+        /// Gets or sets the Unknown2.
         /// </summary>
-        public ushort Unk4 { get; set; }
+        public ushort Unknown2 { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unk5.
+        /// Gets or sets the Unknown3.
         /// </summary>
-        public ushort Unk5 { get; set; }
+        public ushort Unknown3 { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unk6.
+        /// Gets or sets the Unknown4.
         /// </summary>
-        public ushort Unk6 { get; set; }
+        public ushort Unknown4 { get; set; }
     }
 }

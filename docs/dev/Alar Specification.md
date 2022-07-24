@@ -4,16 +4,16 @@
 
 This format is useful to store a lot of files. We have the header where we store all the pointers and then we have the file contents all together.
 
-| Offset | Type    | Description                       |
-| ------ | ------- | --------------------------------- |
-| 0x00   | char[4] | ALAR                              |
-| 0x04   | byte    | Version (3 to follow)             |
-| 0x05   | byte    | Minor version?                    |
-| 0x06   | int     | Number of files                   |
-| 0x0A   | short   | Reserved?                         |
-| 0x0C   | int     | Number of entries                 |
-| 0x10   | short   | Data offset (pointer section end) |
-| 0x12   | short[] | File info absolute pointers       |
+| Offset | Type    | Description                        |
+| ------ | ------- | ---------------------------------- |
+| 0x00   | char[4] | ALAR                               |
+| 0x04   | byte    | Version (3 to follow)              |
+| 0x05   | byte    | Minor version?                     |
+| 0x06   | int     | Number of files (includes folders) |
+| 0x0A   | short   | Reserved?                          |
+| 0x0C   | int     | Number of entries (not folders)    |
+| 0x10   | short   | Data offset (pointer section end)  |
+| 0x12   | short[] | File info absolute pointers        |
 padding?
 | ..     | FileInfo[] | File info list              |
 | ..     | Stream[]   | File data                   |
@@ -45,8 +45,8 @@ koma.aar
 | 0x06   | 4    | 82030000 | Number of Files         | 382           | 898               |
 | 0x0A   | 2    | 000000   | Reserved                |
 | 0x0C   | 4    | 81030000 | Number of entries       | 381           | 897               |
-| 0x10   | 2    | 6085     | Data Offset             | 8560          |                   |
-| 0x12   | 2    | 1807     | File info first pointer | 718           |                   |
+| 0x10   | 2    | 6085     | Data Offset             | 8560          |
+| 0x12   | 2    | 1807     | File info first pointer | 718           |
 
 First file: koma/bb_00.dtx
 
