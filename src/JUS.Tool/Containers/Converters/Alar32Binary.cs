@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.Linq;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -84,6 +85,7 @@ namespace JUSToolkit.Containers.Converters
             writer.WritePadding(0, 04);
 
             // Primero Cabeceras y luego ficheros
+            // TODO: AQUI HAY ALGUN ERROR, ficheros de más?
             foreach (Node node in Navigator.IterateNodes(aar.Root)) {
                 if (!node.IsContainer) {
                     Alar3File aarFile = node.GetFormatAs<Alar3File>();
@@ -101,7 +103,6 @@ namespace JUSToolkit.Containers.Converters
                 }
             }
 
-            // Ajustamos offsets
             int newOffset = 0;
             foreach (Node node in Navigator.IterateNodes(aar.Root)) {
                 if (!node.IsContainer) {
@@ -111,11 +112,11 @@ namespace JUSToolkit.Containers.Converters
                         newOffset = (int)aarFile.Offset;
                     }
 
-                    if (aarFile.FileID != aar.Root.Children.Count - 1) {
-                        newOffset += (int)(aarFile.Size + paddings[aarFile.FileID]);
+                    if (aarFile.FileID != aar.NumFiles - 1) {
+                        newOffset += (int)(aarFile.Size + paddings[aarFile.FileID + 1]);
                         writer.Stream.RunInPosition(
                             () => writer.Write(newOffset),
-                            offsetPositions[aarFile.FileID]);
+                            offsetPositions[aarFile.FileID + 1]);
                     }
                 }
             }

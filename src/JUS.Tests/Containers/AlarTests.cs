@@ -63,13 +63,12 @@ namespace JUSToolkit.Tests.Containers
         [TestCaseSource(nameof(GetAlar3Files))]
         public void TwoWaysIdenticalAlar3Stream(string infoPath, string alarPath)
         {
-            Assert.Ignore();
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            var alar = (NodeContainerFormat)ConvertFormat.With<BinaryAlar2Container>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<BinaryAlar2Container>(alar);
+            var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(node.Format!);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar32Binary>(alar);
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
