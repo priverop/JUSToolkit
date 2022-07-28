@@ -66,6 +66,7 @@ First file: koma/bb_00.dtx
 ### List of Alar3 Files
 
 - koma.aar
+- vscall.aar
 
 ## ALAR 2
 
