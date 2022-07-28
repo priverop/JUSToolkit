@@ -26,7 +26,7 @@ using Yarhl.IO;
 namespace JUSToolkit.Containers.Converters
 {
     /// <summary>
-    /// Converts between a <see cref="BinaryAlar2Container"/> and a BinaryFormat file.
+    /// Converts between an <see cref="Alar3"/> and a BinaryFormat file.
     /// </summary>
     public class Binary2Alar3 : IConverter<IBinary, Alar3>
     {
@@ -49,9 +49,9 @@ namespace JUSToolkit.Containers.Converters
 
             ReadHeader();
 
-            for (int i = 0; i < alar.NumEntries; i++) {
-                alar.FileInfoPointers[0] = reader.ReadUInt16();
-                source.Stream.RunInPosition(() => ReadFileInfo(source), alar.FileInfoPointers[0]);
+            for (int i = 0; i < alar.NumFiles; i++) {
+                alar.FileInfoPointers[i] = reader.ReadUInt16();
+                source.Stream.RunInPosition(() => ReadFileInfo(source), alar.FileInfoPointers[i]);
             }
 
             return alar;
@@ -73,8 +73,8 @@ namespace JUSToolkit.Containers.Converters
             var reserved = reader.ReadUInt16();
             var numEntries = reader.ReadUInt32();
 
-            alar = new Alar3(numEntries) {
-                NumFiles = numFiles,
+            alar = new Alar3(numFiles) {
+                NumEntries = numEntries,
                 Reserved = reserved,
                 DataOffset = reader.ReadUInt16(),
             };

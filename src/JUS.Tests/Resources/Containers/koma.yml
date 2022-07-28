@@ -1802,4 +1802,5 @@ children:
         format_type: JUSToolkit.Containers.Alar3File
       - name: yo_10.dtx 
         format_type: JUSToolkit.Containers.Alar3File
-
+      - name: yo_11.dtx 
+        format_type: JUSToolkit.Containers.Alar3File

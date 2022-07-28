@@ -4,35 +4,36 @@
 
 This format is useful to store a lot of files. We have the header where we store all the pointers and then we have the file contents all together.
 
-| Offset | Type    | Description                        |
-| ------ | ------- | ---------------------------------- |
-| 0x00   | char[4] | ALAR                               |
-| 0x04   | byte    | Version (3 to follow)              |
-| 0x05   | byte    | Minor version?                     |
-| 0x06   | int     | Number of files (includes folders) |
-| 0x0A   | short   | Reserved?                          |
-| 0x0C   | int     | Number of entries (not folders)    |
-| 0x10   | short   | Data offset (pointer section end)  |
-| 0x12   | short[] | File info absolute pointers        |
-padding?
-| ..     | FileInfo[] | File info list              |
-| ..     | Stream[]   | File data                   |
+| Offset | Type       | Description                        |
+| ------ | ---------- | ---------------------------------- |
+| 0x00   | char[4]    | ALAR                               |
+| 0x04   | byte       | Version (3 to follow)              |
+| 0x05   | byte       | Minor version?                     |
+| 0x06   | int        | Number of files (includes folders) |
+| 0x0A   | short      | Reserved?                          |
+| 0x0C   | int        | Number of entries (not folders)    |
+| 0x10   | short      | Data offset (pointer section end)  |
+| 0x12   | short[]    | File info absolute pointers        |
+| ..     | ..         | Padding until 04 multiple          |
+| ..     | FileInfo[] | File info list                     |
+| ..     | Stream[]   | File data                          |
 
 ### File info
 
+36 bytes
+
 | Offset | Type   | Description                 |
 | ------ | ------ | --------------------------- |
-| 0x00   | short  | ID                          |
-| 0x02   | short  | Unknown                     |
+| 0x00   | short  | File ID starting from 0     |
+| 0x02   | short  | Unknown: 040                |
 | 0x04   | int    | Absolute pointer            |
 | 0x08   | int    | Size                        |
-| 0x0C   | short  | Unknown                     |
-| 0x0E   | short  | Unknown                     |
-| 0x10   | short  | Unknown                     |
+| 0x0C   | int    | Unknown: 01000080           |
+| 0x10   | short  | Unknown***                  |
 | 0x12   | string | Null-terminated file path** |
 
 ** char FileName[18] // 14bytes string + 4bytes pad to next entry - null terminated
-
+*** it seems there may be a correlation but i don't know what is it
 ### Example
 
 koma.aar
@@ -56,8 +57,7 @@ First file: koma/bb_00.dtx
 | 0x71A  | 2    | 0040     | Unknown                     | 40            |
 | 0x71C  | 4    | 60850000 | Absolute Pointer            | 8560          |
 | 0x720  | 4    | DC040000 | Size                        | 04DC          | 1244              |
-| 0x724  | 2    | 0100     | Unknown                     |
-| 0x726  | 2    | 0080     | Unknown                     |
+| 0x724  | 4    | 01000080 | Unknown                     |
 | 0x728  | 2    | 3C96     | Unknown                     |
 | 0x72A  | 18   | 1807     | File path: koma/bb_00.dtx** |
 
