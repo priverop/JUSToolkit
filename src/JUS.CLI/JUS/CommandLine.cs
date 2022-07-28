@@ -77,8 +77,15 @@ namespace JUSToolkit.CLI.JUS
             };
             export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar3);
 
+            var import = new Command("import-alar3", "import alar3") {
+                new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            import.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar3);
+
             return new Command("containers", "Unpack/Repack container files") {
                 export,
+                import,
             };
         }
     }

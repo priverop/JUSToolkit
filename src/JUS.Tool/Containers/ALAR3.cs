@@ -25,17 +25,17 @@ namespace JUSToolkit.Containers
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar3" /> class with an empty list of <see cref="Alar3File" />.
         /// </summary>
-        /// <param name="numEntries">How many files are we storing.</param>
-        public Alar3(uint numEntries)
+        /// <param name="numFiles">How many files are we storing.</param>
+        public Alar3(uint numFiles)
         {
-            NumEntries = numEntries;
-            FileInfoPointers = new ushort[numEntries];
+            NumFiles = numFiles;
+            FileInfoPointers = new ushort[numFiles];
         }
 
         /// <summary>
-        /// Gets or sets the Number of files and directories in the container.
+        /// Gets the Number of files in the container.
         /// </summary>
-        public uint NumFiles { get; set; }
+        public uint NumFiles { get; private set; }
 
         /// <summary>
         /// Gets or sets the Reserved section of the container.
@@ -43,9 +43,9 @@ namespace JUSToolkit.Containers
         public ushort Reserved { get; set; }
 
         /// <summary>
-        /// Gets the Number of files (not directories) in the container.
+        /// Gets or sets the Number of files - 1 in the container.
         /// </summary>
-        public uint NumEntries { get; private set; }
+        public uint NumEntries { get; set; }
 
         /// <summary>
         /// Gets or sets the ending of the pointer section and the start of the file data.

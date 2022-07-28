@@ -51,6 +51,29 @@ namespace JUSToolkit.CLI.JUS
                     node.Stream.WriteTo(outputFile);
                 }
             }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import files into an Alar3 container.
+        /// </summary>
+        /// <param name="container">The path to the original alar3 file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void ImportAlar3(string container, string output)
+        {
+            Node alar = NodeFactory.FromFile(container)
+                .TransformWith<Binary2Alar3>();
+
+            if (alar is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            alar.TransformWith<Alar32Binary>();
+
+            alar.Stream.WriteTo(Path.Combine(output, "imported_" + alar.Name));
+
+            Console.WriteLine("Done!");
         }
     }
 }

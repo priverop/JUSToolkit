@@ -4,19 +4,19 @@
 
 This format is useful to store a lot of files. We have the header where we store all the pointers and then we have the file contents all together.
 
-| Offset | Type       | Description                        |
-| ------ | ---------- | ---------------------------------- |
-| 0x00   | char[4]    | ALAR                               |
-| 0x04   | byte       | Version (3 to follow)              |
-| 0x05   | byte       | Minor version?                     |
-| 0x06   | int        | Number of files (includes folders) |
-| 0x0A   | short      | Reserved?                          |
-| 0x0C   | int        | Number of entries (not folders)    |
-| 0x10   | short      | Data offset (pointer section end)  |
-| 0x12   | short[]    | File info absolute pointers        |
-| ..     | ..         | Padding until 04 multiple          |
-| ..     | FileInfo[] | File info list                     |
-| ..     | Stream[]   | File data                          |
+| Offset | Type       | Description                       |
+| ------ | ---------- | --------------------------------- |
+| 0x00   | char[4]    | ALAR                              |
+| 0x04   | byte       | Version (3 to follow)             |
+| 0x05   | byte       | Minor version?                    |
+| 0x06   | int        | Number of files                   |
+| 0x0A   | short      | Reserved?                         |
+| 0x0C   | int        | Number of entries (files - 1)     |
+| 0x10   | short      | Data offset (pointer section end) |
+| 0x12   | short[]    | File info absolute pointers       |
+| ..     | ..         | Padding until 04 multiple         |
+| ..     | FileInfo[] | File info list                    |
+| ..     | Stream[]   | File data                         |
 
 ### File info
 
