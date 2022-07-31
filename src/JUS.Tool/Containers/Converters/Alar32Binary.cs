@@ -48,6 +48,7 @@ namespace JUSToolkit.Containers.Converters
                 DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
             };
 
+            // Write Header
             writer.Write(Alar3.STAMP, false);
             writer.Write((byte)Alar3.SupportedVersion.Major);
             writer.Write((byte)Alar3.SupportedVersion.Minor);
@@ -56,13 +57,19 @@ namespace JUSToolkit.Containers.Converters
             writer.Write(aar.NumEntries);
             writer.Write(aar.DataOffset);
 
+            // Write File Pointers Section
             for (ushort i = 0; i < aar.NumFiles; i++) {
                 writer.Write(aar.FileInfoPointers[i]);
             }
 
+            // We store the positions of the alar file Offset section
+            // so we can modify them later.
             long[] offsetPositions = new long[aar.NumFiles];
+            // As every file has a random padding, we store it so we can write it 
+            // later.
             int[] paddings = new int[aar.NumFiles];
 
+            // Write File Info Section
             foreach (Node aarFile in Navigator.IterateNodes(aar.Root)) {
                 if (!aarFile.IsContainer) {
                     Alar3File alarChild = aarFile.GetFormatAs<Alar3File>();
@@ -84,12 +91,12 @@ namespace JUSToolkit.Containers.Converters
 
             writer.WritePadding(0, 04);
 
-            // Primero Cabeceras y luego ficheros
-            // TODO: AQUI HAY ALGUN ERROR, ficheros de más?
+            // Write File Data Section
             foreach (Node node in Navigator.IterateNodes(aar.Root)) {
                 if (!node.IsContainer) {
                     Alar3File aarFile = node.GetFormatAs<Alar3File>();
 
+                    // Storing Padding for every file but the first one
                     if (aarFile.FileID != 0) {
                         long initPadding = writer.Stream.Position;
                         writer.WritePadding(0, 04);
@@ -103,15 +110,18 @@ namespace JUSToolkit.Containers.Converters
                 }
             }
 
+            // Rewrite Offsets
             int newOffset = 0;
             foreach (Node node in Navigator.IterateNodes(aar.Root)) {
                 if (!node.IsContainer) {
                     Alar3File aarFile = node.GetFormatAs<Alar3File>();
 
+                    // Starter Offset
                     if (aarFile.FileID == 0) {
                         newOffset = (int)aarFile.Offset;
                     }
 
+                    // Add the size of the file and the padding
                     if (aarFile.FileID != aar.NumFiles - 1) {
                         newOffset += (int)(aarFile.Size + paddings[aarFile.FileID + 1]);
                         writer.Stream.RunInPosition(
@@ -124,6 +134,13 @@ namespace JUSToolkit.Containers.Converters
             return binary;
         }
 
+        /// <summary>
+        /// Removes the alar filename (the root name) from the path of the node.
+        /// <remarks>If we have '/alar.aar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
+        /// </summary>
+        /// <param name="fullPath">The full path of the node.</param>
+        /// <param name="alarName">The name of the root node.</param>
+        /// <returns>The string.</returns>
         private string GetAlar3Path(string fullPath, string alarName)
         {
             return fullPath.Substring(1).Replace(alarName, string.Empty).Substring(1);
