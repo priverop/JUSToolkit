@@ -65,7 +65,8 @@ namespace JUSToolkit.Containers.Converters
             // We store the positions of the alar file Offset section
             // so we can modify them later.
             long[] offsetPositions = new long[aar.NumFiles];
-            // As every file has a random padding, we store it so we can write it 
+
+            // As every file has a random padding, we store it so we can write it
             // later.
             int[] paddings = new int[aar.NumFiles];
 
