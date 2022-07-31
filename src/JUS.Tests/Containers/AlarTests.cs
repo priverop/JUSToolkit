@@ -46,6 +46,18 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
+        public static IEnumerable<TestCaseData> GetAlar3InsertionFiles()
+        {
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers");
+            string listPath = Path.Combine(basePath, "alar3insertion.txt");
+            return TestDataBase.ReadTestListFile(listPath)
+                .Select(line => line.Split(','))
+                .Select(data => new TestCaseData(
+                    Path.Combine(basePath, data[0]),
+                    Path.Combine(basePath, data[1]))
+                    .SetName($"({data[0]}, {data[1]})"));
+        }
+
         [TestCaseSource(nameof(GetAlar3Files))]
         public void DeserializeAlar3(string infoPath, string alarPath)
         {
@@ -64,6 +76,7 @@ namespace JUSToolkit.Tests.Containers
         public void TwoWaysIdenticalAlar3Stream(string infoPath, string alarPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
@@ -72,6 +85,23 @@ namespace JUSToolkit.Tests.Containers
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
+        }
+
+        [TestCaseSource(nameof(GetAlar3InsertionFiles))]
+        public void InsertingAlar3Identical(string alarPath, string filePath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(filePath);
+
+            using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
+            using Node fileOriginal = NodeFactory.FromFile(filePath, FileOpenMode.Read);
+
+            var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(alarOriginal.Format!);
+            alar.InsertModification(fileOriginal);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar32Binary>(alar);
+
+            generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
+            generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();
         }
     }
 }
