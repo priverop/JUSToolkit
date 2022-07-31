@@ -1,4 +1,5 @@
-﻿using Yarhl.FileFormat;
+﻿using System;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -7,60 +8,54 @@ namespace JUSToolkit.Containers
     /// <summary>
     /// Alar3 Container Format.
     /// </summary>
-    public class Alar3 : IFormat
+    public class Alar3 : NodeContainerFormat
     {
+        /// <summary>
+        /// The Magic ID of the file.
+        /// </summary>
+        public const string STAMP = "ALAR";
+
+        /// <summary>
+        /// The Version of the File.
+        /// </summary>
+        /// <remarks>Maybe we need to support more than one minor version, but right now.
+        /// I only found the 05.</remarks>
+        public static readonly Version SupportedVersion = new (3, 5);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar3" /> class with an empty list of <see cref="Alar3File" />.
         /// </summary>
-        public Alar3()
+        /// <param name="numFiles">How many files are we storing.</param>
+        public Alar3(uint numFiles)
         {
-            AlarFiles = new NodeContainerFormat();
+            NumFiles = numFiles;
+            FileInfoPointers = new ushort[numFiles];
         }
 
         /// <summary>
-        /// Gets or sets the .
+        /// Gets the Number of files in the container.
         /// </summary>
-        public char[] Header { get; set; }
+        public uint NumFiles { get; private set; }
 
         /// <summary>
-        /// Gets or sets the .
+        /// Gets or sets the Reserved section of the container.
         /// </summary>
-        public byte Type { get; set; }
+        public ushort Reserved { get; set; }
 
         /// <summary>
-        /// Gets or sets the .
+        /// Gets or sets the Number of files - 1 in the container.
         /// </summary>
-        public byte Unk { get; set; }
+        public uint NumEntries { get; set; }
 
         /// <summary>
-        /// Gets or sets the .
+        /// Gets or sets the ending of the pointer section and the start of the file data.
         /// </summary>
-        public uint Num_files { get; set; }
+        public ushort DataOffset { get; set; }
 
         /// <summary>
-        /// Gets or sets the .
+        /// Gets or sets the pointers of the file info.
         /// </summary>
-        public ushort Unk2 { get; set; }
-
-        /// <summary>
-        /// Gets or sets the .
-        /// </summary>
-        public uint Array_count { get; set; }
-
-        /// <summary>
-        /// Gets or sets the .
-        /// </summary>
-        public ushort EndFileIndex { get; set; }
-
-        /// <summary>
-        /// Gets or sets the .
-        /// </summary>
-        public ushort[] FileTableIndex { get; set; }
-
-        /// <summary>
-        /// Gets or sets the .
-        /// </summary>
-        public NodeContainerFormat AlarFiles { get; set; }
+        public ushort[] FileInfoPointers { get; set; }
 
         /// <summary>
         /// Inserts a new Node into the current Alar3 Container.
@@ -71,7 +66,7 @@ namespace JUSToolkit.Containers
             foreach (Node nNew in filesToInsert.Children) {
                 uint newOffset = 0;
 
-                foreach (Node nOld in Navigator.IterateNodes(AlarFiles.Root)) {
+                foreach (Node nOld in Navigator.IterateNodes(Root)) {
                     if (!nOld.IsContainer) {
                         Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>();
 
@@ -100,11 +95,11 @@ namespace JUSToolkit.Containers
             var newAlar = new Alar3File(stream) {
                 FileID = old.FileID,
                 Offset = old.Offset,
-                Unk3 = old.Unk3,
-                Unk4 = old.Unk4,
-                Unk5 = old.Unk5,
-                Unk6 = old.Unk6,
                 Size = (uint)stream.Length,
+                Unknown = old.Unknown,
+                Unknown2 = old.Unknown2,
+                Unknown3 = old.Unknown3,
+                Unknown4 = old.Unknown4,
             };
 
             return newAlar;

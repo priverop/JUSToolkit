@@ -1,0 +1,20 @@
+name: vscall.aar
+format_type: JUSToolkit.Containers.Alar3
+tags:
+check_children: true
+children:
+  - name: vscall
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+      - name: obj_a.aar
+        format_type: JUSToolkit.Containers.Alar3File
+      - name: obj_b.aar 
+        format_type: JUSToolkit.Containers.Alar3File
+      - name: vs00_a.atm
+        format_type: JUSToolkit.Containers.Alar3File
+      - name: vs00_b.atm
+        format_type: JUSToolkit.Containers.Alar3File
+      - name: vs00.dig
+        format_type: JUSToolkit.Containers.Alar3File

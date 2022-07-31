@@ -1,0 +1,75 @@
+name: NodeContainerRoot
+format_type: null
+tags:
+check_children: true
+children:
+  - name: 0
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_00.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 2884
+  - name: 1
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_01.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 4095
+  - name: 2
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_02.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 5590
+  - name: 3
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_03.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 6047
+  - name: 4
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_04.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 7842
+  - name: 5
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_05.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 11456
+  - name: 6
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags:
+    check_children: false
+    children:
+    - name: bb_07.png
+      format_type: Yarhl.IO.BinaryFormat
+      stream:
+        offset: 0x294C
+        length: 15.267

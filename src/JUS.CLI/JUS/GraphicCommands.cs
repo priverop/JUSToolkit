@@ -77,7 +77,7 @@ namespace JUSToolkit.CLI.JUS
         public static void ExportDtx(string container, string koma, string kshape, string output)
         {
             Node images = NodeFactory.FromFile(container)
-                .TransformWith<BinaryAlar2Container>()
+                .TransformWith<Binary2Alar3>()
                 .Children["koma"];
             if (images is null) {
                 throw new FormatException("Invalid container file");

@@ -30,14 +30,14 @@ namespace JUSToolkit.CLI.JUS
     public static class ContainerCommands
     {
         /// <summary>
-        /// Export all the files from the Alar2 container.
+        /// Export all the files from the Alar3 container.
         /// </summary>
-        /// <param name="container">The path to the alar2 file.</param>
+        /// <param name="container">The path to the alar3 file.</param>
         /// <param name="output">The output directory.</param>
-        public static void ExportAlar2(string container, string output)
+        public static void ExportAlar3(string container, string output)
         {
             Node files = NodeFactory.FromFile(container)
-                .TransformWith<BinaryAlar2Container>();
+                .TransformWith<Binary2Alar3>();
 
             if (files is null) {
                 throw new FormatException("Invalid container file");
@@ -51,6 +51,29 @@ namespace JUSToolkit.CLI.JUS
                     node.Stream.WriteTo(outputFile);
                 }
             }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import files into an Alar3 container.
+        /// </summary>
+        /// <param name="container">The path to the original alar3 file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void ImportAlar3(string container, string output)
+        {
+            Node alar = NodeFactory.FromFile(container)
+                .TransformWith<Binary2Alar3>();
+
+            if (alar is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            alar.TransformWith<Alar32Binary>();
+
+            alar.Stream.WriteTo(Path.Combine(output, "imported_" + alar.Name));
+
+            Console.WriteLine("Done!");
         }
     }
 }

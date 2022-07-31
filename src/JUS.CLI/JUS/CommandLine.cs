@@ -71,14 +71,21 @@ namespace JUSToolkit.CLI.JUS
 
         private static Command CreateContainerCommand()
         {
-            var export = new Command("export-alar2", "Export alar2") {
-                new Option<string>("--container", "the input alar2 container", ArgumentArity.ExactlyOne),
+            var export = new Command("export-alar3", "Export alar3") {
+                new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar2);
+            export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar3);
+
+            var import = new Command("import-alar3", "import alar3") {
+                new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            import.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar3);
 
             return new Command("containers", "Unpack/Repack container files") {
                 export,
+                import,
             };
         }
     }

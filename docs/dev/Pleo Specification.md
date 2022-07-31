@@ -36,7 +36,7 @@ The sprite data is 4 bytes:
 | 0x0C   | bgr555[] | palette                                            |
 | ...    | pixels[] | image                                              |
 
-## ALAR
+## ALAR 3
 
 | Offset | Type       | Description                 |
 | ------ | ---------- | --------------------------- |
