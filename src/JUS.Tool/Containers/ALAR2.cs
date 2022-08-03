@@ -1,64 +1,33 @@
-﻿using System.Collections.Generic;
-using Yarhl.FileFormat;
+﻿using System;
+using Yarhl.FileSystem;
 
 namespace JUSToolkit.Containers
 {
     /// <summary>
     /// Alar2 Container Format.
     /// </summary>
-    public class Alar2 : IFormat
+    public class Alar2 : NodeContainerFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Alar2" /> class with an empty list of <see cref="Alar2File" />.
+        /// The Magic ID of the file.
         /// </summary>
-        public Alar2()
-        {
-            AlarFiles = new List<Alar2File>();
-        }
+        public const string STAMP = "ALAR";
 
         /// <summary>
-        /// Gets or sets the Header.
+        /// The Version of the File.
         /// </summary>
-        public char[] Header { get; set; }
+        /// <remarks>Maybe we need to support more than one minor version, but right now.
+        /// I only found the 01.</remarks>
+        public static readonly Version SupportedVersion = new (2, 1);
 
         /// <summary>
-        /// Gets or sets the Type.
+        /// Gets or sets the Number of files in the container.
         /// </summary>
-        public byte Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ??.
-        /// </summary>
-        public byte Unk { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of files for the container.
-        /// </summary>
-        public ushort Num_files { get; set; }
+        public uint NumFiles { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the files.
         /// </summary>
         public byte[] IDs { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of <see cref="Alar2File" />.
-        /// </summary>
-        public List<Alar2File> AlarFiles { get; set; }
-
-        /// <summary>
-        /// Replaces current <see cref="AlarFiles" /> with another list of <see cref="AlarFiles" />.
-        /// </summary>
-        /// <param name="newAlarContainer">Alar2 NodeContainerFormat.</param>
-        public void InsertModification(Alar2 newAlarContainer)
-        {
-            for (int i = 0; i < AlarFiles.Count; i++) {
-                foreach (Alar2File newAlarNode in newAlarContainer.AlarFiles) {
-                    if (newAlarNode.File.Name == AlarFiles[i].File.Name) {
-                        AlarFiles[i] = newAlarNode;
-                    }
-                }
-            }
-        }
     }
 }

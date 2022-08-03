@@ -28,66 +28,80 @@ namespace JUSToolkit.Containers.Converters
     /// <summary>
     /// Converter between BinaryFormat and Alar2.
     /// </summary>
-    public class BinaryFormat2Alar2 : IConverter<BinaryFormat, Alar2>
+    public class Binary2Alar2 : IConverter<IBinary, Alar2>
     {
+        private DataReader reader;
+        private Alar2 alar;
+
         /// <summary>
         /// Converts a BinaryFormat to an Alar2 container.
         /// </summary>
-        /// <param name="input">BinaryFormat node.</param>
+        /// <param name="input">IBinary node.</param>
         /// <returns>Alart2 NodeContainerFormat.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
-        public Alar2 Convert(BinaryFormat input) {
+        public Alar2 Convert(IBinary input) {
             if (input == null) {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            _ = input.Stream.Seek(0, SeekOrigin.Begin); // Just in case
+            reader = new DataReader(input.Stream);
 
-            var br = new DataReader(input.Stream)
+            ReadHeader();
+
+            uint name_offset = 0x10 + (alar.NumFiles * 0x10);
+            for (int i = 0; i < alar.NumFiles; i++)
             {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
-            };
+                uint fileID = reader.ReadUInt32();
+                uint offset = reader.ReadUInt32();
+                uint size = reader.ReadUInt32();
+                uint unknown = reader.ReadUInt32();
 
-            var aar = new Alar2 {
-                Header = br.ReadChars(4),
-                Type = br.ReadByte(),
-                Unk = br.ReadByte(),
-                Num_files = br.ReadUInt16(),
+                var fileStream = new DataStream(input.Stream, offset, size);
+
+                var alarFile = new Alar2File(fileStream) {
+                    FileID = fileID,
+                    Offset = offset,
+                    Size = size,
+                    Unknown = unknown,
+                };
+
+                input.Stream.RunInPosition(() => ReadFileInfo(alarFile), name_offset + 2);
+
+                name_offset += size + 0x24;
+            }
+
+            return alar;
+        }
+
+        private void ReadHeader()
+        {
+            string stamp = reader.ReadString(4);
+            if (stamp != Alar2.STAMP) {
+                throw new FormatException("Invalid header");
+            }
+
+            var version = new Version(reader.ReadByte(), reader.ReadByte());
+            if (version != Alar2.SupportedVersion) {
+                throw new FormatException($"Unsupported version: {version:X}");
+            }
+
+            alar = new Alar2 {
+                NumFiles = reader.ReadUInt16(),
                 IDs = new byte[8],
             };
 
             for (int i = 0; i < 8; i++) {
-                aar.IDs[i] = br.ReadByte();
+                alar.IDs[i] = reader.ReadByte();
             }
+        }
 
-            // Index table
-            uint name_offset = (uint)(0x10 + (aar.Num_files * 0x10));
-            for (int i = 0; i < aar.Num_files; i++)
-            {
-                var aarFile = new Alar2File();
-                uint unk1 = br.ReadUInt32();
-                uint offset = br.ReadUInt32();
-                uint size = br.ReadUInt32();
-                uint unk2 = br.ReadUInt32();
+        private void ReadFileInfo(Alar2File alarFile)
+        {
+            string filename = reader.ReadString();
 
-                var fileStream = new DataStream(input.Stream, offset, size);
+            var child = new Node(filename, alarFile);
 
-                long curPos = br.Stream.Position;
-                br.Stream.Position = name_offset + 2;
-                string filename = br.ReadString();
-                name_offset += size + 0x24;
-                br.Stream.Position = curPos;
-
-                aarFile.File = new Node(filename, new BinaryFormat(fileStream));
-                aarFile.Unknown1 = unk1;
-                aarFile.Unknown2 = unk2;
-
-                aar.AlarFiles.Add(aarFile);
-            }
-
-            br.Stream.Dispose();
-
-            return aar;
+            alar.Root.Add(child);
         }
     }
 }

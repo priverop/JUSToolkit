@@ -32,12 +32,12 @@ using Yarhl.IO;
 namespace JUSToolkit.Tests.Containers
 {
     [TestFixture]
-    public class AlarTests
+    public class Alar2Tests
     {
-        public static IEnumerable<TestCaseData> GetAlar3Files()
+        public static IEnumerable<TestCaseData> GetAlar2Files()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers");
-            string listPath = Path.Combine(basePath, "alar3.txt");
+            string listPath = Path.Combine(basePath, "alar2.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
@@ -46,10 +46,10 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
-        public static IEnumerable<TestCaseData> GetAlar3InsertionFiles()
+        public static IEnumerable<TestCaseData> GetAlar2InsertionFiles()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers");
-            string listPath = Path.Combine(basePath, "alar3insertion.txt");
+            string listPath = Path.Combine(basePath, "alar2insertion.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
@@ -58,8 +58,8 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
-        [TestCaseSource(nameof(GetAlar3Files))]
-        public void DeserializeAlar3(string infoPath, string alarPath)
+        [TestCaseSource(nameof(GetAlar2Files))]
+        public void DeserializeAlar2(string infoPath, string alarPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
@@ -68,37 +68,42 @@ namespace JUSToolkit.Tests.Containers
 
             using var alar = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            alar.Invoking(n => n.TransformWith<Binary2Alar3>()).Should().NotThrow();
+            alar.Invoking(n => n.TransformWith<Binary2Alar2>()).Should().NotThrow();
             alar.Should().MatchInfo(expected);
         }
 
-        [TestCaseSource(nameof(GetAlar3Files))]
-        public void TwoWaysIdenticalAlar3Stream(string infoPath, string alarPath)
+        [TestCaseSource(nameof(GetAlar2Files))]
+        public void TwoWaysIdenticalAlar2Stream(string infoPath, string alarPath)
         {
-            TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
+
+            Assert.Ignore();
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar32Binary>(alar);
+            var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(node.Format!);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2Alar2>(alar);
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
         }
 
-        [TestCaseSource(nameof(GetAlar3InsertionFiles))]
-        public void InsertingAlar3Identical(string alarPath, string filePath)
+        [TestCaseSource(nameof(GetAlar2InsertionFiles))]
+        public void InsertingAlar2Identical(string alarPath, string filePath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
             TestDataBase.IgnoreIfFileDoesNotExist(filePath);
 
+            Assert.Ignore();
+
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromFile(filePath, FileOpenMode.Read);
 
-            var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(alarOriginal.Format!);
-            alar.InsertModification(fileOriginal);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar32Binary>(alar);
+            var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(alarOriginal.Format!);
+            // ToDo: El insertMoification debería recibir un Node
+            // alar.InsertModification(fileOriginal);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2Alar2>(alar);
 
             generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();
