@@ -78,12 +78,10 @@ namespace JUSToolkit.Tests.Containers
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
 
-            Assert.Ignore();
-
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
             var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2Alar2>(alar);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();

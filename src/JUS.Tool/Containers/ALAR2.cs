@@ -23,7 +23,7 @@ namespace JUSToolkit.Containers
         /// <summary>
         /// Gets or sets the Number of files in the container.
         /// </summary>
-        public uint NumFiles { get; set; }
+        public ushort NumFiles { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the files.

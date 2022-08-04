@@ -36,5 +36,10 @@ namespace JUSToolkit.Containers
         /// Gets or sets the Unknown.
         /// </summary>
         public uint Unknown { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 2 bytes previous to the Stream.
+        /// </summary>
+        public ushort Unknown2 { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace JUSToolkit.Containers.Converters
 
             ReadHeader();
 
-            uint name_offset = 0x10 + (alar.NumFiles * 0x10);
+            uint name_offset = (uint)(0x10 + (alar.NumFiles * 0x10));
             for (int i = 0; i < alar.NumFiles; i++)
             {
                 uint fileID = reader.ReadUInt32();
@@ -65,6 +65,7 @@ namespace JUSToolkit.Containers.Converters
                     Unknown = unknown,
                 };
 
+                input.Stream.RunInPosition(() => alarFile.Unknown2 = reader.ReadUInt16(), offset - 2);
                 input.Stream.RunInPosition(() => ReadFileInfo(alarFile), name_offset + 2);
 
                 name_offset += size + 0x24;

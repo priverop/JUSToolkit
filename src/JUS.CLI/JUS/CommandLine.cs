@@ -1,4 +1,4 @@
-// Copyright (c) 2021 SceneGate
+// Copyright (c) 2022 Pablo Rivero
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,15 +17,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
-using JUSToolkit.Containers.Converters;
-using Texim.Formats;
-using Texim.Images;
-using Texim.Sprites;
-using Yarhl.FileSystem;
 
 namespace JUSToolkit.CLI.JUS
 {
@@ -77,15 +70,22 @@ namespace JUSToolkit.CLI.JUS
             };
             export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar3);
 
-            var import = new Command("import-alar3", "import alar3") {
+            var import2 = new Command("import-alar2", "import alar2") {
+                new Option<string>("--container", "the input alar2 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            import2.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar2);
+
+            var import3 = new Command("import-alar3", "import alar3") {
                 new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            import.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar3);
+            import3.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar3);
 
             return new Command("containers", "Unpack/Repack container files") {
                 export,
-                import,
+                import2,
+                import3,
             };
         }
     }
