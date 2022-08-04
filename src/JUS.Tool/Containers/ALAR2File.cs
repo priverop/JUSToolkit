@@ -18,7 +18,7 @@ namespace JUSToolkit.Containers
         }
 
         /// <summary>
-        /// Gets or sets the FileID.
+        /// Gets or sets the internal game identifier of the file.
         /// </summary>
         public uint FileID { get; set; }
 
@@ -41,5 +41,11 @@ namespace JUSToolkit.Containers
         /// Gets or sets the 2 bytes previous to the Stream.
         /// </summary>
         public ushort Unknown2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the absolute number of the file.
+        /// </summary>
+        /// <remarks>If the container has 2 files, FileNum would be 1 or 2.</remarks>
+        public int FileNum { get; set; }
     }
 }

@@ -52,49 +52,7 @@ namespace JUSToolkit.Containers.Converters
             WriteHeader(alar);
             WriteFileInfoSection(alar);
             WriteFileDataSection(alar);
-
-            /* 
-
-            // Write File Data Section
-            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
-                if (!node.IsContainer) {
-                    Alar2File alarFile = node.GetFormatAs<Alar2File>();
-
-                    // Storing Padding for every file but the first one
-                    if (alarFile.FileID != 0) {
-                        long initPadding = writer.Stream.Position;
-                        writer.WritePadding(0, 04);
-                        long endPadding = writer.Stream.Position;
-                        int paddingSize = (int)(endPadding - initPadding);
-
-                        paddings[alarFile.FileID] = paddingSize;
-                    }
-
-                    alarFile.Stream.WriteTo(writer.Stream);
-                }
-            }
-
-            // Rewrite Offsets
-            int newOffset = 0;
-            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
-                if (!node.IsContainer) {
-                    Alar2File alarFile = node.GetFormatAs<Alar2File>();
-
-                    // Starter Offset
-                    if (alarFile.FileID == 0) {
-                        newOffset = (int)alarFile.Offset;
-                    }
-
-                    // Add the size of the file and the padding
-                    if (alarFile.FileID != alar.NumFiles - 1) {
-                        newOffset += (int)(alarFile.Size + paddings[alarFile.FileID + 1]);
-                        writer.Stream.RunInPosition(
-                            () => writer.Write(newOffset),
-                            offsetPositions[alarFile.FileID + 1]);
-                    }
-                }
-            }
-            */
+            RewriteOffsets(alar);
 
             return binary;
         }
@@ -120,7 +78,6 @@ namespace JUSToolkit.Containers.Converters
                 }
             }
         }
-
         private void WriteFileDataSection(Alar2 alar)
         {
             foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
@@ -134,6 +91,36 @@ namespace JUSToolkit.Containers.Converters
 
                     writer.Write(alarChild.Unknown2);
                     alarChild.Stream.WriteTo(writer.Stream);
+                }
+            }
+        }
+
+        private void RewriteOffsets(Alar2 alar)
+        {
+            var offsetPostion = 0x04; // The first file position
+            var sizePostion = 0x08; // The first file position
+            var newOffset = 0;
+            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
+                if (!node.IsContainer) {
+                    Alar2File alarFile = node.GetFormatAs<Alar2File>();
+
+                    // Starter Offset
+                    if (alarFile.FileNum == 1) {
+                        newOffset = (int)alarFile.Offset;
+                    }
+
+                    // Modify the size of the file
+                    writer.Stream.RunInPosition(
+                            () => writer.Write(alarFile.Size),
+                            sizePostion + (0x10 * (alarFile.FileNum)));
+
+                    // Add the size of the file to get the next offset
+                    if (alarFile.FileNum != alar.NumFiles) {
+                        newOffset += (int)(alarFile.Size + 36); // 36 bytes from the file info section
+                        writer.Stream.RunInPosition(
+                            () => writer.Write(newOffset),
+                            offsetPostion + (0x10 * (alarFile.FileNum + 1))); // next file
+                    }
                 }
             }
         }

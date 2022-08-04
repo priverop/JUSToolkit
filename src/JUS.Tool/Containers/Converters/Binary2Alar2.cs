@@ -63,7 +63,8 @@ namespace JUSToolkit.Containers.Converters
                     Offset = offset,
                     Size = size,
                     Unknown = unknown,
-                };
+                    FileNum = i + 1,
+            };
 
                 input.Stream.RunInPosition(() => alarFile.Unknown2 = reader.ReadUInt16(), offset - 2);
                 input.Stream.RunInPosition(() => ReadFileInfo(alarFile), name_offset + 2);

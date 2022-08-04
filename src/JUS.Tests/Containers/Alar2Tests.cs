@@ -99,8 +99,7 @@ namespace JUSToolkit.Tests.Containers
             using Node fileOriginal = NodeFactory.FromFile(filePath, FileOpenMode.Read);
 
             var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(alarOriginal.Format!);
-            // ToDo: El insertMoification debería recibir un Node
-            // alar.InsertModification(fileOriginal);
+            alar.InsertModification(fileOriginal);
             var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2Alar2>(alar);
 
             generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);

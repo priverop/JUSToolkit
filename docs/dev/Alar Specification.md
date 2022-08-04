@@ -84,6 +84,8 @@ This format is useful to store few files. We have a small header, the info of th
 
 ### File Info
 
+16 bytes
+
 | Offset | Type | Description      |
 | ------ | ---- | ---------------- |
 | 0x00   | int  | Unknown? Type?   |
@@ -92,6 +94,8 @@ This format is useful to store few files. We have a small header, the info of th
 | 0x0A   | int  | Unknown          |
 
 ### File Data
+
+36 bytes
 
 | Offset | Type              | Description                         |
 | ------ | ----------------- | ----------------------------------- |
