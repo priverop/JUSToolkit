@@ -121,6 +121,11 @@ namespace JUSToolkit.Containers.Converters
                         newOffset = (int)alarFile.Offset;
                     }
 
+                    // Modify the size of the file
+                    writer.Stream.RunInPosition(
+                            () => writer.Write(alarFile.Size),
+                            offsetPositions[alarFile.FileID] + 4); // The size is always 4 positions ahead
+
                     // Add the size of the file and the padding
                     if (alarFile.FileID != alar.NumFiles - 1) {
                         newOffset += (int)(alarFile.Size + paddings[alarFile.FileID + 1]);
