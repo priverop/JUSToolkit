@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,7 +31,7 @@ using Yarhl.IO;
 namespace JUSToolkit.Tests.Containers
 {
     [TestFixture]
-    public class AlarTests
+    public class Alar3Tests
     {
         public static IEnumerable<TestCaseData> GetAlar3Files()
         {
@@ -81,7 +80,7 @@ namespace JUSToolkit.Tests.Containers
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
             var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar32Binary>(alar);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
@@ -98,7 +97,7 @@ namespace JUSToolkit.Tests.Containers
 
             var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(alarOriginal.Format!);
             alar.InsertModification(fileOriginal);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar32Binary>(alar);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
 
             generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();

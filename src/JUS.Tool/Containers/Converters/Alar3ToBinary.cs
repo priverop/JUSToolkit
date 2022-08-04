@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.Linq;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -28,19 +27,19 @@ namespace JUSToolkit.Containers.Converters
     /// <summary>
     /// Converts between a NodeContainerFormat and a BinaryFormat file.
     /// </summary>
-    public class Alar32Binary :
+    public class Alar3ToBinary :
     IConverter<Alar3, BinaryFormat>
     {
         /// <summary>
         /// Converts Alar3 to BinaryFormat.
         /// </summary>
-        /// <param name="aar">Alar3 NodeContainerFormat.</param>
+        /// <param name="alar">Alar3 NodeContainerFormat.</param>
         /// <returns>BinaryFormat Node.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="aar"/> is <c>null</c>.</exception>
-        public BinaryFormat Convert(Alar3 aar)
+        /// <exception cref="ArgumentNullException"><paramref name="alar"/> is <c>null</c>.</exception>
+        public BinaryFormat Convert(Alar3 alar)
         {
-            if (aar == null) {
-                throw new ArgumentNullException(nameof(aar));
+            if (alar == null) {
+                throw new ArgumentNullException(nameof(alar));
             }
 
             var binary = new BinaryFormat();
@@ -52,28 +51,28 @@ namespace JUSToolkit.Containers.Converters
             writer.Write(Alar3.STAMP, false);
             writer.Write((byte)Alar3.SupportedVersion.Major);
             writer.Write((byte)Alar3.SupportedVersion.Minor);
-            writer.Write(aar.NumFiles);
-            writer.Write(aar.Reserved);
-            writer.Write(aar.NumEntries);
-            writer.Write(aar.DataOffset);
+            writer.Write(alar.NumFiles);
+            writer.Write(alar.Reserved);
+            writer.Write(alar.NumEntries);
+            writer.Write(alar.DataOffset);
 
             // Write File Pointers Section
-            for (ushort i = 0; i < aar.NumFiles; i++) {
-                writer.Write(aar.FileInfoPointers[i]);
+            for (ushort i = 0; i < alar.NumFiles; i++) {
+                writer.Write(alar.FileInfoPointers[i]);
             }
 
             // We store the positions of the alar file Offset section
             // so we can modify them later.
-            long[] offsetPositions = new long[aar.NumFiles];
+            long[] offsetPositions = new long[alar.NumFiles];
 
             // As every file has a random padding, we store it so we can write it
             // later.
-            int[] paddings = new int[aar.NumFiles];
+            int[] paddings = new int[alar.NumFiles];
 
             // Write File Info Section
-            foreach (Node aarFile in Navigator.IterateNodes(aar.Root)) {
-                if (!aarFile.IsContainer) {
-                    Alar3File alarChild = aarFile.GetFormatAs<Alar3File>();
+            foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
+                if (!alarFile.IsContainer) {
+                    Alar3File alarChild = alarFile.GetFormatAs<Alar3File>();
 
                     writer.WritePadding(0, 04);
 
@@ -86,48 +85,53 @@ namespace JUSToolkit.Containers.Converters
                     writer.Write(alarChild.Unknown3);
                     writer.Write(alarChild.Unknown4);
 
-                    writer.Write(GetAlar3Path(aarFile.Path, aar.Root.Name), true);
+                    writer.Write(GetAlar3Path(alarFile.Path, alar.Root.Name), true);
                 }
             }
 
             writer.WritePadding(0, 04);
 
             // Write File Data Section
-            foreach (Node node in Navigator.IterateNodes(aar.Root)) {
+            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
                 if (!node.IsContainer) {
-                    Alar3File aarFile = node.GetFormatAs<Alar3File>();
+                    Alar3File alarFile = node.GetFormatAs<Alar3File>();
 
                     // Storing Padding for every file but the first one
-                    if (aarFile.FileID != 0) {
+                    if (alarFile.FileID != 0) {
                         long initPadding = writer.Stream.Position;
                         writer.WritePadding(0, 04);
                         long endPadding = writer.Stream.Position;
                         int paddingSize = (int)(endPadding - initPadding);
 
-                        paddings[aarFile.FileID] = paddingSize;
+                        paddings[alarFile.FileID] = paddingSize;
                     }
 
-                    aarFile.Stream.WriteTo(writer.Stream);
+                    alarFile.Stream.WriteTo(writer.Stream);
                 }
             }
 
             // Rewrite Offsets
             int newOffset = 0;
-            foreach (Node node in Navigator.IterateNodes(aar.Root)) {
+            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
                 if (!node.IsContainer) {
-                    Alar3File aarFile = node.GetFormatAs<Alar3File>();
+                    Alar3File alarFile = node.GetFormatAs<Alar3File>();
 
                     // Starter Offset
-                    if (aarFile.FileID == 0) {
-                        newOffset = (int)aarFile.Offset;
+                    if (alarFile.FileID == 0) {
+                        newOffset = (int)alarFile.Offset;
                     }
 
+                    // Modify the size of the file
+                    writer.Stream.RunInPosition(
+                            () => writer.Write(alarFile.Size),
+                            offsetPositions[alarFile.FileID] + 4); // The size is always 4 positions ahead
+
                     // Add the size of the file and the padding
-                    if (aarFile.FileID != aar.NumFiles - 1) {
-                        newOffset += (int)(aarFile.Size + paddings[aarFile.FileID + 1]);
+                    if (alarFile.FileID != alar.NumFiles - 1) {
+                        newOffset += (int)(alarFile.Size + paddings[alarFile.FileID + 1]);
                         writer.Stream.RunInPosition(
                             () => writer.Write(newOffset),
-                            offsetPositions[aarFile.FileID + 1]);
+                            offsetPositions[alarFile.FileID + 1]);
                     }
                 }
             }
@@ -137,7 +141,7 @@ namespace JUSToolkit.Containers.Converters
 
         /// <summary>
         /// Removes the alar filename (the root name) from the path of the node.
-        /// <remarks>If we have '/alar.aar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
+        /// <remarks>If we have '/alar.alar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
         /// </summary>
         /// <param name="fullPath">The full path of the node.</param>
         /// <param name="alarName">The name of the root node.</param>

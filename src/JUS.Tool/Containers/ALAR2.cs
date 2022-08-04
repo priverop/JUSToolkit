@@ -1,40 +1,30 @@
-﻿using System.Collections.Generic;
-using Yarhl.FileFormat;
+﻿using System;
+using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUSToolkit.Containers
 {
     /// <summary>
     /// Alar2 Container Format.
     /// </summary>
-    public class Alar2 : IFormat
+    public class Alar2 : NodeContainerFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Alar2" /> class with an empty list of <see cref="Alar2File" />.
+        /// The Magic ID of the file.
         /// </summary>
-        public Alar2()
-        {
-            AlarFiles = new List<Alar2File>();
-        }
+        public const string STAMP = "ALAR";
 
         /// <summary>
-        /// Gets or sets the Header.
+        /// The Version of the File.
         /// </summary>
-        public char[] Header { get; set; }
+        /// <remarks>Maybe we need to support more than one minor version, but right now.
+        /// I only found the 01.</remarks>
+        public static readonly Version SupportedVersion = new (2, 1);
 
         /// <summary>
-        /// Gets or sets the Type.
+        /// Gets or sets the Number of files in the container.
         /// </summary>
-        public byte Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ??.
-        /// </summary>
-        public byte Unk { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of files for the container.
-        /// </summary>
-        public ushort Num_files { get; set; }
+        public ushort NumFiles { get; set; }
 
         /// <summary>
         /// Gets or sets the IDs of the files.
@@ -42,23 +32,49 @@ namespace JUSToolkit.Containers
         public byte[] IDs { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="Alar2File" />.
+        /// Inserts a new Node into the current Alar2 Container.
         /// </summary>
-        public List<Alar2File> AlarFiles { get; set; }
-
-        /// <summary>
-        /// Replaces current <see cref="AlarFiles" /> with another list of <see cref="AlarFiles" />.
-        /// </summary>
-        /// <param name="newAlarContainer">Alar2 NodeContainerFormat.</param>
-        public void InsertModification(Alar2 newAlarContainer)
+        /// <param name="filesToInsert">Alar2 NodeContainerFormat.</param>
+        public void InsertModification(Node filesToInsert)
         {
-            for (int i = 0; i < AlarFiles.Count; i++) {
-                foreach (Alar2File newAlarNode in newAlarContainer.AlarFiles) {
-                    if (newAlarNode.File.Name == AlarFiles[i].File.Name) {
-                        AlarFiles[i] = newAlarNode;
+            foreach (Node nNew in filesToInsert.Children) {
+                uint newOffset = 0;
+
+                foreach (Node nOld in Navigator.IterateNodes(Root)) {
+                    if (!nOld.IsContainer) {
+                        Alar2File alarFileOld = nOld.GetFormatAs<Alar2File>();
+
+                        if (newOffset > 0) {
+                            alarFileOld.Offset = newOffset;
+                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                        }
+
+                        if (nOld.Name == nNew.Name) {
+                            alarFileOld = ReplaceStream(alarFileOld, nNew.Stream);
+
+                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                        }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Replaces an Alar2File with a Datastream.
+        /// </summary>
+        /// <param name="old">Alar2File old File.</param>
+        /// /// <param name="stream">New DataStream.</param>
+        private static Alar2File ReplaceStream(Alar2File old, DataStream stream)
+        {
+            var newAlar = new Alar2File(stream) {
+                FileID = old.FileID,
+                Offset = old.Offset,
+                Size = (uint)stream.Length,
+                Unknown = old.Unknown,
+                Unknown2 = old.Unknown2,
+            };
+
+            return newAlar;
         }
     }
 }
