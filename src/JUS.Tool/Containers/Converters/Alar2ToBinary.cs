@@ -30,7 +30,6 @@ namespace JUSToolkit.Containers.Converters
     public class Alar2ToBinary : IConverter<Alar2, BinaryFormat>
     {
         private DataWriter writer;
-        private BinaryFormat binary;
 
         /// <summary>
         /// Converts Alar2 to BinaryFormat.
@@ -44,10 +43,8 @@ namespace JUSToolkit.Containers.Converters
                 throw new ArgumentNullException(nameof(alar));
             }
 
-            binary = new BinaryFormat();
-            writer = new DataWriter(binary.Stream) {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
-            };
+            var binary = new BinaryFormat();
+            writer = new DataWriter(binary.Stream);
 
             WriteHeader(alar);
             WriteFileInfoSection(alar);
@@ -65,6 +62,7 @@ namespace JUSToolkit.Containers.Converters
             writer.Write(alar.NumFiles);
             writer.Write(alar.IDs);
         }
+
         private void WriteFileInfoSection(Alar2 alar)
         {
             foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
@@ -78,11 +76,11 @@ namespace JUSToolkit.Containers.Converters
                 }
             }
         }
+
         private void WriteFileDataSection(Alar2 alar)
         {
             foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
                 if (!alarFile.IsContainer) {
-
                     writer.WriteTimes(0, 2);
                     writer.Write(alarFile.Name);
                     writer.WriteTimes(0, 19); // we already have the null byte
@@ -112,9 +110,9 @@ namespace JUSToolkit.Containers.Converters
                     // Modify the size of the file
                     writer.Stream.RunInPosition(
                             () => writer.Write(alarFile.Size),
-                            sizePostion + (0x10 * (alarFile.FileNum)));
+                            sizePostion + (0x10 * alarFile.FileNum));
 
-                    // Add the size of the file to get the next offset
+                    // Add the size of the file to get the next file offset
                     if (alarFile.FileNum != alar.NumFiles) {
                         newOffset += (int)(alarFile.Size + 36); // 36 bytes from the file info section
                         writer.Stream.RunInPosition(
