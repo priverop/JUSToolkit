@@ -22,9 +22,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics;
+using JUSToolkit.Graphics.Converters;
 using NUnit.Framework;
+using Texim.Formats;
+using Texim.Images;
+using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -36,28 +40,82 @@ namespace JUSToolkit.Tests.Containers
     {
         public static IEnumerable<TestCaseData> GetDtxFiles()
         {
-            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers");
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
             string listPath = Path.Combine(basePath, "dtx.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
                     Path.Combine(basePath, data[0]),
-                    Path.Combine(basePath, data[1]))
-                    .SetName($"({data[0]}, {data[1]})"));
+                    Path.Combine(basePath, data[1]),
+                    Path.Combine(basePath, data[2]),
+                    Path.Combine(basePath, data[3]))
+                    .SetName($"({data[0]}, {data[1]}, {data[2]}, {data[3]})"));
         }
 
         [TestCaseSource(nameof(GetDtxFiles))]
-        public void DeserializeDtx(string infoPath, string containerPath)
+        public void DeserializeDtx(string infoPath, string container, string koma, string kshape)
         {
-            TestDataBase.IgnoreIfFileDoesNotExist(containerPath);
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(container);
+            TestDataBase.IgnoreIfFileDoesNotExist(koma);
+            TestDataBase.IgnoreIfFileDoesNotExist(kshape);
 
             var expected = NodeContainerInfo.FromYaml(infoPath);
+            var resultContainer = new NodeContainerFormat();
 
-            using var alar = NodeFactory.FromFile(containerPath, FileOpenMode.Read);
+            Node images = NodeFactory.FromFile(container)
+                .TransformWith<Binary2Alar3>()
+                .Children["koma"];
+            if (images is null) {
+                throw new FormatException("Invalid container file");
+            }
 
-            alar.Invoking(n => n.TransformWith<Binary2Alar2>()).Should().NotThrow();
-            alar.Should().MatchInfo(expected);
+            var shapes = NodeFactory.FromFile(kshape)
+                .TransformWith<BinaryKShape2SpriteCollection>()
+                .GetFormatAs<KShapeSprites>();
+
+            Koma komaFormat = NodeFactory.FromFile(koma)
+                .TransformWith<Binary2Koma>()
+                .GetFormatAs<Koma>();
+            foreach (KomaElement komaElement in komaFormat) {
+                string filename = $"{komaElement.KomaName}.dtx";
+
+                Node dtx = images.Children[filename];
+                if (dtx is null) {
+                    continue;
+                }
+
+                dtx.TransformWith<BinaryDstx2SpriteImage>();
+                var image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
+
+                // We ignore the sprite info from the DSTX and we take the one
+                // from the kshape
+                var sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+
+                // If the child Node komaElement.KShapeGroupId does not exist, then we create it
+                if(resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"] == null) {
+                    resultContainer.Root.Add(new Node($"{komaElement.KShapeGroupId}"));
+                }
+
+                string outputFilePath = Path.Combine(
+                    "komas",
+                    $"{komaElement.KShapeGroupId}",
+                    komaElement.KomaName + ".png");
+
+                var spriteParams = new Sprite2IndexedImageParams {
+                    RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
+                    FullImage = image,
+                };
+                var indexedImageParams = new IndexedImageBitmapParams {
+                   Palettes = image,
+                };
+                var resultImage = new Node(komaElement.KomaName, sprite)
+                    .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
+                    .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams);
+                resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"].Add(resultImage);
+            }
+
+            resultContainer.Root.Should().MatchInfo(expected);
         }
     }
 }
