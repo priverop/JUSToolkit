@@ -93,14 +93,9 @@ namespace JUSToolkit.Tests.Containers
                 var sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
                 // If the child Node komaElement.KShapeGroupId does not exist, then we create it
-                if(resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"] == null) {
+                if (resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"] == null) {
                     resultContainer.Root.Add(new Node($"{komaElement.KShapeGroupId}"));
                 }
-
-                string outputFilePath = Path.Combine(
-                    "komas",
-                    $"{komaElement.KShapeGroupId}",
-                    komaElement.KomaName + ".png");
 
                 var spriteParams = new Sprite2IndexedImageParams {
                     RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
