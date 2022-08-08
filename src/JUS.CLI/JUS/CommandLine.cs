@@ -49,12 +49,12 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportDtx);
 
-            var exportDsigAlmt = new Command("export-dsig-almt", "Export dsig+almt") {
-                new Option<string>("--dsig", "the input file.dig", ArgumentArity.ExactlyOne),
-                new Option<string>("--almt", "the input map.atm file", ArgumentArity.ExactlyOne),
+            var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
+                new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
+                new Option<string>("--atm", "the input map.atm file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(GraphicCommands.ExportDsigAlmt);
+            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(GraphicCommands.ExportDig);
 
             return new Command("graphics", "Import/Export graphic files") {
                 exportDtx,

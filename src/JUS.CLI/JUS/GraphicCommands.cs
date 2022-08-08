@@ -40,17 +40,19 @@ namespace JUSToolkit.CLI.JUS
         /// <summary>
         /// Export a DSIG + ALMT into a PNG.
         /// </summary>
-        /// <param name="dsig">The file.dig.</param>
-        /// <param name="almt">The map.atm file.</param>
+        /// <param name="dig">The file.dig.</param>
+        /// <param name="atm">The map.atm file.</param>
         /// <param name="output">The output folder.</param>
-        public static void ExportDsigAlmt(string dsig, string almt, string output)
+        public static void ExportDig(string dig, string atm, string output)
         {
             // Pixels + Palette
-            using var pixelsPaletteNode = NodeFactory.FromFile(dsig, FileOpenMode.Read)
+            using var pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryDsig2IndexedPaletteImage>();
 
             // Map
-            using var mapsNode = NodeFactory.FromFile(almt, FileOpenMode.Read)
+            using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>();
 
             var mapsParams = new MapDecompressionParams {
