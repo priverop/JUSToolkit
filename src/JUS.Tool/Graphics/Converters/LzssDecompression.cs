@@ -41,7 +41,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var decompressedStream = Convert(source.Stream);
+            var decompressedStream = IsCompressed(source.Stream) ? Convert(source.Stream) : source.Stream;
 
             return new BinaryFormat(decompressedStream);
         }
@@ -59,6 +59,14 @@ namespace JUSToolkit.Graphics.Converters
 
             // Discard the first 4 bytes of the header (the DSCP magic ID)
             return LzssUtils.Lzss(new DataStream(source, 4, source.Length - 4), "-d");
+        }
+
+        private bool IsCompressed(DataStream stream)
+        {
+            var reader = new DataReader(stream);
+            stream.Position = 0;
+
+            return reader.ReadString(4) == "DSCP";
         }
     }
 }
