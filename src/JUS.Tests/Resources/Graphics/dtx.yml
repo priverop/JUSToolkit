@@ -1,0 +1,61 @@
+name: NodeContainerRoot
+format_type: Yarhl.FileSystem.NodeContainerFormat
+tags: null
+check_children: true
+children:
+  - name: 0
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_00
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 1
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_01
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 2
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_02
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 3
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_03
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 4
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_04
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 5
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_05
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 6
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bb_07
+        format_type: Yarhl.IO.BinaryFormat
+  - name: 7
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    tags: null
+    check_children: false
+    children:
+      - name: bl_07
+        format_type: Yarhl.IO.BinaryFormat
