@@ -1,0 +1,2 @@
+nin.yml,nin.dig,nin.atm
+bg.yml,bg.dig,bg.atm

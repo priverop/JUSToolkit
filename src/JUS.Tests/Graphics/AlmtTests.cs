@@ -33,7 +33,7 @@ using Yarhl.IO;
 namespace JUSToolkit.Tests.Graphics
 {
     [TestFixture]
-    public class BinaryAlmt2ScreenMapTests
+    public class AlmtTests
     {
         public static IEnumerable<TestCaseData> GetFiles()
         {
@@ -42,19 +42,12 @@ namespace JUSToolkit.Tests.Graphics
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
-                    Path.Combine(basePath, data[0]),
-                    Path.Combine(basePath, data[1]))
-                    .SetName($"{{m}}({data[1]})"));
+                    Path.Combine(basePath, data[0]))
+                    .SetName($"({data[0]})"));
         }
 
         [TestCaseSource(nameof(GetFiles))]
-        public void DeserializeAndCheckImageHash(string infoPath, string almtPath) // string digPath
-        {
-            Assert.Ignore();
-        }
-
-        [TestCaseSource(nameof(GetFiles))]
-        public void TwoWaysIdenticalAlmtStream(string infoPath, string almtPath)
+        public void TwoWaysIdenticalAlmtStream(string almtPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(almtPath);
 
