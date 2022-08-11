@@ -41,7 +41,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var decompressedStream = IsCompressed(source.Stream) ? Convert(source.Stream) : source.Stream;
+            var decompressedStream = IsCompressed(source.Stream) ? Convert(source.Stream) : new DataStream(source.Stream);
 
             return new BinaryFormat(decompressedStream);
         }
@@ -65,8 +65,10 @@ namespace JUSToolkit.Graphics.Converters
         {
             var reader = new DataReader(stream);
             stream.Position = 0;
+            var result = reader.ReadString(4) == "DSCP";
+            stream.Position = 0;
 
-            return reader.ReadString(4) == "DSCP";
+            return result;
         }
     }
 }
