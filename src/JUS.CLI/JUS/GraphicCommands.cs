@@ -70,6 +70,28 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
+        /// Import a PNG into a DSIG + ALMT.
+        /// </summary>
+        /// <param name="dig">The file.dig.</param>
+        /// <param name="atm">The map.atm file.</param>
+        /// <param name="output">The output folder.</param>
+        public static void ImportDig(string dig, string atm, string output)
+        {
+            Node originalDig = NodeFactory.FromFile(dig)
+                .TransformWith<Binary2Dig>();
+
+            if (originalDig is null) {
+                throw new FormatException("Invalid dig file");
+            }
+
+            originalDig.TransformWith<Dig2Binary>();
+
+            originalDig.Stream.WriteTo(Path.Combine(output, "imported_" + originalDig.Name));
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
         /// Export a DTX into PNG komas.
         /// </summary>
         /// <param name="container">The koma.aar container.</param>

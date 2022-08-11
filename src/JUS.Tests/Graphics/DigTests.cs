@@ -28,6 +28,7 @@ using NUnit.Framework;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -77,6 +78,21 @@ namespace JUSToolkit.Tests.Graphics
             pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
                 .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
                 .Stream.Should().MatchInfo(info);
+        }
+
+        [TestCaseSource(nameof(GetFiles))]
+        public void TwoWaysIdenticalDigStream(string infoPath, string digPath, string atmPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(digPath);
+
+            using Node node = NodeFactory.FromFile(digPath, FileOpenMode.Read);
+
+            var dig = (Dig)ConvertFormat.With<Binary2Dig>(node.Format!);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Dig2Binary>(dig);
+
+            var originalStream = new DataStream(node.Stream!, 0, node.Stream.Length);
+            generatedStream.Stream.Length.Should().Be(originalStream.Length);
+            generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }
     }
 }
