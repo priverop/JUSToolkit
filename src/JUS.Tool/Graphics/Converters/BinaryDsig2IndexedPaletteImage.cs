@@ -59,6 +59,10 @@ namespace JUSToolkit.Graphics.Converters
 
             var palettes = new PaletteCollection();
             int colorsPerPalette = is8Bpp ? 256 : 16;
+
+            // 8Bpp dig files only have one 256 colors palette
+            if (is8Bpp) numPalettes = 1;
+
             for (int i = 0; i < numPalettes; i++) {
                 palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
             }

@@ -49,16 +49,25 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportDtx);
 
-            var exportDsigAlmt = new Command("export-dsig-almt", "Export dsig+almt") {
-                new Option<string>("--dsig", "the input file.dig", ArgumentArity.ExactlyOne),
-                new Option<string>("--almt", "the input map.atm file", ArgumentArity.ExactlyOne),
+            var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
+                new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
+                new Option<string>("--atm", "the input map.atm file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(GraphicCommands.ExportDsigAlmt);
+            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(GraphicCommands.ExportDig);
+
+            var importDig = new Command("import-dig", "Import dsig+almt") {
+                new Option<string>("--input", "the png to import", ArgumentArity.ExactlyOne),
+                new Option<string>("--dig", "the original file.dig", ArgumentArity.ExactlyOne),
+                new Option<string>("--atm", "the original file.atm", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importDig.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ImportDig);
 
             return new Command("graphics", "Import/Export graphic files") {
                 exportDtx,
                 exportDsigAlmt,
+                importDig,
             };
         }
 

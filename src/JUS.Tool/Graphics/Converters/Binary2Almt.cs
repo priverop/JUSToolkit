@@ -27,8 +27,7 @@ namespace JUSToolkit.Graphics.Converters
     /// Converts between BinaryFormat and ALMT.
     /// </summary>
     public class Binary2Almt :
-        IConverter<BinaryFormat, Almt>,
-        IConverter<Almt, BinaryFormat>
+        IConverter<BinaryFormat, Almt>
     {
         /// <summary>
         /// Converts a BinaryFormat Node to an Almt Node.
@@ -66,36 +65,6 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             return almt;
-        }
-
-        /// <summary>
-        /// Converts an Almt Node to a BinaryFormat Node.
-        /// </summary>
-        /// <param name="source">Almt Node.</param>
-        /// <returns>BinaryFormat Node.</returns>
-        public BinaryFormat Convert(Almt source)
-        {
-            var b = new BinaryFormat();
-
-            var writer = new DataWriter(b.Stream);
-
-            writer.Write(source.Magic);
-            writer.Write(source.Unknown);
-            writer.Write(source.Unknown2);
-            writer.Write(source.TileSizeW);
-            writer.Write(source.TileSizeH);
-            writer.Write(source.NumTileW);
-            writer.Write(source.NumTileH);
-            writer.Write(source.Unknown3);
-            foreach (MapInfo info in source.Maps) {
-                if (source.BgMode == NitroBackgroundMode.Affine) {
-                    writer.Write(info.TileIndex);
-                } else {
-                    writer.Write(info.ToInt16());
-                }
-            }
-
-            return b;
         }
     }
 }

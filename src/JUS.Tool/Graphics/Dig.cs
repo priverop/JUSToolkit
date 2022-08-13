@@ -1,114 +1,73 @@
-﻿using Texim.Palettes;
+﻿using System.Linq;
+using Texim.Images;
+using Texim.Palettes;
 using Texim.Pixels;
 using Yarhl.FileFormat;
 
 namespace JUSToolkit.Graphics
 {
     /// <summary>
-    /// Texture NDS formats from http://nocash.emubase.de/gbatek.htm#ds3dtextureformats.
-    /// </summary>
-    public enum ColorFormat
-    {
-        /// <summary>
-        /// Unknown Color Format.
-        /// </summary>
-        Unknown,
-
-        /// <summary>
-        ///  8  bits-> 0-4: index; 5-7: alpha
-        /// </summary>
-        Indexed_A3I5 = 1,    // 8  bits-> 0-4: index; 5-7: alpha
-
-        /// <summary>
-        ///  2  bits for 4   colors
-        /// </summary>
-        Indexed_2bpp = 2,    // 2  bits for 4   colors
-
-        /// <summary>
-        ///  4  bits for 16  colors
-        /// </summary>
-        Indexed_4bpp = 3,
-
-        /// <summary>
-        ///  8  bits for 256 colors
-        /// </summary>
-        Indexed_8bpp = 4,
-
-        /// <summary>
-        ///  32 bits-> 2 bits per texel (only in textures)
-        /// </summary>
-        Texeled_4x4 = 5,
-
-        /// <summary>
-        ///  8  bits-> 0-2: index; 3-7: alpha
-        /// </summary>
-        Indexed_A5I3 = 6,
-
-        /// <summary>
-        ///  16 bits BGR555 color with alpha component
-        /// </summary>
-        ABGR555_16bpp = 7,
-
-        /// <summary>
-        ///  1  bit  for 2 colors
-        /// </summary>
-        Indexed_1bpp,
-
-        /// <summary>
-        ///  8  bits-> 0-3: index; 4-7: alpha
-        /// </summary>
-        Indexed_A4I4,
-
-        /// <summary>
-        ///  32 bits BGRA color
-        /// </summary>
-        BGRA_32bpp,
-
-        /// <summary>
-        ///  32 bits ABGR color
-        /// </summary>
-        ABGR_32bpp,
-    }
-
-    /// <summary>
     /// Image format.
     /// </summary>
     public class Dig : IFormat
     {
         /// <summary>
-        /// Gets or sets the Pixels of the image.
+        /// The Magic ID of the file.
         /// </summary>
-        public IndexedPixel[] Pixels { get; set; }
+        public const string STAMP = "DSIG";
 
         /// <summary>
-        /// Gets or sets the Palette of the image.
+        /// Initializes a new instance of the <see cref="Dig"/> class with the PaletteCollection as well.
         /// </summary>
-        public PaletteCollection Palettes { get; set; }
+        public Dig() {
+            PaletteCollection = new PaletteCollection();
+        }
 
         /// <summary>
-        /// Gets or sets the Magic.
+        /// Initializes a new instance of the <see cref="Dig"/> class cloning another Dig object.
         /// </summary>
-        public byte[] Magic { get; set; }
+        /// <param name="dig">Dig object to clone.</param>
+        public Dig(Dig dig) {
+            Unknown = dig.Unknown;
+            ImageFormat = dig.ImageFormat;
+            NumPalettes = dig.NumPalettes;
+            Width = dig.Width;
+            Height = dig.Height;
+            PaletteCollection = dig.PaletteCollection;
+            Pixels = dig.Pixels;
+            PaletteStart = dig.PaletteStart;
+            PixelsStart = dig.PixelsStart;
+        }
 
         /// <summary>
-        /// Gets or sets the Dig Type.
+        /// Initializes a new instance of the <see cref="Dig"/> class cloning the indexed image.
         /// </summary>
-        public byte Type { get; set; }
+        /// <param name="dig">Dig object to clone.</param>
+        /// <param name="image">IndexedImage object to clone.</param>
+        public Dig(Dig dig, IIndexedImage image)
+            : this(dig)
+        {
+            Height = (ushort)image.Height;
+            Width = (ushort)image.Width;
+            Pixels = image.Pixels.ToArray();
+        }
 
         /// <summary>
-        /// Gets or sets the PaletteType.
-        /// </summary>
-        public byte PaletteType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the PaletteSize (PaletteSize * 32 + 12 = First Pixel).
-        /// </summary>
-        public byte PaletteSize { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ??.
+        /// Gets or sets the first byte of the format. Maybe the Type?.
         /// </summary>
         public byte Unknown { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ImageFormat.
+        /// </summary>
+        /// <remarks>Different than 0x10, then 8 bpp.</remarks>
+        public byte ImageFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the NumPalettes.
+        /// </summary>
+        /// <remarks>4bpp: NumPalettes * 32 + 12 (0xC) = First Pixel.</remarks>
+        public ushort NumPalettes { get; set; }
 
         /// <summary>
         /// Gets or sets the Width of the image.
@@ -121,6 +80,16 @@ namespace JUSToolkit.Graphics
         public ushort Height { get; set; }
 
         /// <summary>
+        /// Gets or sets the Palettes of the image.
+        /// </summary>
+        public PaletteCollection PaletteCollection { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Pixels of the image.
+        /// </summary>
+        public IndexedPixel[] Pixels { get; set; }
+
+        /// <summary>
         /// Gets or sets the PaletteStart value.
         /// </summary>
         public uint PaletteStart { get; set; }
@@ -129,10 +98,5 @@ namespace JUSToolkit.Graphics
         /// Gets or sets the PixelsStart value.
         /// </summary>
         public uint PixelsStart { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ColorFormat value.
-        /// </summary>
-        public ColorFormat ColorFormat { get; set; }
     }
 }

@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.IO;
+using System.Linq;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
@@ -40,17 +41,19 @@ namespace JUSToolkit.CLI.JUS
         /// <summary>
         /// Export a DSIG + ALMT into a PNG.
         /// </summary>
-        /// <param name="dsig">The file.dig.</param>
-        /// <param name="almt">The map.atm file.</param>
+        /// <param name="dig">The file.dig.</param>
+        /// <param name="atm">The map.atm file.</param>
         /// <param name="output">The output folder.</param>
-        public static void ExportDsigAlmt(string dsig, string almt, string output)
+        public static void ExportDig(string dig, string atm, string output)
         {
             // Pixels + Palette
-            using var pixelsPaletteNode = NodeFactory.FromFile(dsig, FileOpenMode.Read)
+            using var pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryDsig2IndexedPaletteImage>();
 
             // Map
-            using var mapsNode = NodeFactory.FromFile(almt, FileOpenMode.Read)
+            using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>();
 
             var mapsParams = new MapDecompressionParams {
@@ -63,6 +66,50 @@ namespace JUSToolkit.CLI.JUS
             pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
                 .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
                 .Stream.WriteTo(output + "export.png");
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import a PNG into a DSIG + ALMT.
+        /// </summary>
+        /// <param name="input">The png to import.</param>
+        /// <param name="dig">The original .dig file.</param>
+        /// <param name="atm">The original .atm file.</param>
+        /// <param name="output">The output folder.</param>
+        public static void ImportDig(string input, string dig, string atm, string output)
+        {
+            Dig originalDig = NodeFactory.FromFile(dig)
+                .TransformWith<Binary2Dig>()
+                .GetFormatAs<Dig>();
+
+            Almt originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
+                    .TransformWith<Binary2Almt>()
+                    .GetFormatAs<Almt>();
+
+            if (originalDig is null) {
+                throw new FormatException("Invalid dig file");
+            }
+
+            var compressionParams = new FullImageMapCompressionParams {
+                Palettes = originalDig.PaletteCollection,
+            };
+
+            var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+                .TransformWith<Bitmap2FullImage>()
+                .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
+            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+
+            Dig newDig = new Dig(originalDig, newImage);
+            using var binaryDig = new Dig2Binary().Convert(newDig);
+
+            binaryDig.Stream.WriteTo(Path.Combine(output, input + ".dig"));
+
+            Almt newAtm = new Almt(originalAtm, map);
+            using var binaryAtm = new Almt2Binary().Convert(newAtm);
+
+            binaryAtm.Stream.WriteTo(Path.Combine(output, input + ".atm"));
 
             Console.WriteLine("Done!");
         }
