@@ -87,9 +87,10 @@ namespace JUSToolkit.CLI.JUS
 
             var import3 = new Command("import-alar3", "import alar3") {
                 new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            import3.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar3);
+            import3.Handler = CommandHandler.Create<string, string, string>(ContainerCommands.ImportAlar3);
 
             return new Command("containers", "Unpack/Repack container files") {
                 export,

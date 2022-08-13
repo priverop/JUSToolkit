@@ -58,11 +58,12 @@ namespace JUSToolkit.CLI.JUS
         /// <summary>
         /// Import files into an Alar3 container.
         /// </summary>
-        /// <param name="container">The path to the original alar3 file.</param>
+        /// <param name="originalContainer">The path to the original alar3 file.</param>
+        /// <param name="directoryInsertionPath">The path to the directory of the files we want to add.</param>
         /// <param name="output">The output directory.</param>
-        public static void ImportAlar3(string container, string output)
+        public static void ImportAlar3(string originalContainer, string directoryInsertionPath, string output)
         {
-            Node alar = NodeFactory.FromFile(container)
+            Node alar = NodeFactory.FromFile(originalContainer)
                 .TransformWith<Binary2Alar3>();
 
             if (alar is null) {
