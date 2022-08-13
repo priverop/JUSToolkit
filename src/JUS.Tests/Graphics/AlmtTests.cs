@@ -54,7 +54,7 @@ namespace JUSToolkit.Tests.Graphics
             using Node node = NodeFactory.FromFile(almtPath, FileOpenMode.Read);
 
             var almt = (Almt)ConvertFormat.With<Binary2Almt>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2Almt>(almt);
+            var generatedStream = (BinaryFormat)ConvertFormat.With<Almt2Binary>(almt);
 
             var originalStream = new DataStream(node.Stream!, 0, node.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);

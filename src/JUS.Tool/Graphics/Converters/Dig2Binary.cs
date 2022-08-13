@@ -36,7 +36,6 @@ namespace JUSToolkit.Graphics.Converters
             writer.Write(dig.Width);
             writer.Write(dig.Height);
 
-            // Quizá luego: writer.WriteUntilLength(00, dig.PaletteStart);
             foreach (IPalette c in dig.PaletteCollection.Palettes) {
                 writer.Write<Bgr555>(c.Colors);
             }

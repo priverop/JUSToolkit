@@ -17,30 +17,33 @@ namespace JUSToolkit.Graphics
         public const string STAMP = "DSIG";
 
         /// <summary>
-        /// Initializes an instance of Dig with the PaletteCollection as well.
+        /// Initializes a new instance of the <see cref="Dig"/> class with the PaletteCollection as well.
         /// </summary>
         public Dig() {
             PaletteCollection = new PaletteCollection();
         }
 
         /// <summary>
-        /// Initializes an instance of Dig cloning another Dig.
+        /// Initializes a new instance of the <see cref="Dig"/> class cloning another Dig object.
         /// </summary>
+        /// <param name="dig">Dig object to clone.</param>
         public Dig(Dig dig) {
-            Unknown = dig.Unknown; 
-            ImageFormat = dig.ImageFormat; 
-            NumPalettes = dig.NumPalettes; 
-            Width = dig.Width; 
-            Height = dig.Height; 
-            PaletteCollection = dig.PaletteCollection; 
-            Pixels = dig.Pixels; 
+            Unknown = dig.Unknown;
+            ImageFormat = dig.ImageFormat;
+            NumPalettes = dig.NumPalettes;
+            Width = dig.Width;
+            Height = dig.Height;
+            PaletteCollection = dig.PaletteCollection;
+            Pixels = dig.Pixels;
             PaletteStart = dig.PaletteStart;
             PixelsStart = dig.PixelsStart;
         }
 
         /// <summary>
-        /// Initializes an instance of Dig cloning the indexed image.
+        /// Initializes a new instance of the <see cref="Dig"/> class cloning the indexed image.
         /// </summary>
+        /// <param name="dig">Dig object to clone.</param>
+        /// <param name="image">IndexedImage object to clone.</param>
         public Dig(Dig dig, IIndexedImage image)
             : this(dig)
         {

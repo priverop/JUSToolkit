@@ -28,10 +28,16 @@ namespace JUSToolkit.Graphics
     /// </summary>
     public class Almt : IScreenMap
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Almt"/> class.
+        /// </summary>
         public Almt() {
-
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Almt"/> class cloning another Almt object.
+        /// </summary>
+        /// <param name="atm">Almt object to clone.</param>
         public Almt(Almt atm) {
             Magic = atm.Magic;
             Unknown = atm.Unknown;
@@ -48,6 +54,11 @@ namespace JUSToolkit.Graphics
             BgMode = atm.BgMode;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Almt"/> class cloning another Almt and the ScreenMap properties.
+        /// </summary>
+        /// <param name="atm">Almt object to clone.</param>
+        /// <param name="screenMap">ScreenMap object to clone.</param>
         public Almt(Almt atm, IScreenMap screenMap)
             : this(atm)
         {

@@ -74,7 +74,8 @@ namespace JUSToolkit.CLI.JUS
         /// Import a PNG into a DSIG + ALMT.
         /// </summary>
         /// <param name="input">The png to import.</param>
-        /// <param name="dig">The file.dig.</param>
+        /// <param name="dig">The original .dig file.</param>
+        /// <param name="atm">The original .atm file.</param>
         /// <param name="output">The output folder.</param>
         public static void ImportDig(string input, string dig, string atm, string output)
         {
@@ -89,30 +90,7 @@ namespace JUSToolkit.CLI.JUS
             if (originalDig is null) {
                 throw new FormatException("Invalid dig file");
             }
-/*
-            var paletteIndexes = NodeFactory.FromFile(atm, FileOpenMode.Read)
-                    .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>()
-                    .Maps
-                    .Select(m => m.PaletteIndex)
-                    .Distinct()
-                    .ToArray();
 
-                // Fill of palettes, even if we don't copy them so the palette
-                // indexes are the same in the new collection
-                var limitedPalette = new PaletteCollection();
-                int maxIndex = paletteIndexes.Max();
-                for (int i = 0; i <= maxIndex; i++) {
-                    limitedPalette.Palettes.Add(new Palette());
-                }
-
-                // Copy only those palettes used in the original NSCR.
-                for (int i = 0; i < paletteIndexes.Length; i++) {
-                    int idx = paletteIndexes[i];
-                    limitedPalette.Palettes[idx] = originalDig.PaletteCollection.Palettes[idx];
-                }
-*/
-            // var mergeImage = new IndexedImage(originalDig.Width, originalDig.Height, originalDig.Pixels);
             var compressionParams = new FullImageMapCompressionParams {
                 Palettes = originalDig.PaletteCollection,
             };
@@ -126,12 +104,12 @@ namespace JUSToolkit.CLI.JUS
             Dig newDig = new Dig(originalDig, newImage);
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
-            binaryDig.Stream.WriteTo(Path.Combine(output, "bb_02.dig"));
+            binaryDig.Stream.WriteTo(Path.Combine(output, input + ".dig"));
 
             Almt newAtm = new Almt(originalAtm, map);
             using var binaryAtm = new Almt2Binary().Convert(newAtm);
 
-            binaryAtm.Stream.WriteTo(Path.Combine(output, "bb_02.atm"));
+            binaryAtm.Stream.WriteTo(Path.Combine(output, input + ".atm"));
 
             Console.WriteLine("Done!");
         }
