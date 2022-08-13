@@ -28,6 +28,34 @@ namespace JUSToolkit.Graphics
     /// </summary>
     public class Almt : IScreenMap
     {
+        public Almt() {
+
+        }
+
+        public Almt(Almt atm) {
+            Magic = atm.Magic;
+            Unknown = atm.Unknown;
+            Unknown2 = atm.Unknown2;
+            TileSizeW = atm.TileSizeW;
+            TileSizeH = atm.TileSizeH;
+            NumTileW = atm.NumTileW;
+            NumTileH = atm.NumTileH;
+            Unknown3 = atm.Unknown3;
+            Maps = atm.Maps;
+            Width = atm.Width;
+            Height = atm.Height;
+            TileSize = atm.TileSize;
+            BgMode = atm.BgMode;
+        }
+
+        public Almt(Almt atm, IScreenMap screenMap)
+            : this(atm)
+        {
+            Width = screenMap.Width;
+            Height = screenMap.Height;
+            Maps = screenMap.Maps;
+        }
+
         /// <summary>
         /// Gets or Sets TBD.
         /// </summary>

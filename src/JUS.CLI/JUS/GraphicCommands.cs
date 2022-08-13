@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.IO;
+using System.Linq;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
@@ -72,21 +73,65 @@ namespace JUSToolkit.CLI.JUS
         /// <summary>
         /// Import a PNG into a DSIG + ALMT.
         /// </summary>
+        /// <param name="input">The png to import.</param>
         /// <param name="dig">The file.dig.</param>
-        /// <param name="atm">The map.atm file.</param>
         /// <param name="output">The output folder.</param>
-        public static void ImportDig(string dig, string atm, string output)
+        public static void ImportDig(string input, string dig, string atm, string output)
         {
-            Node originalDig = NodeFactory.FromFile(dig)
-                .TransformWith<Binary2Dig>();
+            Dig originalDig = NodeFactory.FromFile(dig)
+                .TransformWith<Binary2Dig>()
+                .GetFormatAs<Dig>();
+
+            Almt originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
+                    .TransformWith<Binary2Almt>()
+                    .GetFormatAs<Almt>();
 
             if (originalDig is null) {
                 throw new FormatException("Invalid dig file");
             }
+/*
+            var paletteIndexes = NodeFactory.FromFile(atm, FileOpenMode.Read)
+                    .TransformWith<Binary2Almt>()
+                    .GetFormatAs<Almt>()
+                    .Maps
+                    .Select(m => m.PaletteIndex)
+                    .Distinct()
+                    .ToArray();
 
-            originalDig.TransformWith<Dig2Binary>();
+                // Fill of palettes, even if we don't copy them so the palette
+                // indexes are the same in the new collection
+                var limitedPalette = new PaletteCollection();
+                int maxIndex = paletteIndexes.Max();
+                for (int i = 0; i <= maxIndex; i++) {
+                    limitedPalette.Palettes.Add(new Palette());
+                }
 
-            originalDig.Stream.WriteTo(Path.Combine(output, "imported_" + originalDig.Name));
+                // Copy only those palettes used in the original NSCR.
+                for (int i = 0; i < paletteIndexes.Length; i++) {
+                    int idx = paletteIndexes[i];
+                    limitedPalette.Palettes[idx] = originalDig.PaletteCollection.Palettes[idx];
+                }
+*/
+            // var mergeImage = new IndexedImage(originalDig.Width, originalDig.Height, originalDig.Pixels);
+            var compressionParams = new FullImageMapCompressionParams {
+                Palettes = originalDig.PaletteCollection,
+            };
+
+            var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+                .TransformWith<Bitmap2FullImage>()
+                .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
+            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+
+            Dig newDig = new Dig(originalDig, newImage);
+            using var binaryDig = new Dig2Binary().Convert(newDig);
+
+            binaryDig.Stream.WriteTo(Path.Combine(output, "bb_02.dig"));
+
+            Almt newAtm = new Almt(originalAtm, map);
+            using var binaryAtm = new Almt2Binary().Convert(newAtm);
+
+            binaryAtm.Stream.WriteTo(Path.Combine(output, "bb_02.atm"));
 
             Console.WriteLine("Done!");
         }

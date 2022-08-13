@@ -1,4 +1,6 @@
-﻿using Texim.Palettes;
+﻿using System.Linq;
+using Texim.Images;
+using Texim.Palettes;
 using Texim.Pixels;
 using Yarhl.FileFormat;
 
@@ -19,6 +21,32 @@ namespace JUSToolkit.Graphics
         /// </summary>
         public Dig() {
             PaletteCollection = new PaletteCollection();
+        }
+
+        /// <summary>
+        /// Initializes an instance of Dig cloning another Dig.
+        /// </summary>
+        public Dig(Dig dig) {
+            Unknown = dig.Unknown; 
+            ImageFormat = dig.ImageFormat; 
+            NumPalettes = dig.NumPalettes; 
+            Width = dig.Width; 
+            Height = dig.Height; 
+            PaletteCollection = dig.PaletteCollection; 
+            Pixels = dig.Pixels; 
+            PaletteStart = dig.PaletteStart;
+            PixelsStart = dig.PixelsStart;
+        }
+
+        /// <summary>
+        /// Initializes an instance of Dig cloning the indexed image.
+        /// </summary>
+        public Dig(Dig dig, IIndexedImage image)
+            : this(dig)
+        {
+            Height = (ushort)image.Height;
+            Width = (ushort)image.Width;
+            Pixels = image.Pixels.ToArray();
         }
 
         /// <summary>
