@@ -16,3 +16,6 @@ test_results/
 docs/_site
 docs/api
 docs/_site_pdf
+
+# VS Files
+src/.vs
