@@ -20,6 +20,7 @@
 using System;
 using System.IO;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics.Converters;
 using Yarhl.FileSystem;
 
 namespace JUSToolkit.CLI.JUS
@@ -37,6 +38,7 @@ namespace JUSToolkit.CLI.JUS
         public static void ExportAlar3(string container, string output)
         {
             Node files = NodeFactory.FromFile(container)
+                .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar3>();
 
             if (files is null) {
@@ -47,7 +49,34 @@ namespace JUSToolkit.CLI.JUS
                 if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
-                    string outputFile = Path.Combine(output, node.Path.Substring(1));
+                    string outputFile = Path.Combine(output, node.Path[1..]);
+                    node.Stream.WriteTo(outputFile);
+                }
+            }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Export all the files from the Alar2 container.
+        /// </summary>
+        /// <param name="container">The path to the alar2 file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void ExportAlar2(string container, string output)
+        {
+            Node files = NodeFactory.FromFile(container)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Alar2>();
+
+            if (files is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            foreach (var node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
+                    // Path.Combine ignores the relative path if there is an absolute path
+                    // so we remove the first slash of the node.Path
+                    string outputFile = Path.Combine(output, node.Path[1..]);
                     node.Stream.WriteTo(outputFile);
                 }
             }
