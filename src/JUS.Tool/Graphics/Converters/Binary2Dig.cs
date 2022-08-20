@@ -1,4 +1,4 @@
-// Copyright (c) 2021 SceneGate
+﻿// Copyright (c) 2021 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,10 @@ namespace JUSToolkit.Graphics.Converters
     public class Binary2Dig : IConverter<IBinary, Dig>
     {
         /// <summary>
-        /// Converts a BinaryFormat (file) to a Dig.
+        /// Converts a <see cref="BinaryFormat"/> (file) to a <see cref="Dig"/>.
         /// </summary>
         /// <param name="source">File to convert.</param>
-        /// <returns>Dig.</returns>
+        /// <returns><see cref="Dig"/>.</returns>
         public Dig Convert(IBinary source)
         {
             if (source is null) {
@@ -44,29 +44,67 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             var reader = new DataReader(source.Stream);
-            var dig = new Dig();
             source.Stream.Position = 0;
 
-            if (reader.ReadString(4) != Dig.STAMP) {
+            if (reader.ReadString(4) != "DSIG") {
                 throw new FormatException("Invalid stamp");
             }
 
-            dig.Unknown = reader.ReadByte();
-            dig.ImageFormat = reader.ReadByte();
-            bool is8Bpp = dig.ImageFormat != 0x10;
-            dig.NumPalettes = reader.ReadUInt16();
-            dig.Width = reader.ReadUInt16();
-            dig.Height = reader.ReadUInt16();
+            byte unknown = reader.ReadByte();
+            byte imageFormat = reader.ReadByte();
+            ushort numPaletteLines = reader.ReadUInt16();
+            int width = reader.ReadUInt16();
+            int height = reader.ReadUInt16();
+            uint pixelsStart = (uint)((numPaletteLines * 0x20) + 0xC);
 
-            int colorsPerPalette = is8Bpp ? 256 : 16;
+            var bpp = (DigBpp)(imageFormat & 0x0F);
+            var swizzling = (DigSwizzling)(imageFormat >> 4);
+            IIndexedPixelEncoding pixelEncoding;
+            int colorsPerPalette;
+            int numPalettes;
 
-            // 8Bpp dig files only have one 256 colors palette
-            for (int i = 0; i < (is8Bpp ? 1 : dig.NumPalettes); i++) {
-                dig.PaletteCollection.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
+            switch (bpp) {
+                case DigBpp.Bpp4:
+                    pixelEncoding = Indexed4Bpp.Instance;
+                    colorsPerPalette = 16;
+                    numPalettes = numPaletteLines;
+                    break;
+                case DigBpp.Bpp8:
+                    pixelEncoding = Indexed8Bpp.Instance;
+                    colorsPerPalette = 256;
+                    numPalettes = ((numPaletteLines - 1) / 16) + 1;
+                    break;
+                default:
+                    throw new FormatException("Invalid bpp");
             }
 
-            IIndexedPixelEncoding pixelEncoding = is8Bpp ? Indexed8Bpp.Instance : Indexed4Bpp.Instance;
-            dig.Pixels = pixelEncoding.Decode(source.Stream, dig.Width * dig.Height);
+            var palettes = new PaletteCollection();
+
+            for (int i = 0; i < numPalettes; i++) {
+                palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
+            }
+
+            source.Stream.Position = pixelsStart;
+
+            IndexedPixel[] pixels = swizzling switch {
+                DigSwizzling.Tiled => pixelEncoding.Decode(source.Stream, width * height)
+                        .UnswizzleWith(new TileSwizzling<IndexedPixel>(width)),
+                DigSwizzling.Linear => pixelEncoding.Decode(source.Stream, width * height),
+                _ => throw new FormatException("Invalid swizzling"),
+            };
+
+            var dig = new Dig {
+                Unknown = unknown,
+                ImageFormat = imageFormat,
+                NumPaletteLines = numPaletteLines,
+                Width = width,
+                Height = height,
+                Pixels = pixels,
+                PixelsStart = pixelsStart,
+                Bpp = bpp,
+                Swizzling = swizzling,
+            };
+            dig.Palettes.Add(palettes.Palettes);
 
             return dig;
         }

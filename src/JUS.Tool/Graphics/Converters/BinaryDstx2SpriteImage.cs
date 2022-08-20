@@ -1,4 +1,4 @@
-// Copyright (c) 2022 SceneGate
+﻿// Copyright (c) 2022 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ namespace JUSToolkit.Graphics.Converters
         private const string Stamp = "DSTX";
         private const int Type = 0x04;
 
-        private readonly BinaryDsig2IndexedPaletteImage dsigConverter = new ();
+        private readonly Binary2Dig digConverter = new ();
 
         /// <summary>
         /// Converts a BinaryFormat (file) to a NodeContainerFormat.
@@ -72,7 +72,7 @@ namespace JUSToolkit.Graphics.Converters
                 source.Stream,
                 dsigOffset,
                 source.Stream.Length - dsigOffset);
-            IndexedPaletteImage image = dsigConverter.Convert(dsigBinary);
+            IndexedPaletteImage image = digConverter.Convert(dsigBinary);
 
             var container = new NodeContainerFormat();
             container.Root.Add(new Node("sprite", sprite));

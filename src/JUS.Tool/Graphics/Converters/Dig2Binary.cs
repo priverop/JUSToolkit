@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Drawing.Imaging;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -32,19 +33,27 @@ namespace JUSToolkit.Graphics.Converters
             writer.Write(Dig.STAMP, false);
             writer.Write(dig.Unknown);
             writer.Write(dig.ImageFormat);
-            writer.Write(dig.NumPalettes);
-            writer.Write(dig.Width);
-            writer.Write(dig.Height);
+            writer.Write(dig.NumPaletteLines);
+            writer.Write((ushort)dig.Width);
+            writer.Write((ushort)dig.Height);
 
-            foreach (IPalette c in dig.PaletteCollection.Palettes) {
+            foreach (IPalette c in dig.Palettes) {
                 writer.Write<Bgr555>(c.Colors);
             }
 
-            IIndexedPixelEncoding encoder = (dig.ImageFormat == 0x10)
-                ? Indexed4Bpp.Instance
-                : Indexed8Bpp.Instance;
+            IIndexedPixelEncoding encoder = dig.Bpp switch {
+                DigBpp.Bpp4 => Indexed4Bpp.Instance,
+                DigBpp.Bpp8 => Indexed8Bpp.Instance,
+                _ => throw new FormatException("Invalid bpp"),
+            };
 
-            writer.Write(encoder.Encode(dig.Pixels));
+            writer.Stream.Position = dig.PixelsStart;
+            IndexedPixel[] pixels = dig.Swizzling switch {
+                DigSwizzling.Linear => dig.Pixels,
+                DigSwizzling.Tiled => new TileSwizzling<IndexedPixel>(dig.Width).Swizzle(dig.Pixels),
+                _ => throw new FormatException("Invalid swizzling"),
+            };
+            writer.Write(encoder.Encode(pixels));
 
             return binary;
         }

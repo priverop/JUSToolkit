@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Pablo Rivero
+﻿// Copyright (c) 2022 Pablo Rivero
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ namespace JUSToolkit.CLI.JUS
             // Pixels + Palette
             using var pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<BinaryDsig2IndexedPaletteImage>();
+                .TransformWith<Binary2Dig>();
 
             // Map
             using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read)
@@ -65,7 +65,7 @@ namespace JUSToolkit.CLI.JUS
             };
             pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
                 .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
-                .Stream.WriteTo(output + "export.png");
+                .Stream.WriteTo(output + ".png");
 
             Console.WriteLine("Done!");
         }
@@ -92,7 +92,7 @@ namespace JUSToolkit.CLI.JUS
             }
 
             var compressionParams = new FullImageMapCompressionParams {
-                Palettes = originalDig.PaletteCollection,
+                Palettes = originalDig,
             };
 
             var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)

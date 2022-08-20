@@ -1,4 +1,4 @@
-// Copyright(c) 2022 Pablo Rivero
+﻿// Copyright(c) 2022 Pablo Rivero
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ namespace JUSToolkit.Tests.Graphics
 
             // Pixels + Palette
             using var pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
-                .TransformWith<BinaryDsig2IndexedPaletteImage>();
+                .TransformWith<Binary2Dig>();
 
             // Map
             using var mapsNode = NodeFactory.FromFile(atmPath, FileOpenMode.Read)
