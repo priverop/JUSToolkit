@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Pablo Rivero
+﻿// Copyright (c) 2022 Pablo Rivero
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,12 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportDtx);
 
+            var exportDtx3 = new Command("export-dtx3", "Export dtx") {
+                new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportDtx3.Handler = CommandHandler.Create<string, string>(GraphicCommands.ExportDtx3);
+
             var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
                 new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
                 new Option<string>("--atm", "the input map.atm file", ArgumentArity.ExactlyOne),
@@ -66,6 +72,7 @@ namespace JUSToolkit.CLI.JUS
 
             return new Command("graphics", "Import/Export graphic files") {
                 exportDtx,
+                exportDtx3,
                 exportDsigAlmt,
                 importDig,
             };

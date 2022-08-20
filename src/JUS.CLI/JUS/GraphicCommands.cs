@@ -20,6 +20,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
@@ -68,6 +69,30 @@ namespace JUSToolkit.CLI.JUS
                 .Stream.WriteTo(output + ".png");
 
             Console.WriteLine("Done!");
+        }
+
+        public static void ExportDtx3(string dtx, string output)
+        {
+            // Sprites + pixels + palette
+            using var dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
+
+            var image = dtx3.Children["image"].GetFormatAs<IndexedPaletteImage>();
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                FullImage = image,
+            };
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = image,
+            };
+
+            foreach (Node nodeSprite in dtx3.Children["sprites"].Children) {
+                nodeSprite
+                    .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
+                    .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
+                    .Stream.WriteTo(Path.Combine(output,$"{nodeSprite.Name}.png"));
+            }
         }
 
         /// <summary>
