@@ -46,7 +46,7 @@ namespace JUSToolkit.Graphics.Converters
             var reader = new DataReader(source.Stream);
             source.Stream.Position = 0;
 
-            if (reader.ReadString(4) != "DSIG") {
+            if (reader.ReadString(4) != Dig.STAMP) {
                 throw new FormatException("Invalid stamp");
             }
 
