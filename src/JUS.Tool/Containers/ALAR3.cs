@@ -63,45 +63,25 @@ namespace JUSToolkit.Containers
         public void InsertModification(Node filesToInsert)
         {
             foreach (Node nNew in filesToInsert.Children) {
-                uint newOffset = 0;
+                uint nextFileOffset = 0;
 
                 foreach (Node nOld in Navigator.IterateNodes(Root)) {
                     if (!nOld.IsContainer) {
                         Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>();
 
-                        if (newOffset > 0) {
-                            alarFileOld.Offset = newOffset;
-                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                        // Ignoring first file (0 offset)
+                        // Problema, este if no sirve pa na
+                        if (nextFileOffset > 0) {
+                            alarFileOld.Offset = nextFileOffset;
                         }
 
                         if (nOld.Name == nNew.Name) {
-                            alarFileOld = ReplaceStream(alarFileOld, nNew.Stream);
-
-                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                            alarFileOld.ReplaceStream(nNew.Stream);
                         }
+                        nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Replaces an Alar3File with a Datastream.
-        /// </summary>
-        /// <param name="old">Alar3File old File.</param>
-        /// /// <param name="stream">New DataStream.</param>
-        private static Alar3File ReplaceStream(Alar3File old, DataStream stream)
-        {
-            var newAlar = new Alar3File(stream) {
-                FileID = old.FileID,
-                Offset = old.Offset,
-                Size = (uint)stream.Length,
-                Unknown = old.Unknown,
-                Unknown2 = old.Unknown2,
-                Unknown3 = old.Unknown3,
-                Unknown4 = old.Unknown4,
-            };
-
-            return newAlar;
         }
     }
 }
