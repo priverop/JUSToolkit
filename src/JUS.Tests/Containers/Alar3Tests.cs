@@ -89,13 +89,12 @@ namespace JUSToolkit.Tests.Containers
         }
 
         [TestCaseSource(nameof(GetAlar3InsertionFiles))]
-        public void InsertingAlar3Identical(string alarPath, string filePath)
+        public void InsertingAlar3Identical(string alarPath, string dirPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
-            TestDataBase.IgnoreIfFileDoesNotExist(filePath);
 
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
-            using Node fileOriginal = NodeFactory.FromFile(filePath, FileOpenMode.Read);
+            using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
             var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(alarOriginal.Format!);
             alar.InsertModification(fileOriginal);
