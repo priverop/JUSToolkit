@@ -16,6 +16,7 @@ namespace JUSToolkit.Containers
             Stream = fileStream;
         }
 
+        /// <inheritdoc/>
         public DataStream Stream { get; private set; }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace JUSToolkit.Containers
         /// Gets or sets the Unknown4.
         /// </summary>
         public ushort Unknown4 { get; set; }
-        
+
         /// <summary>
         /// We replace the Alar3File Stream and the Size.
         /// </summary>

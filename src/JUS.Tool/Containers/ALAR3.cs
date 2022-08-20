@@ -77,6 +77,7 @@ namespace JUSToolkit.Containers
                         if (nOld.Name == nNew.Name) {
                             alarFileOld.ReplaceStream(nNew.Stream);
                         }
+
                         nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                     }
                 }
