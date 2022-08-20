@@ -19,8 +19,11 @@
 // SOFTWARE.
 using System;
 using System.IO;
+using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUSToolkit.CLI.JUS
 {
@@ -58,21 +61,23 @@ namespace JUSToolkit.CLI.JUS
         /// <summary>
         /// Import files into an Alar3 container.
         /// </summary>
-        /// <param name="originalContainer">The path to the original alar3 file.</param>
-        /// <param name="directoryInsertionPath">The path to the directory of the files we want to add.</param>
+        /// <param name="container">The path to the original alar3 file.</param>
+        /// <param name="input">The path to the directory of the files we want to add.</param>
         /// <param name="output">The output directory.</param>
-        public static void ImportAlar3(string originalContainer, string directoryInsertionPath, string output)
+        public static void ImportAlar3(string container, string input, string output)
         {
-            Node alar = NodeFactory.FromFile(originalContainer)
-                .TransformWith<Binary2Alar3>();
+            Alar3 alar = NodeFactory.FromFile(container)
+                .TransformWith<Binary2Alar3>()
+                .GetFormatAs<Alar3>();
 
             if (alar is null) {
                 throw new FormatException("Invalid container file");
             }
 
-            alar.TransformWith<Alar3ToBinary>();
+            alar.InsertModification(NodeFactory.FromDirectory(input));
 
-            alar.Stream.WriteTo(Path.Combine(output, "imported_" + alar.Name));
+            using var binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
 
             Console.WriteLine("Done!");
         }

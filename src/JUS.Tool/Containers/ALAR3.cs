@@ -70,7 +70,6 @@ namespace JUSToolkit.Containers
                         Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>();
 
                         // Ignoring first file (0 offset)
-                        // Problema, este if no sirve pa na
                         if (nextFileOffset > 0) {
                             alarFileOld.Offset = nextFileOffset;
                         }
