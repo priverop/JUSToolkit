@@ -21,6 +21,7 @@ using System;
 using System.IO;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics.Converters;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
