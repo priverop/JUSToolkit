@@ -73,29 +73,36 @@ namespace JUSToolkit.CLI.JUS
 
         private static Command CreateContainerCommand()
         {
-            var export = new Command("export-alar3", "Export alar3") {
+            var exportAlar3 = new Command("export-alar3", "Export alar3") {
                 new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar3);
+            exportAlar3.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar3);
 
-            var import2 = new Command("import-alar2", "import alar2") {
+            var exportAlar2 = new Command("export-alar2", "Export alar2") {
                 new Option<string>("--container", "the input alar2 container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            import2.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar2);
+            exportAlar2.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportAlar2);
 
-            var import3 = new Command("import-alar3", "import alar3") {
+            var importAlar2 = new Command("import-alar2", "import alar2") {
+                new Option<string>("--container", "the input alar2 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importAlar2.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar2);
+
+            var importAlar3 = new Command("import-alar3", "import alar3") {
                 new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
                 new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            import3.Handler = CommandHandler.Create<string, string, string>(ContainerCommands.ImportAlar3);
+            importAlar3.Handler = CommandHandler.Create<string, string, string>(ContainerCommands.ImportAlar3);
 
             return new Command("containers", "Unpack/Repack container files") {
-                export,
-                import2,
-                import3,
+                exportAlar3,
+                exportAlar2,
+                importAlar2,
+                importAlar3,
             };
         }
     }
