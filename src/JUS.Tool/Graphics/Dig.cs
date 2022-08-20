@@ -7,9 +7,41 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Graphics
 {
     /// <summary>
+    /// Bpp of a <see cref="Dig"/> image.
+    /// </summary>
+    public enum DigBpp
+    {
+        /// <summary>
+        /// 4 bpp mode.
+        /// </summary>
+        Bpp4 = 0,
+
+        /// <summary>
+        /// 8 bpp mode.
+        /// </summary>
+        Bpp8 = 1,
+    }
+
+    /// <summary>
+    /// Swizzling of a <see cref="Dig"/> image.
+    /// </summary>
+    public enum DigSwizzling
+    {
+        /// <summary>
+        /// Tiled swizzling
+        /// </summary>
+        Tiled = 1,
+
+        /// <summary>
+        /// Linear swizzling
+        /// </summary>
+        Linear = 2,
+    }
+
+    /// <summary>
     /// Image format.
     /// </summary>
-    public class Dig : IFormat
+    public class Dig : IndexedPaletteImage, IFormat
     {
         /// <summary>
         /// The Magic ID of the file.
@@ -17,10 +49,9 @@ namespace JUSToolkit.Graphics
         public const string STAMP = "DSIG";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Dig"/> class with the PaletteCollection as well.
+        /// Initializes a new instance of the <see cref="Dig"/> class.
         /// </summary>
         public Dig() {
-            PaletteCollection = new PaletteCollection();
         }
 
         /// <summary>
@@ -30,13 +61,17 @@ namespace JUSToolkit.Graphics
         public Dig(Dig dig) {
             Unknown = dig.Unknown;
             ImageFormat = dig.ImageFormat;
-            NumPalettes = dig.NumPalettes;
+            NumPaletteLines = dig.NumPaletteLines;
             Width = dig.Width;
             Height = dig.Height;
-            PaletteCollection = dig.PaletteCollection;
             Pixels = dig.Pixels;
             PaletteStart = dig.PaletteStart;
             PixelsStart = dig.PixelsStart;
+            Bpp = dig.Bpp;
+            Swizzling = dig.Swizzling;
+            foreach (IPalette p in dig.Palettes) {
+                Palettes.Add(p);
+            }
         }
 
         /// <summary>
@@ -47,8 +82,8 @@ namespace JUSToolkit.Graphics
         public Dig(Dig dig, IIndexedImage image)
             : this(dig)
         {
-            Height = (ushort)image.Height;
-            Width = (ushort)image.Width;
+            Height = image.Height;
+            Width = image.Width;
             Pixels = image.Pixels.ToArray();
         }
 
@@ -60,34 +95,12 @@ namespace JUSToolkit.Graphics
         /// <summary>
         /// Gets or sets the ImageFormat.
         /// </summary>
-        /// <remarks>Different than 0x10, then 8 bpp.</remarks>
         public byte ImageFormat { get; set; }
 
         /// <summary>
-        /// Gets or sets the NumPalettes.
+        /// Gets or sets the NumPaletteLines.
         /// </summary>
-        /// <remarks>4bpp: NumPalettes * 32 + 12 (0xC) = First Pixel.</remarks>
-        public ushort NumPalettes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Width of the image.
-        /// </summary>
-        public ushort Width { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Height of the image.
-        /// </summary>
-        public ushort Height { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Palettes of the image.
-        /// </summary>
-        public PaletteCollection PaletteCollection { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Pixels of the image.
-        /// </summary>
-        public IndexedPixel[] Pixels { get; set; }
+        public ushort NumPaletteLines { get; set; }
 
         /// <summary>
         /// Gets or sets the PaletteStart value.
@@ -98,5 +111,15 @@ namespace JUSToolkit.Graphics
         /// Gets or sets the PixelsStart value.
         /// </summary>
         public uint PixelsStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Bpp mode.
+        /// </summary>
+        public DigBpp Bpp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Swizzling mode.
+        /// </summary>
+        public DigSwizzling Swizzling { get; set; }
     }
 }
