@@ -91,6 +91,10 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid dig file");
             }
 
+            if (originalAtm is null) {
+                throw new FormatException("Invalid atm file");
+            }
+
             var compressionParams = new FullImageMapCompressionParams {
                 Palettes = originalDig,
             };

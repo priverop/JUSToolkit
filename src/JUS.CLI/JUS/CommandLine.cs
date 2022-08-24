@@ -36,6 +36,7 @@ namespace JUSToolkit.CLI.JUS
             return new Command("jus", "Jump Ultimate Stars! game") {
                 CreateGraphicCommand(),
                 CreateContainerCommand(),
+                CreateCrossCommand(),
             };
         }
 
@@ -103,6 +104,20 @@ namespace JUSToolkit.CLI.JUS
                 exportAlar2,
                 importAlar2,
                 importAlar3,
+            };
+        }
+
+        private static Command CreateCrossCommand()
+        {
+            var importPng2Alar3 = new Command("import-png-alar3", "Batch import PNG to alar3") {
+                new Option<string>("--container", "the original alar3 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importPng2Alar3.Handler = CommandHandler.Create<string, string, string>(CrossCommands.ImportPng2Alar3);
+
+            return new Command("cross", "Batch import PNG to Alar") {
+                importPng2Alar3,
             };
         }
     }
