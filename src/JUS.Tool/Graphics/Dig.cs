@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -88,6 +89,56 @@ namespace JUSToolkit.Graphics
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Dig"/> class creating a subimage.
+        /// </summary>
+        /// <param name="dig"><see cref="Dig"/> image to create subimage from.</param>
+        /// <param name="width">Width of the subimage.</param>
+        /// <param name="height">Height of the subimage.</param>
+        /// <param name="tileIndex">Tile index where the subimage starts from.</param>
+        /// <exception cref="FormatException"><paramref name="dig"/> doesn't have a valid format.</exception>
+        public Dig(Dig dig, int width, int height, int tileIndex)
+            : this(dig)
+        {
+            IIndexedPixelEncoding encoding;
+            int size, totalWidth, nWidth, xTileIndex, yTileIndex;
+            Height = height;
+            Width = width;
+            switch (dig.Bpp) {
+                case DigBpp.Bpp4:
+                    encoding = Indexed4Bpp.Instance;
+                    size = width * height / 2;
+                    nWidth = width / 2;
+                    totalWidth = dig.Width / 2;
+                    yTileIndex = tileIndex / (totalWidth / 4) * 8;
+                    xTileIndex = (tileIndex % (totalWidth / 4)) * 4;
+                    break;
+                case DigBpp.Bpp8:
+                    encoding = Indexed4Bpp.Instance;
+                    size = width * height;
+                    nWidth = width;
+                    totalWidth = dig.Width;
+                    xTileIndex = (tileIndex % (totalWidth / 8)) * 8;
+                    yTileIndex = dig.Height / (totalWidth / 8) * 8;
+                    break;
+                default:
+                    throw new FormatException($"Invalid bpp: {dig.Bpp}");
+            }
+
+            byte[] rawPixels = new byte[size];
+            byte[] encoded = encoding.Encode(dig.Pixels);
+
+            int idx = 0;
+            for (int y = 0; y < Height; y++) {
+                for (int x = 0; x < nWidth; x++) {
+                    int fullIndex = ((y + yTileIndex) * totalWidth) + x + xTileIndex;
+                    rawPixels[idx++] = encoded[fullIndex];
+                }
+            }
+
+            Pixels = encoding.Decode(rawPixels);
+        }
+
+        /// <summary>
         /// Gets or sets the first byte of the format. Maybe the Type?.
         /// </summary>
         public byte Unknown { get; set; }
@@ -121,5 +172,81 @@ namespace JUSToolkit.Graphics
         /// Gets or sets the Swizzling mode.
         /// </summary>
         public DigSwizzling Swizzling { get; set; }
+
+        /// <summary>
+        /// Paste a <see cref="Dig"/> subimage into this <see cref="Dig"/>.
+        /// </summary>
+        /// <param name="subimage"><see cref="Dig"/> subimage.</param>
+        /// <param name="xPos">Starting X position where the subimage will be pasted.</param>
+        /// <param name="yPos">Starting Y position where the subimage will be pasted.</param>
+        /// <param name="horizontalFlip">Flip the subimage horizontally.</param>
+        /// <param name="verticalFlip">Flip the subimage vertically.</param>
+        /// <param name="paletteIndex">Palette index of the subimage.</param>
+        public void PasteImage(Dig subimage, int xPos, int yPos, bool horizontalFlip, bool verticalFlip, byte paletteIndex)
+        {
+            if (horizontalFlip)
+                subimage.FlipHorizontal();
+            if (verticalFlip)
+                subimage.FlipVertical();
+
+            subimage.SetPalette(paletteIndex);
+
+            for (int x = 0; x < subimage.Width; x++) {
+                for (int y = 0; y < subimage.Height; y++) {
+                    int inIdx = (y * subimage.Width) + x;
+                    IndexedPixel pixel = subimage.Pixels[inIdx];
+                    if (pixel.Alpha == 0 || pixel.Index == 0) {
+                        continue;
+                    }
+
+                    int outIdx = ((yPos + 128 + y) * Width) + xPos + 128 + x;
+                    Pixels[outIdx] = pixel;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flip pixels horizontally.
+        /// </summary>
+        public void FlipHorizontal()
+        {
+            for (int y = 0; y < Height; y++) {
+                for (int x = 0; x < Width / 2; x++) {
+                    int t1 = (y * Width) + x;
+                    int t2 = (y * Width) + (Width - 1 - x);
+
+                    IndexedPixel swap = Pixels[t1];
+                    Pixels[t1] = Pixels[t2];
+                    Pixels[t2] = swap;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flip pixels vertically.
+        /// </summary>
+        public void FlipVertical()
+        {
+            for (int x = 0; x < Width; x++) {
+                for (int y = 0; y < Height / 2; y++) {
+                    int t1 = x + (Width * y);
+                    int t2 = x + (Width * (Height - 1 - y));
+
+                    IndexedPixel swap = Pixels[t1];
+                    Pixels[t1] = Pixels[t2];
+                    Pixels[t2] = swap;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets palette index for all pixels.
+        /// </summary>
+        /// <param name="paletteIndex">Palette index.</param>
+        public void SetPalette(byte paletteIndex)
+        {
+            for (int i = 0; i < Pixels.Length; i++)
+                Pixels[i] = new IndexedPixel(Pixels[i].Index, Pixels[i].Alpha, paletteIndex);
+        }
     }
 }
