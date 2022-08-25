@@ -21,7 +21,7 @@ using System;
 using System.IO;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
-using Texim;
+using JUSToolkit.Utils;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
@@ -39,8 +39,13 @@ namespace JUSToolkit.Graphics.Converters
         IConverter<NodeContainerFormat, Alar3>
     {
         private NodeContainerFormat transformedFiles;
+
+        /// <summary>
+        /// Original Alar.
+        /// </summary>
         public Node OriginalAlar { get; set; }
 
+        /// <inheritdoc/>
         public void Initialize(Node alar)
         {
             OriginalAlar = alar;
@@ -79,11 +84,21 @@ namespace JUSToolkit.Graphics.Converters
     
         private void Transform(Node png, Node dig, Node atm)
         {
-            Dig originalDig = dig
+            bool digIsCompressed = CompressionUtils.IsCompressed(dig);
+            var uncompressedDig =  digIsCompressed ?
+                dig.TransformWith<LzssDecompression>() :
+                dig;
+
+            Dig originalDig = uncompressedDig
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>();
 
-            Almt originalAtm = atm
+            bool atmIsCompressed = CompressionUtils.IsCompressed(atm);
+            var uncompressedAtm = atmIsCompressed ?
+                atm.TransformWith<LzssDecompression>() :
+                atm;
+
+            Almt originalAtm = uncompressedAtm
                     .TransformWith<Binary2Almt>()
                     .GetFormatAs<Almt>();
 
@@ -105,15 +120,25 @@ namespace JUSToolkit.Graphics.Converters
             var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
             var map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
+            // Dig
             Dig newDig = new Dig(originalDig, newImage);
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
-            transformedFiles.Root.Add(new Node(dig.Name, binaryDig));
+            var compressedDig = digIsCompressed ?
+                new LzssCompression().Convert(binaryDig) :
+                binaryDig;
 
+            transformedFiles.Root.Add(new Node(dig.Name, compressedDig));
+
+            // Atm
             Almt newAtm = new Almt(originalAtm, map);
             using var binaryAtm = new Almt2Binary().Convert(newAtm);
 
-            transformedFiles.Root.Add(new Node(atm.Name, newAtm));
+            var compressedAtm = atmIsCompressed ?
+                new LzssCompression().Convert(binaryAtm) :
+                binaryAtm;
+
+            transformedFiles.Root.Add(new Node(atm.Name, compressedAtm));
         }
 
         private NodeContainerFormat GetOriginals(string name, Node files)

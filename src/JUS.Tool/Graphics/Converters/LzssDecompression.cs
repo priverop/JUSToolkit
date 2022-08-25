@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
@@ -41,7 +41,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var decompressedStream = IsCompressed(source.Stream) ? Convert(source.Stream) : new DataStream(source.Stream);
+            var decompressedStream = CompressionUtils.IsCompressed(source.Stream) ? Convert(source.Stream) : new DataStream(source.Stream);
 
             return new BinaryFormat(decompressedStream);
         }
@@ -59,16 +59,6 @@ namespace JUSToolkit.Graphics.Converters
 
             // Discard the first 4 bytes of the header (the DSCP magic ID)
             return LzssUtils.Lzss(new DataStream(source, 4, source.Length - 4), "-d");
-        }
-
-        private bool IsCompressed(DataStream stream)
-        {
-            var reader = new DataReader(stream);
-            stream.Position = 0;
-            var result = reader.ReadString(4) == "DSCP";
-            stream.Position = 0;
-
-            return result;
         }
     }
 }

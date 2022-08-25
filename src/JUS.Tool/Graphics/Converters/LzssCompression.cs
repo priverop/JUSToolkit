@@ -19,7 +19,6 @@
 // SOFTWARE.
 using System;
 using System.Text;
-using JUSToolkit.Graphics.Converters;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
