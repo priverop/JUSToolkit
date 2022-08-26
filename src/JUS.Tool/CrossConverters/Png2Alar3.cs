@@ -34,14 +34,14 @@ namespace JUSToolkit.Graphics.Converters
     /// <summary>
     /// Converts a bunch of PNGs to and Alar3.
     /// </summary>
-    public class Png2Alar3 : 
+    public class Png2Alar3 :
         IInitializer<Node>,
         IConverter<NodeContainerFormat, Alar3>
     {
         private NodeContainerFormat transformedFiles;
 
         /// <summary>
-        /// Original Alar.
+        /// Gets or sets the Original Alar.
         /// </summary>
         public Node OriginalAlar { get; set; }
 
@@ -50,6 +50,7 @@ namespace JUSToolkit.Graphics.Converters
         {
             OriginalAlar = alar;
         }
+
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (files) to a <see cref="Alar3"/> container.
         /// </summary>
@@ -70,7 +71,8 @@ namespace JUSToolkit.Graphics.Converters
 
             foreach (var file in source.Root.Children)
             {
-                if(Path.GetExtension(file.Name) == ".png"){
+                if (Path.GetExtension(file.Name) == ".png")
+                {
                     var cleanName = Path.GetFileNameWithoutExtension(file.Name);
                     var originals = GetOriginals(cleanName, filesToInsert.Root);
                     Transform(new Node(file), originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
@@ -81,11 +83,11 @@ namespace JUSToolkit.Graphics.Converters
 
             return alar;
         }
-    
+
         private void Transform(Node png, Node dig, Node atm)
         {
             bool digIsCompressed = CompressionUtils.IsCompressed(dig);
-            var uncompressedDig =  digIsCompressed ?
+            var uncompressedDig = digIsCompressed ?
                 dig.TransformWith<LzssDecompression>() :
                 dig;
 
@@ -113,7 +115,7 @@ namespace JUSToolkit.Graphics.Converters
             var compressionParams = new FullImageMapCompressionParams {
                 Palettes = originalDig,
             };
-            
+
             png.Stream.Position = 0;
             var compressed = png
                 .TransformWith<Bitmap2FullImage>()
@@ -165,6 +167,5 @@ namespace JUSToolkit.Graphics.Converters
 
             return originals;
         }
-
     }
 }
