@@ -66,14 +66,14 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             var filesToInsert = source;
-            var transformedFiles = new NodeContainerFormat();
+            transformedFiles = new NodeContainerFormat();
 
             foreach (var file in source.Root.Children)
             {
                 if(Path.GetExtension(file.Name) == ".png"){
                     var cleanName = Path.GetFileNameWithoutExtension(file.Name);
                     var originals = GetOriginals(cleanName, filesToInsert.Root);
-                    Transform(file, originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
+                    Transform(new Node(file), originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
                 }
             }
 
@@ -113,7 +113,8 @@ namespace JUSToolkit.Graphics.Converters
             var compressionParams = new FullImageMapCompressionParams {
                 Palettes = originalDig,
             };
-
+            
+            png.Stream.Position = 0;
             var compressed = png
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
@@ -122,7 +123,7 @@ namespace JUSToolkit.Graphics.Converters
 
             // Dig
             Dig newDig = new Dig(originalDig, newImage);
-            using var binaryDig = new Dig2Binary().Convert(newDig);
+            var binaryDig = new Dig2Binary().Convert(newDig);
 
             var compressedDig = digIsCompressed ?
                 new LzssCompression().Convert(binaryDig) :
@@ -132,7 +133,7 @@ namespace JUSToolkit.Graphics.Converters
 
             // Atm
             Almt newAtm = new Almt(originalAtm, map);
-            using var binaryAtm = new Almt2Binary().Convert(newAtm);
+            var binaryAtm = new Almt2Binary().Convert(newAtm);
 
             var compressedAtm = atmIsCompressed ?
                 new LzssCompression().Convert(binaryAtm) :
@@ -160,7 +161,7 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             originals.Root.Add(new Node(dig));
-            originals.Root.Add(atm);
+            originals.Root.Add(new Node(atm));
 
             return originals;
         }
