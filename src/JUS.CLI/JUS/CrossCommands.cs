@@ -21,11 +21,7 @@ using System;
 using System.IO;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
-using Texim.Images;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -37,7 +33,6 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class CrossCommands
     {
-
         /// <summary>
         /// Import PNG files into an Alar3 container.
         /// </summary>
@@ -48,17 +43,16 @@ namespace JUSToolkit.CLI.JUS
         {
             var originalAlar = NodeFactory.FromFile(container);
             var inputFiles = NodeFactory.FromDirectory(input);
-            
+
             Alar3 alar = inputFiles
                 .TransformWith<Png2Alar3, Node>(originalAlar)
                 .GetFormatAs<Alar3>();
-            
+
             using var binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
 
             Console.WriteLine("Done!");
         }
-
     }
 }
