@@ -115,12 +115,14 @@ namespace JUSToolkit.CLI.JUS
         public static void ImportDig(string input, string dig, string atm, string output)
         {
             Dig originalDig = NodeFactory.FromFile(dig)
+                .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>();
 
             Almt originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
-                    .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>();
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Almt>()
+                .GetFormatAs<Almt>();
 
             if (originalDig is null) {
                 throw new FormatException("Invalid dig file");
@@ -140,7 +142,23 @@ namespace JUSToolkit.CLI.JUS
             var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
             var map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
-            Dig newDig = new Dig(originalDig, newImage);
+            // a
+            Dig newDig = new Dig(originalDig, newImage) {
+                Pixels = new IndexedPixel[newImage.Pixels.Length + 64],
+                Height = newImage.Height + 8,
+            };
+
+            newDig.PasteImage(new Dig(originalDig, newImage), -128, -120, false, false, 0);
+            for (int i = 0; i < map.Maps.Length; i++) {
+                map.Maps[i] = new MapInfo() {
+                    HorizontalFlip = map.Maps[i].HorizontalFlip,
+                    VerticalFlip = map.Maps[i].VerticalFlip,
+                    TileIndex = (short)(map.Maps[i].TileIndex + 1),
+                    PaletteIndex = map.Maps[i].PaletteIndex,
+                };
+            }
+
+            // a
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
             binaryDig.Stream.WriteTo(Path.Combine(output, input + ".dig"));
