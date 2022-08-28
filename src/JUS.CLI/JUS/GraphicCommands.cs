@@ -171,6 +171,38 @@ namespace JUSToolkit.CLI.JUS
             Console.WriteLine("Done!");
         }
 
+        public static void MergeDig(string input, string dig, string atm, string output)
+        {
+            Dig mergedImage = NodeFactory.FromFile(dig, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Dig>()
+                .GetFormatAs<Dig>();
+
+            var compressionParams = new FullImageMapCompressionParams {
+                MergeImage = mergedImage,
+                Palettes = mergedImage,
+            };
+
+            var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+                .TransformWith<Bitmap2FullImage>()
+                .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
+            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+
+            Dig newDig = new Dig(mergedImage, newImage);
+            new Dig2Binary().Convert(newDig)
+                .Stream.WriteTo(Path.Combine(output, input + ".dig"));
+
+            Almt newAtm;
+            var originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
+                .TransformWith<Binary2Almt>()
+                .GetFormatAs<Almt>();
+            newAtm = new Almt(originalAtm, map);
+
+            new Almt2Binary().Convert(newAtm)
+                .Stream.WriteTo(Path.Combine(output, input + ".atm"));
+        }
+
         /// <summary>
         /// Export a DTX into PNG komas.
         /// </summary>

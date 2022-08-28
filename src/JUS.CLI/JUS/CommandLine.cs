@@ -71,11 +71,20 @@ namespace JUSToolkit.CLI.JUS
             };
             importDig.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ImportDig);
 
+            var mergeDig = new Command("merge-dig", "Import dsig+almt") {
+                new Option<string>("--input", "the png to import", ArgumentArity.ExactlyOne),
+                new Option<string>("--dig", "the original file.dig", ArgumentArity.ExactlyOne),
+                new Option<string>("--atm", "the original file.atm", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            mergeDig.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.MergeDig);
+
             return new Command("graphics", "Import/Export graphic files") {
                 exportDtx,
                 exportDtx3,
                 exportDsigAlmt,
                 importDig,
+                mergeDig,
             };
         }
 
