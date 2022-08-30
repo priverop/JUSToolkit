@@ -91,7 +91,6 @@ namespace JUSToolkit.CLI.JUS
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 FullImage = image,
-                IsTiled = false,
             };
             var indexedImageParams = new IndexedImageBitmapParams {
                 Palettes = image,
@@ -111,7 +110,7 @@ namespace JUSToolkit.CLI.JUS
                     foreach (Node nodeTexture in dtx3.Children["sprites"].Children) {
                         nodeTexture
                             .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
-                            .Stream.WriteTo(output + $"{nodeTexture.Name}.png");
+                            .Stream.WriteTo(Path.Combine(output, $"{nodeTexture.Name}.png"));
                     }
 
                     break;

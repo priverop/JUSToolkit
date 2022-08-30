@@ -57,10 +57,7 @@ namespace JUS.Tool.Graphics.Converters
             ushort size = reader.ReadUInt16();
             var sprites = new NodeContainerFormat();
 
-            using var dsigBinary = new BinaryFormat(
-                source.Stream,
-                size,
-                source.Stream.Length - size);
+            using var dsigBinary = new BinaryFormat(source.Stream, size, source.Stream.Length - size);
             Dig image = digConverter.Convert(dsigBinary);
 
             for (int i = 0; i < numSprites; i++) {
