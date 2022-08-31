@@ -142,23 +142,11 @@ namespace JUSToolkit.CLI.JUS
             var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
             var map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
-            // a
-            Dig newDig = new Dig(originalDig, newImage) {
-                Pixels = new IndexedPixel[newImage.Pixels.Length + 64],
-                Height = newImage.Height + 8,
-            };
+            Dig newDig = new Dig(originalDig, newImage);
 
-            newDig.PasteImage(new Dig(originalDig, newImage), -128, -120, false, false, 0);
-            for (int i = 0; i < map.Maps.Length; i++) {
-                map.Maps[i] = new MapInfo() {
-                    HorizontalFlip = map.Maps[i].HorizontalFlip,
-                    VerticalFlip = map.Maps[i].VerticalFlip,
-                    TileIndex = (short)(map.Maps[i].TileIndex + 1),
-                    PaletteIndex = map.Maps[i].PaletteIndex,
-                };
-            }
+            // If meter tile transparente
+            newDig = newDig.InsertTransparentTile(map);
 
-            // a
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
             binaryDig.Stream.WriteTo(Path.Combine(output, input + ".dig"));
@@ -171,36 +159,51 @@ namespace JUSToolkit.CLI.JUS
             Console.WriteLine("Done!");
         }
 
-        public static void MergeDig(string input, string dig, string atm, string output)
+        public static void MergeDig(string[] input, bool insertTransparent, string dig, string[] atm, string output)
         {
-            Dig mergedImage = NodeFactory.FromFile(dig, FileOpenMode.Read)
+            if (input.Length != atm.Length)
+                throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
+
+            Dig mergedImage = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>();
 
             var compressionParams = new FullImageMapCompressionParams {
-                MergeImage = mergedImage,
                 Palettes = mergedImage,
             };
 
-            var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+            IndexedImage newImage = null;
+
+            for (int i = 0; i < input.Length; i++) {
+                var compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
-            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+                newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+                var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+
+                mergedImage = new Dig(mergedImage, newImage);
+
+                if (insertTransparent && i == 0)
+                    mergedImage = mergedImage.InsertTransparentTile(map);
+
+                compressionParams = new FullImageMapCompressionParams {
+                    MergeImage = mergedImage,
+                    Palettes = mergedImage,
+                };
+
+                var originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
+                    .TransformWith<Binary2Almt>()
+                    .GetFormatAs<Almt>();
+                var newAtm = new Almt(originalAtm, map);
+
+                new Almt2Binary().Convert(newAtm)
+                    .Stream.WriteTo(Path.Combine(output, Path.GetFileName(atm[i])));
+            }
 
             Dig newDig = new Dig(mergedImage, newImage);
             new Dig2Binary().Convert(newDig)
-                .Stream.WriteTo(Path.Combine(output, input + ".dig"));
-
-            Almt newAtm;
-            var originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
-                .TransformWith<Binary2Almt>()
-                .GetFormatAs<Almt>();
-            newAtm = new Almt(originalAtm, map);
-
-            new Almt2Binary().Convert(newAtm)
-                .Stream.WriteTo(Path.Combine(output, input + ".atm"));
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dig)));
         }
 
         /// <summary>

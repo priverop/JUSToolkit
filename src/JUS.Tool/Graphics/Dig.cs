@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Texim.Compressions.Nitro;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -203,6 +205,26 @@ namespace JUSToolkit.Graphics
                     Pixels[outIdx] = pixel;
                 }
             }
+        }
+
+        public Dig InsertTransparentTile(ScreenMap map)
+        {
+            var dig = new Dig(this) {
+                Pixels = new IndexedPixel[this.Pixels.Length + 64],
+                Height = this.Height + 8,
+            };
+
+            dig.PasteImage(this, -128, -120, false, false, 0);
+            for (int i = 0; i < map.Maps.Length; i++) {
+                map.Maps[i] = new MapInfo() {
+                    HorizontalFlip = map.Maps[i].HorizontalFlip,
+                    VerticalFlip = map.Maps[i].VerticalFlip,
+                    TileIndex = (short)(map.Maps[i].TileIndex + 1),
+                    PaletteIndex = map.Maps[i].PaletteIndex,
+                };
+            }
+
+            return dig;
         }
 
         /// <summary>
