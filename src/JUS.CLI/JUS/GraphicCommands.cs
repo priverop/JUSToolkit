@@ -18,15 +18,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
+using SixLabors.ImageSharp.PixelFormats;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
 using Texim.Palettes;
+using Texim.Pixels;
 using Texim.Sprites;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -68,6 +72,51 @@ namespace JUSToolkit.CLI.JUS
                 .Stream.WriteTo(output + ".png");
 
             Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Export a sprite .dtx file into multiple PNGs.
+        /// </summary>
+        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="output">The output folder.</param>
+        /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
+        public static void ExportDtx3(string dtx, string output)
+        {
+            // Sprites + pixels + palette
+            using var dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
+
+            var image = dtx3.Children["image"].GetFormatAs<Dig>();
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                FullImage = image,
+            };
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = image,
+            };
+
+            switch (image.Swizzling) {
+                case DigSwizzling.Tiled:
+                    foreach (Node nodeSprite in dtx3.Children["sprites"].Children) {
+                        nodeSprite
+                            .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
+                            .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
+                            .Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
+                    }
+
+                    break;
+                case DigSwizzling.Linear:
+                    foreach (Node nodeTexture in dtx3.Children["sprites"].Children) {
+                        nodeTexture
+                            .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
+                            .Stream.WriteTo(Path.Combine(output, $"{nodeTexture.Name}.png"));
+                    }
+
+                    break;
+                default:
+                    throw new FormatException("Invalid swizzling");
+            }
         }
 
         /// <summary>

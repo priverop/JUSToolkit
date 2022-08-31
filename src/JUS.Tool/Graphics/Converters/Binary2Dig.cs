@@ -56,7 +56,6 @@ namespace JUSToolkit.Graphics.Converters
             int width = reader.ReadUInt16();
             int height = reader.ReadUInt16();
             uint pixelsStart = (uint)((numPaletteLines * 0x20) + 0xC);
-
             var bpp = (DigBpp)(imageFormat & 0x0F);
             var swizzling = (DigSwizzling)(imageFormat >> 4);
             IIndexedPixelEncoding pixelEncoding;
@@ -76,6 +75,16 @@ namespace JUSToolkit.Graphics.Converters
                     break;
                 default:
                     throw new FormatException("Invalid bpp");
+            }
+
+            // Some tiled digs have fake size params
+            if (swizzling == DigSwizzling.Tiled) {
+                width = 8;
+                height = bpp switch {
+                    DigBpp.Bpp4 => (int)(source.Stream.Length - pixelsStart) / 4,
+                    DigBpp.Bpp8 => (int)(source.Stream.Length - pixelsStart) / 8,
+                    _ => throw new FormatException("Invalid bpp"),
+                };
             }
 
             var palettes = new PaletteCollection();
