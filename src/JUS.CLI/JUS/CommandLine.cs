@@ -73,7 +73,7 @@ namespace JUSToolkit.CLI.JUS
 
             var mergeDig = new Command("merge-dig", "Import dsig+almt") {
                 new Option<string>("--input", "the png to import", ArgumentArity.OneOrMore),
-                new Option<bool>("--t", "insert a transparent tile at the start of the .dig", ArgumentArity.Zero),
+                new Option<bool>("--t", "insert a transparent tile at the start of the .dig", ArgumentArity.ZeroOrOne),
                 new Option<string>("--dig", "the original file.dig", ArgumentArity.ExactlyOne),
                 new Option<string>("--atm", "the original file.atm", ArgumentArity.OneOrMore),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),

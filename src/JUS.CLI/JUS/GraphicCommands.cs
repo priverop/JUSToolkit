@@ -149,12 +149,12 @@ namespace JUSToolkit.CLI.JUS
 
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
-            binaryDig.Stream.WriteTo(Path.Combine(output, input + ".dig"));
+            binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
             Almt newAtm = new Almt(originalAtm, map);
             using var binaryAtm = new Almt2Binary().Convert(newAtm);
 
-            binaryAtm.Stream.WriteTo(Path.Combine(output, input + ".atm"));
+            binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 
             Console.WriteLine("Done!");
         }
@@ -163,6 +163,8 @@ namespace JUSToolkit.CLI.JUS
         {
             if (input.Length != atm.Length)
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
+
+            insertTransparent = true;
 
             Dig mergedImage = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
