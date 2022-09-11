@@ -31,11 +31,11 @@ namespace JUSToolkit.Utils
         /// <summary>
         /// Returns the version of the Alar file.
         /// </summary>
-        /// <param name="node">The Node we want to check.</param>
+        /// <param name="file">The File we want to check.</param>
         /// <returns>The version.</returns>
-        public static Version GetAlarVersion(Node node)
+        public static Version GetAlarVersion(BinaryFormat file)
         {
-            return GetAlarVersion(node.Stream);
+            return GetAlarVersion(file.Stream);
         }
 
         /// <summary>
@@ -53,6 +53,5 @@ namespace JUSToolkit.Utils
 
             return new Version(majorVersion, minorVersion);
         }
-
     }
 }

@@ -42,35 +42,19 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlar2Png(string container, string output)
         {
-            var alar = NodeFactory.FromFile(container);
+            var originalAlar = NodeFactory.FromFile(container);
 
-            // TODO: It is compressed?
-
-            var alarVersion = Identifier.GetAlarVersion(alar);
-
-            // In the future we need to encapsulate this
-            if (alarVersion.Major == 3)
-            {
-                alar.TransformWith<Binary2Alar3>();
-            }
-            else if (alarVersion.Major == 2)
-            {
-                alar.TransformWith<Binary2Alar2>();
+            if (originalAlar is null) {
+                throw new FormatException("Invalid container file");
             }
 
-            // Iterate NCF
-            foreach (var child in Navigator.IterateNodes(alar))
-            {
-                if (Path.GetExtension(child.Name) == ".dig")
-                {
-                    var cleanName = Path.GetFileNameWithoutExtension(child.Name);
-                    // We get the .atm, if not we display something
-                    var atm = GetAtm(cleanName, alar);
-                    // We transform the dig+atm (with compression)
-                    Transform(new Node(child), originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
+            NodeContainerFormat result = originalAlar
+                .TransformWith<Alar2Png>()
+                .GetFormatAs<NodeContainerFormat>();
 
-                    binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
-                }
+            foreach (var image in result.Root.Children)
+            {
+                image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
             Console.WriteLine("Done!");

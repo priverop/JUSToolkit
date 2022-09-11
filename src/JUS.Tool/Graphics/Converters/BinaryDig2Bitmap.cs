@@ -30,7 +30,7 @@ namespace JUSToolkit.Graphics.Converters
     /// <summary>
     /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
     /// </summary>
-    public class BinaryDig2Bitmap : 
+    public class BinaryDig2Bitmap :
         IInitializer<Node>,
         IConverter<IBinary, BinaryFormat>
     {
