@@ -85,13 +85,22 @@ Examples:
 
 ## Documentation
 
-- [Alar Specification](docs/dev/Alar-Specification.md)
-- [DTX Specification by PleoNex](docs/dev/Dtx-Specification.md)
-- [DTX Research by PleoNex](docs/dev/dtx-research.md)
-- [FileFormats by Uknown Hacker](docs/dev/FileFormats.md)
-- [DIRECTO ROM Hacking: Triple reto de imágenes by PleoNex](https://www.youtube.com/watch?v=r1Rsx6RRe1U)
-- [DIRECTO Domingos de desensamblador: imágenes de Devil Survivor y JUS y ordenar textos de MetalMax 3 by PleoNex](https://www.youtube.com/watch?v=R2h-UEcO_-k)
-- [DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS by PleoNex](https://www.youtube.com/watch?v=1KT4u_Kvaws)
+### Documents
+
+You can find these documents in our `docs/dev` folder:
+
+- Alar Specification
+- DTX Specification by PleoNex
+- DTX Research by PleoNex
+- FileFormats by Uknown Hacker
+
+### Videos
+
+PleoNex did some research on Streaming:
+
+- [DIRECTO ROM Hacking: Triple reto de imágenes](https://www.youtube.com/watch?v=r1Rsx6RRe1U)
+- [DIRECTO Domingos de desensamblador: imágenes de Devil Survivor y JUS y ordenar textos de MetalMax 3](https://www.youtube.com/watch?v=R2h-UEcO_-k)
+- [DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS](https://www.youtube.com/watch?v=1KT4u_Kvaws)
 
 ## Stack
 
