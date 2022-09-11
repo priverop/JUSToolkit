@@ -59,25 +59,12 @@ namespace JUSToolkit.Tests.Graphics
 
             var info = BinaryInfo.FromYaml(infoPath);
 
-            // Pixels + Palette
+            using var mapsNode = NodeFactory.FromFile(atmPath, FileOpenMode.Read);
+
             using var pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
-                .TransformWith<Binary2Dig>();
+                .TransformWith<BinaryDig2Bitmap, Node>(mapsNode);
 
-            // Map
-            using var mapsNode = NodeFactory.FromFile(atmPath, FileOpenMode.Read)
-                .TransformWith<Binary2Almt>();
-
-            var mapsParams = new MapDecompressionParams {
-                Map = mapsNode.GetFormatAs<Almt>(),
-                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
-            };
-            var bitmapParams = new IndexedImageBitmapParams {
-                Palettes = pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>(),
-            };
-
-            pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
-                .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
-                .Stream.Should().MatchInfo(info);
+            pixelsPaletteNode.Stream.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetFiles))]

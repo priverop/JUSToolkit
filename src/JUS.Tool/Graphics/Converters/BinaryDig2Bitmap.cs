@@ -18,11 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using Texim;
-using Texim.Colors;
-using Texim.Palettes;
-using Texim.Pixels;
+using Texim.Compressions.Nitro;
+using Texim.Formats;
+using Texim.Images;
 using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUSToolkit.Graphics.Converters
@@ -30,10 +30,23 @@ namespace JUSToolkit.Graphics.Converters
     /// <summary>
     /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
     /// </summary>
-    public class BinaryDig2Bitmap : IConverter<IBinary, BinaryFormat>
+    public class BinaryDig2Bitmap : 
+        IInitializer<Node>,
+        IConverter<IBinary, BinaryFormat>
     {
         /// <summary>
-        /// Converts a <see cref="IBinary"/> (file) to a <see cref="BinaryFormat"/>.
+        /// Gets or sets the Original Atm.
+        /// </summary>
+        public Node OriginalAtm { get; set; }
+
+        /// <inheritdoc/>
+        public void Initialize(Node atm)
+        {
+            OriginalAtm = atm;
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Node"/> (file) to a <see cref="BinaryFormat"/>.
         /// </summary>
         /// <param name="source">File to convert.</param>
         /// <returns><see cref="Dig"/>.</returns>
@@ -43,12 +56,12 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            using var pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
+            var pixelsPaletteNode = new Node("dig", source)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>();
 
             // Map
-            using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read)
+            using var mapsNode = OriginalAtm
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>();
 
@@ -60,9 +73,9 @@ namespace JUSToolkit.Graphics.Converters
                 Palettes = pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>(),
             };
             pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
-                .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
+                .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams);
 
-            return dig;
+            return new BinaryFormat(pixelsPaletteNode.Stream);
         }
     }
 }
