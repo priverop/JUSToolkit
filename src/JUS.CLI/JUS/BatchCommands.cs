@@ -22,8 +22,6 @@ using System.IO;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
