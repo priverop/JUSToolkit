@@ -18,41 +18,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.IO;
-using JUSToolkit.Containers;
-using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics.Converters;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.CLI.JUS
+namespace JUSToolkit.Utils
 {
     /// <summary>
-    /// Commands using Containers and Graphics. Batch import, export...
+    /// Compression auxiliar methods.
     /// </summary>
-    public static class CrossCommands
+    public static class Identifier
     {
         /// <summary>
-        /// Import PNG files into an Alar3 container.
+        /// Returns the version of the Alar file.
         /// </summary>
-        /// <param name="container">The path to the original alar3 file.</param>
-        /// <param name="input">The path to the directory of the PNGs we want to add, with the original .dig and .atm.</param>
-        /// <param name="output">The output directory.</param>
-        public static void ImportPng2Alar3(string container, string input, string output)
+        /// <param name="file">The File we want to check.</param>
+        /// <returns>The version.</returns>
+        public static Version GetAlarVersion(BinaryFormat file)
         {
-            var originalAlar = NodeFactory.FromFile(container);
-            var inputFiles = NodeFactory.FromDirectory(input);
+            return GetAlarVersion(file.Stream);
+        }
 
-            Alar3 alar = inputFiles
-                .TransformWith<Png2Alar3, Node>(originalAlar)
-                .GetFormatAs<Alar3>();
+        /// <summary>
+        /// Returns the version of the Alar stream.
+        /// </summary>
+        /// <param name="stream">The stream we want to check.</param>
+        /// <returns>The version.</returns>
+        public static Version GetAlarVersion(DataStream stream)
+        {
+            var reader = new DataReader(stream);
+            stream.Position = 4;
+            var majorVersion = reader.ReadByte();
+            var minorVersion = reader.ReadByte();
+            stream.Position = 0;
 
-            using var binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
-
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
-
-            Console.WriteLine("Done!");
+            return new Version(majorVersion, minorVersion);
         }
     }
 }

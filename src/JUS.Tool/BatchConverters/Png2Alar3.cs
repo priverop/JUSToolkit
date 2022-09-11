@@ -1,4 +1,4 @@
-// Copyright (c) 2021 SceneGate
+// Copyright (c) 2022 Pablo Rivero
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,8 @@ using System;
 using System.IO;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics;
+using JUSToolkit.Graphics.Converters;
 using JUSToolkit.Utils;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
@@ -29,7 +31,7 @@ using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUSToolkit.BatchConverters
 {
     /// <summary>
     /// Converts a bunch of PNGs to and Alar3.
