@@ -46,26 +46,12 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ExportDig(string dig, string atm, string output)
         {
-            // Pixels + Palette
+            using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read);
+
             using var pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Dig>();
+                .TransformWith<BinaryDig2Bitmap, Node>(mapsNode);
 
-            // Map
-            using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Almt>();
-
-            var mapsParams = new MapDecompressionParams {
-                Map = mapsNode.GetFormatAs<Almt>(),
-                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
-            };
-            var bitmapParams = new IndexedImageBitmapParams {
-                Palettes = pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>(),
-            };
-            pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
-                .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams)
-                .Stream.WriteTo(output + ".png");
+            pixelsPaletteNode.Stream.WriteTo(output + ".png");
 
             Console.WriteLine("Done!");
         }
