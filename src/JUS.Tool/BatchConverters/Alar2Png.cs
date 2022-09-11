@@ -72,7 +72,7 @@ namespace JUSToolkit.BatchConverters
 
                     using var atm = GetAtm(cleanName, alarNode.Root.Children[0]);
                     if (atm is null) {
-                        Console.WriteLine("Missing map file for: " + cleanName);
+                        Console.WriteLine("Missing map file for: " + child.Name);
                         continue;
                     }
 
@@ -98,7 +98,7 @@ namespace JUSToolkit.BatchConverters
 
             if (atm is null)
             {
-                throw new FormatException("Atm doesn't exist: " + name + ".atm");
+                Console.WriteLine("Atm doesn't exist: " + name + ".atm");
             }
 
             return atm;
