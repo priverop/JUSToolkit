@@ -70,7 +70,7 @@ namespace JUSToolkit.BatchConverters
                 {
                     var cleanName = Path.GetFileNameWithoutExtension(child.Name);
 
-                    var atm = GetAtm(cleanName, alarNode.Root.Children[0]);
+                    using var atm = GetAtm(cleanName, alarNode.Root.Children[0]);
                     if (atm is null) {
                         Console.WriteLine("Missing map file for: " + cleanName);
                         continue;
