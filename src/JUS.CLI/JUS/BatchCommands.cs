@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.Collections.Generic;
 using System.IO;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
@@ -33,6 +34,13 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class BatchCommands
     {
+        private static Dictionary<string, int> demoImages = new Dictionary<string, int>() {
+            { "_03.dig", 0 },
+            { "_05.dig", 1 },
+            { "_07.dig", 2 },
+            { "_09.dig", 3 },
+        };
+
         /// <summary>
         /// Export PNG files from an Alar container.
         /// </summary>
@@ -46,12 +54,15 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid container file");
             }
 
+            _ = container == "demo.aar" ? originalAlar
+                    .TransformWith<Alar2Png, Dictionary<string, int>>(demoImages)
+                : originalAlar
+                .TransformWith<Alar2Png>();
+
             NodeContainerFormat result = originalAlar
-                .TransformWith<Alar2Png>()
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (var image in result.Root.Children)
-            {
+            foreach (var image in result.Root.Children) {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 

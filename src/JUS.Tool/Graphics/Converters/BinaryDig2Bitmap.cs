@@ -56,6 +56,8 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
+            source.Stream.Position = 0;
+
             var pixelsPaletteNode = new Node("dig", source)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>();
