@@ -55,6 +55,7 @@ namespace JUSToolkit.Graphics.Converters
             if (source is null) {
                 throw new ArgumentNullException(nameof(source));
             }
+
             source.Stream.Position = 0;
 
             var pixelsPaletteNode = new Node("dig", source)
