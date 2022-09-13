@@ -92,7 +92,7 @@ namespace JUSToolkit.BatchConverters
                         }
 
                         BinaryFormat stream_n = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
-                        var image_n = GetPNG(new Node(cleanName + "n", stream_n), atm_n, cleanName + "_n_");
+                        var image_n = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_n.Name), stream_n), atm_n, cleanName + "_n_");
                         if (image_n is not null) {
                             transformedFiles.Root.Add(image_n);
                         }
@@ -107,7 +107,7 @@ namespace JUSToolkit.BatchConverters
                         }
 
                         BinaryFormat stream_m = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
-                        var image_m = GetPNG(new Node(cleanName + "m", stream_m), atm_m, cleanName);
+                        var image_m = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_m.Name), stream_m), atm_m, cleanName);
                         if (image_m is not null) {
                             transformedFiles.Root.Add(image_m);
                         }
