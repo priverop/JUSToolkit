@@ -109,10 +109,11 @@ namespace JUSToolkit.CLI.JUS
         /// Import a PNG into a DSIG + ALMT.
         /// </summary>
         /// <param name="input">The png to import.</param>
+        /// <param name="insertTransparent">Insert a transparent tile at the start of the image.</param>
         /// <param name="dig">The original .dig file.</param>
         /// <param name="atm">The original .atm file.</param>
         /// <param name="output">The output folder.</param>
-        public static void ImportDig(string input, string dig, string atm, string output)
+        public static void ImportDig(string input, bool insertTransparent, string dig, string atm, string output)
         {
             Dig originalDig = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
@@ -144,8 +145,8 @@ namespace JUSToolkit.CLI.JUS
 
             Dig newDig = new Dig(originalDig, newImage);
 
-            // If meter tile transparente
-            newDig = newDig.InsertTransparentTile(map);
+            if (insertTransparent)
+                newDig = newDig.InsertTransparentTile(map);
 
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
@@ -159,12 +160,18 @@ namespace JUSToolkit.CLI.JUS
             Console.WriteLine("Done!");
         }
 
+        /// <summary>
+        /// Import multiple PNGs into multiple ATMs that share the same DIG.
+        /// </summary>
+        /// <param name="input">The pngs to import.</param>
+        /// <param name="insertTransparent">Insert a transparent tile at the start of the image.</param>
+        /// <param name="dig">The original .dig file.</param>
+        /// <param name="atm">The original .atm files.</param>
+        /// <param name="output">The output folder.</param>
         public static void MergeDig(string[] input, bool insertTransparent, string dig, string[] atm, string output)
         {
             if (input.Length != atm.Length)
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
-
-            insertTransparent = true;
 
             Dig mergedImage = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
