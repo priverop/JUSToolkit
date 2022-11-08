@@ -65,7 +65,7 @@ namespace JUSToolkit.CLI.JUS
 
             var importDig = new Command("import-dig", "Import dsig+almt") {
                 new Option<string>("--input", "the png to import", ArgumentArity.ExactlyOne),
-                new Option<bool>("--t", "insert a transparent tile at the start of the .dig", ArgumentArity.Zero),
+                new Option<bool>("--insertTransparent", "insert a transparent tile at the start of the .dig", ArgumentArity.ZeroOrOne),
                 new Option<string>("--dig", "the original file.dig", ArgumentArity.ExactlyOne),
                 new Option<string>("--atm", "the original file.atm", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
