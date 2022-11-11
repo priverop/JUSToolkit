@@ -213,6 +213,8 @@ namespace JUSToolkit.CLI.JUS
             Dig newDig = new Dig(mergedImage, newImage);
             new Dig2Binary().Convert(newDig)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dig)));
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -264,7 +266,7 @@ namespace JUSToolkit.CLI.JUS
                     FullImage = image,
                 };
                 var indexedImageParams = new IndexedImageBitmapParams {
-                   Palettes = image,
+                    Palettes = image,
                 };
                 new Node("sprite", sprite)
                     .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
