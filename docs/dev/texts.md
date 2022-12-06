@@ -35,36 +35,40 @@ The Format class has the main properties of the file and a list of Entries.
 
 | Name          | Format                   | Description                                                 |
 | ------------- | ------------------------ | ----------------------------------------------------------- |
-| ability.bin   |                          |                                                             |
 | ability_t.bin |                          |                                                             |
 | bgm.bin       | Bgm + BgmEntry           | Header (Pointer count) + Relative pointers                  |
-| chr_b.bin     |                          |                                                             |
-| chr_b_t.bin   | BtlChr + BtlChrEntry     |                                                             |
-| chr_s.bin     |                          |                                                             |
-| chr_s_t.bin   | SuppChr + SuppChrEntry   |                                                             |
-| clear.bin     |                          |                                                             |
+| chr_b_t.bin   | BtlChr + BtlChrEntry     | Header (Entry count) + Relative pointers \*1 + padding      |
+| chr_s_t.bin   | SuppChr + SuppChrEntry   | Header (Entry count) + Relative pointers \*2                |
 | clearlst.bin  |                          |                                                             |
 | commwin.bin   |                          |                                                             |
 | demo.bin      | Demo + DemoEntry         | Header (Pointer count) + Relative pointers + padding        |
-| exadd.bin     |                          |                                                             |
 | infoname.bin  |                          |                                                             |
-| jpower.bin    |                          |                                                             |
 | komatxt.bin   |                          |                                                             |
 | location.bin  | Location + LocationEntry | Header (Pointer count) + Relative pointers                  |
 | piece.bin     | Piece + PieceEntry       |                                                             |
 | pname.bin     | Pname (only strings)     | Header (Pointer count) + Relative pointers                  |
 | rulemess.bin  |                          |                                                             |
-| secret.bin    |                          |                                                             |
 | stage.bin     | Stage + StageEntry       | Header (Entry count) + Relative pointers + unknown pointers |
-| state.bin     |                          |                                                             |
 | title.bin     |                          |                                                             |
+
+\*1 Char name, 5 abilities and 5 furiganas; passive name, passive furigana, 2
+passive descriptions, 20 ability descriptions and 20 interactions; 3 unknowns.
+\*2 Char name, 2 abilities and 2 descriptions.
 
 ### Without text
 
-| Name       | Description                         |
-| ---------- | ----------------------------------- |
-| koma.bin   | Used for graphics (dtx koma format) |
-| kshape.bin | Used for graphics (dtx koma format) |
+| Name        | Description                         |
+| ----------- | ----------------------------------- |
+| ability.bin |                                     |
+| chr_b.bin   |                                     |
+| chr_s.bin   |                                     |
+| clear.bin   |                                     |
+| exadd.bin   |                                     |
+| jpower.bin  |                                     |
+| koma.bin    | Used for graphics (dtx koma format) |
+| kshape.bin  | Used for graphics (dtx koma format) |
+| secret.bin  |                                     |
+| state.bin   |                                     |
 
 ## Deckmake folder
 
