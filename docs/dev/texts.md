@@ -39,21 +39,22 @@ The Format class has the main properties of the file and a list of Entries.
 | bgm.bin       | Bgm + BgmEntry           | Header (Pointer count) + Relative pointers                  |
 | chr_b_t.bin   | BtlChr + BtlChrEntry     | Header (Entry count) + Relative pointers \*1 + padding      |
 | chr_s_t.bin   | SuppChr + SuppChrEntry   | Header (Entry count) + Relative pointers \*2                |
-| clearlst.bin  |                          |                                                             |
+| clearlst.bin  | SimpleBin                | Relative pointers                                           |
 | commwin.bin   |                          |                                                             |
 | demo.bin      | Demo + DemoEntry         | Header (Pointer count) + Relative pointers + padding        |
-| infoname.bin  |                          |                                                             |
+| infoname.bin  | SimpleBin                | Relative pointers                                           |
 | komatxt.bin   |                          |                                                             |
 | location.bin  | Location + LocationEntry | Header (Pointer count) + Relative pointers                  |
-| piece.bin     | Piece + PieceEntry       |                                                             |
+| piece.bin     | Piece + PieceEntry       | Header (Pointer count) + Relative pointers \*3              |
 | pname.bin     | Pname (only strings)     | Header (Pointer count) + Relative pointers                  |
 | rulemess.bin  |                          |                                                             |
 | stage.bin     | Stage + StageEntry       | Header (Entry count) + Relative pointers + unknown pointers |
-| title.bin     |                          |                                                             |
+| title.bin     | SimpleBin                | Relative pointers                                           |
 
-\*1 Char name, 5 abilities and 5 furiganas; passive name, passive furigana, 2
-passive descriptions, 20 ability descriptions and 20 interactions; 3 unknowns.
-\*2 Char name, 2 abilities and 2 descriptions.
+- \*1 Char name, abilities and furiganas; passive name, passive furigana,
+  passive descriptions, ability descriptions and interactions; unknowns.
+- \*2 Char name, abilities and descriptions.
+- \*3 Title, Authors, Info, Page1, Page2, unknown, Id.
 
 ### Without text
 
