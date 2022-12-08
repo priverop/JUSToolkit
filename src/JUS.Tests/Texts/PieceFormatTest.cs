@@ -21,7 +21,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/piece.bin");
+            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Piece/piece.bin");
 
             Assert.True(File.Exists(resPath), "The file does not exist", resPath);
         }

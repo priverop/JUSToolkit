@@ -21,7 +21,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/pname.bin");
+            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Pname/pname.bin");
 
             Assert.True(File.Exists(resPath), "The resource file does not exist", resPath);
         }
