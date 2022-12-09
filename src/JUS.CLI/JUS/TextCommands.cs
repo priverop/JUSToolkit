@@ -19,8 +19,11 @@
 // SOFTWARE.
 using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
+using JUSToolkit.Utils;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
+using Yarhl.IO;
+using Yarhl.Media.Text;
 
 namespace JUSToolkit.CLI.JUS
 {
@@ -29,6 +32,8 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class TextCommands
     {
+        private static string textConvertersNamespace = "JUSToolkit.Texts.Converters.";
+
         /// <summary>
         /// Export a .bin file to a .Po file.
         /// </summary>
@@ -36,16 +41,25 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportText(string bin, string output)
         {
-            Node binNode = NodeFactory.FromFile(bin);
+            using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read);
 
             if (binNode is null) {
-                throw new FormatException("Invalid container file");
+                throw new FormatException("Invalid bin file");
             }
 
             // Detect format
+            string binFormatName = TextIdentifier.GetTextFormat(binNode.Name);
+            Console.WriteLine("File Name: " + binNode.Name + " File Format: " + binFormatName);
 
-            string outputFile = Path.Combine(output, node.Path.Substring(1));
-            binNode.TransformWith<BinaryAlar2Container>().Stream.WriteTo(outputFile);
+            var converterName = textConvertersNamespace + "Binary2" + binFormatName;
+            var converterPoName = textConvertersNamespace + binFormatName + "2Po";
+
+            var binFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), binNode.Format!);
+            var poFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
+            var poBinaryFormat = (BinaryFormat)ConvertFormat.With<Po2Binary>(poFormat);
+
+            string outputFile = Path.Combine(output, binNode.Name + ".po");
+            poBinaryFormat.Stream.WriteTo(outputFile);
         }
     }
 }
