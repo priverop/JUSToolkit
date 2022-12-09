@@ -77,6 +77,73 @@ The Format class has the main properties of the file and a list of Entries.
 | ------------ | ------ | ----------- |
 | tutorial.bin |        |             |
 
+## Deck folder
+
+| Name           | Format | Description |
+| -------------- | ------ | ----------- |
+| deck-jadv.bin  |        |             |
+| deck-jard.bin  |        |             |
+| deck-jarg.bin  |        |             |
+| deck-play.bin  |        |             |
+| deck-priv.bin  |        |             |
+| deck-simpl.bin |        |             |
+| deck-test.bin  |        |             |
+
+## InfoDeck folder
+
+| Name            | Format | Description |
+| --------------- | ------ | ----------- |
+| bin-deck-bb.bin |        |             |
+| bin-deck-bc.bin |        |             |
+| bin-deck-bl.bin |        |             |
+| bin-deck-bu.bin |        |             |
+| bin-deck-cb.bin |        |             |
+| bin-deck-ct.bin |        |             |
+| bin-deck-db.bin |        |             |
+| bin-deck-dg.bin |        |             |
+| bin-deck-dn.bin |        |             |
+| bin-deck-ds.bin |        |             |
+| bin-deck-dt.bin |        |             |
+| bin-deck-es.bin |        |             |
+| bin-deck-gt.bin |        |             |
+| bin-deck-hh.bin |        |             |
+| bin-deck-hk.bin |        |             |
+| bin-deck-hs.bin |        |             |
+| bin-deck-ig.bin |        |             |
+| bin-deck-is.bin |        |             |
+| bin-deck-jj.bin |        |             |
+| bin-deck-kk.bin |        |             |
+| bin-deck-kn.bin |        |             |
+| bin-deck-mo.bin |        |             |
+| bin-deck-mr.bin |        |             |
+| bin-deck-na.bin |        |             |
+| bin-deck-nb.bin |        |             |
+| bin-deck-nk.bin |        |             |
+| bin-deck-nn.bin |        |             |
+| bin-deck-oj.bin |        |             |
+| bin-deck-op.bin |        |             |
+| bin-deck-pj.bin |        |             |
+| bin-deck-rb.bin |        |             |
+| bin-deck-rk.bin |        |             |
+| bin-deck-sd.bin |        |             |
+| bin-deck-sk.bin |        |             |
+| bin-deck-ss.bin |        |             |
+| bin-deck-tc.bin |        |             |
+| bin-deck-tl.bin |        |             |
+| bin-deck-to.bin |        |             |
+| bin-deck-tr.bin |        |             |
+| bin-deck-tz.bin |        |             |
+| bin-deck-yh.bin |        |             |
+| bin-deck-yo.bin |        |             |
+
+## jGalaxy folder
+
+| Name                | Format | Description |
+| ------------------- | ------ | ----------- |
+| jgalaxy-battle.bin  |        |             |
+| jgalaxy-jgalaxy.bin |        |             |
+| jgalaxy-mission.bin |        |             |
+
 ## jQuiz folder
 
 Inside the jquiz.aar we have the jquiz.bin.
