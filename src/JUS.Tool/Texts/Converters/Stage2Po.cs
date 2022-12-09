@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JUS.Tool.Texts.Formats;
+using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
 
-namespace JUS.Tool.Texts.Converters
+namespace JUSToolkit.Texts.Converters
 {
     public class Stage2Po :
         IConverter<Stage, Po>,

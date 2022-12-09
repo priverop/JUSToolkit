@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 
-namespace JUS.Tool.Texts
+namespace JUSToolkit.Texts
 {
     /// <summary>
     /// Class with utilities to work with Jus text files.

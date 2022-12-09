@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JUS.Tool.Texts.Formats
+namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
     /// Single entry in a Demo file.

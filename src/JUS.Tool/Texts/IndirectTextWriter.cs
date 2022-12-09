@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JUS.Tool.Texts
+namespace JUSToolkit.Texts
 {
     public class JusIndirectText
     {

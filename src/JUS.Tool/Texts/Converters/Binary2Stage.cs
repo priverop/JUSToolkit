@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
-using JUS.Tool.Texts.Formats;
+using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUS.Tool.Texts.Converters
+namespace JUSToolkit.Texts.Converters
 {
     public class Binary2Stage :
         IConverter<BinaryFormat, Stage>,

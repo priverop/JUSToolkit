@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JUS.Tool.Texts.Formats;
+using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace JUS.Tool.Texts.Converters
+namespace JUSToolkit.Texts.Converters
 {
     public class Binary2Bgm : IConverter<BinaryFormat, Bgm>, IConverter<Bgm, BinaryFormat>
     {
@@ -17,7 +17,7 @@ namespace JUS.Tool.Texts.Converters
         private DataWriter writer;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>

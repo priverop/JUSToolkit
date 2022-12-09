@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Yarhl.FileFormat;
 
-namespace JUS.Tool.Texts.Formats
+namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
     /// Format for simple bin files.
