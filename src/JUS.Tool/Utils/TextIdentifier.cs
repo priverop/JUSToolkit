@@ -25,7 +25,7 @@ namespace JUSToolkit.Utils
     /// </summary>
     public static class TextIdentifier
     {
-        public static Dictionary<string, string> BinDictionary = new Dictionary<string, string>() {
+        private static readonly Dictionary<string, string> BinDictionary = new Dictionary<string, string>() {
             // { "tutorial0.bin", "Tutorial" },
             // { "tutorial1.bin", "Tutorial" },
             // { "tutorial2.bin", "Tutorial" },
@@ -53,7 +53,6 @@ namespace JUSToolkit.Utils
 
             // { "jquiz.bin"," " },
         };
-
 
         /// <summary>
         /// Returns the format name of the .bin file.

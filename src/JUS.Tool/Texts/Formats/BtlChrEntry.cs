@@ -31,6 +31,9 @@ namespace JUSToolkit.Texts.Formats
         /// </summary>
         public static readonly string EmptyAbility = "◇";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BtlChrEntry"/> class.
+        /// </summary>
         public BtlChrEntry()
         {
             AbilityNames = new List<string>();
@@ -39,22 +42,49 @@ namespace JUSToolkit.Texts.Formats
             Interactions = new List<string>();
         }
 
+        /// <summary>
+        /// Character Name.
+        /// </summary>
         public string ChrName { get; set; }
 
+        /// <summary>
+        /// List of ability names.
+        /// </summary>
         public List<string> AbilityNames { get; set; }
 
+        /// <summary>
+        /// List of ability furiganas.
+        /// </summary>
         public List<string> AbilityFuriganas { get; set; }
 
+        /// <summary>
+        /// List of ability descriptions.
+        /// </summary>
         public List<string> AbilityDescriptions { get; set; }
 
+        /// <summary>
+        /// Name of a passive ability.
+        /// </summary>
         public string PassiveName { get; set; }
 
+        /// <summary>
+        /// Furigana of a passive ability.
+        /// </summary>
         public string PassiveFurigana { get; set; }
 
+        /// <summary>
+        /// First description of a passive ability.
+        /// </summary>
         public string PassiveDescription1 { get; set; }
 
+        /// <summary>
+        /// Second description of a passive ability.
+        /// </summary>
         public string PassiveDescription2 { get; set; }
 
+        /// <summary>
+        /// List of interactions.
+        /// </summary>
         public List<string> Interactions { get; set; }
 
         /// <summary>

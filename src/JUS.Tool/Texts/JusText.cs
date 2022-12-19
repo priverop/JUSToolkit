@@ -29,6 +29,13 @@ namespace JUSToolkit.Texts
             return new Po(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
         }
 
+        /// <summary>
+        /// Split string separated by a key character into a list of strings.
+        /// </summary>
+        /// <param name="text">String to split.</param>
+        /// <param name="separator">Key to find in order to split.</param>
+        /// <param name="size">Maximum list length.</param>
+        /// <returns>List of strings.</returns>
         public static List<string> SplitStringToList(string text, char separator, int size)
         {
             List<string> splitText = text.Split(separator).ToList();
@@ -40,6 +47,11 @@ namespace JUSToolkit.Texts
             return splitText;
         }
 
+        /// <summary>
+        /// Split string into non empty entries.
+        /// </summary>
+        /// <param name="extractedComments">String to split.</param>
+        /// <returns>Array of strings.</returns>
         public static string[] ParseMetadata(string extractedComments)
         {
             return extractedComments.Split('-', StringSplitOptions.RemoveEmptyEntries);
@@ -59,6 +71,12 @@ namespace JUSToolkit.Texts
             return text;
         }
 
+        /// <summary>
+        /// Writes relative pointers.
+        /// </summary>
+        /// <param name="text">String to write.</param>
+        /// <param name="writer">Writer.</param>
+        /// <param name="jit"><see cref="JusIndirectText.Strings"/> object to store texts and offsets (pointers).</param>
         public static void WriteStringPointer(string text, DataWriter writer, JusIndirectText jit)
         {
             if (jit.TextOffsets.ContainsKey(text)) {
@@ -83,6 +101,11 @@ namespace JUSToolkit.Texts
             }
         }
 
+        /// <summary>
+        /// Merges multiple strings adding newlines between them.
+        /// </summary>
+        /// <param name="strings">List of strings to merge.</param>
+        /// <returns>Merged string.</returns>
         public static string MergeStrings(List<string> strings)
         {
             var merged = new StringBuilder();

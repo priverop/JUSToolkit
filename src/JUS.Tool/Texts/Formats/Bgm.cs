@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Yarhl.FileFormat;
 
 namespace JUSToolkit.Texts.Formats
@@ -22,6 +18,9 @@ namespace JUSToolkit.Texts.Formats
         /// </summary>
         public List<BgmEntry> Entries { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Bgm"/> class.
+        /// </summary>
         public Bgm()
         {
             Entries = new List<BgmEntry>();

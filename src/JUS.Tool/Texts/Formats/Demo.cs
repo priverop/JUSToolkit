@@ -22,6 +22,9 @@ namespace JUSToolkit.Texts.Formats
         /// </summary>
         public List<DemoEntry> Entries { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Demo"/> class.
+        /// </summary>
         public Demo()
         {
             Entries = new List<DemoEntry>();
