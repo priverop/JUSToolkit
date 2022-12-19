@@ -23,7 +23,7 @@ namespace JUSToolkit.Texts
         /// <summary>
         /// Generates a new Po for a Jus text file.
         /// </summary>
-        /// <returns>Generated Jus <see cref="Po"/></returns>
+        /// <returns>Generated Jus <see cref="Po"/>.</returns>
         public static Po GenerateJusPo()
         {
             return new Po(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
@@ -76,8 +76,8 @@ namespace JUSToolkit.Texts
         /// </summary>
         /// <param name="text">String to write.</param>
         /// <param name="writer">Writer.</param>
-        /// <param name="jit"><see cref="JusIndirectText.Strings"/> object to store texts and offsets (pointers).</param>
-        public static void WriteStringPointer(string text, DataWriter writer, JusIndirectText jit)
+        /// <param name="jit"><see cref="IndirectTextWriter.Strings"/> object to store texts and offsets (pointers).</param>
+        public static void WriteStringPointer(string text, DataWriter writer, IndirectTextWriter jit)
         {
             if (jit.TextOffsets.ContainsKey(text)) {
                 writer.Write(jit.TextOffsets[text] - (int)writer.Stream.Position);
@@ -90,11 +90,11 @@ namespace JUSToolkit.Texts
         }
 
         /// <summary>
-        /// Writes all the strings inside a <see cref="JusIndirectText.Strings"/>.
+        /// Writes all the strings inside a <see cref="IndirectTextWriter.Strings"/>.
         /// </summary>
         /// <param name="writer">Writer to write to.</param>
         /// <param name="jit">JusIndirectText to get the strings from.</param>
-        public static void WriteAllStrings(DataWriter writer, JusIndirectText jit)
+        public static void WriteAllStrings(DataWriter writer, IndirectTextWriter jit)
         {
             foreach (string s in jit.Strings) {
                 writer.Write(s);

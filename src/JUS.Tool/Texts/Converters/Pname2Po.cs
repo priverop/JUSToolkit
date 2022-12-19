@@ -33,6 +33,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Pname format to Po.
         /// </summary>
+        /// <param name="pname">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(Pname pname)
         {
             var po = JusText.GenerateJusPo();
@@ -50,6 +52,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to Pname format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public Pname Convert(Po po)
         {
             var pname = new Pname();

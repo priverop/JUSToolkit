@@ -7,7 +7,6 @@ using Yarhl.FileFormat;
 
 namespace JUSToolkit.Texts.Formats
 {
-
     /// <summary>
     /// Single entry in a Bgm file.
     /// </summary>

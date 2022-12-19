@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to Piece format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public Piece Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -59,6 +62,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Piece format to BinaryFormat.
         /// </summary>
+        /// <param name="piece">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(Piece piece)
         {
             var bin = new BinaryFormat();
@@ -66,7 +71,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText((PieceEntry.EntrySize * piece.Count) + 0x04);
+            var jit = new IndirectTextWriter((PieceEntry.EntrySize * piece.Count) + 0x04);
 
             writer.Write(piece.Count);
 

@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to Location format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public Location Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -60,6 +63,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Location format to BinaryFormat.
         /// </summary>
+        /// <param name="location">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(Location location)
         {
             var bin = new BinaryFormat();
@@ -67,7 +72,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText((LocationEntry.EntrySize * location.Count) + 0x04);
+            var jit = new IndirectTextWriter((LocationEntry.EntrySize * location.Count) + 0x04);
 
             writer.Write(location.Count);
 

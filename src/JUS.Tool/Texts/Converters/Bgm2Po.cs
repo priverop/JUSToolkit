@@ -34,6 +34,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Bgm format to Po.
         /// </summary>
+        /// <param name="bgm">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(Bgm bgm)
         {
             var po = JusText.GenerateJusPo();
@@ -54,6 +56,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to Bgm format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public Bgm Convert(Po po)
         {
             var bgm = new Bgm();

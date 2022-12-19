@@ -35,9 +35,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to Bgm format.
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public Bgm Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -60,6 +60,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Bgm format to BinaryFormat.
         /// </summary>
+        /// <param name="bgm">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(Bgm bgm)
         {
             var bin = new BinaryFormat();
@@ -67,7 +69,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText((BgmEntry.EntrySize * bgm.Count) + 0x04);
+            var jit = new IndirectTextWriter((BgmEntry.EntrySize * bgm.Count) + 0x04);
 
             writer.Write(bgm.Count);
 

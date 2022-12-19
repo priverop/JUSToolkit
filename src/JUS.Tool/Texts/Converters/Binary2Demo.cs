@@ -37,11 +37,15 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to Demo format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public Demo Convert(BinaryFormat source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
             }
+
             var demo = new Demo();
             reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
@@ -58,6 +62,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Demo format to BinaryFormat.
         /// </summary>
+        /// <param name="demo">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(Demo demo)
         {
             var bin = new BinaryFormat();
@@ -65,7 +71,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText((DemoEntry.EntrySize * demo.Count) + 0x04);
+            var jit = new IndirectTextWriter((DemoEntry.EntrySize * demo.Count) + 0x04);
 
             writer.Write(demo.Count);
 

@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to Stage format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public Stage Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -61,6 +64,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Stage format to BinaryFormat.
         /// </summary>
+        /// <param name="stage">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(Stage stage)
         {
             var bin = new BinaryFormat();
@@ -68,7 +73,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText(StageEntry.EntrySize * stage.Entries.Count);
+            var jit = new IndirectTextWriter(StageEntry.EntrySize * stage.Entries.Count);
 
             foreach (StageEntry entry in stage.Entries) {
                 JusText.WriteStringPointer(entry.Name, writer, jit);

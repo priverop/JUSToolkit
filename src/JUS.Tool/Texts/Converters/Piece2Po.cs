@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
@@ -34,6 +33,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Piece format to Po.
         /// </summary>
+        /// <param name="piece">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(Piece piece)
         {
             var po = JusText.GenerateJusPo();
@@ -56,6 +57,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to Piece format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public Piece Convert(Po po)
         {
             var piece = new Piece();

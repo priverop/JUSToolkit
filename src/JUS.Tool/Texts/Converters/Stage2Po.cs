@@ -33,6 +33,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Stage format to Po.
         /// </summary>
+        /// <param name="stage">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(Stage stage)
         {
             var po = JusText.GenerateJusPo();
@@ -51,6 +53,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to Stage format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public Stage Convert(Po po)
         {
             var stage = new Stage();

@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to SimpleBin format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public SimpleBin Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -61,6 +64,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts SimpleBin format to BinaryFormat.
         /// </summary>
+        /// <param name="simpleBin">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(SimpleBin simpleBin)
         {
             var bin = new BinaryFormat();
@@ -68,7 +73,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText(SimpleBin.EntrySize * simpleBin.TextEntries.Count);
+            var jit = new IndirectTextWriter(SimpleBin.EntrySize * simpleBin.TextEntries.Count);
 
             foreach (string entry in simpleBin.TextEntries) {
                 JusText.WriteStringPointer(entry, writer, jit);

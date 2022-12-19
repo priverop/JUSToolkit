@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to Pname format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public Pname Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -60,6 +63,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Pname format to BinaryFormat.
         /// </summary>
+        /// <param name="pname">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(Pname pname)
         {
             var bin = new BinaryFormat();
@@ -67,7 +72,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText(SimpleBin.EntrySize * pname.Count + 0x04);
+            var jit = new IndirectTextWriter(SimpleBin.EntrySize * pname.Count + 0x04);
 
             writer.Write(pname.Count);
             foreach (string entry in pname.TextEntries) {

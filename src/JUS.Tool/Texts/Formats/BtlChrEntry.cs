@@ -43,47 +43,47 @@ namespace JUSToolkit.Texts.Formats
         }
 
         /// <summary>
-        /// Character Name.
+        /// Gets or sets the character Name.
         /// </summary>
         public string ChrName { get; set; }
 
         /// <summary>
-        /// List of ability names.
+        /// Gets or sets the list of ability names.
         /// </summary>
         public List<string> AbilityNames { get; set; }
 
         /// <summary>
-        /// List of ability furiganas.
+        /// Gets or sets the list of ability furiganas.
         /// </summary>
         public List<string> AbilityFuriganas { get; set; }
 
         /// <summary>
-        /// List of ability descriptions.
+        /// Gets or sets the list of ability descriptions.
         /// </summary>
         public List<string> AbilityDescriptions { get; set; }
 
         /// <summary>
-        /// Name of a passive ability.
+        /// Gets or sets the name of a passive ability.
         /// </summary>
         public string PassiveName { get; set; }
 
         /// <summary>
-        /// Furigana of a passive ability.
+        /// Gets or sets the furigana of a passive ability.
         /// </summary>
         public string PassiveFurigana { get; set; }
 
         /// <summary>
-        /// First description of a passive ability.
+        /// Gets or sets the first description of a passive ability.
         /// </summary>
         public string PassiveDescription1 { get; set; }
 
         /// <summary>
-        /// Second description of a passive ability.
+        /// Gets or sets the second description of a passive ability.
         /// </summary>
         public string PassiveDescription2 { get; set; }
 
         /// <summary>
-        /// List of interactions.
+        /// Gets or sets the list of interactions.
         /// </summary>
         public List<string> Interactions { get; set; }
 

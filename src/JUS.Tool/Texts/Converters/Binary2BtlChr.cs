@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to BtlChr format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public BtlChr Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -61,6 +64,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BtlChr format to BinaryFormat.
         /// </summary>
+        /// <param name="btlChr">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(BtlChr btlChr)
         {
             var bin = new BinaryFormat();
@@ -68,7 +73,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText(BtlChrEntry.EntrySize * btlChr.Entries.Count);
+            var jit = new IndirectTextWriter(BtlChrEntry.EntrySize * btlChr.Entries.Count);
 
             foreach (BtlChrEntry entry in btlChr.Entries) {
                 JusText.WriteStringPointer(entry.ChrName, writer, jit);

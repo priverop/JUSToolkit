@@ -13,6 +13,14 @@ namespace JUSToolkit.Texts.Formats
     public class Demo : IFormat
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="Demo"/> class.
+        /// </summary>
+        public Demo()
+        {
+            Entries = new List<DemoEntry>();
+        }
+
+        /// <summary>
         /// Gets or sets the number of entries in <see cref="Entries"/>.
         /// </summary>
         public int Count { get; set; }
@@ -21,13 +29,5 @@ namespace JUSToolkit.Texts.Formats
         /// Gets or sets the list of <see cref="DemoEntry" />.
         /// </summary>
         public List<DemoEntry> Entries { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Demo"/> class.
-        /// </summary>
-        public Demo()
-        {
-            Entries = new List<DemoEntry>();
-        }
     }
 }

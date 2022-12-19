@@ -33,6 +33,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts SimpleBin format to Po.
         /// </summary>
+        /// <param name="simpleBin">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(SimpleBin simpleBin)
         {
             var po = JusText.GenerateJusPo();
@@ -50,6 +52,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to SimpleBin format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public SimpleBin Convert(Po po)
         {
             var simpleBin = new SimpleBin();

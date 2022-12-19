@@ -37,6 +37,9 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BinaryFormat to SuppChr format.
         /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
         public SuppChr Convert(BinaryFormat source)
         {
             if (source == null) {
@@ -61,6 +64,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts SuppChr format to BinaryFormat.
         /// </summary>
+        /// <param name="suppChr">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
         public BinaryFormat Convert(SuppChr suppChr)
         {
             var bin = new BinaryFormat();
@@ -68,10 +73,10 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new JusIndirectText(SuppChrEntry.EntrySize * suppChr.Entries.Count);
+            var jit = new IndirectTextWriter(SuppChrEntry.EntrySize * suppChr.Entries.Count);
 
             foreach (SuppChrEntry entry in suppChr.Entries) {
-                JusText.WriteStringPointer(entry.chrName, writer, jit);
+                JusText.WriteStringPointer(entry.ChrName, writer, jit);
                 foreach (string s in entry.Abilities) {
                     JusText.WriteStringPointer(s, writer, jit);
                 }
@@ -90,7 +95,7 @@ namespace JUSToolkit.Texts.Converters
         {
             var entry = new SuppChrEntry();
 
-            entry.chrName = JusText.ReadIndirectString(reader);
+            entry.ChrName = JusText.ReadIndirectString(reader);
 
             for (int i = 0; i < SuppChrEntry.NumAbilities * 2; i++) {
                 entry.Abilities.Add(JusText.ReadIndirectString(reader));

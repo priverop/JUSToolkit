@@ -36,17 +36,17 @@ namespace JUSToolkit.Texts.Formats
         }
 
         /// <summary>
-        /// Name of the character which has the ability.
+        /// Gets or sets the name of the character which has the ability.
         /// </summary>
-        public string chrName { get; set; }
+        public string ChrName { get; set; }
 
         /// <summary>
-        /// List of abilities.
+        /// Gets or sets the list of abilities.
         /// </summary>
         public List<string> Abilities { get; set; }
 
         /// <summary>
-        /// List of ability descriptions.
+        /// Gets or sets the list of ability descriptions.
         /// </summary>
         public List<string> Descriptions { get; set; }
     }

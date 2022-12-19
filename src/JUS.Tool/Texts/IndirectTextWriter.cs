@@ -5,31 +5,32 @@ namespace JUSToolkit.Texts
     /// <summary>
     /// Class with utilities to work with Jus text files with relative pointers.
     /// </summary>
-    public class JusIndirectText
+    public class IndirectTextWriter
     {
         /// <summary>
-        /// Texts and its pointers.
+        /// Initializes a new instance of the <see cref="IndirectTextWriter"/> class.
         /// </summary>
-        public Dictionary<string, int> TextOffsets { get; set; }
-
-        /// <summary>
-        /// List of sentences / entries.
-        /// </summary>
-        public List<string> Strings { get; set; }
-
-        /// <summary>
-        /// Current pointer.
-        /// </summary>
-        public int CurrentOffset { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JusIndirectText"/> class.
-        /// </summary>
-        public JusIndirectText(int startingOffset)
+        /// <param name="startingOffset">Where the pointer section starts.</param>
+        public IndirectTextWriter(int startingOffset)
         {
             TextOffsets = new Dictionary<string, int>();
             Strings = new List<string>();
             CurrentOffset = startingOffset;
         }
+
+        /// <summary>
+        /// Gets or sets the texts and its pointers.
+        /// </summary>
+        public Dictionary<string, int> TextOffsets { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of sentences / entries.
+        /// </summary>
+        public List<string> Strings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current pointer.
+        /// </summary>
+        public int CurrentOffset { get; set; }
     }
 }

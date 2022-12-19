@@ -25,7 +25,7 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Utils
 {
     /// <summary>
-    /// Auto format discovery class
+    /// Auto format discovery class.
     /// </summary>
     public static class FormatDiscovery
     {

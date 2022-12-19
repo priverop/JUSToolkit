@@ -34,6 +34,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BtlChr format to Po.
         /// </summary>
+        /// <param name="btlChr">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(BtlChr btlChr)
         {
             var po = JusText.GenerateJusPo();
@@ -75,6 +77,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to BtlChr format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public BtlChr Convert(Po po)
         {
             var btlChr = new BtlChr();

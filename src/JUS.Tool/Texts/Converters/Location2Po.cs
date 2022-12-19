@@ -33,6 +33,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Location format to Po.
         /// </summary>
+        /// <param name="location">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(Location location)
         {
             var po = JusText.GenerateJusPo();
@@ -51,6 +53,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to Location format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public Location Convert(Po po)
         {
             var location = new Location();

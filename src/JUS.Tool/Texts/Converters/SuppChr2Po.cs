@@ -34,13 +34,15 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts SuppChr format to Po.
         /// </summary>
+        /// <param name="suppChr">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(SuppChr suppChr)
         {
             var po = JusText.GenerateJusPo();
 
             int i = 0;
             foreach (SuppChrEntry entry in suppChr.Entries) {
-                po.Add(new PoEntry(entry.chrName) { Context = $"{i++}" });
+                po.Add(new PoEntry(entry.ChrName) { Context = $"{i++}" });
 
                 for (int j = 0; j < SuppChrEntry.NumAbilities; j++) {
                     po.Add(new PoEntry($"{entry.Abilities[j * 2]}\n{entry.Abilities[(j * 2) + 1]}") { Context = $"{i++}" });
@@ -54,6 +56,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to SuppChr format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public SuppChr Convert(Po po)
         {
             var suppChr = new SuppChr();
@@ -62,7 +66,7 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < po.Entries.Count / 5; i++) {
                 entry = new SuppChrEntry();
-                entry.chrName = po.Entries[i * 5].Text;
+                entry.ChrName = po.Entries[i * 5].Text;
 
                 for (int j = 0; j < SuppChrEntry.NumAbilities; j++) {
                     splitText = JusText.SplitStringToList(po.Entries[(i * 5) + 1 + (j * 2)].Text, '\n', 2);

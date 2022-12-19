@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Collections.Generic;
+
 namespace JUSToolkit.Utils
 {
     /// <summary>
@@ -26,32 +27,17 @@ namespace JUSToolkit.Utils
     public static class TextIdentifier
     {
         private static readonly Dictionary<string, string> BinDictionary = new Dictionary<string, string>() {
-            // { "tutorial0.bin", "Tutorial" },
-            // { "tutorial1.bin", "Tutorial" },
-            // { "tutorial2.bin", "Tutorial" },
-            // { "tutorial3.bin", "Tutorial" },
-            // { "tutorial4.bin", "Tutorial" },
-            // { "tutorial5.bin", "Tutorial" },
-            // { "tutorial.bin", "Tutorial" },
-
-            // { "ability_t.bin"," " },
             { "bgm.bin", "Bgm" },
             { "chr_b_t.bin", "BtlChr" },
             { "chr_s_t.bin", "SuppChr" },
             { "clearlst.bin", "SimpleBin" },
-            // { "commwin.bin"," " },
             { "demo.bin", "Demo" },
             { "infoname.bin", "SimpleBin" },
-            // { "komatxt.bin"," " },
             { "location.bin", "Location" },
             { "piece.bin", "Piece" },
-            // { "rulemess.bin"," " },
             { "stage.bin", "Stage" },
             { "title.bin", "SimpleBin" },
             { "pname.bin", "Pname" },
-            // { "bin-InfoDeck"," " },
-
-            // { "jquiz.bin"," " },
         };
 
         /// <summary>

@@ -34,6 +34,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Demo format to Po.
         /// </summary>
+        /// <param name="demo">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
         public Po Convert(Demo demo)
         {
             var po = JusText.GenerateJusPo();
@@ -54,6 +56,8 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Po to Demo format.
         /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
         public Demo Convert(Po po)
         {
             var demo = new Demo();
