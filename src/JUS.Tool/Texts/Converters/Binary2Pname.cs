@@ -72,7 +72,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(SimpleBin.EntrySize * pname.Count + 0x04);
+            var jit = new IndirectTextWriter((SimpleBin.EntrySize * pname.Count) + 0x04);
 
             writer.Write(pname.Count);
             foreach (string entry in pname.TextEntries) {
