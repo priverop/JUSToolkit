@@ -203,14 +203,21 @@ namespace JUSToolkit.CLI.JUS
 
         private static Command CreateTextCommand()
         {
-            var export = new Command("export", "Export bin file to a Po file") {
-                new Option<string>("--bin", "the input bin file", ArgumentArity.ExactlyOne),
+            var export = new Command("export", "Export .bin file to a .po file") {
+                new Option<string>("--bin", "the input .bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string>(TextCommands.ExportText);
+            export.Handler = CommandHandler.Create<string, string>(TextCommands.Export);
+
+            var import = new Command("import", "Import a .po file into a .bin") {
+                new Option<string>("--po", "the input .po file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            import.Handler = CommandHandler.Create<string, string>(TextCommands.Import);
 
             return new Command("texts", "Export or import bin files to Po") {
                 export,
+                import,
             };
         }
     }

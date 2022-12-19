@@ -39,7 +39,7 @@ namespace JUSToolkit.CLI.JUS
         /// </summary>
         /// <param name="bin">The path to the bin file.</param>
         /// <param name="output">The output directory.</param>
-        public static void ExportText(string bin, string output)
+        public static void Export(string bin, string output)
         {
             using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read);
 
@@ -54,12 +54,51 @@ namespace JUSToolkit.CLI.JUS
             var converterName = textConvertersNamespace + "Binary2" + binFormatName;
             var converterPoName = textConvertersNamespace + binFormatName + "2Po";
 
+            // Binary -> TextFormat
             var binFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), binNode.Format!);
+
+            // TextFormat -> Po
             var poFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
+
+            // Po -> Binary
             var poBinaryFormat = (BinaryFormat)ConvertFormat.With<Po2Binary>(poFormat);
 
             string outputFile = Path.Combine(output, binNode.Name + ".po");
             poBinaryFormat.Stream.WriteTo(outputFile);
+        }
+
+        /// <summary>
+        /// Import a .po file to a .bin file.
+        /// </summary>
+        /// <param name="po">The path to the po file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void Import(string po, string output)
+        {
+            using Node poNode = NodeFactory.FromFile(po, FileOpenMode.Read)
+                .TransformWith<Binary2Po>();
+
+            if (poNode is null) {
+                throw new FormatException("Invalid po file");
+            }
+
+            string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
+
+            // Detect format
+            string binFormatName = TextIdentifier.GetTextFormat(cleanFileName + ".bin");
+            Console.WriteLine("File Format: " + binFormatName);
+
+            var converterPoName = textConvertersNamespace + binFormatName + "2Po";
+            var converterName = textConvertersNamespace + "Binary2" + binFormatName;
+
+            // Po -> Text Format
+            var textFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), poNode.Format!);
+
+            // Text Format -> Binary
+            var binaryFormat = (BinaryFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), textFormat);
+
+            string outputFile = Path.Combine(output, cleanFileName + ".bin");
+            binaryFormat.Stream.WriteTo(outputFile);
+            Console.WriteLine("Done!");
         }
     }
 }
