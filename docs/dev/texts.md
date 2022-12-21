@@ -33,28 +33,40 @@ Here we have the tutorials.
 
 The Format class has the main properties of the file and a list of Entries.
 
-| Name          | Format                   | Description                                                 |
-| ------------- | ------------------------ | ----------------------------------------------------------- |
-| ability_t.bin |                          |                                                             |
-| bgm.bin       | Bgm + BgmEntry           | Header (Pointer count) + Relative pointers                  |
-| chr_b_t.bin   | BtlChr + BtlChrEntry     | Header (Entry count) + Relative pointers \*1 + padding      |
-| chr_s_t.bin   | SuppChr + SuppChrEntry   | Header (Entry count) + Relative pointers \*2                |
-| clearlst.bin  | SimpleBin                | Relative pointers                                           |
-| commwin.bin   |                          |                                                             |
-| demo.bin      | Demo + DemoEntry         | Header (Pointer count) + Relative pointers + padding        |
-| infoname.bin  | SimpleBin                | Relative pointers                                           |
-| komatxt.bin   |                          |                                                             |
-| location.bin  | Location + LocationEntry | Header (Pointer count) + Relative pointers                  |
-| piece.bin     | Piece + PieceEntry       | Header (Pointer count) + Relative pointers \*3              |
-| pname.bin     | Pname (only strings)     | Header (Pointer count) + Relative pointers                  |
-| rulemess.bin  |                          |                                                             |
-| stage.bin     | Stage + StageEntry       | Header (Entry count) + Relative pointers + unknown pointers |
-| title.bin     | SimpleBin                | Relative pointers                                           |
+| Name          | Format                   | Location                                            |
+| ------------- | ------------------------ | --------------------------------------------------- |
+| ability_t.bin | Ability + AbilityEntry   | Koma list, helper (koma size 1) ability description |
+| bgm.bin       | Bgm + BgmEntry           |                                                     |
+| chr_b_t.bin   | BtlChr + BtlChrEntry     |                                                     |
+| chr_s_t.bin   | SuppChr + SuppChrEntry   |                                                     |
+| clearlst.bin  | SimpleBin                |                                                     |
+| commwin.bin   |                          | Common window messages                              |
+| demo.bin      | Demo + DemoEntry         |                                                     |
+| infoname.bin  | SimpleBin                |                                                     |
+| komatxt.bin   |                          | Koma names                                          |
+| location.bin  | Location + LocationEntry |                                                     |
+| piece.bin     | Piece + PieceEntry       |                                                     |
+| pname.bin     | Pname                    |                                                     |
+| rulemess.bin  |                          | Stage/level rules                                   |
+| stage.bin     | Stage + StageEntry       |                                                     |
+| title.bin     | SimpleBin                |                                                     |
 
-- \*1 Char name, abilities and furiganas; passive name, passive furigana,
-  passive descriptions, ability descriptions and interactions; unknowns.
-- \*2 Char name, abilities and descriptions.
-- \*3 Title, Authors, Info, Page1, Page2, unknown, Id.
+### Formats
+
+The Format class has the main properties of the file and a list of Entries. Each Entry has different parameters, which are listed here.
+
+| Format                   | Format Description                                 | Entry Description                                                                                                                          |
+| ------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ability + AbilityEntry   | ? count + Relative pointers                        | Title and Description.                                                                                                                     |
+| Bgm + BgmEntry           | Pointer count + Relative pointers                  | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
+| BtlChr + BtlChrEntry     | Entry count + Relative pointers + padding (0x04)   | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
+| Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04) | Title, Descriptions (3), Id and Icon.                                                                                                      |
+| Location + LocationEntry | Pointer count + Relative pointers                  | Name and two unkown values.                                                                                                                |
+| Piece + PieceEntry       | Pointer count + Relative pointers                  | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
+| Pname (only strings)     | Pointer count + Relative simple pointers           | Just strings.                                                                                                                              |
+| SimpleBin                | Entry count + Relative pointers                    | Just strings.                                                                                                                              |
+| Stage + StageEntry       | Entry count + Relative pointers + unknown pointers | Name and two unkown values.                                                                                                                |
+| SuppChr + SuppChrEntry   | Entry count + Relative pointers                    | Char name, abilities and descriptions.                                                                                                     |
 
 ### Without text
 
