@@ -30,6 +30,7 @@ namespace JUS.Tests.Texts
         public void PieceTest()
         {
             var node = NodeFactory.FromFile(resPath);
+
             // BinaryFormat -> Piece
             var expectedBin = node.GetFormatAs<BinaryFormat>();
             var binary2Piece = new Binary2Piece();
@@ -69,6 +70,4 @@ namespace JUS.Tests.Texts
             Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Piece is not identical: {node.Path}");
         }
     }
-
 }
-

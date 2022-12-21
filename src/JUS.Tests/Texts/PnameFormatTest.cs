@@ -66,12 +66,8 @@ namespace JUS.Tests.Texts
                 Assert.Fail($"Exception Pname -> BinaryFormat with {node.Path}\n{ex}");
             }
 
-
-
             // Comparing Binaries
             Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Pname is not identical: {node.Path}");
         }
-
-
     }
 }
