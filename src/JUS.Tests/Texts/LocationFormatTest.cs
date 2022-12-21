@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JUSToolkit.Texts.Converters;
 using JUSToolkit.Texts.Formats;
 using NUnit.Framework;
@@ -29,7 +25,7 @@ namespace JUS.Tests.Texts
         [Test]
         public void LocationTest()
         {
-            foreach (string filePath in Directory.GetFiles(resPath, "*.*", SearchOption.AllDirectories)) {
+            foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (var node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Location
                     var expectedBin = node.GetFormatAs<BinaryFormat>();
