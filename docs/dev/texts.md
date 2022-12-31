@@ -47,7 +47,7 @@ The Format class has the main properties of the file and a list of Entries.
 | commwin.bin   |                          | Common window messages                              |
 | demo.bin      | Demo + DemoEntry         |                                                     |
 | infoname.bin  | SimpleBin                |                                                     |
-| komatxt.bin   |                          | Koma names                                          |
+| komatxt.bin   | Komatxt                  | Koma names                                          |
 | location.bin  | Location + LocationEntry |                                                     |
 | piece.bin     | Piece + PieceEntry       |                                                     |
 | pname.bin     | Pname                    |                                                     |
@@ -61,18 +61,19 @@ The Format class has the main properties of the file and a list of Entries. Each
 
 Pointer count is the total number of entries. Entry size is the size of the total entry in the pointer section. The starting offset means that the pointer section ends and the text section starts.
 
-| Format                   | Format Description                                     | Entry Description                                                                                                                          |
-| ------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Ability + AbilityEntry   | Starting offset + Relative pointers                    | Title and Description.                                                                                                                     |
-| Bgm + BgmEntry           | Pointer count + Relative pointers                      | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
-| BtlChr + BtlChrEntry     | Starting offset + Relative pointers + padding (0x04)   | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
-| Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04)     | Title, Descriptions (3), Id and Icon.                                                                                                      |
-| Location + LocationEntry | Pointer count + Relative pointers                      | Name and two unkown values.                                                                                                                |
-| Piece + PieceEntry       | Pointer count + Relative pointers                      | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
-| Pname (only strings)     | Pointer count + Relative simple pointers               | Just strings.                                                                                                                              |
-| SimpleBin                | Starting offset + Relative pointers                    | Just strings.                                                                                                                              |
-| Stage + StageEntry       | Starting offset + Relative pointers + unknown pointers | Name and two unkown values.                                                                                                                |
-| SuppChr + SuppChrEntry   | Starting offset + Relative pointers                    | Char name, abilities and descriptions.                                                                                                     |
+| Format                   | Format Description                                   | Entry Description                                                                                                                          |
+| ------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ability + AbilityEntry   | Starting offset + Relative pointers                  | Title and Description.                                                                                                                     |
+| Bgm + BgmEntry           | Pointer count + Relative pointers                    | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
+| BtlChr + BtlChrEntry     | Starting offset + Relative pointers + padding (0x04) | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
+| Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04)   | Title, Descriptions (3), Id and Icon.                                                                                                      |
+| Komatxt + KomatxtEntry   | Starting offset + Relative pointers                  | Name and two unknowns.                                                                                                                     |
+| Location + LocationEntry | Pointer count + Relative pointers                    | Name and two unkown values (int).                                                                                                          |
+| Piece + PieceEntry       | Pointer count + Relative pointers                    | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
+| Pname (only strings)     | Pointer count + Relative simple pointers             | Just strings.                                                                                                                              |
+| SimpleBin                | Starting offset + Relative pointers                  | Just strings.                                                                                                                              |
+| Stage + StageEntry       | Starting offset + Relative pointers                  | Name and two unkown values (short).                                                                                                        |
+| SuppChr + SuppChrEntry   | Starting offset + Relative pointers                  | Char name, abilities and descriptions.                                                                                                     |
 
 ### Without text
 
