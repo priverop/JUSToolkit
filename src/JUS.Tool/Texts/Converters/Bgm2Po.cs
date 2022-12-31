@@ -47,7 +47,7 @@ namespace JUSToolkit.Texts.Converters
                     ExtractedComments = $"{entry.Unk1}-{entry.Unk2}-{entry.Icon}",
                 });
                 string description = $"{entry.Desc1}\n{entry.Desc2}\n{entry.Desc3}";
-                po.Add(new PoEntry(description) { Context = $"{i++}", });
+                po.Add(new PoEntry(description.TrimEnd()) { Context = $"{i++}", });
             }
 
             return po;

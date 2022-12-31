@@ -29,7 +29,7 @@ namespace JUS.Tests.Texts
         [Test]
         public void StageTest()
         {
-            foreach (string filePath in Directory.GetFiles(resPath, "*.*", SearchOption.AllDirectories)) {
+            foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (var node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Stage
                     var expectedBin = node.GetFormatAs<BinaryFormat>();

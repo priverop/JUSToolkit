@@ -10,7 +10,7 @@ namespace JUSToolkit.Texts
         /// <summary>
         /// Initializes a new instance of the <see cref="IndirectTextWriter"/> class.
         /// </summary>
-        /// <param name="startingOffset">Where the pointer section starts.</param>
+        /// <param name="startingOffset">Where the pointer section ends.</param>
         public IndirectTextWriter(int startingOffset)
         {
             TextOffsets = new Dictionary<string, int>();

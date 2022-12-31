@@ -29,7 +29,7 @@ namespace JUS.Tests.Texts
         [Test]
         public void BtlChrTest()
         {
-            foreach (string filePath in Directory.GetFiles(resPath, "*.*", SearchOption.AllDirectories)) {
+            foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (var node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> BtlChr
                     var expectedBin = node.GetFormatAs<BinaryFormat>();
