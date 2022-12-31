@@ -4,6 +4,10 @@ In this game the texts are stored in .bin files. Usually we have pointers and
 sentences, but each file is different, that's why we have a format for each type
 of file.
 
+## Relative pointers
+
+Relative pointers means that the text is in the pointer offset plus the position of the pointer. If the position of the pointer is 0x04 and the value is 0x100, the text will be in 0x104.
+
 ## Utility classes
 
 To help with the process we've developed some classes to read and write easily:
@@ -55,18 +59,20 @@ The Format class has the main properties of the file and a list of Entries.
 
 The Format class has the main properties of the file and a list of Entries. Each Entry has different parameters, which are listed here.
 
-| Format                   | Format Description                                 | Entry Description                                                                                                                          |
-| ------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Ability + AbilityEntry   | ? count + Relative pointers                        | Title and Description.                                                                                                                     |
-| Bgm + BgmEntry           | Pointer count + Relative pointers                  | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
-| BtlChr + BtlChrEntry     | Entry count + Relative pointers + padding (0x04)   | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
-| Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04) | Title, Descriptions (3), Id and Icon.                                                                                                      |
-| Location + LocationEntry | Pointer count + Relative pointers                  | Name and two unkown values.                                                                                                                |
-| Piece + PieceEntry       | Pointer count + Relative pointers                  | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
-| Pname (only strings)     | Pointer count + Relative simple pointers           | Just strings.                                                                                                                              |
-| SimpleBin                | Entry count + Relative pointers                    | Just strings.                                                                                                                              |
-| Stage + StageEntry       | Entry count + Relative pointers + unknown pointers | Name and two unkown values.                                                                                                                |
-| SuppChr + SuppChrEntry   | Entry count + Relative pointers                    | Char name, abilities and descriptions.                                                                                                     |
+Pointer count is the total number of entries. Entry size is the size of the total entry in the pointer section. The starting offset means that the pointer section ends and the text section starts.
+
+| Format                   | Format Description                                     | Entry Description                                                                                                                          |
+| ------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ability + AbilityEntry   | Starting offset + Relative pointers                    | Title and Description.                                                                                                                     |
+| Bgm + BgmEntry           | Pointer count + Relative pointers                      | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
+| BtlChr + BtlChrEntry     | Starting offset + Relative pointers + padding (0x04)   | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
+| Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04)     | Title, Descriptions (3), Id and Icon.                                                                                                      |
+| Location + LocationEntry | Pointer count + Relative pointers                      | Name and two unkown values.                                                                                                                |
+| Piece + PieceEntry       | Pointer count + Relative pointers                      | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
+| Pname (only strings)     | Pointer count + Relative simple pointers               | Just strings.                                                                                                                              |
+| SimpleBin                | Starting offset + Relative pointers                    | Just strings.                                                                                                                              |
+| Stage + StageEntry       | Starting offset + Relative pointers + unknown pointers | Name and two unkown values.                                                                                                                |
+| SuppChr + SuppChrEntry   | Starting offset + Relative pointers                    | Char name, abilities and descriptions.                                                                                                     |
 
 ### Without text
 

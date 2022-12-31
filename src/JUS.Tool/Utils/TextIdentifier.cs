@@ -27,6 +27,7 @@ namespace JUSToolkit.Utils
     public static class TextIdentifier
     {
         private static readonly Dictionary<string, string> BinDictionary = new Dictionary<string, string>() {
+            { "ability_t.bin", "Ability" },
             { "bgm.bin", "Bgm" },
             { "chr_b_t.bin", "BtlChr" },
             { "chr_s_t.bin", "SuppChr" },

@@ -84,7 +84,7 @@ namespace JUSToolkit.CLI.JUS
             string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
 
             // Detect format
-            string binFormatName = TextIdentifier.GetTextFormat(cleanFileName + ".bin");
+            string binFormatName = TextIdentifier.GetTextFormat(cleanFileName);
             Console.WriteLine("File Format: " + binFormatName);
 
             var converterPoName = textConvertersNamespace + binFormatName + "2Po";
@@ -96,7 +96,7 @@ namespace JUSToolkit.CLI.JUS
             // Text Format -> Binary
             var binaryFormat = (BinaryFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), textFormat);
 
-            string outputFile = Path.Combine(output, cleanFileName + ".bin");
+            string outputFile = Path.Combine(output, cleanFileName);
             binaryFormat.Stream.WriteTo(outputFile);
             Console.WriteLine("Done!");
         }
