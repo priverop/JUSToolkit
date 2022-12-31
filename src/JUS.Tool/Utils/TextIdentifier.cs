@@ -34,6 +34,7 @@ namespace JUSToolkit.Utils
             { "clearlst.bin", "SimpleBin" },
             { "demo.bin", "Demo" },
             { "infoname.bin", "SimpleBin" },
+            { "komatxt.bin", "Komatxt" },
             { "location.bin", "Location" },
             { "piece.bin", "Piece" },
             { "stage.bin", "Stage" },
