@@ -66,8 +66,8 @@ namespace JUSToolkit.Texts.Converters
                 entry.Name = po.Entries[i].Text;
 
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
-                entry.Unk1 = short.Parse(metadata[0]);
-                entry.Unk2 = short.Parse(metadata[1]);
+                entry.Unk1 = int.Parse(metadata[0]);
+                entry.Unk2 = int.Parse(metadata[1]);
 
                 komatxt.Entries.Add(entry);
             }
