@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JUSToolkit.Texts.Converters;
 using JUSToolkit.Texts.Formats;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;

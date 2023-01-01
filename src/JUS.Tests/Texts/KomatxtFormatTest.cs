@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JUSToolkit.Texts.Converters;
 using JUSToolkit.Texts.Formats;
 using NUnit.Framework;
@@ -42,10 +38,10 @@ namespace JUS.Tests.Texts
                     }
 
                     // Komatxt -> Po
-                    var Komatxt2Po = new Komatxt2Po();
+                    var komatxt2Po = new Komatxt2Po();
                     Po expectedPo = null;
                     try {
-                        expectedPo = Komatxt2Po.Convert(expectedKomatxt);
+                        expectedPo = komatxt2Po.Convert(expectedKomatxt);
                     } catch (Exception ex) {
                         Assert.Fail($"Exception Komatxt -> Po with {node.Path}\n{ex}");
                     }
@@ -53,7 +49,7 @@ namespace JUS.Tests.Texts
                     // Po -> Komatxt
                     Komatxt actualKomatxt = null;
                     try {
-                        actualKomatxt = Komatxt2Po.Convert(expectedPo);
+                        actualKomatxt = komatxt2Po.Convert(expectedPo);
                     } catch (Exception ex) {
                         Assert.Fail($"Exception Po -> Komatxt with {node.Path}\n{ex}");
                     }
