@@ -38,10 +38,10 @@ namespace JUS.Tests.Texts
                     }
 
                     // Rulemess -> Po
-                    var Rulemess2Po = new Rulemess2Po();
+                    var rulemess2Po = new Rulemess2Po();
                     Po expectedPo = null;
                     try {
-                        expectedPo = Rulemess2Po.Convert(expectedRulemess);
+                        expectedPo = rulemess2Po.Convert(expectedRulemess);
                     } catch (Exception ex) {
                         Assert.Fail($"Exception Rulemess -> Po with {node.Path}\n{ex}");
                     }
@@ -49,7 +49,7 @@ namespace JUS.Tests.Texts
                     // Po -> Rulemess
                     Rulemess actualRulemess = null;
                     try {
-                        actualRulemess = Rulemess2Po.Convert(expectedPo);
+                        actualRulemess = rulemess2Po.Convert(expectedPo);
                     } catch (Exception ex) {
                         Assert.Fail($"Exception Po -> Rulemess with {node.Path}\n{ex}");
                     }

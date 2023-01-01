@@ -62,18 +62,18 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Ability format to BinaryFormat.
         /// </summary>
-        /// <param name="Ability">TextFormat to convert.</param>
+        /// <param name="ability">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        public BinaryFormat Convert(Ability Ability)
+        public BinaryFormat Convert(Ability ability)
         {
             var bin = new BinaryFormat();
             writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(AbilityEntry.EntrySize * Ability.Count);
+            var jit = new IndirectTextWriter(AbilityEntry.EntrySize * ability.Count);
 
-            foreach (AbilityEntry entry in Ability.Entries) {
+            foreach (AbilityEntry entry in ability.Entries) {
                 JusText.WriteStringPointer(entry.Title, writer, jit);
                 JusText.WriteStringPointer(entry.Description1, writer, jit);
                 JusText.WriteStringPointer(entry.Description2, writer, jit);

@@ -34,14 +34,14 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Rulemess format to Po.
         /// </summary>
-        /// <param name="Rulemess">TextFormat to convert.</param>
+        /// <param name="rulemess">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(Rulemess Rulemess)
+        public Po Convert(Rulemess rulemess)
         {
             var po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (RulemessEntry entry in Rulemess.Entries) {
+            foreach (RulemessEntry entry in rulemess.Entries) {
                 string description = $"{entry.Description1}\n{entry.Description2}\n{entry.Description3}";
                 po.Add(new PoEntry(description) {
                     Context = $"{i++}",
@@ -59,7 +59,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Transformed TextFormat.</returns>
         public Rulemess Convert(Po po)
         {
-            var Rulemess = new Rulemess();
+            var rulemess = new Rulemess();
             RulemessEntry entry;
             List<string> description;
 
@@ -72,10 +72,10 @@ namespace JUSToolkit.Texts.Converters
 
                 entry.Unk1 = int.Parse(po.Entries[i].ExtractedComments);
 
-                Rulemess.Entries.Add(entry);
+                rulemess.Entries.Add(entry);
             }
 
-            return Rulemess;
+            return rulemess;
         }
     }
 }

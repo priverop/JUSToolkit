@@ -46,7 +46,7 @@ namespace JUSToolkit.Texts.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var Rulemess = new Rulemess();
+            var rulemess = new Rulemess();
             reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
@@ -55,27 +55,27 @@ namespace JUSToolkit.Texts.Converters
             reader.Stream.Position = 0x00;
 
             for (int i = 0; i < count; i++) {
-                Rulemess.Entries.Add(ReadEntry());
+                rulemess.Entries.Add(ReadEntry());
             }
 
-            return Rulemess;
+            return rulemess;
         }
 
         /// <summary>
         /// Converts Rulemess format to BinaryFormat.
         /// </summary>
-        /// <param name="Rulemess">TextFormat to convert.</param>
+        /// <param name="rulemess">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        public BinaryFormat Convert(Rulemess Rulemess)
+        public BinaryFormat Convert(Rulemess rulemess)
         {
             var bin = new BinaryFormat();
             writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(RulemessEntry.EntrySize * Rulemess.Entries.Count);
+            var jit = new IndirectTextWriter(RulemessEntry.EntrySize * rulemess.Entries.Count);
 
-            foreach (RulemessEntry entry in Rulemess.Entries) {
+            foreach (RulemessEntry entry in rulemess.Entries) {
                 JusText.WriteStringPointer(entry.Description1, writer, jit);
                 JusText.WriteStringPointer(entry.Description2, writer, jit);
                 JusText.WriteStringPointer(entry.Description3, writer, jit);
