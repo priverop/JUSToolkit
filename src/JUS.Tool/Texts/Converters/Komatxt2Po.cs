@@ -33,14 +33,14 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts Komatxt format to Po.
         /// </summary>
-        /// <param name="Komatxt">TextFormat to convert.</param>
+        /// <param name="komatxt">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(Komatxt Komatxt)
+        public Po Convert(Komatxt komatxt)
         {
             var po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (KomatxtEntry entry in Komatxt.Entries) {
+            foreach (KomatxtEntry entry in komatxt.Entries) {
                 po.Add(new PoEntry(entry.Name) {
                     Context = $"{i++}",
                     ExtractedComments = $"{entry.Unk1}-{entry.Unk2}",
@@ -57,7 +57,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Transformed TextFormat.</returns>
         public Komatxt Convert(Po po)
         {
-            var Komatxt = new Komatxt();
+            var komatxt = new Komatxt();
             KomatxtEntry entry;
             string[] metadata;
 
@@ -69,10 +69,10 @@ namespace JUSToolkit.Texts.Converters
                 entry.Unk1 = short.Parse(metadata[0]);
                 entry.Unk2 = short.Parse(metadata[1]);
 
-                Komatxt.Entries.Add(entry);
+                komatxt.Entries.Add(entry);
             }
 
-            return Komatxt;
+            return komatxt;
         }
     }
 }

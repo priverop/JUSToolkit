@@ -46,7 +46,7 @@ namespace JUSToolkit.Texts.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var Komatxt = new Komatxt();
+            var komatxt = new Komatxt();
             reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
@@ -55,27 +55,27 @@ namespace JUSToolkit.Texts.Converters
             reader.Stream.Position = 0x00;
 
             for (int i = 0; i < count; i++) {
-                Komatxt.Entries.Add(ReadEntry());
+                komatxt.Entries.Add(ReadEntry());
             }
 
-            return Komatxt;
+            return komatxt;
         }
 
         /// <summary>
         /// Converts Komatxt format to BinaryFormat.
         /// </summary>
-        /// <param name="Komatxt">TextFormat to convert.</param>
+        /// <param name="komatxt">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        public BinaryFormat Convert(Komatxt Komatxt)
+        public BinaryFormat Convert(Komatxt komatxt)
         {
             var bin = new BinaryFormat();
             writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(KomatxtEntry.EntrySize * Komatxt.Entries.Count);
+            var jit = new IndirectTextWriter(KomatxtEntry.EntrySize * komatxt.Entries.Count);
 
-            foreach (KomatxtEntry entry in Komatxt.Entries) {
+            foreach (KomatxtEntry entry in komatxt.Entries) {
                 JusText.WriteStringPointer(entry.Name, writer, jit);
                 writer.Write(entry.Unk1);
                 writer.Write(entry.Unk2);
