@@ -37,6 +37,7 @@ namespace JUSToolkit.Utils
             { "komatxt.bin", "Komatxt" },
             { "location.bin", "Location" },
             { "piece.bin", "Piece" },
+            { "rulemess.bin", "Rulemess" },
             { "stage.bin", "Stage" },
             { "title.bin", "SimpleBin" },
             { "pname.bin", "Pname" },
