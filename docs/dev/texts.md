@@ -40,20 +40,20 @@ The Format class has the main properties of the file and a list of Entries.
 | Name          | Format                   | Location                                            |
 | ------------- | ------------------------ | --------------------------------------------------- |
 | ability_t.bin | Ability + AbilityEntry   | Koma list, helper (koma size 1) ability description |
-| bgm.bin       | Bgm + BgmEntry           |                                                     |
-| chr_b_t.bin   | BtlChr + BtlChrEntry     |                                                     |
-| chr_s_t.bin   | SuppChr + SuppChrEntry   |                                                     |
-| clearlst.bin  | SimpleBin                |                                                     |
-| commwin.bin   |                          | Common window messages                              |
-| demo.bin      | Demo + DemoEntry         |                                                     |
-| infoname.bin  | SimpleBin                |                                                     |
+| bgm.bin       | Bgm + BgmEntry           | Battle stage Background Music (Database menu)       |
+| chr_b_t.bin   | BtlChr + BtlChrEntry     | Koma abilities info                                 |
+| chr_s_t.bin   | SuppChr + SuppChrEntry   | Koma abilities info support komas                   |
+| clearlst.bin  | SimpleBin                | Stage goals                                         |
+| commwin.bin   | Commwin + CommwinEntry   | Common window messages                              |
+| demo.bin      | Demo + DemoEntry         | World names (demo player menu, database)            |
+| infoname.bin  | SimpleBin                | Main menu helper names                              |
 | komatxt.bin   | Komatxt + KomatxtEntry   | Koma names                                          |
-| location.bin  | Location + LocationEntry |                                                     |
-| piece.bin     | Piece + PieceEntry       |                                                     |
-| pname.bin     | Pname                    |                                                     |
-| rulemess.bin  | Rulemess + RulemessEntry | Stage/level rules                                   |
-| stage.bin     | Stage + StageEntry       |                                                     |
-| title.bin     | SimpleBin                |                                                     |
+| location.bin  | Location + LocationEntry | Player location                                     |
+| piece.bin     | Piece + PieceEntry       | Manga author and info (database menu)               |
+| pname.bin     | Pname                    | Player name titles (player settings)                |
+| rulemess.bin  | Rulemess + RulemessEntry | Stage rules                                         |
+| stage.bin     | Stage + StageEntry       | Stage names                                         |
+| title.bin     | SimpleBin                | Manga names                                         |
 
 ### Formats
 
@@ -66,6 +66,7 @@ Pointer count is the total number of entries. Entry size is the size of the tota
 | Ability + AbilityEntry   | Starting offset + Relative pointers                  | Title and Description.                                                                                                                     |
 | Bgm + BgmEntry           | Pointer count + Relative pointers                    | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
 | BtlChr + BtlChrEntry     | Starting offset + Relative pointers + padding (0x04) | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
+| Commwin + CommwinEntry   | Pointer count + Relative pointers                    | ?                                                                                                                                          |
 | Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04)   | Title, Descriptions (3), Id and Icon.                                                                                                      |
 | Komatxt + KomatxtEntry   | Starting offset + Relative pointers                  | Name and two unknowns (int).                                                                                                               |
 | Location + LocationEntry | Pointer count + Relative pointers                    | Name and two unkown values (short).                                                                                                        |
