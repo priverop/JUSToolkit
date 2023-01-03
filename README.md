@@ -92,7 +92,7 @@ You can find these documents in our `docs/dev` folder:
 - Alar Specification
 - DTX Specification by PleoNex
 - DTX Research by PleoNex
-- FileFormats by Uknown Hacker
+- [FileFormats by Uknown Hacker](https://web.archive.org/web/20100111220659/http://jumpstars.wikispaces.com/File+Formats#toc10)
 
 ### Videos
 
