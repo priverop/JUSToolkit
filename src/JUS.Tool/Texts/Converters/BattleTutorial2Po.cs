@@ -17,6 +17,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
+using System.Linq;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
@@ -27,8 +29,8 @@ namespace JUSToolkit.Texts.Converters
     /// Converts between BattleTutorial format and Po.
     /// </summary>
     public class BattleTutorial2Po :
-        IConverter<BattleTutorial, Po>
-    // IConverter<Po, BattleTutorial>
+        IConverter<BattleTutorial, Po>,
+        IConverter<Po, BattleTutorial>
     {
         /// <summary>
         /// Converts BattleTutorial format to Po.
@@ -38,6 +40,9 @@ namespace JUSToolkit.Texts.Converters
         public Po Convert(BattleTutorial battleTutorial)
         {
             var po = JusText.GenerateJusPo();
+            po.Add(new PoEntry("<!Don't remove>") {
+                ExtractedComments = $"{battleTutorial.StartingOffset}",
+            });
 
             int i = 0;
             foreach (BattleTutorialEntry entry in battleTutorial.Entries) {
@@ -55,24 +60,25 @@ namespace JUSToolkit.Texts.Converters
         /// </summary>
         /// <param name="po">Po to convert.</param>
         /// <returns>Transformed TextFormat.</returns>
-        // public BattleTutorial Convert(Po po)
-        // {
-        //     var battleTutorial = new BattleTutorial();
-        //     BattleTutorialEntry entry;
-        //     string[] metadata;
+        public BattleTutorial Convert(Po po)
+        {
+            var battleTutorial = new BattleTutorial();
+            BattleTutorialEntry entry;
+            string[] metadata;
 
-        //     for (int i = 0; i < po.Entries.Count; i++) {
-        //         entry = new BattleTutorialEntry();
-        //         entry.Name = po.Entries[i].Text;
+            battleTutorial.StartingOffset = int.Parse(po.Entries[0].ExtractedComments);
 
-        //         metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
-        //         entry.Unk1 = int.Parse(metadata[0]);
-        //         entry.Unk2 = int.Parse(metadata[1]);
+            for (int i = 1; i < po.Entries.Count; i++) {
+                entry = new BattleTutorialEntry();
+                entry.Description = po.Entries[i].Text;
 
-        //         battleTutorial.Entries.Add(entry);
-        //     }
+                metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
+                entry.Unknowns = metadata.Select(int.Parse).ToList();
 
-        //     return battleTutorial;
-        // }
+                battleTutorial.Entries.Add(entry);
+            }
+
+            return battleTutorial;
+        }
     }
 }

@@ -105,6 +105,19 @@ namespace JUSToolkit.Texts
         }
 
         /// <summary>
+        /// Writes string with accumulator pointer.
+        /// </summary>
+        /// <param name="text">String to write.</param>
+        /// <param name="writer">Writer.</param>
+        /// <param name="jdt"><see cref="DirectTextWriter.Strings"/> object to store texts and offsets (pointers).</param>
+        public static void WriteStringRelativePointer(string text, DataWriter writer, DirectTextWriter jdt)
+        {
+            jdt.PointerAccumulator += JusEncoding.GetByteCount(text) + 1;
+            writer.Write(jdt.PointerAccumulator);
+            jdt.Strings.Add(text);
+        }
+
+        /// <summary>
         /// Writes all the strings inside a <see cref="IndirectTextWriter.Strings"/>.
         /// </summary>
         /// <param name="writer">Writer to write to.</param>
@@ -112,6 +125,18 @@ namespace JUSToolkit.Texts
         public static void WriteAllStrings(DataWriter writer, IndirectTextWriter jit)
         {
             foreach (string s in jit.Strings) {
+                writer.Write(s);
+            }
+        }
+
+        /// <summary>
+        /// Writes all the strings inside a <see cref="DirectTextWriter.Strings"/>.
+        /// </summary>
+        /// <param name="writer">Writer to write to.</param>
+        /// <param name="jdt">JusDirectText to get the strings from.</param>
+        public static void WriteAllStrings(DataWriter writer, DirectTextWriter jdt)
+        {
+            foreach (string s in jdt.Strings) {
                 writer.Write(s);
             }
         }

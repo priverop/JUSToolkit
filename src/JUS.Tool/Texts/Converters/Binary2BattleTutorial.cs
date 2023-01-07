@@ -28,12 +28,12 @@ namespace JUSToolkit.Texts.Converters
     /// Converts between BattleTutorial format and BinaryFormat.
     /// </summary>
     public class Binary2BattleTutorial :
-        IConverter<BinaryFormat, BattleTutorial>
-    // IConverter<BattleTutorial, BinaryFormat>
+        IConverter<BinaryFormat, BattleTutorial>,
+        IConverter<BattleTutorial, BinaryFormat>
     {
         private DataReader reader;
         private DataWriter writer;
-        int pointerAccumulator = 0;
+        private int pointerAccumulator = 0;
 
         /// <summary>
         /// Converts BinaryFormat to BattleTutorial format.
@@ -65,27 +65,35 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts BattleTutorial format to BinaryFormat.
         /// </summary>
-        /// <param name="komatxt">TextFormat to convert.</param>
+        /// <param name="battleTutorial">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        // public BinaryFormat Convert(BattleTutorial komatxt)
-        // {
-        //     var bin = new BinaryFormat();
-        //     writer = new DataWriter(bin.Stream) {
-        //         DefaultEncoding = JusText.JusEncoding,
-        //     };
+        public BinaryFormat Convert(BattleTutorial battleTutorial)
+        {
+            var bin = new BinaryFormat();
+            writer = new DataWriter(bin.Stream) {
+                DefaultEncoding = JusText.JusEncoding,
+            };
 
-        //     var jit = new IndirectTextWriter(BattleTutorialEntry.EntrySize * komatxt.Entries.Count);
+            var jdt = new DirectTextWriter();
 
-        //     foreach (BattleTutorialEntry entry in komatxt.Entries) {
-        //         JusText.WriteStringPointer(entry.Name, writer, jit);
-        //         writer.Write(entry.Unk1);
-        //         writer.Write(entry.Unk2);
-        //     }
+            writer.Write(battleTutorial.StartingOffset);
 
-        //     JusText.WriteAllStrings(writer, jit);
+            foreach (BattleTutorialEntry entry in battleTutorial.Entries) {
+                foreach (var unknown in entry.Unknowns) {
+                    writer.Write(unknown);
+                }
 
-        //     return bin;
-        // }
+                JusText.WriteStringRelativePointer(entry.Description, writer, jdt);
+            }
+
+            // Last pointer is not written, let's overwrite it
+            writer.Stream.Position -= 4;
+            writer.Write(0);
+
+            JusText.WriteAllStrings(writer, jdt);
+
+            return bin;
+        }
 
         /// <summary>
         /// Reads a single <see cref="BattleTutorialEntry"/>.
@@ -96,13 +104,9 @@ namespace JUSToolkit.Texts.Converters
         {
             var entry = new BattleTutorialEntry();
             entry.Description = JusText.ReadIndirectString(reader, startingOffset + pointerAccumulator);
-            Console.WriteLine("ReadEntry:");
-            Console.WriteLine(entry.Description);
-            Console.WriteLine("Length: " + JusText.JusEncoding.GetByteCount(entry.Description));
 
             // +1 is because of the null end byte
             pointerAccumulator += JusText.JusEncoding.GetByteCount(entry.Description) + 1;
-            Console.WriteLine("Pointer Accumulator:" + pointerAccumulator.ToString("X"));
 
             // Read pointers until we find the accumulator one or the ending of the pointer section
             var pointer = reader.ReadInt32();
@@ -111,13 +115,6 @@ namespace JUSToolkit.Texts.Converters
                 pointer = reader.ReadInt32();
             }
 
-            Console.WriteLine("Position of the pointer:" + reader.Stream.Position.ToString("X"));
-
-            // storing this just in case the entry.Description.Length doesnt' work well
-            // the last Entry will have a useless pointer
-            entry.Pointer = pointer;
-
-            Console.WriteLine("___");
             return entry;
         }
     }

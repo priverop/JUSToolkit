@@ -21,11 +21,6 @@ namespace JUSToolkit.Texts.Formats
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the Pointer (which is the Description.Length * 2 - 1 as it's shift jis).
-        /// </summary>
-        public int Pointer { get; set; }
-
-        /// <summary>
         /// Gets or sets the list of Unknown pointers/values.
         /// </summary>
         public List<int> Unknowns { get; set; }
