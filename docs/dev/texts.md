@@ -22,7 +22,7 @@ To help with the process we've developed some classes to read and write easily:
 
 ## Battle folder
 
-Here we have the tutorials.
+Here we have the tutorials. They all have the same structure: StartingOffset, a lot of random unknown ints and the pointers. These pointers just store the size of the string starting from 0. For example if the first two strings are 2bytes and 4bytes long, the pointers will be 02 and then 06.
 
 | Name          | Format | Description |
 | ------------- | ------ | ----------- |

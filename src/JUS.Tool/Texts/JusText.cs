@@ -72,6 +72,21 @@ namespace JUSToolkit.Texts
         }
 
         /// <summary>
+        /// Returns a string from indirect stream offset.
+        /// </summary>
+        /// <param name="reader">Reader to read from.</param>
+        /// <param name="offset">Offset to start reading.</param>
+        /// <returns><see cref="string"/> at position.</returns>
+        public static string ReadIndirectString(DataReader reader, int offset)
+        {
+            reader.Stream.PushToPosition(offset);
+            string text = reader.ReadString();
+            reader.Stream.PopPosition();
+
+            return text;
+        }
+
+        /// <summary>
         /// Writes relative pointers.
         /// </summary>
         /// <param name="text">String to write.</param>
@@ -114,6 +129,16 @@ namespace JUSToolkit.Texts
             }
 
             return merged.ToString()[..^1];
+        }
+
+        /// <summary>
+        /// Split a list of ints into a string with dashes.
+        /// </summary>
+        /// <param name="list">list to merge.</param>
+        /// <returns>String.</returns>
+        public static string MergeStrings(List<int> list)
+        {
+            return string.Join("-", list.ToArray());
         }
     }
 }
