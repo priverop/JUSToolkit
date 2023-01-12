@@ -87,7 +87,7 @@ namespace JUSToolkit.Texts
         }
 
         /// <summary>
-        /// Writes relative pointers.
+        /// Writes absolute pointers.
         /// </summary>
         /// <param name="text">String to write.</param>
         /// <param name="writer">Writer.</param>

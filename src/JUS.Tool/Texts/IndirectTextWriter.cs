@@ -3,7 +3,7 @@
 namespace JUSToolkit.Texts
 {
     /// <summary>
-    /// Class with utilities to work with Jus text files with relative pointers.
+    /// Class with utilities to work with Jus text files with absolute pointers.
     /// </summary>
     public class IndirectTextWriter
     {
