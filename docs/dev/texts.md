@@ -104,15 +104,20 @@ The same format as Battle Tutorials.
 
 ## Deck folder
 
-| Name           | Format | Description |
-| -------------- | ------ | ----------- |
-| deck-jadv.bin  |        |             |
-| deck-jard.bin  |        |             |
-| deck-jarg.bin  |        |             |
-| deck-play.bin  |        |             |
-| deck-priv.bin  |        |             |
-| deck-simpl.bin |        |             |
-| deck-test.bin  |        |             |
+10 files.
+
+| Name             | Format | Description |
+| ---------------- | ------ | ----------- |
+| deck-jadv.bin    |        |             |
+| deck-jard.bin    |        |             |
+| deck-jard_P.bin  |        |             |
+| deck-jarg.bin    |        |             |
+| deck-jarg_P.bin  |        |             |
+| deck-play.bin    |        |             |
+| deck-priv.bin    |        |             |
+| deck-simpl.bin   |        |             |
+| deck-simpl_P.bin |        |             |
+| deck-test.bin    |        |             |
 
 ## InfoDeck folder
 
