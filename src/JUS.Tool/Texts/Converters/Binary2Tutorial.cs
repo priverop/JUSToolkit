@@ -25,49 +25,49 @@ using Yarhl.IO;
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between BattleTutorial format and BinaryFormat.
+    /// Converts between Tutorial format and BinaryFormat.
     /// </summary>
-    public class Binary2BattleTutorial :
-        IConverter<BinaryFormat, BattleTutorial>,
-        IConverter<BattleTutorial, BinaryFormat>
+    public class Binary2Tutorial :
+        IConverter<BinaryFormat, Tutorial>,
+        IConverter<Tutorial, BinaryFormat>
     {
         private DataReader reader;
         private DataWriter writer;
         private int pointerAccumulator = 0;
 
         /// <summary>
-        /// Converts BinaryFormat to BattleTutorial format.
+        /// Converts BinaryFormat to Tutorial format.
         /// </summary>
         /// <param name="source">BinaryFormat to convert.</param>
         /// <returns>Text format.</returns>
         /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
-        public BattleTutorial Convert(BinaryFormat source)
+        public Tutorial Convert(BinaryFormat source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var battleTutorial = new BattleTutorial();
+            var tutorial = new Tutorial();
             reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
             reader.Stream.Position = 0x00;
-            battleTutorial.StartingOffset = reader.ReadInt32();
+            tutorial.StartingOffset = reader.ReadInt32();
 
-            while (reader.Stream.Position != battleTutorial.StartingOffset) {
-                battleTutorial.Entries.Add(ReadEntry(battleTutorial.StartingOffset));
+            while (reader.Stream.Position != tutorial.StartingOffset) {
+                tutorial.Entries.Add(ReadEntry(tutorial.StartingOffset));
             }
 
-            return battleTutorial;
+            return tutorial;
         }
 
         /// <summary>
-        /// Converts BattleTutorial format to BinaryFormat.
+        /// Converts Tutorial format to BinaryFormat.
         /// </summary>
-        /// <param name="battleTutorial">TextFormat to convert.</param>
+        /// <param name="tutorial">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        public BinaryFormat Convert(BattleTutorial battleTutorial)
+        public BinaryFormat Convert(Tutorial tutorial)
         {
             var bin = new BinaryFormat();
             writer = new DataWriter(bin.Stream) {
@@ -76,9 +76,9 @@ namespace JUSToolkit.Texts.Converters
 
             var jdt = new DirectTextWriter();
 
-            writer.Write(battleTutorial.StartingOffset);
+            writer.Write(tutorial.StartingOffset);
 
-            foreach (BattleTutorialEntry entry in battleTutorial.Entries) {
+            foreach (TutorialEntry entry in tutorial.Entries) {
                 foreach (var unknown in entry.Unknowns) {
                     writer.Write(unknown);
                 }
@@ -96,13 +96,13 @@ namespace JUSToolkit.Texts.Converters
         }
 
         /// <summary>
-        /// Reads a single <see cref="BattleTutorialEntry"/>.
+        /// Reads a single <see cref="TutorialEntry"/>.
         /// </summary>
         /// <param name="startingOffset">Accumulator with the sum of the string lengths.</param>
-        /// <returns>The read <see cref="BattleTutorialEntry"/>.</returns>
-        private BattleTutorialEntry ReadEntry(int startingOffset)
+        /// <returns>The read <see cref="TutorialEntry"/>.</returns>
+        private TutorialEntry ReadEntry(int startingOffset)
         {
-            var entry = new BattleTutorialEntry();
+            var entry = new TutorialEntry();
             entry.Description = JusText.ReadIndirectString(reader, startingOffset + pointerAccumulator);
 
             // +1 is because of the null end byte

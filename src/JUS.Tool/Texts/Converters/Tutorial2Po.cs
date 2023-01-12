@@ -26,26 +26,26 @@ using Yarhl.Media.Text;
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between BattleTutorial format and Po.
+    /// Converts between Tutorial format and Po.
     /// </summary>
-    public class BattleTutorial2Po :
-        IConverter<BattleTutorial, Po>,
-        IConverter<Po, BattleTutorial>
+    public class Tutorial2Po :
+        IConverter<Tutorial, Po>,
+        IConverter<Po, Tutorial>
     {
         /// <summary>
-        /// Converts BattleTutorial format to Po.
+        /// Converts Tutorial format to Po.
         /// </summary>
-        /// <param name="battleTutorial">TextFormat to convert.</param>
+        /// <param name="tutorial">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(BattleTutorial battleTutorial)
+        public Po Convert(Tutorial tutorial)
         {
             var po = JusText.GenerateJusPo();
             po.Add(new PoEntry("<!Don't remove>") {
-                ExtractedComments = $"{battleTutorial.StartingOffset}",
+                ExtractedComments = $"{tutorial.StartingOffset}",
             });
 
             int i = 0;
-            foreach (BattleTutorialEntry entry in battleTutorial.Entries) {
+            foreach (TutorialEntry entry in tutorial.Entries) {
                 po.Add(new PoEntry(entry.Description) {
                     Context = $"{i++}",
                     ExtractedComments = JusText.MergeStrings(entry.Unknowns),
@@ -56,29 +56,29 @@ namespace JUSToolkit.Texts.Converters
         }
 
         /// <summary>
-        /// Converts Po to BattleTutorial format.
+        /// Converts Po to Tutorial format.
         /// </summary>
         /// <param name="po">Po to convert.</param>
         /// <returns>Transformed TextFormat.</returns>
-        public BattleTutorial Convert(Po po)
+        public Tutorial Convert(Po po)
         {
-            var battleTutorial = new BattleTutorial();
-            BattleTutorialEntry entry;
+            var tutorial = new Tutorial();
+            TutorialEntry entry;
             string[] metadata;
 
-            battleTutorial.StartingOffset = int.Parse(po.Entries[0].ExtractedComments);
+            tutorial.StartingOffset = int.Parse(po.Entries[0].ExtractedComments);
 
             for (int i = 1; i < po.Entries.Count; i++) {
-                entry = new BattleTutorialEntry();
+                entry = new TutorialEntry();
                 entry.Description = po.Entries[i].Text;
 
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
                 entry.Unknowns = metadata.Select(int.Parse).ToList();
 
-                battleTutorial.Entries.Add(entry);
+                tutorial.Entries.Add(entry);
             }
 
-            return battleTutorial;
+            return tutorial;
         }
     }
 }

@@ -6,14 +6,14 @@ namespace JUSToolkit.Texts.Formats
     /// <summary>
     /// Format for battle/tutorials file.
     /// </summary>
-    public class BattleTutorial : IFormat
+    public class Tutorial : IFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BattleTutorial"/> class.
+        /// Initializes a new instance of the <see cref="Tutorial"/> class.
         /// </summary>
-        public BattleTutorial()
+        public Tutorial()
         {
-            Entries = new List<BattleTutorialEntry>();
+            Entries = new List<TutorialEntry>();
         }
 
         /// <summary>
@@ -22,8 +22,8 @@ namespace JUSToolkit.Texts.Formats
         public int StartingOffset { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="BattleTutorialEntry" />.
+        /// Gets or sets the list of <see cref="TutorialEntry" />.
         /// </summary>
-        public List<BattleTutorialEntry> Entries { get; set; }
+        public List<TutorialEntry> Entries { get; set; }
     }
 }

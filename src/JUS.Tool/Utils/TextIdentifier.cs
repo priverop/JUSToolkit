@@ -41,12 +41,13 @@ namespace JUSToolkit.Utils
             { "stage.bin", "Stage" },
             { "title.bin", "SimpleBin" },
             { "pname.bin", "Pname" },
-            { "tutorial0.bin", "BattleTutorial" },
-            { "tutorial1.bin", "BattleTutorial" },
-            { "tutorial2.bin", "BattleTutorial" },
-            { "tutorial3.bin", "BattleTutorial" },
-            { "tutorial4.bin", "BattleTutorial" },
-            { "tutorial5.bin", "BattleTutorial" },
+            { "tutorial.bin", "Tutorial" },
+            { "tutorial0.bin", "Tutorial" },
+            { "tutorial1.bin", "Tutorial" },
+            { "tutorial2.bin", "Tutorial" },
+            { "tutorial3.bin", "Tutorial" },
+            { "tutorial4.bin", "Tutorial" },
+            { "tutorial5.bin", "Tutorial" },
         };
 
         /// <summary>

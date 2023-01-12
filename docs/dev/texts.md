@@ -4,34 +4,36 @@ In this game the texts are stored in .bin files. Usually we have pointers and
 sentences, but each file is different, that's why we have a format for each type
 of file.
 
-## Relative pointers
+## Absolute pointers
 
-Relative pointers means that the text is in the pointer offset plus the position of the pointer. If the position of the pointer is 0x04 and the value is 0x100, the text will be in 0x104.
+Absolute pointers means that the text is in the pointer offset plus the position of the pointer. If the position of the pointer is 0x04 and the value is 0x100, the text will be in 0x104.
 
 ## Utility classes
 
 To help with the process we've developed some classes to read and write easily:
 
-- JusText.ReadIndirectString: This method help us to read relative pointers. It
-  reads 4 bytes (relative pointer), adds up our position, goes to that offset
+- JusText.ReadIndirectString: This method help us to read absolute pointers. It
+  reads 4 bytes (absolute pointer), adds up our position, goes to that offset
   and read until a null byte.
-- JusText.WriteStringPointer: This allows us to write relative pointers. It
+- JusText.WriteStringPointer: This allows us to write absolute pointers. It
   needs the JusIndirectText Class which stores the StartingOffset (where the
   pointer section ends and the text section starts), the strings to write and
   the pointers to these strings.
 
 ## Battle folder
 
-Here we have the tutorials. They all have the same structure: StartingOffset, a lot of random unknown ints and the pointers. These pointers just store the size of the string starting from 0. For example if the first two strings are 2bytes and 4bytes long, the pointers will be 02 and then 06.
+Here we have the tutorials. Relative Pointers. They all have the same structure: StartingOffset, a lot of random unknown ints and the pointers. These pointers just store the size of the string starting from 0. For example if the first two strings are 2bytes and 4bytes long, the pointers will be 02 and then 06.
 
-| Name          | Format | Description |
-| ------------- | ------ | ----------- |
-| tutorial0.bin |        |             |
-| tutorial1.bin |        |             |
-| tutorial2.bin |        |             |
-| tutorial3.bin |        |             |
-| tutorial4.bin |        |             |
-| tutorial5.bin |        |             |
+We store the unused pointers in the Po file as comments.
+
+| Name          | Format         |
+| ------------- | -------------- |
+| tutorial0.bin | BattleTutorial |
+| tutorial1.bin | BattleTutorial |
+| tutorial2.bin | BattleTutorial |
+| tutorial3.bin | BattleTutorial |
+| tutorial4.bin | BattleTutorial |
+| tutorial5.bin | BattleTutorial |
 
 ## Bin folder
 
@@ -63,19 +65,19 @@ Pointer count is the total number of entries. Entry size is the size of the tota
 
 | Format                   | Format Description                                   | Entry Description                                                                                                                          |
 | ------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Ability + AbilityEntry   | Starting offset + Relative pointers                  | Title and Description.                                                                                                                     |
-| Bgm + BgmEntry           | Pointer count + Relative pointers                    | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
-| BtlChr + BtlChrEntry     | Starting offset + Relative pointers + padding (0x04) | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
-| Commwin + CommwinEntry   | Pointer count + Relative pointers                    | ?                                                                                                                                          |
-| Demo + DemoEntry         | Pointer count + Relative pointers + padding (0x04)   | Title, Descriptions (3), Id and Icon.                                                                                                      |
-| Komatxt + KomatxtEntry   | Starting offset + Relative pointers                  | Name and two unknowns (int).                                                                                                               |
-| Location + LocationEntry | Pointer count + Relative pointers                    | Name and two unkown values (short).                                                                                                        |
-| Piece + PieceEntry       | Pointer count + Relative pointers                    | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
-| Pname (only strings)     | Pointer count + Relative simple pointers             | Just strings.                                                                                                                              |
-| Rulemess + RulemessEntry | Starting offset + Relative pointers                  | 3 Descriptions + int unknown.                                                                                                              |
-| SimpleBin                | Starting offset + Relative pointers                  | Just strings.                                                                                                                              |
-| Stage + StageEntry       | Starting offset + Relative pointers                  | Name and two unkown values (short).                                                                                                        |
-| SuppChr + SuppChrEntry   | Starting offset + Relative pointers                  | Char name, abilities and descriptions.                                                                                                     |
+| Ability + AbilityEntry   | Starting offset + Absolute pointers                  | Title and Description.                                                                                                                     |
+| Bgm + BgmEntry           | Pointer count + Absolute pointers                    | Title, Descriptions (3), Unkown 1 and 2, Icon.                                                                                             |
+| BtlChr + BtlChrEntry     | Starting offset + Absolute pointers + padding (0x04) | Char name, abilities and furiganas; passive name, passive furigana, passive descriptions, ability descriptions and interactions; unknowns. |
+| Commwin + CommwinEntry   | Pointer count + Absolute pointers                    | ?                                                                                                                                          |
+| Demo + DemoEntry         | Pointer count + Absolute pointers + padding (0x04)   | Title, Descriptions (3), Id and Icon.                                                                                                      |
+| Komatxt + KomatxtEntry   | Starting offset + Absolute pointers                  | Name and two unknowns (int).                                                                                                               |
+| Location + LocationEntry | Pointer count + Absolute pointers                    | Name and two unkown values (short).                                                                                                        |
+| Piece + PieceEntry       | Pointer count + Absolute pointers                    | Title, Authors, Info, Page1, Page2, unknown, Id.                                                                                           |
+| Pname (only strings)     | Pointer count + Absolute simple pointers             | Just strings.                                                                                                                              |
+| Rulemess + RulemessEntry | Starting offset + Absolute pointers                  | 3 Descriptions + int unknown.                                                                                                              |
+| SimpleBin                | Starting offset + Absolute pointers                  | Just strings.                                                                                                                              |
+| Stage + StageEntry       | Starting offset + Absolute pointers                  | Name and two unkown values (short).                                                                                                        |
+| SuppChr + SuppChrEntry   | Starting offset + Absolute pointers                  | Char name, abilities and descriptions.                                                                                                     |
 
 ### Without text
 
@@ -94,9 +96,11 @@ Pointer count is the total number of entries. Entry size is the size of the tota
 
 ## Deckmake folder
 
-| Name         | Format | Description |
-| ------------ | ------ | ----------- |
-| tutorial.bin |        |             |
+The same format as Battle Tutorials.
+
+| Name         | Format   |
+| ------------ | -------- |
+| tutorial.bin | Tutorial |
 
 ## Deck folder
 

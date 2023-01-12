@@ -3,14 +3,14 @@
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Single entry in a BattleTutorial file.
+    /// Single entry in a Tutorial file.
     /// </summary>
-    public class BattleTutorialEntry
+    public class TutorialEntry
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BattleTutorialEntry"/> class.
+        /// Initializes a new instance of the <see cref="TutorialEntry"/> class.
         /// </summary>
-        public BattleTutorialEntry()
+        public TutorialEntry()
         {
             Unknowns = new List<int>();
         }
