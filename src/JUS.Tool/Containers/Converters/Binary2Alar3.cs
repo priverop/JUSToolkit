@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.IO;
+using System.Linq;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -65,7 +66,7 @@ namespace JUSToolkit.Containers.Converters
             }
 
             var version = new Version(reader.ReadByte(), reader.ReadByte());
-            if (version != Alar3.SupportedVersion) {
+            if (!Alar3.SupportedVersions.Contains(version)) {
                 throw new FormatException($"Unsupported version: {version:X}");
             }
 
@@ -77,6 +78,7 @@ namespace JUSToolkit.Containers.Converters
                 NumEntries = numEntries,
                 Reserved = reserved,
                 DataOffset = reader.ReadUInt16(),
+                MinorVersion = (byte)version.Minor,
             };
         }
 
