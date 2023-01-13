@@ -92,6 +92,12 @@ namespace JUSToolkit.CLI.JUS
 
         private static Command CreateContainerCommand()
         {
+            var export = new Command("export", "Export alar container, any version") {
+                new Option<string>("--container", "the input alar container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            export.Handler = CommandHandler.Create<string, string>(ContainerCommands.Export);
+
             var exportAlar3 = new Command("export-alar3", "Export alar3") {
                 new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
@@ -118,6 +124,7 @@ namespace JUSToolkit.CLI.JUS
             importAlar3.Handler = CommandHandler.Create<string, string, string>(ContainerCommands.ImportAlar3);
 
             return new Command("containers", "Unpack/Repack container files") {
+                export,
                 exportAlar3,
                 exportAlar2,
                 importAlar2,

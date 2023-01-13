@@ -22,6 +22,7 @@ using System.IO;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -33,6 +34,41 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class ContainerCommands
     {
+        /// <summary>
+        /// Export all the files from an Alar container.
+        /// </summary>
+        /// <param name="container">The path to the alar file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void Export(string container, string output)
+        {
+            Node files = NodeFactory.FromFile(container)
+                .TransformWith<LzssDecompression>();
+
+            if (files is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            var alarVersion = Identifier.GetAlarVersion(files.Stream);
+
+            // ToDo: In the future we need to encapsulate this
+            if (alarVersion.Major == 3) {
+                files.TransformWith<Binary2Alar3>();
+            } else if (alarVersion.Major == 2) {
+                files.TransformWith<Binary2Alar2>();
+            }
+
+            foreach (var node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
+                    // Path.Combine ignores the relative path if there is an absolute path
+                    // so we remove the first slash of the node.Path
+                    string outputFile = Path.Combine(output, node.Path[1..]);
+                    node.Stream.WriteTo(outputFile);
+                }
+            }
+
+            Console.WriteLine("Done!");
+        }
+
         /// <summary>
         /// Export all the files from the Alar3 container.
         /// </summary>
