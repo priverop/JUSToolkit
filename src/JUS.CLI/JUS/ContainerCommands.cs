@@ -124,6 +124,49 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
+        /// Import files into an Alar container.
+        /// </summary>
+        /// <param name="container">The path to the original alar file.</param>
+        /// <param name="input">The path to the directory of the files we want to add.</param>
+        /// <param name="output">The output directory.</param>
+        public static void Import(string container, string input, string output)
+        {
+            Node originalAlar = NodeFactory.FromFile(container);
+
+            if (originalAlar is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            var originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
+
+            var alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
+
+            originalAlar.TransformWith<LzssDecompression>();
+
+            BinaryFormat binary = new BinaryFormat();
+
+            if (alarVersion.Major == 3) {
+                Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
+                .GetFormatAs<Alar3>();
+                alar.InsertModification(NodeFactory.FromDirectory(input));
+                binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            } else if (alarVersion.Major == 2) {
+                Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
+                .GetFormatAs<Alar2>();
+                alar.InsertModification(NodeFactory.FromDirectory(input));
+                binary = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+            }
+
+            binary = originalIsCompressed ?
+                (BinaryFormat)ConvertFormat.With<LzssCompression>(binary) :
+                binary;
+
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
         /// Import files into an Alar3 container.
         /// </summary>
         /// <param name="container">The path to the original alar3 file.</param>
