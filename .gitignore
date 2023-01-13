@@ -17,5 +17,10 @@ docs/_site
 docs/api
 docs/_site_pdf
 
-# VS Files
-src/.vs
+# Visual studio files
+src/.vs/
+
+# Text test resources
+*.aar
+*.dig
+*.bin
