@@ -5,7 +5,7 @@ OLD_FORMAT=$2
 DIRECTORY="/Users//Dev/JUSToolkit/src/"
 
 if [ $# -ne 2 ]; then
-    echo "We need two arguments."
+    echo "We need two arguments. Usage: ./copy_text_format new_format old_format"
     exit 1
 fi
 
