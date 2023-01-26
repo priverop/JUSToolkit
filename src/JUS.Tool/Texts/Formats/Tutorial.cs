@@ -4,7 +4,7 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Format for battle/tutorials file.
+    /// Format for tutorials files.
     /// </summary>
     public class Tutorial : IFormat
     {
