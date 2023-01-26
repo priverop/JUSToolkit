@@ -104,20 +104,37 @@ The same format as Battle Tutorials.
 
 ## Deck folder
 
-10 files.
+There is 7 folders. Some of them includes regular files (3 digit numbers) and 
+some of them includes also p-files (a p and then the 3 digit numbers).
 
-| Name             | Format | Description |
-| ---------------- | ------ | ----------- |
-| deck-jadv.bin    |        |             |
-| deck-jard.bin    |        |             |
-| deck-jard_P.bin  |        |             |
-| deck-jarg.bin    |        |             |
-| deck-jarg_P.bin  |        |             |
-| deck-play.bin    |        |             |
-| deck-priv.bin    |        |             |
-| deck-simpl.bin   |        |             |
-| deck-simpl_P.bin |        |             |
-| deck-test.bin    |        |             |
+| Name         | Format |
+| ------------ | ------ |
+| deck-jadv    | Deck   |
+| deck-jard    | Deck   |
+| deck-jard_P  | PDeck  |
+| deck-jarg    | Deck   |
+| deck-jarg_P  | PDeck  |
+| deck-play    | Deck   |
+| deck-priv    | Deck   |
+| deck-simpl   | Deck   |
+| deck-simpl_P | PDeck  |
+| deck-test    | Deck   |
+
+### Deck
+
+| Offset | Type         | Description                      |
+| ------ | ------------ | -------------------------------- |
+| 0x00   | 64 bytes     | Header                           |
+| 0x40   | string       | Name                             |
+| ...    | zero padding | Until it reaches 64 bytes length |
+
+### PDeck
+
+| Offset | Type         | Description                      |
+| ------ | ------------ | -------------------------------- |
+| 0x00   | 20 bytes     | Header                           |
+| 0x14   | string       | Description                      |
+| ...    | zero padding | Until it reaches 92 bytes length |
 
 ## InfoDeck folder
 
