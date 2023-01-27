@@ -126,7 +126,7 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 | ------ | ------------ | -------------------------------- |
 | 0x00   | 64 bytes     | Header                           |
 | 0x40   | string       | Name                             |
-| ...    | zero padding | Until it reaches 64 bytes length |
+| ...    | zero padding | Until it reaches 92 bytes length |
 
 ### PDeck
 
@@ -134,7 +134,9 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 | ------ | ------------ | -------------------------------- |
 | 0x00   | 20 bytes     | Header                           |
 | 0x14   | string       | Description                      |
-| ...    | zero padding | Until it reaches 92 bytes length |
+| ...    | zero padding | Until 0x34                       |
+| 0x34   | int          | Unkown                           |
+| ...    | zero padding | Until it reaches 64 bytes length |
 
 ## InfoDeck folder
 

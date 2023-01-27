@@ -24,40 +24,45 @@ using Yarhl.Media.Text;
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between Deck format and Po.
+    /// Converts between PDeck format and Po.
     /// </summary>
-    public class Deck2Po :
-        IConverter<Deck, Po>,
-        IConverter<Po, Deck>
+    public class PDeck2Po :
+        IConverter<PDeck, Po>,
+        IConverter<Po, PDeck>
     {
         /// <summary>
-        /// Converts Deck format to Po.
+        /// Converts PDeck format to Po.
         /// </summary>
-        /// <param name="deck">TextFormat to convert.</param>
+        /// <param name="pDeck">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(Deck deck)
+        public Po Convert(PDeck pDeck)
         {
             var po = JusText.GenerateJusPo();
+            var headerBase64 = System.Convert.ToBase64String(pDeck.Header);
 
-            po.Add(new PoEntry(deck.Name) {
+            po.Add(new PoEntry(pDeck.Name) {
                 Context = "0",
-                ExtractedComments = System.Convert.ToBase64String(deck.Header),
+                ExtractedComments = $"{headerBase64}-{pDeck.Unknown}",
             });
 
             return po;
         }
 
         /// <summary>
-        /// Converts Po to Deck format.
+        /// Converts Po to PDeck format.
         /// </summary>
         /// <param name="po">Po to convert.</param>
         /// <returns>Transformed TextFormat.</returns>
-        public Deck Convert(Po po)
+        public PDeck Convert(Po po)
         {
-            var deck = new Deck();
-            deck.Name = po.Entries[0].Text;
-            deck.Header = System.Convert.FromBase64String(po.Entries[0].ExtractedComments);
-            return deck;
+            var pDeck = new PDeck();
+            string[] metadata;
+
+            pDeck.Name = po.Entries[0].Text;
+            metadata = JusText.ParseMetadata(po.Entries[0].ExtractedComments);
+            pDeck.Header = System.Convert.FromBase64String(metadata[0]);
+            pDeck.Unknown = int.Parse(metadata[1]);
+            return pDeck;
         }
     }
 }
