@@ -135,7 +135,7 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 | 0x00   | 20 bytes     | Header                           |
 | 0x14   | string       | Description                      |
 | ...    | zero padding | Until 0x34                       |
-| 0x34   | int          | Unkown                           |
+| 0x34   | int          | Unknown                          |
 | ...    | zero padding | Until it reaches 64 bytes length |
 
 ## InfoDeck folder
