@@ -8,7 +8,7 @@ This format is useful to store a lot of files. We have the header where we store
 | ------ | ---------- | --------------------------------- |
 | 0x00   | char[4]    | ALAR                              |
 | 0x04   | byte       | Version (3 to follow)             |
-| 0x05   | byte       | Minor version?                    |
+| 0x05   | byte       | Minor version (5, 69)             |
 | 0x06   | int        | Number of files                   |
 | 0x0A   | short      | Reserved?                         |
 | 0x0C   | int        | Number of entries (files - 1)     |

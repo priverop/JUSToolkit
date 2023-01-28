@@ -49,8 +49,8 @@ namespace JUSToolkit.Containers.Converters
 
             // Write Header
             writer.Write(Alar3.STAMP, false);
-            writer.Write((byte)Alar3.SupportedVersion.Major);
-            writer.Write((byte)Alar3.SupportedVersion.Minor);
+            writer.Write((byte)3);
+            writer.Write(alar.MinorVersion);
             writer.Write(alar.NumFiles);
             writer.Write(alar.Reserved);
             writer.Write(alar.NumEntries);

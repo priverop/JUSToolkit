@@ -22,6 +22,7 @@ using System.IO;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -33,6 +34,41 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class ContainerCommands
     {
+        /// <summary>
+        /// Export all the files from an Alar container.
+        /// </summary>
+        /// <param name="container">The path to the alar file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void Export(string container, string output)
+        {
+            Node files = NodeFactory.FromFile(container)
+                .TransformWith<LzssDecompression>();
+
+            if (files is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            var alarVersion = Identifier.GetAlarVersion(files.Stream);
+
+            // ToDo: In the future we need to encapsulate this
+            if (alarVersion.Major == 3) {
+                files.TransformWith<Binary2Alar3>();
+            } else if (alarVersion.Major == 2) {
+                files.TransformWith<Binary2Alar2>();
+            }
+
+            foreach (var node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
+                    // Path.Combine ignores the relative path if there is an absolute path
+                    // so we remove the first slash of the node.Path
+                    string outputFile = Path.Combine(output, node.Path[1..]);
+                    node.Stream.WriteTo(outputFile);
+                }
+            }
+
+            Console.WriteLine("Done!");
+        }
+
         /// <summary>
         /// Export all the files from the Alar3 container.
         /// </summary>
@@ -83,6 +119,49 @@ namespace JUSToolkit.CLI.JUS
                     node.Stream.WriteTo(outputFile);
                 }
             }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import files into an Alar container.
+        /// </summary>
+        /// <param name="container">The path to the original alar file.</param>
+        /// <param name="input">The path to the directory of the files we want to add.</param>
+        /// <param name="output">The output directory.</param>
+        public static void Import(string container, string input, string output)
+        {
+            Node originalAlar = NodeFactory.FromFile(container);
+
+            if (originalAlar is null) {
+                throw new FormatException("Invalid container file");
+            }
+
+            var originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
+
+            var alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
+
+            originalAlar.TransformWith<LzssDecompression>();
+
+            BinaryFormat binary = new BinaryFormat();
+
+            if (alarVersion.Major == 3) {
+                Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
+                .GetFormatAs<Alar3>();
+                alar.InsertModification(NodeFactory.FromDirectory(input));
+                binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            } else if (alarVersion.Major == 2) {
+                Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
+                .GetFormatAs<Alar2>();
+                alar.InsertModification(NodeFactory.FromDirectory(input));
+                binary = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+            }
+
+            binary = originalIsCompressed ?
+                (BinaryFormat)ConvertFormat.With<LzssCompression>(binary) :
+                binary;
+
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
 
             Console.WriteLine("Done!");
         }
