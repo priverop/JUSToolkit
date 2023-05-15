@@ -12,17 +12,17 @@ Absolute pointers means that the text is in the pointer offset plus the position
 
 To help with the process we've developed some classes to read and write easily:
 
-- JusText.ReadIndirectString: This method help us to read absolute pointers. It
+- **JusText.ReadIndirectString:** This method help us to read absolute pointers. It
   reads 4 bytes (absolute pointer), adds up our position, goes to that offset
   and read until a null byte.
-- JusText.WriteStringPointer: This allows us to write absolute pointers. It
-  needs the JusIndirectText Class which stores the StartingOffset (where the
+- **JusText.WriteStringPointer:** This allows us to write absolute pointers. It
+  needs the **JusIndirectText** Class which stores the *StartingOffset* (where the
   pointer section ends and the text section starts), the strings to write and
   the pointers to these strings.
 
 ## Battle folder
 
-Here we have the tutorials. Relative Pointers. They all have the same structure: StartingOffset, a lot of random unknown ints and the pointers. These pointers just store the size of the string starting from 0. For example if the first two strings are 2bytes and 4bytes long, the pointers will be 02 and then 06.
+Here we have the tutorials. **Relative Pointers**. They all have the same structure: *StartingOffset*, a lot of random unknown ints and the pointers. These pointers just store the size of the string starting from 0. For example if the first two strings are 2bytes and 4bytes long, the pointers will be 02 and then 06.
 
 We store the unused pointers in the Po file as comments.
 
