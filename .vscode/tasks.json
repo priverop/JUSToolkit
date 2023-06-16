@@ -58,6 +58,13 @@
                 "$msCompile"
             ],
             "label": "Cake: Run Build for release"
+        },
+        {
+          "label": "build",
+          "command": "dotnet",
+          "type": "process",
+          "args": ["build", "${workspaceFolder}/src/JUS.CLI/"],
+          "problemMatcher": "$msCompile"
         }
     ]
 }
