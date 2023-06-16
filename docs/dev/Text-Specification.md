@@ -6,23 +6,29 @@ of file.
 
 ## Absolute pointers
 
-Absolute pointers means that the text is in the pointer offset plus the position of the pointer. If the position of the pointer is 0x04 and the value is 0x100, the text will be in 0x104.
+Absolute pointers means that the text is in the pointer offset plus the position
+of the pointer. If the position of the pointer is 0x04 and the value is 0x100,
+the text will be in 0x104.
 
 ## Utility classes
 
 To help with the process we've developed some classes to read and write easily:
 
-- **JusText.ReadIndirectString:** This method help us to read absolute pointers. It
-  reads 4 bytes (absolute pointer), adds up our position, goes to that offset
+- **JusText.ReadIndirectString:** This method help us to read absolute pointers.
+  It reads 4 bytes (absolute pointer), adds up our position, goes to that offset
   and read until a null byte.
 - **JusText.WriteStringPointer:** This allows us to write absolute pointers. It
-  needs the **JusIndirectText** Class which stores the *StartingOffset* (where the
-  pointer section ends and the text section starts), the strings to write and
-  the pointers to these strings.
+  needs the **JusIndirectText** Class which stores the _StartingOffset_ (where
+  the pointer section ends and the text section starts), the strings to write
+  and the pointers to these strings.
 
 ## Battle folder
 
-Here we have the tutorials. **Relative Pointers**. They all have the same structure: *StartingOffset*, a lot of random unknown ints and the pointers. These pointers just store the size of the string starting from 0. For example if the first two strings are 2bytes and 4bytes long, the pointers will be 02 and then 06.
+Here we have the tutorials. **Relative Pointers**. They all have the same
+structure: _StartingOffset_, a lot of random unknown ints and the pointers.
+These pointers just store the size of the string starting from 0. For example if
+the first two strings are 2bytes and 4bytes long, the pointers will be 02 and
+then 06.
 
 We store the unused pointers in the Po file as comments.
 
@@ -59,9 +65,15 @@ The Format class has the main properties of the file and a list of Entries.
 
 ### Formats
 
-The Format class has the main properties of the file and a list of Entries. Each Entry has different parameters, which are listed here.
+The Format class has the main properties of the file and a list of Entries. Each
+Entry has different parameters, which are listed here.
 
-Pointer count is the total number of entries. Entry size is the size of the total entry in the pointer section. The starting offset means that the pointer section ends and the text section starts.
+Pointer count is the total number of entries. Entry size is the size of the
+total entry in the pointer section. The starting offset means that the pointer
+section ends and the text section starts.
+
+EntrySize is the size of each header pointer entry. For example:
+`A8 00 00 00 A9 00 00 00 B4 00 00 00 BE 00 00 00` the size would be 4 (0x04).
 
 | Format                   | Format Description                                   | Entry Description                                                                                                                          |
 | ------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -104,7 +116,7 @@ The same format as Battle Tutorials.
 
 ## Deck folder
 
-There is 7 folders. Some of them includes regular files (3 digit numbers) and 
+There is 7 folders. Some of them includes regular files (3 digit numbers) and
 some of them includes also p-files (a p and then the 3 digit numbers).
 
 | Name         | Format |
@@ -140,50 +152,94 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 
 ## InfoDeck folder
 
-| Name            | Format | Description |
-| --------------- | ------ | ----------- |
-| bin-deck-bb.bin |        |             |
-| bin-deck-bc.bin |        |             |
-| bin-deck-bl.bin |        |             |
-| bin-deck-bu.bin |        |             |
-| bin-deck-cb.bin |        |             |
-| bin-deck-ct.bin |        |             |
-| bin-deck-db.bin |        |             |
-| bin-deck-dg.bin |        |             |
-| bin-deck-dn.bin |        |             |
-| bin-deck-ds.bin |        |             |
-| bin-deck-dt.bin |        |             |
-| bin-deck-es.bin |        |             |
-| bin-deck-gt.bin |        |             |
-| bin-deck-hh.bin |        |             |
-| bin-deck-hk.bin |        |             |
-| bin-deck-hs.bin |        |             |
-| bin-deck-ig.bin |        |             |
-| bin-deck-is.bin |        |             |
-| bin-deck-jj.bin |        |             |
-| bin-deck-kk.bin |        |             |
-| bin-deck-kn.bin |        |             |
-| bin-deck-mo.bin |        |             |
-| bin-deck-mr.bin |        |             |
-| bin-deck-na.bin |        |             |
-| bin-deck-nb.bin |        |             |
-| bin-deck-nk.bin |        |             |
-| bin-deck-nn.bin |        |             |
-| bin-deck-oj.bin |        |             |
-| bin-deck-op.bin |        |             |
-| bin-deck-pj.bin |        |             |
-| bin-deck-rb.bin |        |             |
-| bin-deck-rk.bin |        |             |
-| bin-deck-sd.bin |        |             |
-| bin-deck-sk.bin |        |             |
-| bin-deck-ss.bin |        |             |
-| bin-deck-tc.bin |        |             |
-| bin-deck-tl.bin |        |             |
-| bin-deck-to.bin |        |             |
-| bin-deck-tr.bin |        |             |
-| bin-deck-tz.bin |        |             |
-| bin-deck-yh.bin |        |             |
-| bin-deck-yo.bin |        |             |
+Starting offset + absolute pointers
+
+| Name            | Format   | Description |
+| --------------- | -------- | ----------- |
+| bin-deck-bb.bin | InfoDeck |             |
+| bin-deck-bc.bin | InfoDeck |             |
+| bin-deck-bl.bin | InfoDeck |             |
+| bin-deck-bu.bin | InfoDeck |             |
+| bin-deck-cb.bin | InfoDeck |             |
+| bin-deck-ct.bin | InfoDeck |             |
+| bin-deck-db.bin | InfoDeck |             |
+| bin-deck-dg.bin | InfoDeck |             |
+| bin-deck-dn.bin | InfoDeck |             |
+| bin-deck-ds.bin | InfoDeck |             |
+| bin-deck-dt.bin | InfoDeck |             |
+| bin-deck-es.bin | InfoDeck |             |
+| bin-deck-gt.bin | InfoDeck |             |
+| bin-deck-hh.bin | InfoDeck |             |
+| bin-deck-hk.bin | InfoDeck |             |
+| bin-deck-hs.bin | InfoDeck |             |
+| bin-deck-ig.bin | InfoDeck |             |
+| bin-deck-is.bin | InfoDeck |             |
+| bin-deck-jj.bin | InfoDeck |             |
+| bin-deck-kk.bin | InfoDeck |             |
+| bin-deck-kn.bin | InfoDeck |             |
+| bin-deck-mo.bin | InfoDeck |             |
+| bin-deck-mr.bin | InfoDeck |             |
+| bin-deck-na.bin | InfoDeck |             |
+| bin-deck-nb.bin | InfoDeck |             |
+| bin-deck-nk.bin | InfoDeck |             |
+| bin-deck-nn.bin | InfoDeck |             |
+| bin-deck-oj.bin | InfoDeck |             |
+| bin-deck-op.bin | InfoDeck |             |
+| bin-deck-pj.bin | InfoDeck |             |
+| bin-deck-rb.bin | InfoDeck |             |
+| bin-deck-rk.bin | InfoDeck |             |
+| bin-deck-sd.bin | InfoDeck |             |
+| bin-deck-sk.bin | InfoDeck |             |
+| bin-deck-ss.bin | InfoDeck |             |
+| bin-deck-tc.bin | InfoDeck |             |
+| bin-deck-tl.bin | InfoDeck |             |
+| bin-deck-to.bin | InfoDeck |             |
+| bin-deck-tr.bin | InfoDeck |             |
+| bin-deck-tz.bin | InfoDeck |             |
+| bin-deck-yh.bin | InfoDeck |             |
+| bin-deck-yo.bin | InfoDeck |             |
+| bin-info-bb.bin | InfoDeck |             |
+| bin-info-bc.bin | InfoDeck |             |
+| bin-info-bl.bin | InfoDeck |             |
+| bin-info-bu.bin | InfoDeck |             |
+| bin-info-cb.bin | InfoDeck |             |
+| bin-info-ct.bin | InfoDeck |             |
+| bin-info-db.bin | InfoDeck |             |
+| bin-info-dg.bin | InfoDeck |             |
+| bin-info-dn.bin | InfoDeck |             |
+| bin-info-ds.bin | InfoDeck |             |
+| bin-info-dt.bin | InfoDeck |             |
+| bin-info-es.bin | InfoDeck |             |
+| bin-info-gt.bin | InfoDeck |             |
+| bin-info-hh.bin | InfoDeck |             |
+| bin-info-hk.bin | InfoDeck |             |
+| bin-info-hs.bin | InfoDeck |             |
+| bin-info-ig.bin | InfoDeck |             |
+| bin-info-is.bin | InfoDeck |             |
+| bin-info-jj.bin | InfoDeck |             |
+| bin-info-kk.bin | InfoDeck |             |
+| bin-info-kn.bin | InfoDeck |             |
+| bin-info-mo.bin | InfoDeck |             |
+| bin-info-mr.bin | InfoDeck |             |
+| bin-info-na.bin | InfoDeck |             |
+| bin-info-nb.bin | InfoDeck |             |
+| bin-info-nk.bin | InfoDeck |             |
+| bin-info-nn.bin | InfoDeck |             |
+| bin-info-oj.bin | InfoDeck |             |
+| bin-info-op.bin | InfoDeck |             |
+| bin-info-pj.bin | InfoDeck |             |
+| bin-info-rb.bin | InfoDeck |             |
+| bin-info-rk.bin | InfoDeck |             |
+| bin-info-sd.bin | InfoDeck |             |
+| bin-info-sk.bin | InfoDeck |             |
+| bin-info-ss.bin | InfoDeck |             |
+| bin-info-tc.bin | InfoDeck |             |
+| bin-info-tl.bin | InfoDeck |             |
+| bin-info-to.bin | InfoDeck |             |
+| bin-info-tr.bin | InfoDeck |             |
+| bin-info-tz.bin | InfoDeck |             |
+| bin-info-yh.bin | InfoDeck |             |
+| bin-info-yo.bin | InfoDeck |             |
 
 ## jGalaxy folder
 

@@ -48,6 +48,8 @@ namespace JUSToolkit.Utils
             { "tutorial3.bin", "Tutorial" },
             { "tutorial4.bin", "Tutorial" },
             { "tutorial5.bin", "Tutorial" },
+            { "bin-info-jump.bin", "InfoDeck" },
+            { "bin-deck-bb.bin", "InfoDeck" },
         };
 
         /// <summary>
