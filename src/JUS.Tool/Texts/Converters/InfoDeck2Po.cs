@@ -33,15 +33,18 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Converts InfoDeck format to Po.
         /// </summary>
-        /// <param name="InfoDeck">TextFormat to convert.</param>
+        /// <param name="infoDeck">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(InfoDeck InfoDeck)
+        public Po Convert(InfoDeck infoDeck)
         {
             var po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (string entry in InfoDeck.TextEntries) {
-                po.Add(new PoEntry(entry) {
+            foreach (string entry in infoDeck.TextEntries) {
+                string sentence = string.IsNullOrWhiteSpace(entry) ?
+                                "<!empty>" : entry;
+
+                po.Add(new PoEntry(sentence) {
                     Context = $"{i++}",
                 });
             }
@@ -56,13 +59,16 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Transformed TextFormat.</returns>
         public InfoDeck Convert(Po po)
         {
-            var InfoDeck = new InfoDeck();
+            var infoDeck = new InfoDeck();
 
             foreach (PoEntry entry in po.Entries) {
-                InfoDeck.TextEntries.Add(entry.Text);
+                string sentence = entry.Text == "<!empty>" ?
+                    string.Empty : entry.Text;
+
+                infoDeck.TextEntries.Add(sentence);
             }
 
-            return InfoDeck;
+            return infoDeck;
         }
     }
 }

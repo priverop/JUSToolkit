@@ -49,7 +49,7 @@ namespace JUSToolkit.CLI.JUS
 
             // Detect format
             string binFormatName = TextIdentifier.GetTextFormat(binNode.Name);
-            Console.WriteLine("File Name: " + binNode.Name + " File Format: " + binFormatName);
+            Console.WriteLine("File Name: " + binNode.Name + " - File Format: " + binFormatName);
 
             var converterName = textConvertersNamespace + "Binary2" + binFormatName;
             var converterPoName = textConvertersNamespace + binFormatName + "2Po";
@@ -65,6 +65,7 @@ namespace JUSToolkit.CLI.JUS
 
             string outputFile = Path.Combine(output, binNode.Name + ".po");
             poBinaryFormat.Stream.WriteTo(outputFile);
+            Console.WriteLine("Done!");
         }
 
         /// <summary>

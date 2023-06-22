@@ -43,7 +43,7 @@ namespace JUSToolkit.Texts.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var simple = new InfoDeck();
+            var infodeck = new InfoDeck();
             var reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
@@ -52,10 +52,10 @@ namespace JUSToolkit.Texts.Converters
             reader.Stream.Position = 0x00;
 
             for (int i = 0; i < count; i++) {
-                simple.TextEntries.Add(JusText.ReadIndirectString(reader));
+                infodeck.TextEntries.Add(JusText.ReadIndirectString(reader));
             }
 
-            return simple;
+            return infodeck;
         }
 
         /// <summary>
