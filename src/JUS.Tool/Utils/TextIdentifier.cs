@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace JUSToolkit.Utils
 {
@@ -48,8 +49,6 @@ namespace JUSToolkit.Utils
             { "tutorial3.bin", "Tutorial" },
             { "tutorial4.bin", "Tutorial" },
             { "tutorial5.bin", "Tutorial" },
-            { "bin-info-jump.bin", "InfoDeck" },
-            { "bin-deck-bb.bin", "InfoDeck" },
         };
 
         /// <summary>
@@ -59,7 +58,21 @@ namespace JUSToolkit.Utils
         /// <returns>The format.</returns>
         public static string GetTextFormat(string fileName)
         {
-            return BinDictionary[fileName];
+            return IsInfoDeckFormat(fileName) ? "InfoDeck" : BinDictionary[fileName];
         }
+
+        /// <summary>
+        /// Checks if the fileName correspond with the InfoDeck format files.
+        /// Example of correct format:  "bin-info-jump.bin" or "bin-deck-bb.bin".
+        /// </summary>
+        /// <param name="fileName">The name of the file we want to check.</param>
+        /// <returns>True if the filename follows the pattern bin-info|deck-manga.bin.</returns>
+        private static bool IsInfoDeckFormat(string fileName)
+        {
+            Regex regex = new Regex("^bin-.*-.*.bin$"); // ToDo: info or deck
+            return regex.IsMatch(fileName);
+        }
+
+        // ToDo: Testing
     }
 }
