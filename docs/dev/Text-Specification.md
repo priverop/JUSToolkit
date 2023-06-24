@@ -243,21 +243,79 @@ Starting offset + absolute pointers + just strings
 
 ## jGalaxy folder
 
--
+Here we have two formats, even thought they are pretty similar.
 
-| Name                | Format | Description |
-| ------------------- | ------ | ----------- |
-| jgalaxy-battle.bin  |        |             |
-| jgalaxy-jgalaxy.bin |        |             |
-| jgalaxy-mission.bin |        |             |
+| Name                | Format         | Description                                                        |
+| ------------------- | -------------- | ------------------------------------------------------------------ |
+| jgalaxy-battle.bin  | JGalaxySimple  | Number of entries + entries                                        |
+| jgalaxy-jgalaxy.bin | JGalaxyComplex | Number of entries per block (4) + Pointers of the blocks + entries |
+| jgalaxy-mission.bin | JGalaxySimple  | Number of entries + entries                                        |
+
+### JGalaxySimple
+
+This format is pretty simple.
+
+| Offset | Type      | Description        |
+| ------ | --------- | ------------------ |
+| 0x00   | byte      | Number of entries. |
+| 0x04   | byte[164] | Entry (164 bytes)  |
+
+So the size of the file is 4 + (164 \* number_of_entries).
+
+### JGalaxyComplex
+
+This is also simple but there is a twist that you are not expecting: the blocks
+are not entirely ordered. But don't worry it's just one file.
+
+There are four blocks in this file. Each block is a JGalaxySimple Entry. We
+share that.
+
+The block 3 is the last block. And the block 4 is before the 3 block: Block 1 -
+Block 2 - Block 4 - Block 3.
+
+| Offset | Type                    | Description                                 |
+| ------ | ----------------------- | ------------------------------------------- |
+| 0x00   | short[4]                | Number of entries per block (4 blocks).     |
+| 0x08   | int[4]                  | Pointer of the start of the text, per block |
+| 0x18   | byte[size_of_the_block] | String + null bytes + weird stuff           |
+
+**How to calculate the size_of_the_block?**
+
+We have the size of each block (with the pointers) and the number of entries, so
+we can divide them.
+
+#### Example
+
+| Block Number | Pointer        | Number of entries | Size of the entries | Math                        | Notes                                                           |
+| ------------ | -------------- | ----------------- | ------------------- | --------------------------- | --------------------------------------------------------------- | ----------------- |
+| 1            | 24 (0x18)      | 5 (0x5)           | 60bytes             | 24 + (5 \* 60) = 324        |                                                                 |
+| 2            | 324 (0x144)    | 36 (0x24)         | 72bytes             | 324 + (36 \* 72) = 2916     |                                                                 |
+| 3            | 2916 (0xB64)   | 142 (0x41)        | 136bytes            | 2916 + (142 \* 136) = 22228 | This pointer 64 0B comes after the next block's pointer (D4 56) |
+| 4            | 22228 (0x56D4) | 65 (0x8E)         | 64bytes             | 22228 + (65 \* 64)          | 26388 (0x6714)                                                  | Until end of file |
 
 ## jQuiz folder
 
-Inside the jquiz.aar we have the jquiz.bin.
+Inside the jquiz.aar we have the jquiz.bin. We have the header with the pointers
+and then the texts. The pointers are absolute starting with 0x08 (because the
+first 8 bytes are uknown) and adding 4 in each entry PLUS the length of the
+previous sentence plus ONE (because pointers are pointing to a null byte).
+Example below.
 
-| Name      | Format | Description |
-| --------- | ------ | ----------- |
-| jquiz.bin |        |             |
+### Definition
+
+| Offset   | Type   | Description                            |
+| -------- | ------ | -------------------------------------- |
+| 0x00     | short  | 0x0BBE (190) Unknown.                  |
+| 0x04     | byte   | 0xFF (190) Unknown.                    |
+| 0x08     | int    | First Pointer (AC D5 01 00)            |
+| 0x01D5B4 | string | Sentence starting and ending with null |
+
+### Example
+
+| Order | Offset of the Text | Pointer                                                                            |
+| ----- | ------------------ | ---------------------------------------------------------------------------------- |
+| #1    | 0x01D5B4 (120244)  | AC D5 01 00 —> 0x01D5AC (120236) + 8                                               |
+| #2    | 0x1D5D3 (120275)   | 0xA9 D5 01 00 —> 0x01 D5 A9 (120233) + {Text1.Length = 30} + 12 = 0x1D5D3 (120275) |
 
 ## Bin files without text
 
