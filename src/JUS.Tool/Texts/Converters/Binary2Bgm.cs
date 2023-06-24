@@ -30,7 +30,6 @@ namespace JUSToolkit.Texts.Converters
     public class Binary2Bgm : IConverter<BinaryFormat, Bgm>, IConverter<Bgm, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to Bgm format.
@@ -65,7 +64,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Bgm bgm)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

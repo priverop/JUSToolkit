@@ -31,9 +31,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<BinaryFormat, Deck>,
         IConverter<Deck, BinaryFormat>
     {
-        private DataReader reader;
-        private DataWriter writer;
-
         /// <summary>
         /// Converts BinaryFormat to Deck format.
         /// </summary>
@@ -47,7 +44,7 @@ namespace JUSToolkit.Texts.Converters
             }
 
             var deck = new Deck();
-            reader = new DataReader(source.Stream) {
+            DataReader reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
@@ -66,7 +63,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Deck deck)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

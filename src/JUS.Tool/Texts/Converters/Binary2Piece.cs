@@ -32,7 +32,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<Piece, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to Piece format.
@@ -67,7 +66,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Piece piece)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

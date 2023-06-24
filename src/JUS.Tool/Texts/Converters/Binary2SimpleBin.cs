@@ -31,9 +31,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<BinaryFormat, SimpleBin>,
         IConverter<SimpleBin, BinaryFormat>
     {
-        private DataReader reader;
-        private DataWriter writer;
-
         /// <summary>
         /// Converts BinaryFormat to SimpleBin format.
         /// </summary>
@@ -47,7 +44,7 @@ namespace JUSToolkit.Texts.Converters
             }
 
             var simple = new SimpleBin();
-            reader = new DataReader(source.Stream) {
+            DataReader reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
@@ -69,7 +66,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(SimpleBin simpleBin)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

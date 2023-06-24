@@ -32,7 +32,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<Tutorial, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
         private int pointerAccumulator = 0;
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Tutorial tutorial)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

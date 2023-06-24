@@ -32,7 +32,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<Location, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to Location format.
@@ -68,7 +67,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Location location)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

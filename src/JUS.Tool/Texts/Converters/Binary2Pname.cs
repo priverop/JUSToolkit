@@ -31,9 +31,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<BinaryFormat, Pname>,
         IConverter<Pname, BinaryFormat>
     {
-        private DataReader reader;
-        private DataWriter writer;
-
         /// <summary>
         /// Converts BinaryFormat to Pname format.
         /// </summary>
@@ -47,7 +44,7 @@ namespace JUSToolkit.Texts.Converters
             }
 
             var pname = new Pname();
-            reader = new DataReader(source.Stream) {
+            DataReader reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
@@ -68,7 +65,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Pname pname)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

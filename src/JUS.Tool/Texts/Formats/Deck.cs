@@ -16,7 +16,7 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets the File size of the Deck format.
         /// </summary>
-        public readonly int FileSize = 0x5C; //92
+        public readonly int FileSize = 0x5C; // 92
 
         /// <summary>
         /// Gets or sets the Name of the Deck.

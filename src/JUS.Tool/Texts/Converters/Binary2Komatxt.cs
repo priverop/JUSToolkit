@@ -32,7 +32,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<Komatxt, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to Komatxt format.
@@ -69,7 +68,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Komatxt komatxt)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

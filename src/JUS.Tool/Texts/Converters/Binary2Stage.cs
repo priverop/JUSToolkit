@@ -32,7 +32,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<Stage, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to Stage format.
@@ -69,7 +68,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Stage stage)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

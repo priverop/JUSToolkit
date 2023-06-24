@@ -30,7 +30,6 @@ namespace JUSToolkit.Texts.Converters
     public class Binary2Ability : IConverter<BinaryFormat, Ability>, IConverter<Ability, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to Ability format.
@@ -67,7 +66,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Ability ability)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

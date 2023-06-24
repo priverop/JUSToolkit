@@ -32,7 +32,6 @@ namespace JUSToolkit.Texts.Converters
         IConverter<BtlChr, BinaryFormat>
     {
         private DataReader reader;
-        private DataWriter writer;
 
         /// <summary>
         /// Converts BinaryFormat to BtlChr format.
@@ -69,7 +68,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(BtlChr btlChr)
         {
             var bin = new BinaryFormat();
-            writer = new DataWriter(bin.Stream) {
+            DataWriter writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
