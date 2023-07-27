@@ -49,6 +49,8 @@ namespace JUSToolkit.Utils
             { "tutorial3.bin", "Tutorial" },
             { "tutorial4.bin", "Tutorial" },
             { "tutorial5.bin", "Tutorial" },
+            { "battle.bin", "JGalaxySimple" },
+            { "mission.bin", "JGalaxySimple" },
         };
 
         /// <summary>
