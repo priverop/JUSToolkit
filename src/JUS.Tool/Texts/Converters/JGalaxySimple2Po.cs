@@ -26,38 +26,38 @@ namespace JUSToolkit.Texts.Converters
     /// <summary>
     /// Converts between JGalaxySimple format and Po.
     /// </summary>
-    public class JGalaxySimple2Po :
-        IConverter<JGalaxySimple, Po>,
-        IConverter<Po, JGalaxySimple>
-    {
-        /// <summary>
-        /// Converts JGalaxySimple format to Po.
-        /// </summary>
-        /// <param name="deck">TextFormat to convert.</param>
-        /// <returns>Po format.</returns>
-        public Po Convert(JGalaxySimple deck)
-        {
-            var po = JusText.GenerateJusPo();
+    // public class JGalaxySimple2Po :
+    //     IConverter<JGalaxySimple, Po>,
+    //     IConverter<Po, JGalaxySimple>
+    // {
+    //     /// <summary>
+    //     /// Converts JGalaxySimple format to Po.
+    //     /// </summary>
+    //     /// <param name="deck">TextFormat to convert.</param>
+    //     /// <returns>Po format.</returns>
+    //     public Po Convert(JGalaxySimple deck)
+    //     {
+    //         var po = JusText.GenerateJusPo();
 
-            po.Add(new PoEntry(deck.Name) {
-                Context = "0",
-                ExtractedComments = System.Convert.ToBase64String(deck.Header),
-            });
+    //         po.Add(new PoEntry(deck.Name) {
+    //             Context = "0",
+    //             ExtractedComments = System.Convert.ToBase64String(deck.Header),
+    //         });
 
-            return po;
-        }
+    //         return po;
+    //     }
 
-        /// <summary>
-        /// Converts Po to JGalaxySimple format.
-        /// </summary>
-        /// <param name="po">Po to convert.</param>
-        /// <returns>Transformed TextFormat.</returns>
-        public JGalaxySimple Convert(Po po)
-        {
-            var deck = new JGalaxySimple();
-            deck.Name = po.Entries[0].Text;
-            deck.Header = System.Convert.FromBase64String(po.Entries[0].ExtractedComments);
-            return deck;
-        }
-    }
+    //     /// <summary>
+    //     /// Converts Po to JGalaxySimple format.
+    //     /// </summary>
+    //     /// <param name="po">Po to convert.</param>
+    //     /// <returns>Transformed TextFormat.</returns>
+    //     public JGalaxySimple Convert(Po po)
+    //     {
+    //         var deck = new JGalaxySimple();
+    //         deck.Name = po.Entries[0].Text;
+    //         deck.Header = System.Convert.FromBase64String(po.Entries[0].ExtractedComments);
+    //         return deck;
+    //     }
+    // }
 }

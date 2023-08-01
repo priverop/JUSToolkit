@@ -30,6 +30,18 @@ namespace JUSToolkit.Texts
         }
 
         /// <summary>
+        /// Cleans the string for a PoEntry returning empty instead of "" or null.
+        /// </summary>
+        /// <param name="input">String to clean.</param>
+        /// <returns>Clean string.</returns>
+        public static string CleanString(string input)
+        {
+            return string.IsNullOrWhiteSpace(input) ?
+                                    "<!empty>" :
+                                    input;
+        }
+
+        /// <summary>
         /// Split string separated by a key character into a list of strings.
         /// </summary>
         /// <param name="text">String to split.</param>
