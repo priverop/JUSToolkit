@@ -27,7 +27,7 @@ namespace JUSToolkit.Texts.Converters
     /// <summary>
     /// Converts between JQuiz format and BinaryFormat.
     /// </summary>
-    public class Binary2JQuiz : IConverter<BinaryFormat, JQuiz>
+    public class Binary2JQuiz : IConverter<BinaryFormat, JQuiz>, IConverter<JQuiz, BinaryFormat>
     {
         private DataReader reader;
 
@@ -62,25 +62,35 @@ namespace JUSToolkit.Texts.Converters
         /// </summary>
         /// <param name="jquiz">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        // public BinaryFormat Convert(JQuiz jquiz)
-        // {
-        //     var bin = new BinaryFormat();
-        //     DataWriter writer = new DataWriter(bin.Stream) {
-        //         DefaultEncoding = JusText.JusEncoding,
-        //     };
+        public BinaryFormat Convert(JQuiz jquiz)
+        {
+            var bin = new BinaryFormat();
+            DataWriter writer = new DataWriter(bin.Stream) {
+                DefaultEncoding = JusText.JusEncoding,
+            };
 
-        //     var jit = new IndirectTextWriter(JQuizEntry.EntrySize * jquiz.Count);
+            var jit = new IndirectTextWriter(0x04 + jquiz.Count * JQuizEntry.EntrySize);
 
-        //     foreach (JQuizEntry entry in jquiz.Entries) {
-        //         JusText.WriteStringPointer(entry.Title, writer, jit);
-        //         JusText.WriteStringPointer(entry.Description1, writer, jit);
-        //         JusText.WriteStringPointer(entry.Description2, writer, jit);
-        //     }
+            writer.Write(jquiz.Count);
 
-        //     JusText.WriteAllStrings(writer, jit);
+            foreach (JQuizEntry entry in jquiz.Entries) {
+                writer.Write(entry.MangaID);
+                writer.Write(entry.Unknown);
+                writer.Write(entry.Unknown2);
+                JusText.WriteStringPointer(entry.Photo, writer, jit);
+                for (int i = 0; i < entry.Questions.Length; i++) {
+                    JusText.WriteStringPointer(entry.Questions[i], writer, jit);
+                }
 
-        //     return bin;
-        // }
+                for (int i = 0; i < entry.Answers.Length; i++) {
+                    JusText.WriteStringPointer(entry.Answers[i], writer, jit);
+                }
+            }
+
+            JusText.WriteAllStrings(writer, jit);
+
+            return bin;
+        }
 
         /// <summary>
         /// Reads a single <see cref="JQuizEntry"/>.
