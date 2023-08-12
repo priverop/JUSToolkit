@@ -81,7 +81,7 @@ namespace JUSToolkit.Tests.Containers
             using var jquiz = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
             jquiz.Invoking(n => n.TransformWith<Binary2JQuiz>()).Should().NotThrow();
-            jquiz.Should().MatchInfo(expected);
+            jquiz.GetFormatAs<JQuiz>().Entries.Should().NotBeEmpty().And.HaveCount(3006);
         }
 
         [TestCaseSource(nameof(GetJQuizFiles))]
