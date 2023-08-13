@@ -295,27 +295,17 @@ we can divide them.
 
 ## jQuiz folder
 
-Inside the jquiz.aar we have the jquiz.bin. We have the header with the pointers
-and then the texts. The pointers are absolute starting with 0x08 (because the
-first 8 bytes are uknown) and adding 4 in each entry PLUS the length of the
-previous sentence plus ONE (because pointers are pointing to a null byte).
-Example below.
+Inside the jquiz.aar we have the jquiz.bin. We have the number of questions (3006 total questions) and then the entries. Each entry is 40bytes long, here is the example with the first entry. 
 
-### Definition
-
-| Offset   | Type   | Description                            |
-| -------- | ------ | -------------------------------------- |
-| 0x00     | short  | 0x0BBE (190) Unknown.                  |
-| 0x04     | byte   | 0xFF (190) Unknown.                    |
-| 0x08     | int    | First Pointer (AC D5 01 00)            |
-| 0x01D5B4 | string | Sentence starting and ending with null |
-
-### Example
-
-| Order | Offset of the Text | Pointer                                                                            |
-| ----- | ------------------ | ---------------------------------------------------------------------------------- |
-| #1    | 0x01D5B4 (120244)  | AC D5 01 00 —> 0x01D5AC (120236) + 8                                               |
-| #2    | 0x1D5D3 (120275)   | 0xA9 D5 01 00 —> 0x01 D5 A9 (120233) + {Text1.Length = 30} + 12 = 0x1D5D3 (120275) |
+| Offset | Type   | Description                     |
+| ------ | ------ | ------------------------------- |
+| 0x00   | int    | NumQuestions (3006)             |
+| 0x04   | byte   | MangaCode                       |
+| 0x05   | byte   | Unknown                         |
+| 0x06   | short  | Internal number of the question |
+| 0x08   | int    | Photo of the question           |
+| 0x0C   | int[4] | Question pointers               |
+| 0x1C   | int[4] | Answer pointers                 |
 
 ## Bin files without text
 
