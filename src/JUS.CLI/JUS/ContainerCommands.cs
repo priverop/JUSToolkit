@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Pablo Rivero
+﻿// Copyright (c) 2022 Pablo Rivero
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -161,7 +161,7 @@ namespace JUSToolkit.CLI.JUS
                 (BinaryFormat)ConvertFormat.With<LzssCompression>(binary) :
                 binary;
 
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }

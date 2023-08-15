@@ -145,7 +145,7 @@ namespace JUSToolkit.CLI.JUS
                 Height = pixels.Count / 8,
             };
             var b = new Dig2Binary().Convert(updatedImage);
-            b.Stream.WriteTo(Path.Combine(output, $"file.bin"));
+            b.Stream.WriteTo(Path.Combine(output, $"file.dig"));
 
             dtx3.Children["image"].ChangeFormat(updatedImage);
 

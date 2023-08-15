@@ -106,6 +106,7 @@ namespace JUS.Tool.Graphics.Converters
                     Height = height,
                     VerticalFlip = vFlip,
                     HorizontalFlip = hFlip,
+                    Layer = numSegments - i,
                 };
                 sprite.Segments.Add(segment);
             }
