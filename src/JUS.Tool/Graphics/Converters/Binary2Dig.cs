@@ -113,7 +113,10 @@ namespace JUSToolkit.Graphics.Converters
                 Bpp = bpp,
                 Swizzling = swizzling,
             };
-            dig.Palettes.Add(palettes.Palettes);
+
+            foreach (var p in palettes.Palettes) {
+                dig.Palettes.Add(p);
+            }
 
             return dig;
         }
