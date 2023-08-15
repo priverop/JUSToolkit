@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -80,6 +81,53 @@ namespace JUSToolkit.CLI.JUS
             }
 
 
+        }
+
+        public static void ImportDtx3(string input, string dtx, string output)
+        {
+            // Sprites + pixels + palette
+            using var dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
+
+            var image = dtx3.Children["image"].GetFormatAs<Dig>();
+            var palettes = new PaletteCollection();
+            foreach (var p in image.Palettes) {
+                palettes.Palettes.Add(p);
+            }
+
+            var pixels = new List<IndexedPixel>();
+
+            var spriteConverterParameters = new FullImage2SpriteParams {
+                Palettes = palettes,
+                IsImageTiled = true,
+                MinimumPixelsPerSegment = 64,
+                PixelsPerIndex = 64,
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                PixelSequences = pixels,
+            };
+
+            foreach (string spritePath in Directory.GetFiles(input)) {
+                var sprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read)
+                .TransformWith<Bitmap2FullImage>()
+                .TransformWith<FullImage2Sprite, FullImage2SpriteParams>(spriteConverterParameters)
+                .GetFormatAs<Sprite>();
+
+                dtx3.Children["sprites"].Children[Path.GetFileNameWithoutExtension(spritePath)].ChangeFormat(sprite);
+            }
+
+            var updatedImage = new Dig(image) {
+                Pixels = pixels.ToArray(),
+                Width = 8,
+                Height = pixels.Count / 8,
+            };
+            var b = new Dig2Binary().Convert(updatedImage);
+            b.Stream.WriteTo(Path.Combine(output, $"file.bin"));
+
+            dtx3.Children["image"].ChangeFormat(updatedImage);
+
+            new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+                .Stream.WriteTo(Path.Combine(output, $"file.dtx"));
         }
 
         /// <summary>

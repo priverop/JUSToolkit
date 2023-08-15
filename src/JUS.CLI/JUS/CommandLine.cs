@@ -58,6 +58,13 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx3.Handler = CommandHandler.Create<string, string>(GraphicCommands.ExportDtx3);
 
+            var importDtx3 = new Command("import-dtx3", "Import dtx3") {
+                new Option<string>("--input", "the new sprite to import", ArgumentArity.ExactlyOne),
+                new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importDtx3.Handler = CommandHandler.Create<string, string, string>(GraphicCommands.ImportDtx3);
+
             var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
                 new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
                 new Option<string>("--atm", "the input map.atm file", ArgumentArity.ExactlyOne),
@@ -86,6 +93,7 @@ namespace JUSToolkit.CLI.JUS
             return new Command("graphics", "Import/Export graphic files") {
                 exportDtx,
                 exportDtx3,
+                importDtx3,
                 exportDsigAlmt,
                 importDig,
                 mergeDig,
