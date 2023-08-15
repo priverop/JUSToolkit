@@ -147,7 +147,7 @@ namespace JUSToolkit.CLI.JUS
                 new LzssCompression().Convert(binary) :
                 binary;
 
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + originalAlar.Name));
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
