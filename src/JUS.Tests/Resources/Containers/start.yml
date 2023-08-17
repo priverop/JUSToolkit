@@ -1,0 +1,9 @@
+name: start.aar
+format_type: JUSToolkit.Containers.Alar2
+tags:
+check_children: true
+children:
+  - name: start.dtx
+    format_type: JUSToolkit.Containers.Alar2File
+  - name: start.amt
+    format_type: JUSToolkit.Containers.Alar2File
