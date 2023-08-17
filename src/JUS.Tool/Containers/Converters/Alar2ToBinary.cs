@@ -83,7 +83,9 @@ namespace JUSToolkit.Containers.Converters
                 if (!alarFile.IsContainer) {
                     writer.WriteTimes(0, 2);
                     writer.Write(alarFile.Name);
-                    writer.WriteTimes(0, 19); // we already have the null byte
+                    // Tenemos que pintar ceros hasta el offset del puntero - 02 (que hay un unknown)
+                    int times = 32 - alarFile.Name.Length - 1; // 1 null byte
+                    writer.WriteTimes(0, times);
 
                     Alar2File alarChild = alarFile.GetFormatAs<Alar2File>();
 
