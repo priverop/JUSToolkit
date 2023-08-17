@@ -139,9 +139,11 @@ namespace JUSToolkit.CLI.JUS
 
             var originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
 
-            var alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
+            if (originalIsCompressed) {
+                originalAlar.TransformWith<LzssDecompression>();
+            }
 
-            originalAlar.TransformWith<LzssDecompression>();
+            var alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
 
             BinaryFormat binary = new BinaryFormat();
 
