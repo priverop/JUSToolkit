@@ -2,5 +2,6 @@
 *.dig
 *.dsig
 *.atm
+*.amt
 *.aar
 *.bin

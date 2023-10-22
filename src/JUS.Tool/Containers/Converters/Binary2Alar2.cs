@@ -64,7 +64,7 @@ namespace JUSToolkit.Containers.Converters
                     Size = size,
                     Unknown = unknown,
                     FileNum = i + 1,
-            };
+                };
 
                 input.Stream.RunInPosition(() => alarFile.Unknown2 = reader.ReadUInt16(), offset - 2);
                 input.Stream.RunInPosition(() => ReadFileInfo(alarFile), name_offset + 2);
@@ -87,10 +87,7 @@ namespace JUSToolkit.Containers.Converters
                 throw new FormatException($"Unsupported version: {version:X}");
             }
 
-            alar = new Alar2 {
-                NumFiles = reader.ReadUInt16(),
-                IDs = new byte[8],
-            };
+            alar = new Alar2(reader.ReadUInt16());
 
             for (int i = 0; i < 8; i++) {
                 alar.IDs[i] = reader.ReadByte();

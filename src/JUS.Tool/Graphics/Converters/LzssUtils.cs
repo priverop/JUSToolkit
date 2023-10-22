@@ -30,8 +30,8 @@ namespace JUSToolkit.Graphics.Converters
     /// </summary>
     public static class LzssUtils
     {
-        private static string programExe = System.IO.Path.GetFullPath(@"..\..\..\..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
-        private static string programUnix = System.IO.Path.GetFullPath(@"../../../../../") + "/lib/NDS_Compressors_CUE/lzss";
+        private static readonly string ProgramExe = System.IO.Path.GetFullPath(@"..\..\..\..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
+        private static readonly string ProgramUnix = System.IO.Path.GetFullPath(@"../../../../../") + "lib/NDS_Compressors_CUE/lzss";
 
         /// <summary>
         /// Calls the external CUE's lzss library. It executes the unix binary.
@@ -46,7 +46,7 @@ namespace JUSToolkit.Graphics.Converters
             string tempFile = Path.GetRandomFileName();
             input.WriteTo(tempFile);
 
-            string program = Environment.OSVersion.Platform == PlatformID.Win32NT ? programExe : programUnix;
+            string program = Environment.OSVersion.Platform == PlatformID.Win32NT ? ProgramExe : ProgramUnix;
             string arguments = mode + " " + tempFile;
             ExecuteExternalProcess(program, arguments);
 
@@ -61,8 +61,9 @@ namespace JUSToolkit.Graphics.Converters
         /// </summary>
         /// <param name="program">The program path.</param>
         /// <param name="arguments">The arguments for the program.</param>
-        private static void ExecuteExternalProcess(string program, string arguments) {
-            Process process = new Process();
+        private static void ExecuteExternalProcess(string program, string arguments)
+        {
+            var process = new Process();
             process.StartInfo.FileName = program;
             process.StartInfo.Arguments = arguments;
             process.StartInfo.UseShellExecute = false;

@@ -22,7 +22,7 @@ namespace JUSToolkit.Containers
         public static readonly Version[] SupportedVersions = new Version[] { new Version(3, 5), new Version(3, 69) };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Alar3" /> class with an empty list of <see cref="Alar3File" />.
+        /// Initializes a new instance of the <see cref="Alar3" /> class with an empty array of FileInfoPointers.
         /// </summary>
         /// <param name="numFiles">How many files are we storing.</param>
         public Alar3(uint numFiles)
