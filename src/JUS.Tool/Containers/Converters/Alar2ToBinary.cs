@@ -83,6 +83,7 @@ namespace JUSToolkit.Containers.Converters
                 if (!alarFile.IsContainer) {
                     writer.WriteTimes(0, 2);
                     writer.Write(alarFile.Name);
+
                     // Tenemos que pintar ceros hasta el offset del puntero - 02 (que hay un unknown)
                     int times = 32 - alarFile.Name.Length - 1; // 1 null byte
                     writer.WriteTimes(0, times);

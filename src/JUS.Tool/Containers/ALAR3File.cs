@@ -25,11 +25,6 @@ namespace JUSToolkit.Containers
         public ushort FileID { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unknown.
-        /// </summary>
-        public ushort Unknown { get; set; }
-
-        /// <summary>
         /// Gets or sets the absolute pointer of the File.
         /// </summary>
         public uint Offset { get; set; }
@@ -38,6 +33,11 @@ namespace JUSToolkit.Containers
         /// Gets or sets the size of the File.
         /// </summary>
         public uint Size { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Unknown.
+        /// </summary>
+        public ushort Unknown { get; set; }
 
         /// <summary>
         /// Gets or sets the Unknown2.
