@@ -22,6 +22,16 @@ namespace JUSToolkit.Containers
         public static readonly Version SupportedVersion = new (2, 1);
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Alar2" /> class with an empty array of IDs.
+        /// </summary>
+        /// <param name="numFiles">How many files are we storing.</param>
+        public Alar2(ushort numFiles)
+        {
+            NumFiles = numFiles;
+            IDs = new byte[8];
+        }
+
+        /// <summary>
         /// Gets or sets the Number of files in the container.
         /// </summary>
         public ushort NumFiles { get; set; }
@@ -38,43 +48,25 @@ namespace JUSToolkit.Containers
         public void InsertModification(Node filesToInsert)
         {
             foreach (Node nNew in filesToInsert.Children) {
-                uint newOffset = 0;
+                uint nextFileOffset = 0;
 
                 foreach (Node nOld in Navigator.IterateNodes(Root)) {
                     if (!nOld.IsContainer) {
                         Alar2File alarFileOld = nOld.GetFormatAs<Alar2File>();
 
-                        if (newOffset > 0) {
-                            alarFileOld.Offset = newOffset;
-                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                        // Ignoring first file (0 offset)
+                        if (nextFileOffset > 0) {
+                            alarFileOld.Offset = nextFileOffset;
                         }
 
                         if (nOld.Name == nNew.Name) {
-                            alarFileOld = ReplaceStream(alarFileOld, nNew.Stream);
-
-                            newOffset = alarFileOld.Offset + alarFileOld.Size;
+                            alarFileOld.ReplaceStream(nNew.Stream);
                         }
+
+                        nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Replaces an Alar2File with a Datastream.
-        /// </summary>
-        /// <param name="old">Alar2File old File.</param>
-        /// /// <param name="stream">New DataStream.</param>
-        private static Alar2File ReplaceStream(Alar2File old, DataStream stream)
-        {
-            var newAlar = new Alar2File(stream) {
-                FileID = old.FileID,
-                Offset = old.Offset,
-                Size = (uint)stream.Length,
-                Unknown = old.Unknown,
-                Unknown2 = old.Unknown2,
-            };
-
-            return newAlar;
         }
     }
 }
