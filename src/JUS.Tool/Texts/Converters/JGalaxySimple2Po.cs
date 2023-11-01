@@ -26,38 +26,51 @@ namespace JUSToolkit.Texts.Converters
     /// <summary>
     /// Converts between JGalaxySimple format and Po.
     /// </summary>
-    // public class JGalaxySimple2Po :
-    //     IConverter<JGalaxySimple, Po>,
-    //     IConverter<Po, JGalaxySimple>
-    // {
-    //     /// <summary>
-    //     /// Converts JGalaxySimple format to Po.
-    //     /// </summary>
-    //     /// <param name="deck">TextFormat to convert.</param>
-    //     /// <returns>Po format.</returns>
-    //     public Po Convert(JGalaxySimple deck)
-    //     {
-    //         var po = JusText.GenerateJusPo();
+    public class JGalaxySimple2Po :
+        IConverter<JGalaxySimple, Po>,
+        IConverter<Po, JGalaxySimple>
+    {
+        /// <summary>
+        /// Converts JGalaxySimple format to Po.
+        /// </summary>
+        /// <param name="jgalaxy">TextFormat to convert.</param>
+        /// <returns>Po format.</returns>
+        public Po Convert(JGalaxySimple jgalaxy)
+        {
+            var po = JusText.GenerateJusPo();
 
-    //         po.Add(new PoEntry(deck.Name) {
-    //             Context = "0",
-    //             ExtractedComments = System.Convert.ToBase64String(deck.Header),
-    //         });
+            int i = 0;
+            
+            // To DO:
+            // Igual tengo que separar la entry entre String y basurilla.
+            // EL string se puede traducir y la basurilla no.
+            // Creo que la entrada deberia ser un objeto: string principal, número de ceros hasta el primer byte y la basurilla 
 
-    //         return po;
-    //     }
+            foreach(byte[] entry in jgalaxy.Entries) {
+                po.Add(new PoEntry(entry) { // transformamos a string
+                    Context = $"{i++}",
+                    // Guardamos como ExtractedComments el base64string de los bytes
+                    ExtractedComments = System.Convert.ToBase64String(entry),
+                });
+            }
 
-    //     /// <summary>
-    //     /// Converts Po to JGalaxySimple format.
-    //     /// </summary>
-    //     /// <param name="po">Po to convert.</param>
-    //     /// <returns>Transformed TextFormat.</returns>
-    //     public JGalaxySimple Convert(Po po)
-    //     {
-    //         var deck = new JGalaxySimple();
-    //         deck.Name = po.Entries[0].Text;
-    //         deck.Header = System.Convert.FromBase64String(po.Entries[0].ExtractedComments);
-    //         return deck;
-    //     }
-    // }
+            return po;
+        }
+
+        /// <summary>
+        /// Converts Po to JGalaxySimple format.
+        /// </summary>
+        /// <param name="po">Po to convert.</param>
+        /// <returns>Transformed TextFormat.</returns>
+        public JGalaxySimple Convert(Po po)
+        {
+            var jgalaxy = new JGalaxySimple();
+
+            foreach (PoEntry entry in po.Entries) {
+                jgalaxy.TextEntries.Add(System.Convert.FromBase64String(entry.ExtractedComments));
+            }
+
+            return jgalaxy;
+        }
+    }
 }

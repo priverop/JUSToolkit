@@ -27,56 +27,56 @@ namespace JUSToolkit.Texts.Converters
     /// <summary>
     /// Converts between JGalaxySimple format and BinaryFormat.
     /// </summary>
-    // public class Binary2JGalaxySimple :
-    //     IConverter<BinaryFormat, JGalaxySimple>,
-    //     IConverter<JGalaxySimple, BinaryFormat>
-    // {
-    //     /// <summary>
-    //     /// Converts BinaryFormat to JGalaxySimple format.
-    //     /// </summary>
-    //     /// <param name="source">BinaryFormat to convert.</param>
-    //     /// <returns>Text format.</returns>
-    //     /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
-    //     public JGalaxySimple Convert(BinaryFormat source)
-    //     {
-    //         if (source == null) {
-    //             throw new ArgumentNullException(nameof(source));
-    //         }
+    public class Binary2JGalaxySimple :
+        IConverter<BinaryFormat, JGalaxySimple>
+        // IConverter<JGalaxySimple, BinaryFormat>
+    {
+        /// <summary>
+        /// Converts BinaryFormat to JGalaxySimple format.
+        /// </summary>
+        /// <param name="source">BinaryFormat to convert.</param>
+        /// <returns>Text format.</returns>
+        /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
+        public JGalaxySimple Convert(BinaryFormat source)
+        {
+            if (source == null) {
+                throw new ArgumentNullException(nameof(source));
+            }
 
-    //         var jgalaxy = new JGalaxySimple();
-    //         var reader = new DataReader(source.Stream) {
-    //             DefaultEncoding = JusText.JusEncoding,
-    //         };
+            var jgalaxy = new JGalaxySimple();
+            var reader = new DataReader(source.Stream) {
+                DefaultEncoding = JusText.JusEncoding,
+            };
 
-    //         reader.Stream.Position = 0x00;
-    //         jgalaxy.NumberOfEntries = reader.ReadInt32();
+            reader.Stream.Position = 0x00;
+            jgalaxy.NumberOfEntries = reader.ReadInt32();
 
-    //         for (int i = 0; i < jgalaxy.NumberOfEntries; i++) {
-    //             jgalaxy.TextEntries.Add(reader.ReadBytes(JGalaxySimple.EntrySize));
-    //         }
+            for (int i = 0; i < jgalaxy.NumberOfEntries; i++) {
+                jgalaxy.TextEntries.Add(reader.ReadBytes(JGalaxySimple.EntrySize));
+            }
 
-    //         return jgalaxy;
-    //     }
+            return jgalaxy;
+        }
 
-    //     /// <summary>
-    //     /// Converts JGalaxySimple format to BinaryFormat.
-    //     /// </summary>
-    //     /// <param name="jgalaxy">TextFormat to convert.</param>
-    //     /// <returns>BinaryFormat.</returns>
-    //     public BinaryFormat Convert(JGalaxySimple jgalaxy)
-    //     {
-    //         var bin = new BinaryFormat();
-    //         var writer = new DataWriter(bin.Stream) {
-    //             DefaultEncoding = JusText.JusEncoding,
-    //         };
+        /// <summary>
+        /// Converts JGalaxySimple format to BinaryFormat.
+        /// </summary>
+        /// <param name="jgalaxy">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
+        public BinaryFormat Convert(JGalaxySimple jgalaxy)
+        {
+            var bin = new BinaryFormat();
+            var writer = new DataWriter(bin.Stream) {
+                DefaultEncoding = JusText.JusEncoding,
+            };
 
-    //         writer.Write(jgalaxy.NumberOfEntries);
+            writer.Write(jgalaxy.NumberOfEntries);
 
-    //         foreach (byte[] entry in jgalaxy.TextEntries) {
-    //             writer.Write(entry);
-    //         }
+            foreach (byte[] entry in jgalaxy.TextEntries) {
+                writer.Write(entry);
+            }
 
-    //         return bin;
-    //     }
-    // }
+            return bin;
+        }
+    }
 }

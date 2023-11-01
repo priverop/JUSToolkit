@@ -257,7 +257,7 @@ This format is pretty simple.
 
 | Offset | Type      | Description        |
 | ------ | --------- | ------------------ |
-| 0x00   | byte      | Number of entries. |
+| 0x00   | int       | Number of entries. |
 | 0x04   | byte[164] | Entry (164 bytes)  |
 
 So the size of the file is 4 + (164 \* number_of_entries).
