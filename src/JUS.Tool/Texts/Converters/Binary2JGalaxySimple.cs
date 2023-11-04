@@ -28,9 +28,11 @@ namespace JUSToolkit.Texts.Converters
     /// Converts between JGalaxySimple format and BinaryFormat.
     /// </summary>
     public class Binary2JGalaxySimple :
-        IConverter<BinaryFormat, JGalaxySimple>
-        // IConverter<JGalaxySimple, BinaryFormat>
+        IConverter<BinaryFormat, JGalaxySimple>,
+        IConverter<JGalaxySimple, BinaryFormat>
     {
+        private DataReader reader;
+
         /// <summary>
         /// Converts BinaryFormat to JGalaxySimple format.
         /// </summary>
@@ -52,8 +54,9 @@ namespace JUSToolkit.Texts.Converters
             jgalaxy.NumberOfEntries = reader.ReadInt32();
 
             for (int i = 0; i < jgalaxy.NumberOfEntries; i++) {
-                jgalaxy.TextEntries.Add(reader.ReadBytes(JGalaxySimple.EntrySize));
+                jgalaxy.Entries.Add(ReadEntry(i));
             }
+            // reader.ReadBytes(JGalaxySimple.EntrySize)
 
             return jgalaxy;
         }
@@ -72,11 +75,36 @@ namespace JUSToolkit.Texts.Converters
 
             writer.Write(jgalaxy.NumberOfEntries);
 
-            foreach (byte[] entry in jgalaxy.TextEntries) {
+            foreach (JGalaxySimpleEntry entry in jgalaxy.Entries) {
                 writer.Write(entry);
             }
 
             return bin;
+        }
+
+        /// <summary>
+        /// Reads a single <see cref="JGalaxySimpleEntry"/>.
+        /// </summary>
+        /// <returns>The read <see cref="JGalaxySimpleEntry"/>.</returns>
+        private JGalaxySimpleEntry ReadEntry(int blockNumber)
+        {
+            var entry = new JGalaxySimpleEntry();
+
+            entry.Description = reader.ReadString();
+
+            // Skipping zeros
+            while (reader.ReadByte() == 0) {
+                _ = "Don't do anything";
+            }
+
+            reader.Stream.Position--; // Because the while did read a non zero value
+
+            // Position of the next block
+            var blockEndPosition = 0x04 + (blockNumber + 1) * entry.EntrySize;
+
+            entry.Unknown = reader.ReadBytes(blockEndPosition - reader.Stream.Position);
+
+            return entry;
         }
     }
 }
