@@ -46,7 +46,7 @@ namespace JUSToolkit.Texts.Converters
             }
 
             var jgalaxy = new JGalaxySimple();
-            var reader = new DataReader(source.Stream) {
+            reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
@@ -56,7 +56,6 @@ namespace JUSToolkit.Texts.Converters
             for (int i = 0; i < jgalaxy.NumberOfEntries; i++) {
                 jgalaxy.Entries.Add(ReadEntry(i));
             }
-            // reader.ReadBytes(JGalaxySimple.EntrySize)
 
             return jgalaxy;
         }
@@ -76,7 +75,13 @@ namespace JUSToolkit.Texts.Converters
             writer.Write(jgalaxy.NumberOfEntries);
 
             foreach (JGalaxySimpleEntry entry in jgalaxy.Entries) {
-                writer.Write(entry);
+                writer.Write(entry.Description);
+
+                // I don't know if the extra byte if because of the null ending string or is just the length, but don't remove it
+                long numberOfZeros = JGalaxySimpleEntry.EntrySize - entry.Description.Length - entry.Unknown.Length - 1;
+
+                writer.WriteTimes(00, numberOfZeros);
+                writer.Write(entry.Unknown);
             }
 
             return bin;
@@ -88,9 +93,9 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>The read <see cref="JGalaxySimpleEntry"/>.</returns>
         private JGalaxySimpleEntry ReadEntry(int blockNumber)
         {
-            var entry = new JGalaxySimpleEntry();
-
-            entry.Description = reader.ReadString();
+            var entry = new JGalaxySimpleEntry {
+                Description = reader.ReadString(),
+            };
 
             // Skipping zeros
             while (reader.ReadByte() == 0) {
@@ -100,9 +105,9 @@ namespace JUSToolkit.Texts.Converters
             reader.Stream.Position--; // Because the while did read a non zero value
 
             // Position of the next block
-            var blockEndPosition = 0x04 + (blockNumber + 1) * entry.EntrySize;
+            int blockEndPosition = 0x04 + ((blockNumber + 1) * JGalaxySimpleEntry.EntrySize);
 
-            entry.Unknown = reader.ReadBytes(blockEndPosition - reader.Stream.Position);
+            entry.Unknown = reader.ReadBytes(blockEndPosition - (int)reader.Stream.Position);
 
             return entry;
         }

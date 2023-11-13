@@ -37,20 +37,13 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public Po Convert(JGalaxySimple jgalaxy)
         {
-            var po = JusText.GenerateJusPo();
+            Po po = JusText.GenerateJusPo();
 
             int i = 0;
-            
-            // To DO:
-            // Igual tengo que separar la entry entre String y basurilla.
-            // EL string se puede traducir y la basurilla no.
-            // Creo que la entrada deberia ser un objeto: string principal, número de ceros hasta el primer byte y la basurilla 
-
-            foreach(byte[] entry in jgalaxy.Entries) {
-                po.Add(new PoEntry(entry) { // transformamos a string
+            foreach (JGalaxySimpleEntry entry in jgalaxy.Entries) {
+                po.Add(new PoEntry(entry.Description) {
                     Context = $"{i++}",
-                    // Guardamos como ExtractedComments el base64string de los bytes
-                    ExtractedComments = System.Convert.ToBase64String(entry),
+                    ExtractedComments = System.Convert.ToBase64String(entry.Unknown),
                 });
             }
 
@@ -64,10 +57,17 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Transformed TextFormat.</returns>
         public JGalaxySimple Convert(Po po)
         {
-            var jgalaxy = new JGalaxySimple();
+            var jgalaxy = new JGalaxySimple {
+                NumberOfEntries = po.Entries.Count,
+            };
 
             foreach (PoEntry entry in po.Entries) {
-                jgalaxy.TextEntries.Add(System.Convert.FromBase64String(entry.ExtractedComments));
+                var jgalaxyEntry = new JGalaxySimpleEntry {
+                    Description = entry.Text,
+                    Unknown = System.Convert.FromBase64String(entry.ExtractedComments),
+                };
+
+                jgalaxy.Entries.Add(jgalaxyEntry);
             }
 
             return jgalaxy;

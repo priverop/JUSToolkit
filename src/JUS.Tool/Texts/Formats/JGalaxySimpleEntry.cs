@@ -18,6 +18,6 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the Unknown section.
         /// </summary>
-        public byte[] Unkown { get; set; }
+        public byte[] Unknown { get; set; }
     }
 }

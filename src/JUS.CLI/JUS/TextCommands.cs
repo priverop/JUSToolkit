@@ -32,7 +32,7 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class TextCommands
     {
-        private static string textConvertersNamespace = "JUSToolkit.Texts.Converters.";
+        private static readonly string TextConvertersNamespace = "JUSToolkit.Texts.Converters.";
 
         /// <summary>
         /// Export a .bin file to a .Po file.
@@ -41,18 +41,14 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Export(string bin, string output)
         {
-            using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read);
-
-            if (binNode is null) {
-                throw new FormatException("Invalid bin file");
-            }
+            using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read) ?? throw new FormatException("Invalid bin file");
 
             // Detect format
             string binFormatName = TextIdentifier.GetTextFormat(binNode.Name);
             Console.WriteLine("File Name: " + binNode.Name + " - File Format: " + binFormatName);
 
-            var converterName = textConvertersNamespace + "Binary2" + binFormatName;
-            var converterPoName = textConvertersNamespace + binFormatName + "2Po";
+            string converterName = TextConvertersNamespace + "Binary2" + binFormatName;
+            string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
 
             // Binary -> TextFormat
             var binFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), binNode.Format!);
@@ -63,8 +59,7 @@ namespace JUSToolkit.CLI.JUS
                 foreach (Node quiz in container.Root.Children) {
                     quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
                 }
-            }
-            else {
+            } else {
                 // TextFormat -> Po
                 var poFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
 
@@ -86,11 +81,7 @@ namespace JUSToolkit.CLI.JUS
         public static void Import(string po, string output)
         {
             using Node poNode = NodeFactory.FromFile(po, FileOpenMode.Read)
-                .TransformWith<Binary2Po>();
-
-            if (poNode is null) {
-                throw new FormatException("Invalid po file");
-            }
+                .TransformWith<Binary2Po>() ?? throw new FormatException("Invalid po file");
 
             string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
 
@@ -98,8 +89,8 @@ namespace JUSToolkit.CLI.JUS
             string binFormatName = TextIdentifier.GetTextFormat(cleanFileName);
             Console.WriteLine("File Format: " + binFormatName);
 
-            var converterPoName = textConvertersNamespace + binFormatName + "2Po";
-            var converterName = textConvertersNamespace + "Binary2" + binFormatName;
+            string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
+            string converterName = TextConvertersNamespace + "Binary2" + binFormatName;
 
             // Po -> Text Format
             var textFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), poNode.Format!);

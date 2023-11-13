@@ -28,9 +28,12 @@ namespace JUSToolkit.Texts.Formats
     public class JGalaxySimple : IFormat
     {
         /// <summary>
-        /// Size of a <see cref="JGalaxySimple"/> entry.
+        /// Initializes a new instance of the <see cref="JGalaxySimple"/> class.
         /// </summary>
-        // public static readonly int EntrySize = 164;
+        public JGalaxySimple()
+        {
+            Entries = new List<JGalaxySimpleEntry>();
+        }
 
         /// <summary>
         /// Gets or sets the number of <see cref="JGalaxySimple"/> entries.
@@ -38,16 +41,8 @@ namespace JUSToolkit.Texts.Formats
         public int NumberOfEntries { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JGalaxySimple"/> class.
-        /// </summary>
-        public JGalaxySimple()
-        {
-            Entries = new List<JGalaxySimple>();
-        }
-
-        /// <summary>
         /// Gets or sets the list of text entries.
         /// </summary>
-        public List<JGalaxySimple> Entries { get; set; }
+        public List<JGalaxySimpleEntry> Entries { get; set; }
     }
 }
