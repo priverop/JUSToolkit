@@ -74,11 +74,11 @@ namespace JUSToolkit.Texts.Converters
 
             writer.Write(jgalaxy.NumberOfEntries);
 
-            foreach (JGalaxySimpleEntry entry in jgalaxy.Entries) {
+            foreach (JGalaxyEntry entry in jgalaxy.Entries) {
                 writer.Write(entry.Description);
 
                 // I don't know if the extra byte if because of the null ending string or is just the length, but don't remove it
-                long numberOfZeros = JGalaxySimpleEntry.EntrySize - entry.Description.Length - entry.Unknown.Length - 1;
+                long numberOfZeros = entry.EntrySize - entry.Description.Length - entry.Unknown.Length - 1;
 
                 writer.WriteTimes(00, numberOfZeros);
                 writer.Write(entry.Unknown);
@@ -88,12 +88,13 @@ namespace JUSToolkit.Texts.Converters
         }
 
         /// <summary>
-        /// Reads a single <see cref="JGalaxySimpleEntry"/>.
+        /// Reads a single <see cref="JGalaxyEntry"/>.
         /// </summary>
-        /// <returns>The read <see cref="JGalaxySimpleEntry"/>.</returns>
-        private JGalaxySimpleEntry ReadEntry(int blockNumber)
+        /// <returns>The read <see cref="JGalaxyEntry"/>.</returns>
+        private JGalaxyEntry ReadEntry(int blockNumber)
         {
-            var entry = new JGalaxySimpleEntry {
+            var entry = new JGalaxyEntry {
+                EntrySize = 164,
                 Description = reader.ReadString(),
             };
 
@@ -105,7 +106,7 @@ namespace JUSToolkit.Texts.Converters
             reader.Stream.Position--; // Because the while did read a non zero value
 
             // Position of the next block
-            int blockEndPosition = 0x04 + ((blockNumber + 1) * JGalaxySimpleEntry.EntrySize);
+            int blockEndPosition = 0x04 + ((blockNumber + 1) * entry.EntrySize);
 
             entry.Unknown = reader.ReadBytes(blockEndPosition - (int)reader.Stream.Position);
 

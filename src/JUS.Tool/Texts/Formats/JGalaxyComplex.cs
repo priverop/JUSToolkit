@@ -25,24 +25,20 @@ namespace JUSToolkit.Texts.Formats
     /// <summary>
     /// Format for simple JGalaxy files.
     /// </summary>
-    public class JGalaxySimple : IFormat
+    public class JGalaxyComplex : IFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="JGalaxySimple"/> class.
+        /// Initializes a new instance of the <see cref="JGalaxyComplex"/> class.
         /// </summary>
-        public JGalaxySimple()
+        public JGalaxyComplex()
         {
-            Entries = new List<JGalaxyEntry>();
+            Blocks = new JGalaxyComplexBlock[4];
         }
 
         /// <summary>
-        /// Gets or sets the number of <see cref="JGalaxySimple"/> entries.
+        /// Gets or sets the array of text entries.
+        /// It's important to keep an order, that's why I use an array.
         /// </summary>
-        public int NumberOfEntries { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of text entries.
-        /// </summary>
-        public List<JGalaxyEntry> Entries { get; set; }
+        public JGalaxyComplexBlock[] Blocks { get; set; }
     }
 }

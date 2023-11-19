@@ -273,29 +273,31 @@ share that.
 The block 3 is the last block. And the block 4 is before the 3 block: Block 1 -
 Block 2 - Block 4 - Block 3.
 
-| Offset | Type                    | Description                                 |
-| ------ | ----------------------- | ------------------------------------------- |
-| 0x00   | short[4]                | Number of entries per block (4 blocks).     |
-| 0x08   | int[4]                  | Pointer of the start of the text, per block |
-| 0x18   | byte[size_of_the_block] | String + null bytes + weird stuff           |
+| Offset | Type                    | Description                                               |
+| ------ | ----------------------- | --------------------------------------------------------- |
+| 0x00   | short[4]                | Array of number of entries of each block (4 blocks).      |
+| 0x08   | int[4]                  | Array of pointers of the start of the text of each block. |
+| 0x18   | byte[size_of_the_block] | String + null bytes + weird stuff                         |
 
 **How to calculate the size_of_the_block?**
 
-We have the size of each block (with the pointers) and the number of entries, so
-we can divide them.
+Difference between the next block's pointer and the current block's pointers
+divide by the number of entries.
 
 #### Example
 
-| Block Number | Pointer        | Number of entries | Size of the entries | Math                        | Notes                                                           |
-| ------------ | -------------- | ----------------- | ------------------- | --------------------------- | --------------------------------------------------------------- | ----------------- |
-| 1            | 24 (0x18)      | 5 (0x5)           | 60bytes             | 24 + (5 \* 60) = 324        |                                                                 |
-| 2            | 324 (0x144)    | 36 (0x24)         | 72bytes             | 324 + (36 \* 72) = 2916     |                                                                 |
-| 3            | 2916 (0xB64)   | 142 (0x41)        | 136bytes            | 2916 + (142 \* 136) = 22228 | This pointer 64 0B comes after the next block's pointer (D4 56) |
-| 4            | 22228 (0x56D4) | 65 (0x8E)         | 64bytes             | 22228 + (65 \* 64)          | 26388 (0x6714)                                                  | Until end of file |
+| Block Number | Pointer        | Number of entries | Size of the entries | Size of the block | Math                                | Notes                                                           |
+| ------------ | -------------- | ----------------- | ------------------- | ----------------- | ----------------------------------- | --------------------------------------------------------------- |
+| 1            | 24 (0x18)      | 5 (0x5)           | 60bytes             | 300bytes          | 24 + (5 \* 60) = 324                |                                                                 |
+| 2            | 324 (0x144)    | 36 (0x24)         | 72bytes             | 2592bytes         | 324 + (36 \* 72) = 2916             |                                                                 |
+| 3            | 2916 (0x0B64)  | 142 (0x8E)        | 136bytes            | 4160bytes         | 2916 + (142 \* 136) = 22228         | This pointer 64 0B comes after the next block's pointer (D4 56) |
+| 4            | 22228 (0x56D4) | 65 (0x41)         | 64bytes             | 19312bytes        | 22228 + (65 \* 64) = 26388 (0x6714) | Until end of file                                               |
 
 ## jQuiz folder
 
-Inside the jquiz.aar we have the jquiz.bin. We have the number of questions (3006 total questions) and then the entries. Each entry is 40bytes long, here is the example with the first entry. 
+Inside the jquiz.aar we have the jquiz.bin. We have the number of questions
+(3006 total questions) and then the entries. Each entry is 40bytes long, here is
+the example with the first entry.
 
 | Offset | Type   | Description                     |
 | ------ | ------ | ------------------------------- |

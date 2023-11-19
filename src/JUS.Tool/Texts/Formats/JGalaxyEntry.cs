@@ -1,14 +1,14 @@
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Single entry in a JGalaxySimple file.
+    /// Single entry in a JGalaxy file.
     /// </summary>
-    public class JGalaxySimpleEntry
+    public class JGalaxyEntry
     {
         /// <summary>
         /// Entry size in bytes.
         /// </summary>
-        public static readonly int EntrySize = 164;
+        public int EntrySize { get; set; }
 
         /// <summary>
         /// Gets or sets the Description.

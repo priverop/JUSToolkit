@@ -23,22 +23,35 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Format for simple JGalaxy files.
+    /// Format for blocks of the complex JGalaxy files.
     /// </summary>
-    public class JGalaxySimple : IFormat
+    public class JGalaxyComplexBlock : IFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="JGalaxySimple"/> class.
+        /// Initializes a new instance of the <see cref="JGalaxyComplexBlock"/> class.
         /// </summary>
-        public JGalaxySimple()
+        public JGalaxyComplexBlock(short numberOfEntries, int startingPointer, int entrySize)
         {
             Entries = new List<JGalaxyEntry>();
+            NumberOfEntries = numberOfEntries;
+            StartPointer = startingPointer;
+            EntrySize = entrySize;
         }
 
         /// <summary>
-        /// Gets or sets the number of <see cref="JGalaxySimple"/> entries.
+        /// Gets or sets the number of <see cref="JGalaxyComplexBlock"/> entries.
         /// </summary>
-        public int NumberOfEntries { get; set; }
+        public short NumberOfEntries { get; set; }
+
+        /// <summary>
+        /// Gets or sets the offset of the block start in the file.
+        /// </summary>
+        public int StartPointer { get; set; } // ToDo: Do we need this?
+
+        /// <summary>
+        /// Gets or sets the entry size of the block.
+        /// </summary>
+        public int EntrySize { get; set; }
 
         /// <summary>
         /// Gets or sets the list of text entries.

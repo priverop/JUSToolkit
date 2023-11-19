@@ -40,7 +40,7 @@ namespace JUSToolkit.Texts.Converters
             Po po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (JGalaxySimpleEntry entry in jgalaxy.Entries) {
+            foreach (JGalaxyEntry entry in jgalaxy.Entries) {
                 po.Add(new PoEntry(entry.Description) {
                     Context = $"{i++}",
                     ExtractedComments = System.Convert.ToBase64String(entry.Unknown),
@@ -63,7 +63,7 @@ namespace JUSToolkit.Texts.Converters
 
             foreach (PoEntry entry in po.Entries) {
 
-                var jgalaxyEntry = new JGalaxySimpleEntry {
+                var jgalaxyEntry = new JGalaxyEntry {
                     Description = entry.Text,
                     Unknown = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
