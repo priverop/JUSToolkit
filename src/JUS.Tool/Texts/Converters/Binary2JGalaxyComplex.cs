@@ -18,8 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.IO;
+using System.Reflection;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUSToolkit.Texts.Converters
@@ -28,8 +31,8 @@ namespace JUSToolkit.Texts.Converters
     /// Converts between JGalaxyComplex format and BinaryFormat.
     /// </summary>
     public class Binary2JGalaxyComplex :
-        IConverter<BinaryFormat, JGalaxyComplex>
-        // IConverter<JGalaxyComplex, BinaryFormat>
+        IConverter<BinaryFormat, JGalaxyComplex>,
+        IConverter<JGalaxyComplex, BinaryFormat>
     {
         private DataReader reader;
 
@@ -68,20 +71,63 @@ namespace JUSToolkit.Texts.Converters
 
             jgalaxy.Blocks[0] = ReadBlock(numberOfEntries0, startingPointer0, blockSize0);
             jgalaxy.Blocks[1] = ReadBlock(numberOfEntries1, startingPointer1, blockSize1);
-
-            // This file has the 4th block before the 3rd.
-            jgalaxy.Blocks[3] = ReadBlock(numberOfEntries3, startingPointer3, blockSize3);
             jgalaxy.Blocks[2] = ReadBlock(numberOfEntries2, startingPointer2, blockSize2);
+            jgalaxy.Blocks[3] = ReadBlock(numberOfEntries3, startingPointer3, blockSize3);
 
             return jgalaxy;
+        }
+
+        /// <summary>
+        /// Converts JGalaxyComplex format to BinaryFormat.
+        /// </summary>
+        /// <param name="jgalaxy">TextFormat to convert.</param>
+        /// <returns>BinaryFormat.</returns>
+        public BinaryFormat Convert(JGalaxyComplex jgalaxy)
+        {
+            var bin = new BinaryFormat();
+            var writer = new DataWriter(bin.Stream) {
+                DefaultEncoding = JusText.JusEncoding,
+            };
+
+            for (int i = 0; i < 3; i++) {
+                writer.Write(jgalaxy.Blocks[i].NumberOfEntries);
+            }
+
+            for (int i = 0; i < 3; i++) {
+                writer.Write(jgalaxy.Blocks[i].StartPointer);
+            }
+
+            for (int i = 0; i < 3; i++) {
+                foreach (JGalaxyEntry entry in jgalaxy.Blocks[i].Entries) {
+                    writer.Write(entry.Description);
+
+                    int descriptionLength = System.Text.Encoding.UTF8.GetByteCount(entry.Description);
+
+                    // I don't know if the extra byte if because of the null ending string or is just the length, but don't remove it
+                    long numberOfZeros = entry.EntrySize - descriptionLength - entry.Unknown.Length - 1;
+
+                    writer.WriteTimes(00, numberOfZeros);
+                    writer.Write(entry.Unknown);
+                }
+                if (i == 1) {
+                    // Abrimos el fichero ese jgalaxy_unknown.bin
+                    // Lo escribimos
+                    string programDir = AppDomain.CurrentDomain.BaseDirectory;
+                    var testing = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string path = Path.Combine(testing, @"lib\Names.txt");
+                    string resPath = Path.GetFullPath(programDir + "/../../../Resources/Utils/jgalaxy_unknown.bin");
+                    using Node node = NodeFactory.FromFile(resPath);
+                    node.Stream.WriteTo(writer.Stream);
+                }
+            }
+
+            return bin;
         }
 
         private JGalaxyComplexBlock ReadBlock(short numberOfEntries, int startingPointer, int blockSize)
         {
 
-            if (reader.Stream.Position != startingPointer) {
-                throw new Exception("Issue reading the file: wrong position of the block.");
-            }
+            reader.Stream.Position = startingPointer;
 
             int entrySize = blockSize / numberOfEntries;
             var block = new JGalaxyComplexBlock(numberOfEntries, startingPointer, entrySize);
@@ -112,38 +158,13 @@ namespace JUSToolkit.Texts.Converters
 
             reader.Stream.Position--; // Because the while did read a non zero value
 
-            int unknownLength = entrySize - entry.Description.Length - zeroCounter - 1;
+            int descriptionLength = System.Text.Encoding.UTF8.GetByteCount(entry.Description);
+
+            int unknownLength = entrySize - descriptionLength - zeroCounter - 1;
 
             entry.Unknown = reader.ReadBytes(unknownLength);
 
             return entry;
         }
-
-        /// <summary>
-        /// Converts JGalaxyComplex format to BinaryFormat.
-        /// </summary>
-        /// <param name="jgalaxy">TextFormat to convert.</param>
-        /// <returns>BinaryFormat.</returns>
-        // public BinaryFormat Convert(JGalaxyComplex jgalaxy)
-        // {
-        //     var bin = new BinaryFormat();
-        //     var writer = new DataWriter(bin.Stream) {
-        //         DefaultEncoding = JusText.JusEncoding,
-        //     };
-
-        //     writer.Write(jgalaxy.NumberOfEntries);
-
-        //     foreach (JGalaxyComplexEntry entry in jgalaxy.Entries) {
-        //         writer.Write(entry.Description);
-
-        //         // I don't know if the extra byte if because of the null ending string or is just the length, but don't remove it
-        //         long numberOfZeros = JGalaxyComplexEntry.EntrySize - entry.Description.Length - entry.Unknown.Length - 1;
-
-        //         writer.WriteTimes(00, numberOfZeros);
-        //         writer.Write(entry.Unknown);
-        //     }
-
-        //     return bin;
-        // }
     }
 }
