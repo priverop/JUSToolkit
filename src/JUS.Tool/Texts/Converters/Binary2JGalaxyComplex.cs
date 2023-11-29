@@ -57,7 +57,6 @@ namespace JUSToolkit.Texts.Converters
             short numberOfEntries0 = reader.ReadInt16();
             short numberOfEntries1 = reader.ReadInt16();
             short numberOfEntries2 = reader.ReadInt16();
-            short numberOfEntries3 = reader.ReadInt16();
 
             int startingPointer0 = reader.ReadInt32();
             int startingPointer1 = reader.ReadInt32();
@@ -67,12 +66,10 @@ namespace JUSToolkit.Texts.Converters
             int blockSize0 = startingPointer1 - startingPointer0;
             int blockSize1 = startingPointer3 - startingPointer1;
             int blockSize2 = (int)source.Stream.Length - startingPointer2;
-            int blockSize3 = startingPointer2 - startingPointer3;
 
             jgalaxy.Blocks[0] = ReadBlock(numberOfEntries0, startingPointer0, blockSize0);
             jgalaxy.Blocks[1] = ReadBlock(numberOfEntries1, startingPointer1, blockSize1);
             jgalaxy.Blocks[2] = ReadBlock(numberOfEntries2, startingPointer2, blockSize2);
-            jgalaxy.Blocks[3] = ReadBlock(numberOfEntries3, startingPointer3, blockSize3);
 
             return jgalaxy;
         }
@@ -124,13 +121,16 @@ namespace JUSToolkit.Texts.Converters
             return bin;
         }
 
+        /// <summary>
+        /// Reads a single <see cref="JGalaxyComplexBlock"/>.
+        /// </summary>
+        /// <returns>The read <see cref="JGalaxyComplexBlock"/>.</returns>
         private JGalaxyComplexBlock ReadBlock(short numberOfEntries, int startingPointer, int blockSize)
         {
-
             reader.Stream.Position = startingPointer;
 
             int entrySize = blockSize / numberOfEntries;
-            var block = new JGalaxyComplexBlock(numberOfEntries, startingPointer, entrySize);
+            var block = new JGalaxyComplexBlock(numberOfEntries, startingPointer);
 
             for (int i = 0; i < numberOfEntries; i++) {
                 block.Entries.Add(ReadEntry(entrySize));
@@ -158,7 +158,7 @@ namespace JUSToolkit.Texts.Converters
 
             reader.Stream.Position--; // Because the while did read a non zero value
 
-            int descriptionLength = System.Text.Encoding.UTF8.GetByteCount(entry.Description);
+            int descriptionLength = JusText.JusEncoding.GetByteCount(entry.Description);
 
             int unknownLength = entrySize - descriptionLength - zeroCounter - 1;
 

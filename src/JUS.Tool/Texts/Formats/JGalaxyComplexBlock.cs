@@ -30,12 +30,11 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Initializes a new instance of the <see cref="JGalaxyComplexBlock"/> class.
         /// </summary>
-        public JGalaxyComplexBlock(short numberOfEntries, int startingPointer, int entrySize)
+        public JGalaxyComplexBlock(short numberOfEntries, int startingPointer)
         {
             Entries = new List<JGalaxyEntry>();
             NumberOfEntries = numberOfEntries;
             StartPointer = startingPointer;
-            EntrySize = entrySize;
         }
 
         /// <summary>
@@ -46,12 +45,7 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the offset of the block start in the file.
         /// </summary>
-        public int StartPointer { get; set; } // ToDo: Do we need this?
-
-        /// <summary>
-        /// Gets or sets the entry size of the block.
-        /// </summary>
-        public int EntrySize { get; set; }
+        public int StartPointer { get; set; }
 
         /// <summary>
         /// Gets or sets the list of text entries.

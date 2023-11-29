@@ -6,7 +6,7 @@ namespace JUSToolkit.Texts.Formats
     public class JGalaxyEntry
     {
         /// <summary>
-        /// Entry size in bytes.
+        /// Gets or sets the entry size in bytes.
         /// </summary>
         public int EntrySize { get; set; }
 

@@ -273,6 +273,8 @@ share that.
 The block 3 is the last block. And the block 4 is before the 3 block: Block 1 -
 Block 2 - Block 4 - Block 3.
 
+The block 4 doesn't have text.
+
 | Offset | Type                    | Description                                               |
 | ------ | ----------------------- | --------------------------------------------------------- |
 | 0x00   | short[4]                | Array of number of entries of each block (4 blocks).      |
