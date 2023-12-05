@@ -17,7 +17,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Komatxt/");
+            resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Komatxt/");
 
             Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
         }
@@ -26,9 +26,9 @@ namespace JUS.Tests.Texts
         public void KomatxtTest()
         {
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
-                using (var node = NodeFactory.FromFile(filePath)) {
+                using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Komatxt
-                    var expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2Komatxt = new Binary2Komatxt();
                     Komatxt expectedKomatxt = null;
                     try {

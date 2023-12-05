@@ -17,7 +17,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Piece/piece.bin");
+            resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Piece/piece.bin");
 
             Assert.True(File.Exists(resPath), "The file does not exist", resPath);
         }
@@ -25,10 +25,10 @@ namespace JUS.Tests.Texts
         [Test]
         public void PieceTest()
         {
-            var node = NodeFactory.FromFile(resPath);
+            Node node = NodeFactory.FromFile(resPath);
 
             // BinaryFormat -> Piece
-            var expectedBin = node.GetFormatAs<BinaryFormat>();
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
             var binary2Piece = new Binary2Piece();
             Piece expectedPiece = null;
             try {

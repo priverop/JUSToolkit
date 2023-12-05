@@ -17,7 +17,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/Pname/pname.bin");
+            resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Pname/pname.bin");
 
             Assert.True(File.Exists(resPath), "The resource file does not exist", resPath);
         }
@@ -25,10 +25,10 @@ namespace JUS.Tests.Texts
         [Test]
         public void PnameTest()
         {
-            var node = NodeFactory.FromFile(resPath);
+            Node node = NodeFactory.FromFile(resPath);
 
             // BinaryFormat -> Pname
-            var expectedBin = node.GetFormatAs<BinaryFormat>();
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
             var binary2Pname = new Binary2Pname();
             Pname expectedPname = null;
             try {

@@ -41,7 +41,7 @@ namespace JUSToolkit.Tests.Containers
         // public void Setup()
         // {
         //     string programDir = AppDomain.CurrentDomain.BaseDirectory;
-        //     resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/JQuiz/");
+        //     resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/JQuiz/");
 
         //     Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
         // }
@@ -122,9 +122,9 @@ namespace JUSToolkit.Tests.Containers
         // public void JQuizTest()
         // {
         //     foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
-        //         using (var node = NodeFactory.FromFile(filePath)) {
+        //         using (Node node = NodeFactory.FromFile(filePath)) {
         //             // BinaryFormat -> JQuiz
-        //             var expectedBin = node.GetFormatAs<BinaryFormat>();
+        //             BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
         //             var binary2JQuiz = new Binary2JQuiz();
         //             JQuiz expectedJQuiz = null;
         //             try {

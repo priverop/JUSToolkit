@@ -17,7 +17,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/BtlChr/");
+            resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/BtlChr/");
 
             Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
         }
@@ -26,9 +26,9 @@ namespace JUS.Tests.Texts
         public void BtlChrTest()
         {
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
-                using (var node = NodeFactory.FromFile(filePath)) {
+                using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> BtlChr
-                    var expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2BtlChr = new Binary2BtlChr();
                     BtlChr expectedBtlChr = null;
                     try {

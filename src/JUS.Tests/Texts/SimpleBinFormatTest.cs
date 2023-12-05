@@ -17,7 +17,7 @@ namespace JUS.Tests.Texts
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
-            resPath = Path.GetFullPath(programDir + "/../../../" + "Resources/Texts/SimpleBin/");
+            resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/SimpleBin/");
 
             Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
         }
@@ -26,9 +26,9 @@ namespace JUS.Tests.Texts
         public void SimpleBinTest()
         {
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
-                using (var node = NodeFactory.FromFile(filePath)) {
+                using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> SimpleBin
-                    var expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2SimpleBin = new Binary2SimpleBin();
                     SimpleBin expectedSimpleBin = null;
                     try {

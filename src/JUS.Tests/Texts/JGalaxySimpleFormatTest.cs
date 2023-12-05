@@ -28,7 +28,7 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> JGalaxySimple
-                    var expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2JGalaxySimple = new Binary2JGalaxySimple();
                     JGalaxySimple expectedJGalaxySimple = null;
                     try {
