@@ -44,6 +44,7 @@ namespace JUSToolkit.Texts.Converters
             foreach (JGalaxyComplexBlock block in jgalaxy.Blocks) {
                 po.Add(new PoEntry("<!Don't remove>") {
                     Context = $"{blockCount++}",
+                    ExtractedComments = $"{block.StartPointer} - {block.NumberOfEntries}",
                 });
                 foreach (JGalaxyEntry entry in block.Entries) {
                     string description = string.IsNullOrWhiteSpace(entry.Description) ?
@@ -72,8 +73,19 @@ namespace JUSToolkit.Texts.Converters
             int blockCount = 0;
             int i = 0;
             foreach (PoEntry entry in po.Entries) {
-                if (entry.Text.Equals("<!Don't remove>") && i != 0) {
-                    blockCount++;
+                // New block found
+                if (entry.Text.Equals("<!Don't remove>")) {
+                    if (i != 0) {
+                        blockCount++;
+                    }
+
+                    string[] blockMetadata = JusText.ParseMetadata(entry.ExtractedComments);
+                    int startPointer = int.Parse(blockMetadata[0]);
+                    short numberOfEntries = short.Parse(blockMetadata[1]);
+
+                    jgalaxy.Blocks[blockCount] = new JGalaxyComplexBlock(numberOfEntries, startPointer);
+
+                    continue;
                 }
 
                 i++;

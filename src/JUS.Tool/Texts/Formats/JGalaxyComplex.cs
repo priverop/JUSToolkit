@@ -31,7 +31,7 @@ namespace JUSToolkit.Texts.Formats
         /// </summary>
         public JGalaxyComplex()
         {
-            Blocks = new JGalaxyComplexBlock[3];
+            Blocks = new JGalaxyComplexBlock[4];
         }
 
         /// <summary>

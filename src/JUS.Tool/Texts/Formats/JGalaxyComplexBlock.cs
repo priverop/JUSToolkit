@@ -38,6 +38,15 @@ namespace JUSToolkit.Texts.Formats
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="JGalaxyComplexBlock"/> class.
+        /// </summary>
+        public JGalaxyComplexBlock(int startingPointer)
+        {
+            Entries = new List<JGalaxyEntry>();
+            StartPointer = startingPointer;
+        }
+
+        /// <summary>
         /// Gets or sets the number of <see cref="JGalaxyComplexBlock"/> entries.
         /// </summary>
         public short NumberOfEntries { get; set; }

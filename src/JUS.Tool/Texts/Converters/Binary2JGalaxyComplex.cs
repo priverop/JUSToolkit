@@ -57,6 +57,7 @@ namespace JUSToolkit.Texts.Converters
             short numberOfEntries0 = reader.ReadInt16();
             short numberOfEntries1 = reader.ReadInt16();
             short numberOfEntries2 = reader.ReadInt16();
+            short numberOfEntries3 = reader.ReadInt16();
 
             int startingPointer0 = reader.ReadInt32();
             int startingPointer1 = reader.ReadInt32();
@@ -70,6 +71,8 @@ namespace JUSToolkit.Texts.Converters
             jgalaxy.Blocks[0] = ReadBlock(numberOfEntries0, startingPointer0, blockSize0);
             jgalaxy.Blocks[1] = ReadBlock(numberOfEntries1, startingPointer1, blockSize1);
             jgalaxy.Blocks[2] = ReadBlock(numberOfEntries2, startingPointer2, blockSize2);
+            // There is no text in the last Block
+            jgalaxy.Blocks[3] = new JGalaxyComplexBlock(numberOfEntries3, startingPointer3);
 
             return jgalaxy;
         }
@@ -86,19 +89,19 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i <= 3; i++) {
                 writer.Write(jgalaxy.Blocks[i].NumberOfEntries);
             }
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i <= 3; i++) {
                 writer.Write(jgalaxy.Blocks[i].StartPointer);
             }
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i <= 3; i++) {
                 foreach (JGalaxyEntry entry in jgalaxy.Blocks[i].Entries) {
                     writer.Write(entry.Description);
 
-                    int descriptionLength = System.Text.Encoding.UTF8.GetByteCount(entry.Description);
+                    int descriptionLength = JusText.JusEncoding.GetByteCount(entry.Description);
 
                     // I don't know if the extra byte if because of the null ending string or is just the length, but don't remove it
                     long numberOfZeros = entry.EntrySize - descriptionLength - entry.Unknown.Length - 1;
@@ -110,9 +113,7 @@ namespace JUSToolkit.Texts.Converters
                     // Abrimos el fichero ese jgalaxy_unknown.bin
                     // Lo escribimos
                     string programDir = AppDomain.CurrentDomain.BaseDirectory;
-                    var testing = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    string path = Path.Combine(testing, @"lib\Names.txt");
-                    string resPath = Path.GetFullPath(programDir + "/../../../Resources/Utils/jgalaxy_unknown.bin");
+                    string resPath = Path.GetFullPath(programDir + "/../../../../JUS.Tool/Utils/jgalaxy_unknown.bin");
                     using Node node = NodeFactory.FromFile(resPath);
                     node.Stream.WriteTo(writer.Stream);
                 }
