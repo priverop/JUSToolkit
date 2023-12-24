@@ -71,6 +71,7 @@ namespace JUSToolkit.Texts.Converters
             jgalaxy.Blocks[0] = ReadBlock(numberOfEntries0, startingPointer0, blockSize0);
             jgalaxy.Blocks[1] = ReadBlock(numberOfEntries1, startingPointer1, blockSize1);
             jgalaxy.Blocks[2] = ReadBlock(numberOfEntries2, startingPointer2, blockSize2);
+
             // There is no text in the last Block
             jgalaxy.Blocks[3] = new JGalaxyComplexBlock(numberOfEntries3, startingPointer3);
 
@@ -109,6 +110,7 @@ namespace JUSToolkit.Texts.Converters
                     writer.WriteTimes(00, numberOfZeros);
                     writer.Write(entry.Unknown);
                 }
+
                 if (i == 1) {
                     // Abrimos el fichero ese jgalaxy_unknown.bin
                     // Lo escribimos

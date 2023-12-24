@@ -47,11 +47,7 @@ namespace JUSToolkit.Texts.Converters
                     ExtractedComments = $"{block.StartPointer} - {block.NumberOfEntries}",
                 });
                 foreach (JGalaxyEntry entry in block.Entries) {
-                    string description = string.IsNullOrWhiteSpace(entry.Description) ?
-                                    "<!empty>" :
-                                    entry.Description;
-
-                    po.Add(new PoEntry(description) {
+                    po.Add(new PoEntry(JusText.CleanString(entry.Description)) {
                         Context = $"{i++}",
                         ExtractedComments = $"{entry.EntrySize}-{System.Convert.ToBase64String(entry.Unknown)}",
                     });

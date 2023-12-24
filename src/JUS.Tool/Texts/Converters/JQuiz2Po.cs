@@ -30,9 +30,10 @@ namespace JUSToolkit.Texts.Converters
     /// Converts between JQuiz format and NodeContainerFormat.
     /// </summary>
     public class JQuiz2Po :
-        IConverter<JQuiz, NodeContainerFormat>
+        IConverter<JQuiz, NodeContainerFormat>,
+        IConverter<NodeContainerFormat, JQuiz>
     {
-        private readonly Dictionary<int, string> mangaIndex = new Dictionary<int, string>() {
+        private readonly Dictionary<int, string> mangaIndex = new() {
             { 0x00, "Shonen Jump" },
             { 0x01, "Eyeshield 21" },
             { 0x02, "I's" },
@@ -85,7 +86,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public NodeContainerFormat Convert(JQuiz jquiz)
         {
-            var po = JusText.GenerateJusPo();
+            Po po = JusText.GenerateJusPo();
             var container = new NodeContainerFormat();
             BinaryFormat poBin;
 
@@ -95,7 +96,7 @@ namespace JUSToolkit.Texts.Converters
             foreach (JQuizEntry entry in jquiz.Entries) {
                 if (entry.MangaID != currentManga) {
                     poBin = ConvertFormat.With<Po2Binary>(po) as BinaryFormat;
-                    container.Root.Add(new Node($"jquiz-{mangaCount}-{mangaIndex[currentManga]}.po", poBin));
+                    container.Root.Add(new Node($"jquiz-{mangaCount:00}-{mangaIndex[currentManga]}.po", poBin));
                     po = JusText.GenerateJusPo();
                     mangaCount++;
                     currentManga = entry.MangaID;
@@ -119,44 +120,58 @@ namespace JUSToolkit.Texts.Converters
 
                 questionCount++;
             }
+
             poBin = ConvertFormat.With<Po2Binary>(po) as BinaryFormat;
-            container.Root.Add(new Node($"jquiz-{mangaCount}-{mangaIndex[currentManga]}.po", poBin));
+            container.Root.Add(new Node($"jquiz-{mangaCount:00}-{mangaIndex[currentManga]}.po", poBin));
 
             return container;
         }
 
         /// <summary>
-        /// Converts Po to JQuiz format.
+        /// Converts Po files to JQuiz format.
         /// </summary>
-        /// <param name="po">Po to convert.</param>
+        /// <param name="poFiles">Po files to convert.</param>
         /// <returns>Transformed TextFormat.</returns>
-        // public JQuiz Convert(Po po)
-        // {
-        //     var jquiz = new JQuiz();
-        //     JQuizEntry entry;
-        //     List<string> description;
+        public JQuiz Convert(NodeContainerFormat poFiles)
+        {
+            var jquiz = new JQuiz();
+            int questionCount = 0;
+            var jquizEntry = new JQuizEntry();
 
-        //     jquiz.Count = po.Entries.Count / 2;
+            foreach (Node file in poFiles.Root.Children) {
+                Po po = file.TransformWith<Binary2Po>().GetFormatAs<Po>();
+                foreach (PoEntry entry in po.Entries) {
+                    if (entry.Context.Contains("foto")) {
+                        if (questionCount != 0) {
+                            jquiz.Entries.Add(jquizEntry);
+                            jquizEntry = new JQuizEntry();
+                        }
 
-        //     for (int i = 0; i < jquiz.Count; i++) {
-        //         entry = new JQuizEntry();
+                        jquizEntry.Photo = entry.Text;
+                        string[] metadata = JusText.ParseMetadata(entry.ExtractedComments);
+                        jquizEntry.MangaID = byte.Parse(metadata[0]);
+                        jquizEntry.Unknown = byte.Parse(metadata[1]);
+                        jquizEntry.Unknown2 = short.Parse(metadata[2]);
+                        questionCount++;
+                        continue;
+                    }
 
-        //         entry.Title = po.Entries[i * 2].Text;
+                    string number = entry.Context[^1..];
 
-        //         string descriptionEntry = po.Entries[(i * 2) + 1].Text;
-        //         if (descriptionEntry == "<!empty>") {
-        //             entry.Description1 = string.Empty;
-        //             entry.Description2 = string.Empty;
-        //         } else {
-        //             description = JusText.SplitStringToList(descriptionEntry, '\n', 2);
-        //             entry.Description1 = description[0];
-        //             entry.Description2 = description[1];
-        //         }
+                    if (entry.Context.Contains("enunciado")) {
+                        jquizEntry.Questions[int.Parse(number)] = entry.Text;
+                    }
 
-        //         jquiz.Entries.Add(entry);
-        //     }
+                    if (entry.Context.Contains("respuesta")) {
+                        jquizEntry.Answers[int.Parse(number)] = entry.Text;
+                    }
+                }
+            }
 
-        //     return jquiz;
-        // }
+            jquiz.Entries.Add(jquizEntry);
+            jquiz.NumQuestions = questionCount;
+
+            return jquiz;
+        }
     }
 }

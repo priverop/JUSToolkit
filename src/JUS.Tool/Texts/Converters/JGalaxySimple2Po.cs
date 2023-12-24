@@ -41,7 +41,7 @@ namespace JUSToolkit.Texts.Converters
 
             int i = 0;
             foreach (JGalaxyEntry entry in jgalaxy.Entries) {
-                po.Add(new PoEntry(entry.Description) {
+                po.Add(new PoEntry(JusText.CleanString(entry.Description)) {
                     Context = $"{i++}",
                     ExtractedComments = System.Convert.ToBase64String(entry.Unknown),
                 });
@@ -62,7 +62,6 @@ namespace JUSToolkit.Texts.Converters
             };
 
             foreach (PoEntry entry in po.Entries) {
-
                 var jgalaxyEntry = new JGalaxyEntry {
                     Description = entry.Text,
                     Unknown = System.Convert.FromBase64String(entry.ExtractedComments),

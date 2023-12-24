@@ -33,7 +33,7 @@ using Yarhl.Media.Text;
 namespace JUSToolkit.Tests.Containers
 {
     [TestFixture]
-    public class JQuizFormatTests
+    public class JQuizFormatTest
     {
         private string resPath;
 
@@ -78,7 +78,7 @@ namespace JUSToolkit.Tests.Containers
 
             var expected = NodeContainerInfo.FromYaml(infoPath);
 
-            using var jquiz = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
+            using Node jquiz = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
             jquiz.Invoking(n => n.TransformWith<Binary2JQuiz>()).Should().NotThrow();
             jquiz.GetFormatAs<JQuiz>().Entries.Should().NotBeEmpty().And.HaveCount(3006);

@@ -311,6 +311,20 @@ the example with the first entry.
 | 0x0C   | int[4] | Question pointers               |
 | 0x1C   | int[4] | Answer pointers                 |
 
+Starting Offset: 0x0001D5B4 (120244) where the text starts.
+
+### Pointers Entry 1
+| Offset | Type       | Pointer             | Text Length* | Pointer Calc (Offset + Pointer) |
+| ------ | ---------- | ------------------- | ------------ | ------------------------------- |
+| 0x4    | MangaID    |                     | 1            |                                 |
+| 0x8    | Photo      | 120236(0x01 D5 AC)  | 0            | 120244 (0x01 D5 B4)             |
+| 0xC    | Question 1 | 120233 (0x01 D5 A9) | 30           | 120245 (0x01 D5 B5)             |
+| 0x10   | Question 2 | 120260 (0x01 D5 C4) | 14           | 120276 (0x01 D5 D4)             |
+| 0x14   | Question 3 | 120224 (0x01 D5 A0) | 0            | 120244 (0x01 D5 B4)             |
+| 0x18   | Question 4 | 120220 (0x01 D5 9C) | 0            | 120244 (0x01 D5 B4)             |
+
+*No null byte.
+
 ## Bin files without text
 
 - dwc/utility.bin

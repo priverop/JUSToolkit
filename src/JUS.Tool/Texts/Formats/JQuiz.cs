@@ -36,9 +36,9 @@ namespace JUSToolkit.Texts.Formats
         }
 
         /// <summary>
-        /// Gets or sets the number of entries in <see cref="JQuizEntry"/>.
+        /// Gets or sets the number of entries.
         /// </summary>
-        public int Count { get; set; }
+        public int NumQuestions { get; set; }
 
         /// <summary>
         /// Gets or sets the list of <see cref="JQuizEntry" />.

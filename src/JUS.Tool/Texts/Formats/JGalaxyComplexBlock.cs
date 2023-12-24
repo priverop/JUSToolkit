@@ -30,6 +30,8 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Initializes a new instance of the <see cref="JGalaxyComplexBlock"/> class.
         /// </summary>
+        /// <param name="numberOfEntries">Number of entries for the whole block.</param>
+        /// <param name="startingPointer">Pointer of the start of the block.</param>
         public JGalaxyComplexBlock(short numberOfEntries, int startingPointer)
         {
             Entries = new List<JGalaxyEntry>();
@@ -40,6 +42,7 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Initializes a new instance of the <see cref="JGalaxyComplexBlock"/> class.
         /// </summary>
+        /// <param name="startingPointer">Pointer of the start of the block.</param>
         public JGalaxyComplexBlock(int startingPointer)
         {
             Entries = new List<JGalaxyEntry>();

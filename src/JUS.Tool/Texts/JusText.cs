@@ -21,10 +21,7 @@ namespace JUSToolkit.Texts
         /// Generates a new Po for a Jus text file.
         /// </summary>
         /// <returns>Generated Jus <see cref="Po"/>.</returns>
-        public static Po GenerateJusPo()
-        {
-            return new Po(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
-        }
+        public static Po GenerateJusPo() => new(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
 
         /// <summary>
         /// Cleans the string for a PoEntry returning empty instead of "" or null.
@@ -35,6 +32,18 @@ namespace JUSToolkit.Texts
         {
             return string.IsNullOrWhiteSpace(input) ?
                                     "<!empty>" :
+                                    input;
+        }
+
+        /// <summary>
+        /// Cleans the string for a PoEntry returning empty instead of "" or null.
+        /// </summary>
+        /// <param name="input">String to clean.</param>
+        /// <returns>Clean string.</returns>
+        public static string WriteCleanString(string input)
+        {
+            return input == "<!empty>" ?
+                                    string.Empty :
                                     input;
         }
 
@@ -61,10 +70,7 @@ namespace JUSToolkit.Texts
         /// </summary>
         /// <param name="extractedComments">String to split.</param>
         /// <returns>Array of strings.</returns>
-        public static string[] ParseMetadata(string extractedComments)
-        {
-            return extractedComments.Split('-', StringSplitOptions.RemoveEmptyEntries);
-        }
+        public static string[] ParseMetadata(string extractedComments) => extractedComments.Split('-', StringSplitOptions.RemoveEmptyEntries);
 
         /// <summary>
         /// Returns a string from current indirect stream position.
@@ -107,8 +113,11 @@ namespace JUSToolkit.Texts
                 writer.Write(jit.TextOffsets[text] - (int)writer.Stream.Position);
             } else {
                 jit.TextOffsets.Add(text, jit.CurrentOffset);
+
+                // Write absolute pointer of the text: offset of the text - writerPosition
                 writer.Write(jit.CurrentOffset - (int)writer.Stream.Position);
                 jit.CurrentOffset += writer.DefaultEncoding.GetByteCount(text) + 1;
+
                 jit.Strings.Add(text);
             }
         }

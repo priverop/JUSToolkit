@@ -48,9 +48,9 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            jquiz.Count = reader.ReadInt32();
+            jquiz.NumQuestions = reader.ReadInt32();
 
-            for (int i = 0; i < jquiz.Count; i++) {
+            for (int i = 0; i < jquiz.NumQuestions; i++) {
                 jquiz.Entries.Add(ReadEntry());
             }
 
@@ -65,25 +65,27 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(JQuiz jquiz)
         {
             var bin = new BinaryFormat();
-            DataWriter writer = new DataWriter(bin.Stream) {
+            var writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(0x04 + jquiz.Count * JQuizEntry.EntrySize);
+            var jit = new IndirectTextWriter(0x04 + (jquiz.NumQuestions * JQuizEntry.EntrySize)); // debug: 120244
 
-            writer.Write(jquiz.Count);
+            writer.Write(jquiz.NumQuestions);
 
+            // debug: First iteration -> 120399 current offset + 7 strings + 7 textsoffsets
+            // debug: Second iteration -> 120509 current offset + 13 strings + 13 textsoffsets
             foreach (JQuizEntry entry in jquiz.Entries) {
                 writer.Write(entry.MangaID);
                 writer.Write(entry.Unknown);
                 writer.Write(entry.Unknown2);
-                JusText.WriteStringPointer(entry.Photo, writer, jit);
+                JusText.WriteStringPointer(JusText.WriteCleanString(entry.Photo), writer, jit);
                 for (int i = 0; i < entry.Questions.Length; i++) {
-                    JusText.WriteStringPointer(entry.Questions[i], writer, jit);
+                    JusText.WriteStringPointer(JusText.WriteCleanString(entry.Questions[i]), writer, jit);
                 }
 
                 for (int i = 0; i < entry.Answers.Length; i++) {
-                    JusText.WriteStringPointer(entry.Answers[i], writer, jit);
+                    JusText.WriteStringPointer(JusText.WriteCleanString(entry.Answers[i]), writer, jit);
                 }
             }
 
@@ -98,12 +100,12 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>The read <see cref="JQuizEntry"/>.</returns>
         private JQuizEntry ReadEntry()
         {
-            var entry = new JQuizEntry();
-
-            entry.MangaID = reader.ReadByte();
-            entry.Unknown = reader.ReadByte();
-            entry.Unknown2 = reader.ReadInt16();
-            entry.Photo = JusText.ReadIndirectString(reader);
+            var entry = new JQuizEntry {
+                MangaID = reader.ReadByte(),
+                Unknown = reader.ReadByte(),
+                Unknown2 = reader.ReadInt16(),
+                Photo = JusText.ReadIndirectString(reader),
+            };
 
             for (int i = 0; i < entry.Questions.Length; i++) {
                 entry.Questions[i] = JusText.ReadIndirectString(reader);

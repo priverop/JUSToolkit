@@ -19,6 +19,8 @@
 // SOFTWARE.
 using System;
 using System.IO;
+using JUSToolkit.Texts.Converters;
+using JUSToolkit.Texts.Formats;
 using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -32,7 +34,7 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class TextCommands
     {
-        private static readonly string TextConvertersNamespace = "JUSToolkit.Texts.Converters.";
+        private const string TextConvertersNamespace = "JUSToolkit.Texts.Converters.";
 
         /// <summary>
         /// Export a .bin file to a .Po file.
@@ -100,6 +102,27 @@ namespace JUSToolkit.CLI.JUS
 
             string outputFile = Path.Combine(output, cleanFileName);
             binaryFormat.Stream.WriteTo(outputFile);
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import the jquiz container to a .bin file.
+        /// </summary>
+        /// <param name="container">The path to the po file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void ImportJQuiz(string container, string output)
+        {
+            Node inputFiles = NodeFactory.FromDirectory(container, "*.po") ?? throw new FormatException("Invalid container file");
+
+            inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
+
+            JQuiz jquiz = inputFiles
+                .TransformWith<JQuiz2Po>()
+                .GetFormatAs<JQuiz>();
+
+            using var binary = (BinaryFormat)ConvertFormat.With<Binary2JQuiz>(jquiz);
+
+            binary.Stream.WriteTo(Path.Combine(output, "imported_jquiz.bin"));
             Console.WriteLine("Done!");
         }
     }

@@ -215,9 +215,16 @@ namespace JUSToolkit.CLI.JUS
             };
             import.Handler = CommandHandler.Create<string, string>(TextCommands.Import);
 
+            var importJQuiz = new Command("importjquiz", "Import the jquiz Po folder into a .bin") {
+                new Option<string>("--container", "the container of the .po files", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importJQuiz.Handler = CommandHandler.Create<string, string>(TextCommands.ImportJQuiz);
+
             return new Command("texts", "Export or import bin files to Po") {
                 export,
                 import,
+                importJQuiz,
             };
         }
     }
