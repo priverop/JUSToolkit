@@ -313,6 +313,8 @@ the example with the first entry.
 
 Starting Offset: 0x0001D5B4 (120244) where the text starts.
 
+Offset of the empty string: 0x1D5B4 (120244).
+
 ### Pointers Entry 1
 | Offset | Type       | Pointer             | Text Length* | Pointer Calc (Offset + Pointer) |
 | ------ | ---------- | ------------------- | ------------ | ------------------------------- |
@@ -324,6 +326,9 @@ Starting Offset: 0x0001D5B4 (120244) where the text starts.
 | 0x18   | Question 4 | 120220 (0x01 D5 9C) | 0            | 120244 (0x01 D5 B4)             |
 
 *No null byte.
+
+> [!CAUTION]
+> This file has two random `81 40 00`, maybe it means something in the game graphics but I don't know yet.
 
 ## Bin files without text
 

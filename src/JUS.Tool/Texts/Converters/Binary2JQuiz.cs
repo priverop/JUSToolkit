@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 Priverop
+// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,12 +69,10 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(0x04 + (jquiz.NumQuestions * JQuizEntry.EntrySize)); // debug: 120244
+            var jit = new IndirectTextWriter(0x04 + (jquiz.NumQuestions * JQuizEntry.EntrySize));
 
             writer.Write(jquiz.NumQuestions);
 
-            // debug: First iteration -> 120399 current offset + 7 strings + 7 textsoffsets
-            // debug: Second iteration -> 120509 current offset + 13 strings + 13 textsoffsets
             foreach (JQuizEntry entry in jquiz.Entries) {
                 writer.Write(entry.MangaID);
                 writer.Write(entry.Unknown);

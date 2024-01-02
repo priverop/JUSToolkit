@@ -24,15 +24,21 @@ namespace JUSToolkit.Texts
         public static Po GenerateJusPo() => new(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
 
         /// <summary>
-        /// Cleans the string for a PoEntry returning empty instead of "" or null.
+        /// Checks for null or empty string, returning "empty"
+        /// Returns "small_space" or "big_space" if the string is " " or "  ".
         /// </summary>
         /// <param name="input">String to clean.</param>
         /// <returns>Clean string.</returns>
         public static string CleanString(string input)
         {
-            return string.IsNullOrWhiteSpace(input) ?
-                                    "<!empty>" :
-                                    input;
+            if (string.IsNullOrEmpty(input)) {
+                return "<!empty>";
+            } else if (string.IsNullOrWhiteSpace(input) && input.Length > 0) {
+                // Spaces
+                return input.Length == 1 ? "<!small_space>" : "<!big_space>";
+            } else {
+                return input;
+            }
         }
 
         /// <summary>
@@ -42,9 +48,15 @@ namespace JUSToolkit.Texts
         /// <returns>Clean string.</returns>
         public static string WriteCleanString(string input)
         {
-            return input == "<!empty>" ?
-                                    string.Empty :
-                                    input;
+            if (input.Equals("<!empty>")) {
+                return string.Empty;
+            } else if (input.Equals("<!small_space>")) {
+                return JusEncoding.GetString(new byte[] { 0x81, 0x40 });
+            } else if (input.Equals("<!big_space>")) {
+                return JusEncoding.GetString(new byte[] { 0x81, 0x40, 0x81, 0x40 });
+            } else {
+                return input;
+            }
         }
 
         /// <summary>
