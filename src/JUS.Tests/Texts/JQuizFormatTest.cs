@@ -35,17 +35,6 @@ namespace JUSToolkit.Tests.Containers
     [TestFixture]
     public class JQuizFormatTest
     {
-        private string resPath;
-
-        // [SetUp]
-        // public void Setup()
-        // {
-        //     string programDir = AppDomain.CurrentDomain.BaseDirectory;
-        //     resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/JQuiz/");
-
-        //     Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
-        // }
-
         public static IEnumerable<TestCaseData> GetJQuizFiles()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Texts/JQuiz");
@@ -58,25 +47,12 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
-        // public static IEnumerable<TestCaseData> GetJQuizInsertionFiles()
-        // {
-        //     string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers");
-        //     string listPath = Path.Combine(basePath, "JQuizinsertion.txt");
-        //     return TestDataBase.ReadTestListFile(listPath)
-        //         .Select(line => line.Split(','))
-        //         .Select(data => new TestCaseData(
-        //             Path.Combine(basePath, data[0]),
-        //             Path.Combine(basePath, data[1]))
-        //             .SetName($"({data[0]}, {data[1]})"));
-        // }
-
+        // We can't use the yml to check the deserialized stream because our JQuiz is not a NodeContainerFormat.
         [TestCaseSource(nameof(GetJQuizFiles))]
         public void DeserializeJQuiz(string infoPath, string jquizPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(jquizPath);
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
-
-            var expected = NodeContainerInfo.FromYaml(infoPath);
 
             using Node jquiz = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
@@ -99,69 +75,51 @@ namespace JUSToolkit.Tests.Containers
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
         }
 
-        // [TestCaseSource(nameof(GetJQuizInsertionFiles))]
-        // public void InsertingJQuizIdentical(string jquizPath, string filePath)
-        // {
-        //     TestDataBase.IgnoreIfFileDoesNotExist(jquizPath);
-        //     TestDataBase.IgnoreIfFileDoesNotExist(filePath);
+        [TestCaseSource(nameof(GetJQuizFiles))]
+        public void JQuizTest(string infoPath, string jquizPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(jquizPath);
 
-        //     Assert.Ignore();
+            using Node node = NodeFactory.FromFile(jquizPath);
 
-        //     using Node jquizOriginal = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
-        //     using Node fileOriginal = NodeFactory.FromFile(filePath, FileOpenMode.Read);
+            // BinaryFormat -> JQuiz
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+            var binary2JQuiz = new Binary2JQuiz();
+            JQuiz expectedJQuiz = null;
+            try {
+                expectedJQuiz = binary2JQuiz.Convert(expectedBin);
+            } catch (Exception ex) {
+                Assert.Fail($"Exception BinaryFormat -> JQuiz with {node.Path}\n{ex}");
+            }
 
-        //     var jquiz = (JQuiz)ConvertFormat.With<Binary2JQuiz>(jquizOriginal.Format!);
-        //     jquiz.InsertModification(fileOriginal);
-        //     var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2JQuiz>(jquiz);
+            // JQuiz -> NCF of Pos
+            var jquiz2Po = new JQuiz2Po();
+            NodeContainerFormat expectedPo = null;
+            try {
+                expectedPo = jquiz2Po.Convert(expectedJQuiz);
+            } catch (Exception ex) {
+                Assert.Fail($"Exception JQuiz -> Po with {node.Path}\n{ex}");
+            }
 
-        //     generatedStream.Stream.Length.Should().Be(jquizOriginal.Stream!.Length);
-        //     generatedStream.Stream.Compare(jquizOriginal.Stream).Should().BeTrue();
-        // }
+            // Po -> JQuiz
+            JQuiz actualJQuiz = null;
+            try {
+                actualJQuiz = jquiz2Po.Convert(expectedPo);
+            } catch (Exception ex) {
+                Assert.Fail($"Exception Po -> JQuiz with {node.Path}\n{ex}");
+            }
 
-        // [Test]
-        // public void JQuizTest()
-        // {
-        //     foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
-        //         using (Node node = NodeFactory.FromFile(filePath)) {
-        //             // BinaryFormat -> JQuiz
-        //             BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
-        //             var binary2JQuiz = new Binary2JQuiz();
-        //             JQuiz expectedJQuiz = null;
-        //             try {
-        //                 expectedJQuiz = binary2JQuiz.Convert(expectedBin);
-        //             } catch (Exception ex) {
-        //                 Assert.Fail($"Exception BinaryFormat -> JQuiz with {node.Path}\n{ex}");
-        //             }
+            // JQuiz -> BinaryFormat
+            BinaryFormat actualBin = null;
+            try {
+                actualBin = binary2JQuiz.Convert(actualJQuiz);
+            } catch (Exception ex) {
+                Assert.Fail($"Exception Stage -> JQuiz with {node.Path}\n{ex}");
+            }
 
-        //             // JQuiz -> Po
-        //             var jquiz2Po = new JQuiz2Po();
-        //             Po expectedPo = null;
-        //             try {
-        //                 expectedPo = jquiz2Po.Convert(expectedJQuiz);
-        //             } catch (Exception ex) {
-        //                 Assert.Fail($"Exception JQuiz -> Po with {node.Path}\n{ex}");
-        //             }
-
-        //             // Po -> JQuiz
-        //             JQuiz actualJQuiz = null;
-        //             try {
-        //                 actualJQuiz = jquiz2Po.Convert(expectedPo);
-        //             } catch (Exception ex) {
-        //                 Assert.Fail($"Exception Po -> JQuiz with {node.Path}\n{ex}");
-        //             }
-
-        //             // JQuiz -> BinaryFormat
-        //             BinaryFormat actualBin = null;
-        //             try {
-        //                 actualBin = binary2JQuiz.Convert(actualJQuiz);
-        //             } catch (Exception ex) {
-        //                 Assert.Fail($"Exception Stage -> JQuiz with {node.Path}\n{ex}");
-        //             }
-
-        //             // Comparing Binaries
-        //             Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"JQuiz is not identical: {node.Path}");
-        //         }
-        //     }
-        // }
+            // Comparing Binaries
+            Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"JQuiz is not identical: {node.Path}");
+        }
     }
 }
