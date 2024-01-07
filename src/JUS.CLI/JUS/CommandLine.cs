@@ -170,6 +170,12 @@ namespace JUSToolkit.CLI.JUS
             };
             export.Handler = CommandHandler.Create<string, string>(TextCommands.Export);
 
+            var batchExport = new Command("batchExport", "Export .bin files from a folder, to a .po file") {
+                new Option<string>("--directory", "the input directory with the .bin files", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            batchExport.Handler = CommandHandler.Create<string, string>(TextCommands.BatchExport);
+
             var import = new Command("import", "Import a .po file into a .bin") {
                 new Option<string>("--po", "the input .po file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
@@ -184,6 +190,7 @@ namespace JUSToolkit.CLI.JUS
 
             return new Command("texts", "Export or import bin files to Po") {
                 export,
+                batchExport,
                 import,
                 importJQuiz,
             };

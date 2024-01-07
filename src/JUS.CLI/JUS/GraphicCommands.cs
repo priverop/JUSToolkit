@@ -50,9 +50,9 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ExportDig(string dig, string atm, string output)
         {
-            using var mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read);
+            using Node mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read);
 
-            using var pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
+            using Node pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
                 .TransformWith<BinaryDig2Bitmap, Node>(mapsNode);
 
             pixelsPaletteNode.Stream.WriteTo(output + ".png");

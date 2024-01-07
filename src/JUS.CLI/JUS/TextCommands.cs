@@ -45,6 +45,34 @@ namespace JUSToolkit.CLI.JUS
         {
             using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read) ?? throw new FormatException("Invalid bin file");
 
+            ExportBin(binNode, output);
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Export a folder full of .bin files to .Po.
+        /// </summary>
+        /// <param name="directory">The directory with the bin files.</param>
+        /// <param name="output">The output directory.</param>
+        public static void BatchExport(string directory, string output)
+        {
+            Node inputFiles = NodeFactory.FromDirectory(directory);
+            Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
+
+            foreach (Node file in inputFiles.Children) {
+                Console.WriteLine(file.Name);
+                ExportBin(file, output);
+            }
+        }
+
+        /// <summary>
+        /// Auxiliary function to export a bin file to .po.
+        /// </summary>
+        /// <param name="binNode">The node with the bin file.</param>
+        /// <param name="output">The output directory.</param>
+        private static void ExportBin(Node binNode, string output)
+        {
             // Detect format
             string binFormatName = TextIdentifier.GetTextFormat(binNode.Name);
             Console.WriteLine("File Name: " + binNode.Name + " - File Format: " + binFormatName);
@@ -71,8 +99,6 @@ namespace JUSToolkit.CLI.JUS
                 string outputFile = Path.Combine(output, binNode.Name + ".po");
                 poBinaryFormat.Stream.WriteTo(outputFile);
             }
-
-            Console.WriteLine("Done!");
         }
 
         /// <summary>
