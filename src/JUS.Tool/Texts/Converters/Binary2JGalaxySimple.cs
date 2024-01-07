@@ -78,7 +78,8 @@ namespace JUSToolkit.Texts.Converters
                 writer.Write(entry.Description);
 
                 // I don't know if the extra byte if because of the null ending string or is just the length, but don't remove it
-                long numberOfZeros = entry.EntrySize - entry.Description.Length - entry.Unknown.Length - 1;
+                // The entry.Description.Length would fail if the text is in Japanese. Check Binary2GalaxyComplex
+                long numberOfZeros = JGalaxySimple.EntrySize - entry.Description.Length - entry.Unknown.Length - 1;
 
                 writer.WriteTimes(00, numberOfZeros);
                 writer.Write(entry.Unknown);

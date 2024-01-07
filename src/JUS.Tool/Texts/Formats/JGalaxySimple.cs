@@ -28,6 +28,11 @@ namespace JUSToolkit.Texts.Formats
     public class JGalaxySimple : IFormat
     {
         /// <summary>
+        /// Size of mission.bin and battle.bin entries.
+        /// </summary>
+        public static readonly int EntrySize = 164;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="JGalaxySimple"/> class.
         /// </summary>
         public JGalaxySimple()

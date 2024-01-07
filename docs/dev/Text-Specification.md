@@ -262,6 +262,8 @@ This format is pretty simple.
 
 So the size of the file is 4 + (164 \* number_of_entries).
 
+Each entry has the text (description), then a lot of 00s and at the end an unknown number of bytes (unknown region).
+
 ### JGalaxyComplex
 
 This is also simple but there is a twist that you are not expecting: the blocks
