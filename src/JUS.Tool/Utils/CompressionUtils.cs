@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Pablo Rivero
+// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,7 @@ namespace JUSToolkit.Utils
         /// </summary>
         /// <param name="node">The Node we want to check.</param>
         /// <returns>The result.</returns>
-        public static bool IsCompressed(Node node)
-        {
-            return IsCompressed(node.Stream);
-        }
+        public static bool IsCompressed(Node node) => IsCompressed(node.Stream);
 
         /// <summary>
         /// Returns true if the DataStream is compressed.
@@ -46,7 +43,7 @@ namespace JUSToolkit.Utils
         {
             var reader = new DataReader(stream);
             stream.Position = 0;
-            var result = reader.ReadString(4) == "DSCP";
+            bool result = reader.ReadString(4) == "DSCP";
             stream.Position = 0;
 
             return result;

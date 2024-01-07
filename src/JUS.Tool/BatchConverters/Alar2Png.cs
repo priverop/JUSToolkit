@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Pablo Rivero
+// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,8 +78,7 @@ namespace JUSToolkit.BatchConverters
                     // Some containers (demo.aar) have a special type of .dig that needs
                     // to be compressed with 2 extra maps (we get 3 images with just one .dig)
                     // child.Name.Substring(2) removes the manga name
-                    if (MultipleMaps is not null && MultipleMaps.ContainsKey(child.Name.Substring(2)))
-                    {
+                    if (MultipleMaps is not null && MultipleMaps.ContainsKey(child.Name.Substring(2))) {
                         string mangaName = child.Name.Substring(0, 2);
 
                         // _n_00.atm
