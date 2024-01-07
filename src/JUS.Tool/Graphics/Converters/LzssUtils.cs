@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 Pablo Rivero
+// Copyright (c) 2022 Pablo Rivero
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,9 @@ namespace JUSToolkit.Graphics.Converters
     /// </summary>
     public static class LzssUtils
     {
-        private static readonly string ProgramExe = System.IO.Path.GetFullPath(@"..\..\..\..\..\") + @"\lib\NDS_Compressors_CUE\lzss.exe";
-        private static readonly string ProgramUnix = System.IO.Path.GetFullPath(@"../../../../../") + "lib/NDS_Compressors_CUE/lzss";
+        private static readonly string BasePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "lib", "NDS_Compressors_CUE"));
+        private static readonly string ProgramExe = Path.Combine(BasePath, "lzss.exe");
+        private static readonly string ProgramUnix = Path.Combine(BasePath, "lzss");
 
         /// <summary>
         /// Calls the external CUE's lzss library. It executes the unix binary.
