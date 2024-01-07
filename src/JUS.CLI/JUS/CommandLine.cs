@@ -34,8 +34,9 @@ namespace JUSToolkit.CLI.JUS
         public static Command CreateCommand()
         {
             return new Command("jus", "Jump Ultimate Stars! game") {
-                CreateGraphicCommand(),
                 CreateContainerCommand(),
+                CreateGraphicCommand(),
+                CreateTextCommand(),
                 CreateBatchCommand(),
             };
         }
@@ -158,6 +159,72 @@ namespace JUSToolkit.CLI.JUS
             return new Command("batch", "Batch import/export PNG to/from Alar") {
                 importPng2Alar3,
                 exportAlar2Png,
+            };
+        }
+
+        private static Command CreateTextCommand()
+        {
+            var export = new Command("export-text", "Export bin file") {
+                new Option<string>("--bin", "the input bin file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            export.Handler = CommandHandler.Create<string, string>(ContainerCommands.ExportText);
+
+            return new Command("texts", "Export or import bin files to Po") {
+                export,
+                exportAlar3,
+                exportAlar2,
+                import,
+                importAlar2,
+                importAlar3,
+            };
+        }
+
+        private static Command CreateBatchCommand()
+        {
+            var importPng2Alar3 = new Command("import-png-alar3", "Batch import PNG to alar3") {
+                new Option<string>("--container", "the original alar3 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importPng2Alar3.Handler = CommandHandler.Create<string, string, string>(BatchCommands.ImportPng2Alar3);
+
+            var exportAlar2Png = new Command("export-alar-png", "Batch export PNGs from alar") {
+                new Option<string>("--container", "the alar container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportAlar2Png.Handler = CommandHandler.Create<string, string>(BatchCommands.ExportAlar2Png);
+
+            return new Command("batch", "Batch import/export PNG to/from Alar") {
+                importPng2Alar3,
+                exportAlar2Png,
+            };
+        }
+
+        private static Command CreateTextCommand()
+        {
+            var export = new Command("export", "Export .bin file to a .po file") {
+                new Option<string>("--bin", "the input .bin file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            export.Handler = CommandHandler.Create<string, string>(TextCommands.Export);
+
+            var import = new Command("import", "Import a .po file into a .bin") {
+                new Option<string>("--po", "the input .po file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            import.Handler = CommandHandler.Create<string, string>(TextCommands.Import);
+
+            var importJQuiz = new Command("importjquiz", "Import the jquiz Po folder into a .bin") {
+                new Option<string>("--container", "the container of the .po files", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importJQuiz.Handler = CommandHandler.Create<string, string>(TextCommands.ImportJQuiz);
+
+            return new Command("texts", "Export or import bin files to Po") {
+                export,
+                import,
+                importJQuiz,
             };
         }
     }

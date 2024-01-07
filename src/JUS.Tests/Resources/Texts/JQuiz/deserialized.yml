@@ -1,0 +1,91 @@
+name: jquiz.bin
+format_type: JUSToolkit.Texts.Formats.JQuiz
+tags:
+check_children: true
+children:
+  - name: jquiz-0-Dr. Slum.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-1-Bobobo.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-10-Dr. Slump.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-11-Eyeshield 21.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-12-Gintama.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-13-Hunter x Hunter.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-14-El puno de la estrella del norte.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-15-Hoshin Engi.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-16-Ichigo 100%.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-17-I's.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-18-JoJo's Bizarre Adventure.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-19-Shonen Jump.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-2-Black Cat.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-20-Kochikame.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-21-Musculman.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-22-Midori no Makibao.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-23-Muhyo y Roji.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-24-Naruto.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-25-Nube, el maestro del infierno.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-26-Ninku.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-27-Nogami Neuro, el Detective Demoniaco.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-28-Sakigake!! Otokojuku.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-29-One Piece.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-3-Bleach.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-30-Pyu to Fuku! Jaguar.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-31-Rokudenashi Blues.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-32-Ruroni Kenshin, el guerrero samurai.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-33-Slam Dunk.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-34-Shaman King.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-35-Los caballeros del Zodiaco.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-36-Jungle King Tar-chan.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-37-Tottemo! Luckyman.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-38-The Prince of Tennis.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-39-Tutor Hitman Reborn!.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-4-Buso Renkin.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-40-Taizo Mote King Saga.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-41-Yu Yu Hakusho.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-42-Yu-Gi-Oh!.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-5-Cobra.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-6-Oliver y Benji.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-7-Dragon Ball.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-8-D. Gray-Man.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry
+  - name: jquiz-9-Death Note.po
+    format_type: JUSToolkit.Texts.Formats.JQuizEntry

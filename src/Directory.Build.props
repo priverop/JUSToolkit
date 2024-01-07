@@ -1,9 +1,9 @@
 <Project>
     <PropertyGroup>
         <Product>JUSToolkit</Product>
-        <Authors>Pablo Rivero</Authors>
+        <Authors>Priverop</Authors>
         <Company>None</Company>
-        <Copyright>Copyright (C) 2022 Pablo Rivero</Copyright>
+        <Copyright>Copyright (C) 2023 Priverop</Copyright>
 
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
