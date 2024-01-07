@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.IO;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -39,7 +38,8 @@ namespace JUSToolkit.Containers.Converters
         /// <param name="input">IBinary node.</param>
         /// <returns>Alart2 NodeContainerFormat.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
-        public Alar2 Convert(IBinary input) {
+        public Alar2 Convert(IBinary input)
+        {
             if (input == null) {
                 throw new ArgumentNullException(nameof(input));
             }
@@ -49,8 +49,7 @@ namespace JUSToolkit.Containers.Converters
             ReadHeader();
 
             uint name_offset = (uint)(0x10 + (alar.NumFiles * 0x10));
-            for (int i = 0; i < alar.NumFiles; i++)
-            {
+            for (int i = 0; i < alar.NumFiles; i++) {
                 uint fileID = reader.ReadUInt32();
                 uint offset = reader.ReadUInt32();
                 uint size = reader.ReadUInt32();
