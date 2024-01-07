@@ -21,7 +21,7 @@ namespace JUSToolkit.Texts
         /// Generates a new Po for a Jus text file.
         /// </summary>
         /// <returns>Generated Jus <see cref="Po"/>.</returns>
-        public static Po GenerateJusPo() => new(new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
+        public static Po GenerateJusPo() => new (new PoHeader("Jump Ultimate Stars", "tradusquare@gmail.es", "es"));
 
         /// <summary>
         /// Checks for null or empty string, returning "empty"

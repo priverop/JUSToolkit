@@ -115,7 +115,7 @@ namespace JUSToolkit.Texts.Converters
                     // Abrimos el fichero ese jgalaxy_unknown.bin
                     // Lo escribimos
                     string programDir = AppDomain.CurrentDomain.BaseDirectory;
-                    string resPath = Path.GetFullPath(programDir + "/../../../../JUS.Tool/Utils/jgalaxy_unknown.bin");
+                    string resPath = Path.GetFullPath(programDir + "/../../../../JUS.Tool/Utils/jgalaxy_unknown");
                     using Node node = NodeFactory.FromFile(resPath);
                     node.Stream.WriteTo(writer.Stream);
                 }
