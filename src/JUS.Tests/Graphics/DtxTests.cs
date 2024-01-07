@@ -1,4 +1,4 @@
-// Copyright(c) 2022 Pablo Rivero
+// Copyright(c) 2022 Priverop
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ namespace JUSToolkit.Tests.Containers
                     FullImage = image,
                 };
                 var indexedImageParams = new IndexedImageBitmapParams {
-                   Palettes = image,
+                    Palettes = image,
                 };
                 var resultImage = new Node(komaElement.KomaName, sprite)
                     .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)

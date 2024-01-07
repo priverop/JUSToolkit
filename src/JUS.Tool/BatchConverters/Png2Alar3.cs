@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Pablo Rivero
+// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,10 +71,8 @@ namespace JUSToolkit.BatchConverters
             var filesToInsert = source;
             transformedFiles = new NodeContainerFormat();
 
-            foreach (var file in source.Root.Children)
-            {
-                if (Path.GetExtension(file.Name) == ".png")
-                {
+            foreach (var file in source.Root.Children) {
+                if (Path.GetExtension(file.Name) == ".png") {
                     var cleanName = Path.GetFileNameWithoutExtension(file.Name);
                     var originals = GetOriginals(cleanName, filesToInsert.Root);
                     Transform(new Node(file), originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
@@ -152,15 +150,13 @@ namespace JUSToolkit.BatchConverters
 
             var dig = Navigator.SearchNode(files, name + ".dig");
 
-            if (dig is null)
-            {
+            if (dig is null) {
                 throw new FormatException("Dig doesn't exist: " + name + ".dig");
             }
 
             var atm = Navigator.SearchNode(files, name + ".atm");
 
-            if (atm is null)
-            {
+            if (atm is null) {
                 throw new FormatException("Atm doesn't exist: " + name + ".atm");
             }
 

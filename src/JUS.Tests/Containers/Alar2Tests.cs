@@ -1,4 +1,4 @@
-// Copyright(c) 2022 Pablo Rivero
+// Copyright(c) 2022 Priverop
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -124,14 +124,12 @@ namespace JUSToolkit.Tests.Containers
         [Test]
         public void Alar2InsertNodesTest()
         {
-            var totalFiles = 4;
+            const int totalFiles = 4;
 
             // Alar2 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar2((ushort)totalFiles);
-            for (int i = 0; i < totalFiles; i++)
-            {
-                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) })))
-                {
+            for (int i = 0; i < totalFiles; i++) {
+                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
                     Size = 5,
                     Offset = (uint)(i * 5),
                 };
@@ -139,8 +137,7 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })))
-            {
+            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
                 Size = 10,
                 Offset = 5,
             };
