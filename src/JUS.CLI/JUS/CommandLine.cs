@@ -168,23 +168,37 @@ namespace JUSToolkit.CLI.JUS
                 new Option<string>("--bin", "the input .bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string>(TextCommands.Export);
+            export.Handler = CommandHandler.Create<string, string>(TextExportCommands.Export);
+
+            var batchExport = new Command("batchExport", "Export .bin files from a folder, to a .po file") {
+                new Option<string>("--directory", "the input directory with the .bin files", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            batchExport.Handler = CommandHandler.Create<string, string>(TextExportCommands.BatchExport);
 
             var import = new Command("import", "Import a .po file into a .bin") {
                 new Option<string>("--po", "the input .po file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            import.Handler = CommandHandler.Create<string, string>(TextCommands.Import);
+            import.Handler = CommandHandler.Create<string, string>(TextImportCommands.Import);
+
+            var batchImport = new Command("batchImport", "Import .bin files from a folder, to a .po file") {
+                new Option<string>("--directory", "the input directory with the .bin files", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            batchImport.Handler = CommandHandler.Create<string, string>(TextImportCommands.BatchImport);
 
             var importJQuiz = new Command("importjquiz", "Import the jquiz Po folder into a .bin") {
                 new Option<string>("--container", "the container of the .po files", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            importJQuiz.Handler = CommandHandler.Create<string, string>(TextCommands.ImportJQuiz);
+            importJQuiz.Handler = CommandHandler.Create<string, string>(TextImportCommands.ImportJQuiz);
 
             return new Command("texts", "Export or import bin files to Po") {
                 export,
+                batchExport,
                 import,
+                batchImport,
                 importJQuiz,
             };
         }

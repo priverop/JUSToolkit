@@ -34,7 +34,7 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class BatchCommands
     {
-        private static Dictionary<string, int> demoImages = new Dictionary<string, int>() {
+        private static readonly Dictionary<string, int> DemoImages = new Dictionary<string, int>() {
             { "_03.dig", 0 },
             { "_05.dig", 1 },
             { "_07.dig", 2 },
@@ -48,14 +48,14 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlar2Png(string container, string output)
         {
-            var originalAlar = NodeFactory.FromFile(container);
+            Node originalAlar = NodeFactory.FromFile(container);
 
             if (originalAlar is null) {
                 throw new FormatException("Invalid container file");
             }
 
             _ = container == "demo.aar" ? originalAlar
-                    .TransformWith<Alar2Png, Dictionary<string, int>>(demoImages)
+                    .TransformWith<Alar2Png, Dictionary<string, int>>(DemoImages)
                 : originalAlar
                 .TransformWith<Alar2Png>();
 
@@ -77,8 +77,8 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ImportPng2Alar3(string container, string input, string output)
         {
-            var originalAlar = NodeFactory.FromFile(container);
-            var inputFiles = NodeFactory.FromDirectory(input);
+            Node originalAlar = NodeFactory.FromFile(container);
+            Node inputFiles = NodeFactory.FromDirectory(input);
 
             Alar3 alar = inputFiles
                 .TransformWith<Png2Alar3, Node>(originalAlar)
