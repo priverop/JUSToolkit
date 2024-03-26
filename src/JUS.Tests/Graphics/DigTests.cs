@@ -75,8 +75,8 @@ namespace JUSToolkit.Tests.Graphics
 
             using Node node = NodeFactory.FromFile(digPath, FileOpenMode.Read);
 
-            var dig = (Dig)ConvertFormat.With<Binary2Dig>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Dig2Binary>(dig);
+            Dig dig = node.GetFormatAs<IBinary>.ConvertWith(new Binary2Dig());
+            BinaryFormat generatedStream = dig.ConvertWith(new Dig2Binary());
 
             var originalStream = new DataStream(node.Stream!, 0, node.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);

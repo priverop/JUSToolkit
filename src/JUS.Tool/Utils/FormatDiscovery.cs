@@ -36,9 +36,11 @@ namespace JUSToolkit.Utils
         /// <returns>The converter class.</returns>
         public static IConverter GetConverter(string converterName)
         {
+            // ToDo: pleo
             var yarhlConverters = PluginManager.Instance.GetConverters().Select(x => x.Metadata).ToList();
 
             ConverterMetadata metadata = yarhlConverters.Find(x => x.Name == converterName);
+            // ToDo: pleo
             var converter = (IConverter)Activator.CreateInstance(metadata.Type);
             return converter;
         }

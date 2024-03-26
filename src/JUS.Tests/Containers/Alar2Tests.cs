@@ -80,8 +80,8 @@ namespace JUSToolkit.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+            Alar2 alar = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar2());
+            BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
@@ -95,9 +95,9 @@ namespace JUSToolkit.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(alarOriginal.Format!);
+            Alar2 alar = alarOriginal.Format!.ConvertWith(new Binary2Alar2());
             alar.InsertModification(fileOriginal);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+            BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
             generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();
@@ -128,8 +128,10 @@ namespace JUSToolkit.Tests.Containers
 
             // Alar2 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar2((ushort)totalFiles);
-            for (int i = 0; i < totalFiles; i++) {
-                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
+            for (int i = 0; i < totalFiles; i++)
+            {
+                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) })))
+                {
                     Size = 5,
                     Offset = (uint)(i * 5),
                 };
@@ -137,7 +139,8 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
+            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })))
+            {
                 Size = 10,
                 Offset = 5,
             };

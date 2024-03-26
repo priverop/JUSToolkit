@@ -74,17 +74,21 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<BinaryToDtx3>();
 
             var image = dtx3.Children["image"].GetFormatAs<Dig>();
-            var spriteParams = new Sprite2IndexedImageParams {
+            var spriteParams = new Sprite2IndexedImageParams
+            {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 FullImage = image,
             };
-            var indexedImageParams = new IndexedImageBitmapParams {
+            var indexedImageParams = new IndexedImageBitmapParams
+            {
                 Palettes = image,
             };
 
-            switch (image.Swizzling) {
+            switch (image.Swizzling)
+            {
                 case DigSwizzling.Tiled:
-                    foreach (Node nodeSprite in dtx3.Children["sprites"].Children) {
+                    foreach (Node nodeSprite in dtx3.Children["sprites"].Children)
+                    {
                         nodeSprite
                             .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
                             .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
@@ -93,7 +97,8 @@ namespace JUSToolkit.CLI.JUS
 
                     break;
                 case DigSwizzling.Linear:
-                    foreach (Node nodeTexture in dtx3.Children["sprites"].Children) {
+                    foreach (Node nodeTexture in dtx3.Children["sprites"].Children)
+                    {
                         nodeTexture
                             .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
                             .Stream.WriteTo(Path.Combine(output, $"{nodeTexture.Name}.png"));
@@ -125,15 +130,18 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Binary2Almt>()
                 .GetFormatAs<Almt>();
 
-            if (originalDig is null) {
+            if (originalDig is null)
+            {
                 throw new FormatException("Invalid dig file");
             }
 
-            if (originalAtm is null) {
+            if (originalAtm is null)
+            {
                 throw new FormatException("Invalid atm file");
             }
 
-            var compressionParams = new FullImageMapCompressionParams {
+            var compressionParams = new FullImageMapCompressionParams
+            {
                 Palettes = originalDig,
             };
 
@@ -148,12 +156,12 @@ namespace JUSToolkit.CLI.JUS
             if (insertTransparent)
                 newDig = newDig.InsertTransparentTile(map);
 
-            using var binaryDig = new Dig2Binary().Convert(newDig);
+            using var binaryDig = newDig.ConvertWith(new Dig2Binary());
 
             binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
             Almt newAtm = new Almt(originalAtm, map);
-            using var binaryAtm = new Almt2Binary().Convert(newAtm);
+            using var binaryAtm = newAtm.ConvertWith(new Almt2Binary());
 
             binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 
@@ -178,13 +186,15 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>();
 
-            var compressionParams = new FullImageMapCompressionParams {
+            var compressionParams = new FullImageMapCompressionParams
+            {
                 Palettes = mergedImage,
             };
 
             IndexedImage newImage = null;
 
-            for (int i = 0; i < input.Length; i++) {
+            for (int i = 0; i < input.Length; i++)
+            {
                 var compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
@@ -196,7 +206,8 @@ namespace JUSToolkit.CLI.JUS
                 if (insertTransparent && i == 0)
                     mergedImage = mergedImage.InsertTransparentTile(map);
 
-                compressionParams = new FullImageMapCompressionParams {
+                compressionParams = new FullImageMapCompressionParams
+                {
                     MergeImage = mergedImage,
                     Palettes = mergedImage,
                 };
@@ -229,7 +240,8 @@ namespace JUSToolkit.CLI.JUS
             Node images = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
                 .Children["koma"];
-            if (images is null) {
+            if (images is null)
+            {
                 throw new FormatException("Invalid container file");
             }
 
@@ -240,11 +252,13 @@ namespace JUSToolkit.CLI.JUS
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
                 .GetFormatAs<Koma>();
-            foreach (KomaElement komaElement in komaFormat) {
+            foreach (KomaElement komaElement in komaFormat)
+            {
                 string filename = $"{komaElement.KomaName}.dtx";
 
                 Node dtx = images.Children[filename];
-                if (dtx is null) {
+                if (dtx is null)
+                {
                     Console.WriteLine("- Missing: " + filename);
                     continue;
                 }
@@ -261,11 +275,13 @@ namespace JUSToolkit.CLI.JUS
                     $"{komaElement.KShapeGroupId}",
                     komaElement.KomaName + ".png");
 
-                var spriteParams = new Sprite2IndexedImageParams {
+                var spriteParams = new Sprite2IndexedImageParams
+                {
                     RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
                     FullImage = image,
                 };
-                var indexedImageParams = new IndexedImageBitmapParams {
+                var indexedImageParams = new IndexedImageBitmapParams
+                {
                     Palettes = image,
                 };
                 new Node("sprite", sprite)

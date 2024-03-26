@@ -50,7 +50,8 @@ namespace JUSToolkit.CLI.JUS
         {
             Node originalAlar = NodeFactory.FromFile(container);
 
-            if (originalAlar is null) {
+            if (originalAlar is null)
+            {
                 throw new FormatException("Invalid container file");
             }
 
@@ -62,7 +63,8 @@ namespace JUSToolkit.CLI.JUS
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (var image in result.Root.Children) {
+            foreach (var image in result.Root.Children)
+            {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
@@ -84,7 +86,7 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Png2Alar3, Node>(originalAlar)
                 .GetFormatAs<Alar3>();
 
-            using var binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
 

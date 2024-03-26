@@ -60,7 +60,8 @@ namespace JUSToolkit.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(directory);
             Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
 
-            foreach (Node file in inputFiles.Children) {
+            foreach (Node file in inputFiles.Children)
+            {
                 Console.WriteLine(file.Name);
                 ExportBin(file, output);
             }
@@ -81,20 +82,27 @@ namespace JUSToolkit.CLI.JUS
             string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
 
             // Binary -> TextFormat
+            // ToDo: Pleo
             var binFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), binNode.Format!);
 
             // If instead of Po we get a Container
-            if (binFormatName == "JQuiz") {
+            if (binFormatName == "JQuiz")
+            {
+                // ToDo: Pleo
                 var container = (NodeContainerFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
-                foreach (Node quiz in container.Root.Children) {
+                foreach (Node quiz in container.Root.Children)
+                {
                     quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
                 }
-            } else {
+            }
+            else
+            {
                 // TextFormat -> Po
+                // ToDo: Pleo
                 var poFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
 
                 // Po -> Binary
-                var poBinaryFormat = (BinaryFormat)ConvertFormat.With<Po2Binary>(poFormat);
+                BinaryFormat poBinaryFormat = poFormat.ConvertWith(new Po2Binary());
 
                 string outputFile = Path.Combine(output, binNode.Name + ".po");
                 poBinaryFormat.Stream.WriteTo(outputFile);
