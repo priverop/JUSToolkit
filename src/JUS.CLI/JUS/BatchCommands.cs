@@ -63,7 +63,7 @@ namespace JUSToolkit.CLI.JUS
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (var image in result.Root.Children)
+            foreach (Node image in result.Root.Children)
             {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }

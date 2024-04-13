@@ -38,7 +38,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public Po Convert(BtlChr btlChr)
         {
-            var po = JusText.GenerateJusPo();
+            Po po = JusText.GenerateJusPo();
 
             int i = 0;
             foreach (BtlChrEntry entry in btlChr.Entries) {

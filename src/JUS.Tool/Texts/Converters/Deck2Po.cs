@@ -37,7 +37,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public Po Convert(Deck deck)
         {
-            var po = JusText.GenerateJusPo();
+            Po po = JusText.GenerateJusPo();
 
             po.Add(new PoEntry(deck.Name) {
                 Context = "0",

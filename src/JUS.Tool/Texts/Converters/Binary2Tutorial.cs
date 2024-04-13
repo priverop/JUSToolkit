@@ -78,7 +78,7 @@ namespace JUSToolkit.Texts.Converters
             writer.Write(tutorial.StartingOffset);
 
             foreach (TutorialEntry entry in tutorial.Entries) {
-                foreach (var unknown in entry.Unknowns) {
+                foreach (int unknown in entry.Unknowns) {
                     writer.Write(unknown);
                 }
 
@@ -108,7 +108,7 @@ namespace JUSToolkit.Texts.Converters
             pointerAccumulator += JusText.JusEncoding.GetByteCount(entry.Description) + 1;
 
             // Read pointers until we find the accumulator one or the ending of the pointer section
-            var pointer = reader.ReadInt32();
+            int pointer = reader.ReadInt32();
             while (pointer != pointerAccumulator && reader.Stream.Position != startingOffset) {
                 entry.Unknowns.Add(pointer);
                 pointer = reader.ReadInt32();

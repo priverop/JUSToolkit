@@ -98,9 +98,9 @@ namespace JUSToolkit.Containers.Converters
 
         private void RewriteOffsets(Alar2 alar)
         {
-            var offsetPostion = 0x04; // The first file position
-            var sizePostion = 0x08; // The first file position
-            var newOffset = 0;
+            int offsetPostion = 0x04; // The first file position
+            int sizePostion = 0x08; // The first file position
+            int newOffset = 0;
             foreach (Node node in Navigator.IterateNodes(alar.Root)) {
                 if (!node.IsContainer) {
                     Alar2File alarFile = node.GetFormatAs<Alar2File>();

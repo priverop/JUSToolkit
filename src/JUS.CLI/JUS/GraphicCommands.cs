@@ -69,11 +69,11 @@ namespace JUSToolkit.CLI.JUS
         public static void ExportDtx3(string dtx, string output)
         {
             // Sprites + pixels + palette
-            using var dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            var image = dtx3.Children["image"].GetFormatAs<Dig>();
+            Dig image = dtx3.Children["image"].GetFormatAs<Dig>();
             var spriteParams = new Sprite2IndexedImageParams
             {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
@@ -145,11 +145,11 @@ namespace JUSToolkit.CLI.JUS
                 Palettes = originalDig,
             };
 
-            var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+            Node compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
-            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+            IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+            ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
             Dig newDig = new Dig(originalDig, newImage);
 
@@ -195,11 +195,11 @@ namespace JUSToolkit.CLI.JUS
 
             for (int i = 0; i < input.Length; i++)
             {
-                var compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
+                Node compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
                 newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-                var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+                ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
                 mergedImage = new Dig(mergedImage, newImage);
 
@@ -212,7 +212,7 @@ namespace JUSToolkit.CLI.JUS
                     Palettes = mergedImage,
                 };
 
-                var originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
+                Almt originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
                     .TransformWith<Binary2Almt>()
                     .GetFormatAs<Almt>();
                 var newAtm = new Almt(originalAtm, map);
@@ -245,7 +245,7 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid container file");
             }
 
-            var shapes = NodeFactory.FromFile(kshape)
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
                 .GetFormatAs<KShapeSprites>();
 
@@ -264,11 +264,11 @@ namespace JUSToolkit.CLI.JUS
                 }
 
                 dtx.TransformWith<BinaryDstx2SpriteImage>();
-                var image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
+                IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
                 // We ignore the sprite info from the DSTX and we take the one
                 // from the kshape
-                var sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+                Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
                 string outputFilePath = Path.Combine(
                     output,

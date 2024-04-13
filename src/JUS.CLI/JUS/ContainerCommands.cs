@@ -49,7 +49,7 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid container file");
             }
 
-            var alarVersion = Identifier.GetAlarVersion(files.Stream);
+            Version alarVersion = Identifier.GetAlarVersion(files.Stream);
 
             // ToDo: In the future we need to encapsulate this
             if (alarVersion.Major == 3)
@@ -61,7 +61,7 @@ namespace JUSToolkit.CLI.JUS
                 files.TransformWith<Binary2Alar2>();
             }
 
-            foreach (var node in Navigator.IterateNodes(files))
+            foreach (Node node in Navigator.IterateNodes(files))
             {
                 if (!node.IsContainer)
                 {
@@ -91,7 +91,7 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid container file");
             }
 
-            foreach (var node in Navigator.IterateNodes(files))
+            foreach (Node node in Navigator.IterateNodes(files))
             {
                 if (!node.IsContainer)
                 {
@@ -121,7 +121,7 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid container file");
             }
 
-            foreach (var node in Navigator.IterateNodes(files))
+            foreach (Node node in Navigator.IterateNodes(files))
             {
                 if (!node.IsContainer)
                 {
@@ -150,14 +150,14 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid container file");
             }
 
-            var originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
+            bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
 
             if (originalIsCompressed)
             {
                 originalAlar.TransformWith<LzssDecompression>();
             }
 
-            var alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
+            Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
 
             BinaryFormat binary = new BinaryFormat();
 

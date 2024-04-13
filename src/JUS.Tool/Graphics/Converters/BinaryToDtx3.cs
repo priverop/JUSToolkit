@@ -94,8 +94,8 @@ namespace JUS.Tool.Graphics.Converters
                 sbyte yPos = reader.ReadSByte();
                 byte shape = reader.ReadByte();
                 byte paletteIndex = reader.ReadByte();
-                var (width, height) = GetSize(shape & 0x0F);
-                var (hFlip, vFlip) = GetFlip(shape >> 4);
+                (int width, int height) = GetSize(shape & 0x0F);
+                (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
 
                 var segment = new ImageSegment() {
                     TileIndex = tileIndex,
@@ -135,8 +135,8 @@ namespace JUS.Tool.Graphics.Converters
                 sbyte yPos = reader.ReadSByte();
                 byte shape = reader.ReadByte();
                 byte paletteIndex = reader.ReadByte();
-                var (width, height) = GetSize(shape & 0x0F);
-                var (hFlip, vFlip) = GetFlip(shape >> 4);
+                (int width, int height) = GetSize(shape & 0x0F);
+                (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
 
                 var segment = new Dig(fullImage, width, height, tileIndex);
                 frame.PasteImage(segment, xPos, yPos, hFlip, vFlip, paletteIndex);

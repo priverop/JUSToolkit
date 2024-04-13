@@ -61,12 +61,12 @@ namespace JUSToolkit.Graphics.Converters
 
             source.Stream.Position = 0;
 
-            var pixelsPaletteNode = new Node("dig", source)
+            Node pixelsPaletteNode = new Node("dig", source)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>();
 
             // Map
-            using var mapsNode = OriginalAtm
+            using Node mapsNode = OriginalAtm
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>();
 

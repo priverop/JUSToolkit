@@ -38,7 +38,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public Po Convert(Tutorial tutorial)
         {
-            var po = JusText.GenerateJusPo();
+            Po po = JusText.GenerateJusPo();
             po.Add(new PoEntry("<!Don't remove>") {
                 ExtractedComments = $"{tutorial.StartingOffset}",
             });

@@ -47,8 +47,8 @@ namespace JUSToolkit.Utils
         {
             var reader = new DataReader(stream);
             stream.Position = 4;
-            var majorVersion = reader.ReadByte();
-            var minorVersion = reader.ReadByte();
+            byte majorVersion = reader.ReadByte();
+            byte minorVersion = reader.ReadByte();
             stream.Position = 0;
 
             return new Version(majorVersion, minorVersion);

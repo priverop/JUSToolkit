@@ -70,9 +70,9 @@ namespace JUSToolkit.Containers.Converters
                 throw new FormatException($"Unsupported version: {version:X}");
             }
 
-            var numFiles = reader.ReadUInt32();
-            var reserved = reader.ReadUInt16();
-            var numEntries = reader.ReadUInt32();
+            uint numFiles = reader.ReadUInt32();
+            ushort reserved = reader.ReadUInt16();
+            uint numEntries = reader.ReadUInt32();
 
             alar = new Alar3(numFiles) {
                 NumEntries = numEntries,

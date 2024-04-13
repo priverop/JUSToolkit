@@ -125,7 +125,7 @@ namespace JUSToolkit.Tests.Containers
         [Test]
         public void Alar3InsertNodesTest()
         {
-            var totalFiles = 4;
+            int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);

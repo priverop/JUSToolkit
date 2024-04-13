@@ -64,22 +64,17 @@ namespace JUSToolkit.BatchConverters
         {
             Alar3 alar = OriginalAlar
                 .TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>();
+                .GetFormatAs<Alar3>() ?? throw new FormatException("Invalid container file");
 
-            if (alar is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
-
-            var filesToInsert = source;
+            NodeContainerFormat filesToInsert = source;
             transformedFiles = new NodeContainerFormat();
 
-            foreach (var file in source.Root.Children)
+            foreach (Node file in source.Root.Children)
             {
                 if (Path.GetExtension(file.Name) == ".png")
                 {
-                    var cleanName = Path.GetFileNameWithoutExtension(file.Name);
-                    var originals = GetOriginals(cleanName, filesToInsert.Root);
+                    string cleanName = Path.GetFileNameWithoutExtension(file.Name);
+                    NodeContainerFormat originals = GetOriginals(cleanName, filesToInsert.Root);
                     Transform(new Node(file), originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
                 }
             }
@@ -92,7 +87,7 @@ namespace JUSToolkit.BatchConverters
         private void Transform(Node png, Node dig, Node atm)
         {
             bool digIsCompressed = CompressionUtils.IsCompressed(dig);
-            var uncompressedDig = digIsCompressed ?
+            Node uncompressedDig = digIsCompressed ?
                 dig.TransformWith<LzssDecompression>() :
                 dig;
 
@@ -101,7 +96,7 @@ namespace JUSToolkit.BatchConverters
                 .GetFormatAs<Dig>();
 
             bool atmIsCompressed = CompressionUtils.IsCompressed(atm);
-            var uncompressedAtm = atmIsCompressed ?
+            Node uncompressedAtm = atmIsCompressed ?
                 atm.TransformWith<LzssDecompression>() :
                 atm;
 
@@ -126,17 +121,17 @@ namespace JUSToolkit.BatchConverters
 
             png.Stream.Position = 0;
             var mapCompression = new FullImageMapCompression(compressionParams);
-            var compressed = png
+            Node compressed = png
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith(mapCompression);
-            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+            IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+            ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
             // Dig
             Dig newDig = new Dig(originalDig, newImage);
-            var binaryDig = new Dig2Binary().Convert(newDig);
+            BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
-            var compressedDig = digIsCompressed ?
+            BinaryFormat compressedDig = digIsCompressed ?
                 new LzssCompression().Convert(binaryDig) :
                 binaryDig;
 
@@ -144,9 +139,9 @@ namespace JUSToolkit.BatchConverters
 
             // Atm
             Almt newAtm = new Almt(originalAtm, map);
-            var binaryAtm = new Almt2Binary().Convert(newAtm);
+            BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
 
-            var compressedAtm = atmIsCompressed ?
+            BinaryFormat compressedAtm = atmIsCompressed ?
                 new LzssCompression().Convert(binaryAtm) :
                 binaryAtm;
 
@@ -157,14 +152,14 @@ namespace JUSToolkit.BatchConverters
         {
             var originals = new NodeContainerFormat();
 
-            var dig = Navigator.SearchNode(files, name + ".dig");
+            Node dig = Navigator.SearchNode(files, name + ".dig");
 
             if (dig is null)
             {
                 throw new FormatException("Dig doesn't exist: " + name + ".dig");
             }
 
-            var atm = Navigator.SearchNode(files, name + ".atm");
+            Node atm = Navigator.SearchNode(files, name + ".atm");
 
             if (atm is null)
             {

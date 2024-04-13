@@ -60,7 +60,7 @@ namespace JUSToolkit.BatchConverters
             var transformedFiles = new NodeContainerFormat();
 
             // TODO: It is compressed?
-            var alarVersion = Identifier.GetAlarVersion(alar);
+            Version alarVersion = Identifier.GetAlarVersion(alar);
 
             NodeContainerFormat alarNode = new NodeContainerFormat();
 
@@ -76,11 +76,11 @@ namespace JUSToolkit.BatchConverters
             }
 
             // Iterate alar
-            foreach (var child in Navigator.IterateNodes(alarNode.Root))
+            foreach (Node child in Navigator.IterateNodes(alarNode.Root))
             {
                 if (Path.GetExtension(child.Name) == ".dig")
                 {
-                    var cleanName = Path.GetFileNameWithoutExtension(child.Name);
+                    string cleanName = Path.GetFileNameWithoutExtension(child.Name);
                     var childClone = new Node(cleanName, new BinaryFormat(child.Stream));
 
                     // Some containers (demo.aar) have a special type of .dig that needs
@@ -91,7 +91,7 @@ namespace JUSToolkit.BatchConverters
                         string mangaName = child.Name.Substring(0, 2);
 
                         // _n_00.atm
-                        using var atm_n = GetAtm(
+                        using Node atm_n = GetAtm(
                             GetSpecialMapName(mangaName, "n", child.Name.Substring(2)),
                             alarNode.Root.Children[0]);
 
@@ -101,14 +101,14 @@ namespace JUSToolkit.BatchConverters
                         }
 
                         BinaryFormat stream_n = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
-                        var image_n = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_n.Name), stream_n), atm_n, cleanName + "_n_");
+                        Node image_n = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_n.Name), stream_n), atm_n, cleanName + "_n_");
                         if (image_n is not null)
                         {
                             transformedFiles.Root.Add(image_n);
                         }
 
                         // _m_00.atm
-                        using var atm_m = GetAtm(
+                        using Node atm_m = GetAtm(
                             GetSpecialMapName(mangaName, "m", child.Name.Substring(2)),
                             alarNode.Root.Children[0]);
 
@@ -118,7 +118,7 @@ namespace JUSToolkit.BatchConverters
                         }
 
                         BinaryFormat stream_m = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
-                        var image_m = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_m.Name), stream_m), atm_m, cleanName);
+                        Node image_m = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_m.Name), stream_m), atm_m, cleanName);
                         if (image_m is not null)
                         {
                             transformedFiles.Root.Add(image_m);
@@ -126,14 +126,14 @@ namespace JUSToolkit.BatchConverters
                     }
 
                     // Get Map with the same name
-                    using var atm = GetAtm(cleanName, alarNode.Root.Children[0]);
+                    using Node atm = GetAtm(cleanName, alarNode.Root.Children[0]);
                     if (atm is null)
                     {
                         Console.WriteLine("Missing map file for: " + child.Name);
                         continue;
                     }
 
-                    var image = GetPNG(childClone, atm, cleanName);
+                    Node image = GetPNG(childClone, atm, cleanName);
                     if (image is not null)
                     {
                         transformedFiles.Root.Add(image);
@@ -171,7 +171,7 @@ namespace JUSToolkit.BatchConverters
 
         private Node GetAtm(string name, Node files)
         {
-            var atm = Navigator.SearchNode(files, name + ".atm");
+            Node atm = Navigator.SearchNode(files, name + ".atm");
 
             if (atm is null)
             {

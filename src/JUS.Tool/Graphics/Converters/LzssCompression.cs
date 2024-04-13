@@ -41,7 +41,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var decompressedStream = Convert(source.Stream);
+            DataStream decompressedStream = Convert(source.Stream);
 
             return new BinaryFormat(decompressedStream);
         }

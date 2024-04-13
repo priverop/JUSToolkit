@@ -37,7 +37,7 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public Po Convert(Pname pname)
         {
-            var po = JusText.GenerateJusPo();
+            Po po = JusText.GenerateJusPo();
 
             int i = 0;
             foreach (string entry in pname.TextEntries) {
