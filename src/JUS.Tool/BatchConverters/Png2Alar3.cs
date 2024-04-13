@@ -128,7 +128,7 @@ namespace JUSToolkit.BatchConverters
             ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
             // Dig
-            Dig newDig = new Dig(originalDig, newImage);
+            var newDig = new Dig(originalDig, newImage);
             BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
             BinaryFormat compressedDig = digIsCompressed ?
@@ -138,7 +138,7 @@ namespace JUSToolkit.BatchConverters
             transformedFiles.Root.Add(new Node(dig.Name, compressedDig));
 
             // Atm
-            Almt newAtm = new Almt(originalAtm, map);
+            var newAtm = new Almt(originalAtm, map);
             BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
 
             BinaryFormat compressedAtm = atmIsCompressed ?
@@ -152,19 +152,9 @@ namespace JUSToolkit.BatchConverters
         {
             var originals = new NodeContainerFormat();
 
-            Node dig = Navigator.SearchNode(files, name + ".dig");
+            Node dig = Navigator.SearchNode(files, name + ".dig") ?? throw new FormatException("Dig doesn't exist: " + name + ".dig");
 
-            if (dig is null)
-            {
-                throw new FormatException("Dig doesn't exist: " + name + ".dig");
-            }
-
-            Node atm = Navigator.SearchNode(files, name + ".atm");
-
-            if (atm is null)
-            {
-                throw new FormatException("Atm doesn't exist: " + name + ".atm");
-            }
+            Node atm = Navigator.SearchNode(files, name + ".atm") ?? throw new FormatException("Atm doesn't exist: " + name + ".atm");
 
             originals.Root.Add(new Node(dig));
             originals.Root.Add(new Node(atm));

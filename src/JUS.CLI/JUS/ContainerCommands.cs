@@ -42,12 +42,7 @@ namespace JUSToolkit.CLI.JUS
         public static void Export(string container, string output)
         {
             Node files = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>();
-
-            if (files is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+                .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
 
             Version alarVersion = Identifier.GetAlarVersion(files.Stream);
 
@@ -84,12 +79,7 @@ namespace JUSToolkit.CLI.JUS
         {
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Alar3>();
-
-            if (files is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+                .TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
 
             foreach (Node node in Navigator.IterateNodes(files))
             {
@@ -114,12 +104,7 @@ namespace JUSToolkit.CLI.JUS
         {
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Alar2>();
-
-            if (files is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
 
             foreach (Node node in Navigator.IterateNodes(files))
             {
@@ -143,12 +128,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Import(string container, string input, string output)
         {
-            Node originalAlar = NodeFactory.FromFile(container);
-
-            if (originalAlar is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+            Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
             bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
 
@@ -195,12 +175,7 @@ namespace JUSToolkit.CLI.JUS
         {
             Alar3 alar = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>();
-
-            if (alar is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+                .GetFormatAs<Alar3>() ?? throw new FormatException("Invalid container file");
 
             alar.InsertModification(NodeFactory.FromDirectory(input));
 
@@ -218,12 +193,7 @@ namespace JUSToolkit.CLI.JUS
         public static void ImportAlar2(string container, string output)
         {
             Node alar = NodeFactory.FromFile(container)
-                .TransformWith<Binary2Alar2>();
-
-            if (alar is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
 
             alar.TransformWith<Alar2ToBinary>();
 

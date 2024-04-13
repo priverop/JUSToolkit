@@ -48,12 +48,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlar2Png(string container, string output)
         {
-            Node originalAlar = NodeFactory.FromFile(container);
-
-            if (originalAlar is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+            Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
             _ = container == "demo.aar" ? originalAlar
                     .TransformWith<Alar2Png, Dictionary<string, int>>(DemoImages)

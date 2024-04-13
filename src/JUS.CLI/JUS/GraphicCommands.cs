@@ -239,11 +239,7 @@ namespace JUSToolkit.CLI.JUS
         {
             Node images = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .Children["koma"];
-            if (images is null)
-            {
-                throw new FormatException("Invalid container file");
-            }
+                .Children["koma"] ?? throw new FormatException("Invalid container file");
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()

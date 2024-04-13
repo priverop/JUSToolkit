@@ -33,7 +33,7 @@ namespace JUSToolkit.Texts.Converters
         IConverter<JQuiz, NodeContainerFormat>,
         IConverter<NodeContainerFormat, JQuiz>
     {
-        private readonly Dictionary<int, string> mangaIndex = new() {
+        private readonly Dictionary<int, string> mangaIndex = new () {
             { 0x00, "Shonen Jump" },
             { 0x01, "Eyeshield 21" },
             { 0x02, "I's" },
