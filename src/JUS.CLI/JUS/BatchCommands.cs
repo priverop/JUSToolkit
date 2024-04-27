@@ -50,10 +50,12 @@ namespace JUSToolkit.CLI.JUS
         {
             Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
+            var alar2png = new Alar2Png(DemoImages);
+
             _ = container == "demo.aar" ? originalAlar
-                    .TransformWith<Alar2Png, Dictionary<string, int>>(DemoImages)
+                    .TransformWith(alar2png)
                 : originalAlar
-                .TransformWith<Alar2Png>();
+                .TransformWith<Alar2Png>(); // ToDo: Apparently I can't transform it without the parameters of the Class. Maybe 2 different converters?
 
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
@@ -77,8 +79,10 @@ namespace JUSToolkit.CLI.JUS
             Node originalAlar = NodeFactory.FromFile(container);
             Node inputFiles = NodeFactory.FromDirectory(input);
 
+            var png2Alar3 = new Png2Alar3(originalAlar);
+
             Alar3 alar = inputFiles
-                .TransformWith<Png2Alar3, Node>(originalAlar)
+                .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
             using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());

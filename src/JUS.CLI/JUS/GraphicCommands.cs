@@ -151,16 +151,17 @@ namespace JUSToolkit.CLI.JUS
             IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
             ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
-            Dig newDig = new Dig(originalDig, newImage);
+            var newDig = new Dig(originalDig, newImage);
 
-            if (insertTransparent)
+            if (insertTransparent) {
                 newDig = newDig.InsertTransparentTile(map);
+            }
 
             using var binaryDig = newDig.ConvertWith(new Dig2Binary());
 
             binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
-            Almt newAtm = new Almt(originalAtm, map);
+            var newAtm = new Almt(originalAtm, map);
             using var binaryAtm = newAtm.ConvertWith(new Almt2Binary());
 
             binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));

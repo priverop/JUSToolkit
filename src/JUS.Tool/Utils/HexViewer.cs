@@ -63,7 +63,7 @@ namespace JUSToolkit.Graphics.Converters
             // For each line: offset, hex content and text content
             content.AppendFormat("{0:X8} {1} ", startPosition, verticalBar);
             for (int i = 0; i < read; i++) {
-                char ch = (buffer[i] >= 0x21 && buffer[i] <= 0x7F) ? (char)buffer[i] : '.';
+                char ch = (buffer[i] is >= 0x21 and <= 0x7F) ? (char)buffer[i] : '.';
                 textLineBuilder.AppendFormat("{0} ", ch);
 
                 if (i != 0 && ((i + 1) % BytesPerRow == 0)) {
