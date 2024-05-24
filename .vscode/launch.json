@@ -9,8 +9,16 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/JUS.CLI/bin/Debug/net6.0/JUS.CLI.dll",
-      "args": [],
+      "program": "${workspaceFolder}/src/JUS.CLI/bin/Debug/net8.0/JUS.CLI.dll",
+      "args": [
+        "jus",
+        "texts",
+        "export",
+        "--bin",
+        "${workspaceFolder}/src/JUS.CLI/bin/Debug/net6.0/test.bin",
+        "--output",
+        "${workspaceFolder}/src/JUS.CLI/bin/Debug/net6.0/out/"
+      ],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
       "console": "internalConsole"
