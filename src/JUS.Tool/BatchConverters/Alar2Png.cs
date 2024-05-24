@@ -46,6 +46,13 @@ namespace JUSToolkit.BatchConverters
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Alar2Png"/> class.
+        /// </summary>
+        public Alar2Png()
+        {
+        }
+
+        /// <summary>
         /// Gets or sets the param to export the same image with multiple maps.
         /// </summary>
         public Dictionary<string, int> MultipleMaps { get; set; }
@@ -65,21 +72,15 @@ namespace JUSToolkit.BatchConverters
             var alarNode = new NodeContainerFormat();
 
             // In the future we need to encapsulate this
-            // ToDo: pleo
-            if (alarVersion.Major == 3)
-            {
+            if (alarVersion.Major == 3) {
                 alarNode = alar.ConvertWith(new Binary2Alar3());
-            }
-            else if (alarVersion.Major == 2)
-            {
+            } else if (alarVersion.Major == 2) {
                 alarNode = alar.ConvertWith(new Binary2Alar2());
             }
 
             // Iterate alar
-            foreach (Node child in Navigator.IterateNodes(alarNode.Root))
-            {
-                if (Path.GetExtension(child.Name) == ".dig")
-                {
+            foreach (Node child in Navigator.IterateNodes(alarNode.Root)) {
+                if (Path.GetExtension(child.Name) == ".dig") {
                     string cleanName = Path.GetFileNameWithoutExtension(child.Name);
                     var childClone = new Node(cleanName, new BinaryFormat(child.Stream));
                     string mangaName = child.Name.Substring(0, 2);
@@ -88,22 +89,19 @@ namespace JUSToolkit.BatchConverters
                     // Some containers (demo.aar) have a special type of .dig that needs
                     // to be compressed with 2 extra maps (we get 3 images with just one .dig)
                     // child.Name.Substring(2) removes the manga name
-                    if (MultipleMaps?.ContainsKey(fileNumber) == true)
-                    {
+                    if (MultipleMaps?.ContainsKey(fileNumber) == true) {
                         // _n_00.atm
                         using Node atm_n = GetAtm(
                             GetSpecialMapName(mangaName, "n", fileNumber),
                             alarNode.Root.Children[0]);
 
-                        if (atm_n is null)
-                        {
+                        if (atm_n is null) {
                             Console.WriteLine("Missing special n map file for: " + child.Name);
                         }
 
                         var stream_n = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
                         Node image_n = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_n.Name), stream_n), atm_n, cleanName + "_n_");
-                        if (image_n is not null)
-                        {
+                        if (image_n is not null) {
                             transformedFiles.Root.Add(image_n);
                         }
 
@@ -112,30 +110,26 @@ namespace JUSToolkit.BatchConverters
                             GetSpecialMapName(mangaName, "m", fileNumber),
                             alarNode.Root.Children[0]);
 
-                        if (atm_m is null)
-                        {
+                        if (atm_m is null) {
                             Console.WriteLine("Missing special m map file for: " + child.Name);
                         }
 
                         var stream_m = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
                         Node image_m = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_m.Name), stream_m), atm_m, cleanName);
-                        if (image_m is not null)
-                        {
+                        if (image_m is not null) {
                             transformedFiles.Root.Add(image_m);
                         }
                     }
 
                     // Get Map with the same name
                     using Node atm = GetAtm(cleanName, alarNode.Root.Children[0]);
-                    if (atm is null)
-                    {
+                    if (atm is null) {
                         Console.WriteLine("Missing map file for: " + child.Name);
                         continue;
                     }
 
                     Node image = GetPNG(childClone, atm, cleanName);
-                    if (image is not null)
-                    {
+                    if (image is not null) {
                         transformedFiles.Root.Add(image);
                     }
                 }
@@ -157,12 +151,9 @@ namespace JUSToolkit.BatchConverters
         {
             Node image = null;
             var dig2Bitmap = new BinaryDig2Bitmap(atm);
-            try
-            {
+            try {
                 image = pixels.TransformWith(dig2Bitmap);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.WriteLine("Exception detected in file " + cleanName + ": " + ex);
             }
 
@@ -173,8 +164,7 @@ namespace JUSToolkit.BatchConverters
         {
             Node atm = Navigator.SearchNode(files, name + ".atm");
 
-            if (atm is null)
-            {
+            if (atm is null) {
                 Console.WriteLine("Atm doesn't exist: " + name + ".atm");
             }
 

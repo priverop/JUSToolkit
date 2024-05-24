@@ -17,8 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using JUSToolkit.Texts.Converters;
 
 namespace JUSToolkit.Utils
 {
@@ -27,32 +29,32 @@ namespace JUSToolkit.Utils
     /// </summary>
     public static class TextIdentifier
     {
-        private static readonly Dictionary<string, string> BinDictionary = new Dictionary<string, string>() {
-            { "ability_t.bin", "Ability" },
-            { "bgm.bin", "Bgm" },
-            { "chr_b_t.bin", "BtlChr" },
-            { "chr_s_t.bin", "SuppChr" },
-            { "clearlst.bin", "SimpleBin" },
-            { "demo.bin", "Demo" },
-            { "infoname.bin", "SimpleBin" },
-            { "komatxt.bin", "Komatxt" },
-            { "location.bin", "Location" },
-            { "piece.bin", "Piece" },
-            { "rulemess.bin", "Rulemess" },
-            { "stage.bin", "Stage" },
-            { "title.bin", "SimpleBin" },
-            { "pname.bin", "Pname" },
-            { "tutorial.bin", "Tutorial" },
-            { "tutorial0.bin", "Tutorial" },
-            { "tutorial1.bin", "Tutorial" },
-            { "tutorial2.bin", "Tutorial" },
-            { "tutorial3.bin", "Tutorial" },
-            { "tutorial4.bin", "Tutorial" },
-            { "tutorial5.bin", "Tutorial" },
-            { "battle.bin", "JGalaxySimple" },
-            { "mission.bin", "JGalaxySimple" },
-            { "jgalaxy.bin", "JGalaxyComplex" },
-            { "jquiz.bin", "JQuiz" },
+        private static readonly Dictionary<string, Type[]> BinDictionary = new() {
+            { "ability_t.bin", [typeof(Binary2Ability), typeof(Ability2Po)] },
+            { "bgm.bin", [typeof(Binary2Bgm), typeof(Bgm2Po)] },
+            { "chr_b_t.bin", [typeof(Binary2BtlChr), typeof(BtlChr2Po)] },
+            { "chr_s_t.bin", [typeof(Binary2SuppChr), typeof(SuppChr2Po)] },
+            { "clearlst.bin", [typeof(Binary2SimpleBin), typeof(SimpleBin2Po)] },
+            { "demo.bin", [typeof(Binary2Demo), typeof(Demo2Po)] },
+            { "infoname.bin", [typeof(Binary2SimpleBin), typeof(SimpleBin2Po)] },
+            { "komatxt.bin", [typeof(Binary2Komatxt), typeof(Komatxt2Po)] },
+            { "location.bin", [typeof(Binary2Location), typeof(Location2Po)] },
+            { "piece.bin", [typeof(Binary2Piece), typeof(Piece2Po)] },
+            { "rulemess.bin", [typeof(Binary2Rulemess), typeof(Rulemess2Po)] },
+            { "stage.bin", [typeof(Binary2Stage), typeof(Stage2Po)] },
+            { "title.bin", [typeof(Binary2SimpleBin), typeof(SimpleBin2Po)] },
+            { "pname.bin", [typeof(Binary2Pname), typeof(Pname2Po)] },
+            { "tutorial.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "tutorial0.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "tutorial1.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "tutorial2.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "tutorial3.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "tutorial4.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "tutorial5.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
+            { "battle.bin", [typeof(Binary2JGalaxySimple), typeof(JGalaxySimple2Po)] },
+            { "mission.bin", [typeof(Binary2JGalaxySimple), typeof(JGalaxySimple2Po)] },
+            { "jgalaxy.bin", [typeof(Binary2JGalaxyComplex), typeof(JGalaxyComplex2Po)] },
+            { "jquiz.bin", [typeof(Binary2JQuiz), typeof(JQuiz2Po)] },
         };
 
         /// <summary>
@@ -60,10 +62,7 @@ namespace JUSToolkit.Utils
         /// </summary>
         /// <param name="fileName">The name of the file we want to check.</param>
         /// <returns>The format.</returns>
-        public static string GetTextFormat(string fileName)
-        {
-            return IsInfoDeckFormat(fileName) ? "InfoDeck" : BinDictionary[fileName];
-        }
+        public static Type[] GetTextFormat(string fileName) => IsInfoDeckFormat(fileName) ? [typeof(Binary2InfoDeck), typeof(InfoDeck2Po)] : BinDictionary[fileName];
 
         /// <summary>
         /// Checks if the fileName correspond with the InfoDeck format files.
@@ -73,7 +72,7 @@ namespace JUSToolkit.Utils
         /// <returns>True if the filename follows the pattern bin-info|deck-manga.bin.</returns>
         private static bool IsInfoDeckFormat(string fileName)
         {
-            Regex regex = new Regex("^bin-.*-.*.bin$"); // ToDo: info or deck
+            var regex = new Regex("^bin-.*-.*.bin$"); // ToDo: info or deck
             return regex.IsMatch(fileName);
         }
 

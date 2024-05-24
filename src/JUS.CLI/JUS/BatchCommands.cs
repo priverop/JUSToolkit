@@ -54,14 +54,12 @@ namespace JUSToolkit.CLI.JUS
 
             _ = container == "demo.aar" ? originalAlar
                     .TransformWith(alar2png)
-                : originalAlar
-                .TransformWith<Alar2Png>(); // ToDo: Apparently I can't transform it without the parameters of the Class. Maybe 2 different converters?
+                : originalAlar.TransformWith<Alar2Png>();
 
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (Node image in result.Root.Children)
-            {
+            foreach (Node image in result.Root.Children) {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
