@@ -81,7 +81,7 @@ namespace JUSToolkit.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            Alar3 alar = node.GetFormatAs<IBinary>.ConvertWith(new Binary2Alar3());
+            Alar3 alar = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
@@ -96,7 +96,7 @@ namespace JUSToolkit.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            Alar3 alar = alarOriginal.GetFormatAs<IBinary>.ConvertWith(new Binary2Alar3());
+            Alar3 alar = alarOriginal.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
             alar.InsertModification(fileOriginal);
             BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
@@ -129,10 +129,8 @@ namespace JUSToolkit.Tests.Containers
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);
-            for (int i = 0; i < totalFiles; i++)
-            {
-                var child = new Alar3File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) })))
-                {
+            for (int i = 0; i < totalFiles; i++) {
+                var child = new Alar3File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
                     Size = 5,
                     Offset = (uint)(i * 5),
                 };
@@ -140,8 +138,7 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar3File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })))
-            {
+            var modifiedChild1 = new Alar3File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
                 Size = 10,
                 Offset = 5,
             };

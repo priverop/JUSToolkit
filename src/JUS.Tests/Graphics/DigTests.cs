@@ -59,10 +59,10 @@ namespace JUSToolkit.Tests.Graphics
 
             var info = BinaryInfo.FromYaml(infoPath);
 
-            using var mapsNode = NodeFactory.FromFile(atmPath, FileOpenMode.Read);
+            using Node mapsNode = NodeFactory.FromFile(atmPath, FileOpenMode.Read);
 
-            using var pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
-                .TransformWith<BinaryDig2Bitmap, Node>(mapsNode);
+            using Node pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
+                .TransformWith(new BinaryDig2Bitmap(mapsNode));
 
             pixelsPaletteNode.Stream.Should().MatchInfo(info);
         }
@@ -75,7 +75,7 @@ namespace JUSToolkit.Tests.Graphics
 
             using Node node = NodeFactory.FromFile(digPath, FileOpenMode.Read);
 
-            Dig dig = node.GetFormatAs<IBinary>.ConvertWith(new Binary2Dig());
+            Dig dig = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Dig());
             BinaryFormat generatedStream = dig.ConvertWith(new Dig2Binary());
 
             var originalStream = new DataStream(node.Stream!, 0, node.Stream.Length);

@@ -95,7 +95,7 @@ namespace JUSToolkit.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            Alar2 alar = alarOriginal.Format!.ConvertWith(new Binary2Alar2());
+            Alar2 alar = new Binary2Alar2().Convert(alarOriginal.GetFormatAs<IBinary>());
             alar.InsertModification(fileOriginal);
             BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
@@ -128,10 +128,8 @@ namespace JUSToolkit.Tests.Containers
 
             // Alar2 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar2((ushort)totalFiles);
-            for (int i = 0; i < totalFiles; i++)
-            {
-                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) })))
-                {
+            for (int i = 0; i < totalFiles; i++) {
+                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
                     Size = 5,
                     Offset = (uint)(i * 5),
                 };
@@ -139,8 +137,7 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })))
-            {
+            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
                 Size = 10,
                 Offset = 5,
             };

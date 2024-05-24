@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
@@ -65,18 +66,16 @@ namespace JUSToolkit.Tests.Containers
 
             Node images = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .Children["koma"];
-            if (images is null) {
-                throw new FormatException("Invalid container file");
-            }
+                .Children["koma"] ?? throw new FormatException("Invalid container file");
 
-            var shapes = NodeFactory.FromFile(kshape)
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
                 .GetFormatAs<KShapeSprites>();
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
                 .GetFormatAs<Koma>();
+
             foreach (KomaElement komaElement in komaFormat) {
                 string filename = $"{komaElement.KomaName}.dtx";
 
@@ -86,11 +85,11 @@ namespace JUSToolkit.Tests.Containers
                 }
 
                 dtx.TransformWith<BinaryDstx2SpriteImage>();
-                var image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
+                IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
                 // We ignore the sprite info from the DSTX and we take the one
                 // from the kshape
-                var sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+                Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
                 // If the child Node komaElement.KShapeGroupId does not exist, then we create it
                 if (resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"] == null) {
@@ -104,9 +103,9 @@ namespace JUSToolkit.Tests.Containers
                 var indexedImageParams = new IndexedImageBitmapParams {
                     Palettes = image,
                 };
-                var resultImage = new Node(komaElement.KomaName, sprite)
-                    .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
-                    .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams);
+                Node resultImage = new Node(komaElement.KomaName, sprite)
+                    .TransformWith(new Sprite2IndexedImage(spriteParams))
+                    .TransformWith(new IndexedImage2Bitmap(indexedImageParams));
                 resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"].Add(resultImage);
             }
 
