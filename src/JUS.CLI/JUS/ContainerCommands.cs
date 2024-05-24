@@ -47,19 +47,14 @@ namespace JUSToolkit.CLI.JUS
             Version alarVersion = Identifier.GetAlarVersion(files.Stream);
 
             // ToDo: In the future we need to encapsulate this
-            if (alarVersion.Major == 3)
-            {
+            if (alarVersion.Major == 3) {
                 files.TransformWith<Binary2Alar3>();
-            }
-            else if (alarVersion.Major == 2)
-            {
+            } else if (alarVersion.Major == 2) {
                 files.TransformWith<Binary2Alar2>();
             }
 
-            foreach (Node node in Navigator.IterateNodes(files))
-            {
-                if (!node.IsContainer)
-                {
+            foreach (Node node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
                     string outputFile = Path.Combine(output, node.Path[1..]);
@@ -81,10 +76,8 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
 
-            foreach (Node node in Navigator.IterateNodes(files))
-            {
-                if (!node.IsContainer)
-                {
+            foreach (Node node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
                     string outputFile = Path.Combine(output, node.Path[1..]);
@@ -106,10 +99,8 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
 
-            foreach (Node node in Navigator.IterateNodes(files))
-            {
-                if (!node.IsContainer)
-                {
+            foreach (Node node in Navigator.IterateNodes(files)) {
+                if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
                     string outputFile = Path.Combine(output, node.Path[1..]);
@@ -132,24 +123,20 @@ namespace JUSToolkit.CLI.JUS
 
             bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
 
-            if (originalIsCompressed)
-            {
+            if (originalIsCompressed) {
                 originalAlar.TransformWith<LzssDecompression>();
             }
 
             Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
 
-            BinaryFormat binary = new BinaryFormat();
+            var binary = new BinaryFormat();
 
-            if (alarVersion.Major == 3)
-            {
+            if (alarVersion.Major == 3) {
                 Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
                 .GetFormatAs<Alar3>();
                 alar.InsertModification(NodeFactory.FromDirectory(input));
                 binary = alar.ConvertWith(new Alar3ToBinary());
-            }
-            else if (alarVersion.Major == 2)
-            {
+            } else if (alarVersion.Major == 2) {
                 Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
                 .GetFormatAs<Alar2>();
                 alar.InsertModification(NodeFactory.FromDirectory(input));
@@ -157,7 +144,7 @@ namespace JUSToolkit.CLI.JUS
             }
 
             binary = originalIsCompressed ?
-                LzssCompression.Convert(binary) :
+                new LzssCompression().Convert(binary) :
                 binary;
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));

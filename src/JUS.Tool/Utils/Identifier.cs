@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUSToolkit.Utils
@@ -33,10 +32,7 @@ namespace JUSToolkit.Utils
         /// </summary>
         /// <param name="file">The File we want to check.</param>
         /// <returns>The version.</returns>
-        public static Version GetAlarVersion(BinaryFormat file)
-        {
-            return GetAlarVersion(file.Stream);
-        }
+        public static Version GetAlarVersion(BinaryFormat file) => GetAlarVersion(file.Stream);
 
         /// <summary>
         /// Returns the version of the Alar stream.

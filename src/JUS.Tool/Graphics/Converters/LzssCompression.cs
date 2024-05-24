@@ -37,9 +37,7 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns>The compressed stream.</returns>
         public BinaryFormat Convert(IBinary source)
         {
-            if (source == null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             DataStream decompressedStream = Convert(source.Stream);
 
@@ -53,13 +51,12 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns>The compressed DataStream.</returns>
         public DataStream Convert(DataStream source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             DataStream compressed = LzssUtils.Lzss(source, "-evn");
 
             // Write the DSCP magic ID header
-            DataStream memoryStream = new DataStream();
+            var memoryStream = new DataStream();
 
             memoryStream.Seek(0);
             memoryStream.Write(Encoding.ASCII.GetBytes("DSCP"), 0, 4);

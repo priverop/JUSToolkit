@@ -44,7 +44,7 @@ namespace JUSToolkit.Graphics
     /// <summary>
     /// Image format.
     /// </summary>
-    public class Dig : IndexedPaletteImage, IFormat
+    public class Dig : IndexedPaletteImage
     {
         /// <summary>
         /// The Magic ID of the file.
@@ -54,14 +54,16 @@ namespace JUSToolkit.Graphics
         /// <summary>
         /// Initializes a new instance of the <see cref="Dig"/> class.
         /// </summary>
-        public Dig() {
+        public Dig()
+        {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dig"/> class cloning another Dig object.
         /// </summary>
         /// <param name="dig">Dig object to clone.</param>
-        public Dig(Dig dig) {
+        public Dig(Dig dig)
+        {
             Unknown = dig.Unknown;
             ImageFormat = dig.ImageFormat;
             NumPaletteLines = dig.NumPaletteLines;
