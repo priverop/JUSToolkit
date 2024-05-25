@@ -87,6 +87,12 @@ namespace JUSToolkit.Graphics.Converters
                 };
             }
 
+            var palettes = new PaletteCollection();
+
+            for (int i = 0; i < numPalettes; i++) {
+                palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
+            }
+
             source.Stream.Position = pixelsStart;
 
             IndexedPixel[] pixels = swizzling switch {
@@ -107,9 +113,8 @@ namespace JUSToolkit.Graphics.Converters
                 Bpp = bpp,
                 Swizzling = swizzling,
             };
-
-            for (int i = 0; i < numPalettes; i++) {
-                dig.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
+            foreach (IPalette p in palettes.Palettes) {
+                dig.Palettes.Add(p);
             }
 
             return dig;
