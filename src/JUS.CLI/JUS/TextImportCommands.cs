@@ -81,7 +81,7 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<JQuiz2Po>()
                 .GetFormatAs<JQuiz>();
 
-            using var binary = (BinaryFormat)ConvertFormat.With<Binary2JQuiz>(jquiz);
+            using BinaryFormat binary = new Binary2JQuiz().Convert(jquiz);
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_jquiz.bin"));
             Console.WriteLine("Done!");
@@ -94,23 +94,25 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         private static void ImportBin(Node poNode, string output)
         {
-            string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
+            // string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
 
             // Detect format
-            string binFormatName = TextIdentifier.GetTextFormat(cleanFileName);
-            Console.WriteLine("File Format: " + binFormatName);
+            // string binFormatName = TextIdentifier.GetTextFormat(cleanFileName);
+            // Console.WriteLine("File Format: " + binFormatName);
 
-            string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
-            string converterName = TextConvertersNamespace + "Binary2" + binFormatName;
+            // string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
+            // string converterName = TextConvertersNamespace + "Binary2" + binFormatName;
 
-            // Po -> Text Format
-            var textFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), poNode.Format!);
+            // // Po -> Text Format
+            // // ToDo: Pleo
+            // var textFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), poNode.Format!);
 
-            // Text Format -> Binary
-            var binaryFormat = (BinaryFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), textFormat);
+            // // Text Format -> Binary
+            // // ToDo: Pleo
+            // var binaryFormat = (BinaryFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), textFormat);
 
-            string outputFile = Path.Combine(output, cleanFileName);
-            binaryFormat.Stream.WriteTo(outputFile);
+            // string outputFile = Path.Combine(output, cleanFileName);
+            // binaryFormat.Stream.WriteTo(outputFile);
         }
     }
 }

@@ -81,8 +81,8 @@ namespace JUSToolkit.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            Alar3 alar = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
+            BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
@@ -96,9 +96,9 @@ namespace JUSToolkit.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            var alar = (Alar3)ConvertFormat.With<Binary2Alar3>(alarOriginal.Format!);
+            Alar3 alar = alarOriginal.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
             alar.InsertModification(fileOriginal);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
             generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();
@@ -125,7 +125,7 @@ namespace JUSToolkit.Tests.Containers
         [Test]
         public void Alar3InsertNodesTest()
         {
-            var totalFiles = 4;
+            int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);

@@ -80,8 +80,8 @@ namespace JUSToolkit.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+            Alar2 alar = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar2());
+            BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
@@ -95,9 +95,9 @@ namespace JUSToolkit.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            var alar = (Alar2)ConvertFormat.With<Binary2Alar2>(alarOriginal.Format!);
+            Alar2 alar = new Binary2Alar2().Convert(alarOriginal.GetFormatAs<IBinary>());
             alar.InsertModification(fileOriginal);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+            BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
             generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();

@@ -37,8 +37,8 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Po format.</returns>
         public Po Convert(PDeck pDeck)
         {
-            var po = JusText.GenerateJusPo();
-            var headerBase64 = System.Convert.ToBase64String(pDeck.Header);
+            Po po = JusText.GenerateJusPo();
+            string headerBase64 = System.Convert.ToBase64String(pDeck.Header);
 
             po.Add(new PoEntry(pDeck.Name) {
                 Context = "0",

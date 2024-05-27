@@ -31,19 +31,21 @@ namespace JUSToolkit.Graphics.Converters
     /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
     /// </summary>
     public class BinaryDig2Bitmap :
-        IInitializer<Node>,
         IConverter<IBinary, BinaryFormat>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BinaryDig2Bitmap"/> class.
+        /// </summary>
+        /// <param name="atm">Node with the required map.</param>
+        public BinaryDig2Bitmap(Node atm)
+        {
+            OriginalAtm = atm;
+        }
+
         /// <summary>
         /// Gets or sets the Original Atm.
         /// </summary>
         public Node OriginalAtm { get; set; }
-
-        /// <inheritdoc/>
-        public void Initialize(Node atm)
-        {
-            OriginalAtm = atm;
-        }
 
         /// <summary>
         /// Converts a <see cref="Node"/> (file) to a <see cref="BinaryFormat"/>.
@@ -52,30 +54,35 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns><see cref="Dig"/>.</returns>
         public BinaryFormat Convert(IBinary source)
         {
-            if (source is null) {
+            if (source is null)
+            {
                 throw new ArgumentNullException(nameof(source));
             }
 
             source.Stream.Position = 0;
 
-            var pixelsPaletteNode = new Node("dig", source)
+            Node pixelsPaletteNode = new Node("dig", source)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>();
 
             // Map
-            using var mapsNode = OriginalAtm
+            using Node mapsNode = OriginalAtm
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>();
 
-            var mapsParams = new MapDecompressionParams {
+            var mapsParams = new MapDecompressionParams
+            {
                 Map = mapsNode.GetFormatAs<Almt>(),
                 TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
             };
-            var bitmapParams = new IndexedImageBitmapParams {
+            var bitmapParams = new IndexedImageBitmapParams
+            {
                 Palettes = pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>(),
             };
-            pixelsPaletteNode.TransformWith<MapDecompression, MapDecompressionParams>(mapsParams)
-                .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(bitmapParams);
+            var mapCompression = new MapDecompression(mapsParams);
+            var image2Bitmap = new IndexedImage2Bitmap(bitmapParams);
+            pixelsPaletteNode.TransformWith(mapCompression)
+                .TransformWith(image2Bitmap);
 
             return new BinaryFormat(pixelsPaletteNode.Stream);
         }

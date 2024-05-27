@@ -93,27 +93,34 @@ namespace JUSToolkit.Texts.Converters
             int currentManga = 0xFF;
             int mangaCount = 0;
             int questionCount = 0;
-            foreach (JQuizEntry entry in jquiz.Entries) {
-                if (entry.MangaID != currentManga) {
-                    poBin = ConvertFormat.With<Po2Binary>(po) as BinaryFormat;
+            foreach (JQuizEntry entry in jquiz.Entries)
+            {
+                if (entry.MangaID != currentManga)
+                {
+                    poBin = po.ConvertWith(new Po2Binary());
                     container.Root.Add(new Node($"jquiz-{mangaCount:00}-{mangaIndex[currentManga]}.po", poBin));
                     po = JusText.GenerateJusPo();
                     mangaCount++;
                     currentManga = entry.MangaID;
                 }
 
-                po.Add(new PoEntry(JusText.CleanString(entry.Photo)) {
+                po.Add(new PoEntry(JusText.CleanString(entry.Photo))
+                {
                     Context = $"Pregunta {questionCount} foto",
                     ExtractedComments = $"{entry.MangaID}-{entry.Unknown}-{entry.Unknown2}",
                 });
-                for (int j = 0; j < entry.Questions.Length; j++) {
-                    po.Add(new PoEntry(JusText.CleanString(entry.Questions[j])) {
+                for (int j = 0; j < entry.Questions.Length; j++)
+                {
+                    po.Add(new PoEntry(JusText.CleanString(entry.Questions[j]))
+                    {
                         Context = $"Pregunta {questionCount} enunciado {j}",
                     });
                 }
 
-                for (int k = 0; k < entry.Answers.Length; k++) {
-                    po.Add(new PoEntry(JusText.CleanString(entry.Answers[k])) {
+                for (int k = 0; k < entry.Answers.Length; k++)
+                {
+                    po.Add(new PoEntry(JusText.CleanString(entry.Answers[k]))
+                    {
                         Context = $"Pregunta {questionCount} respuesta {k}",
                     });
                 }
@@ -121,7 +128,7 @@ namespace JUSToolkit.Texts.Converters
                 questionCount++;
             }
 
-            poBin = ConvertFormat.With<Po2Binary>(po) as BinaryFormat;
+            poBin = po.ConvertWith(new Po2Binary());
             container.Root.Add(new Node($"jquiz-{mangaCount:00}-{mangaIndex[currentManga]}.po", poBin));
 
             return container;
@@ -138,11 +145,15 @@ namespace JUSToolkit.Texts.Converters
             int questionCount = 0;
             var jquizEntry = new JQuizEntry();
 
-            foreach (Node file in poFiles.Root.Children) {
+            foreach (Node file in poFiles.Root.Children)
+            {
                 Po po = file.TransformWith<Binary2Po>().GetFormatAs<Po>();
-                foreach (PoEntry entry in po.Entries) {
-                    if (entry.Context.Contains("foto")) {
-                        if (questionCount != 0) {
+                foreach (PoEntry entry in po.Entries)
+                {
+                    if (entry.Context.Contains("foto"))
+                    {
+                        if (questionCount != 0)
+                        {
                             jquiz.Entries.Add(jquizEntry);
                             jquizEntry = new JQuizEntry();
                         }
@@ -158,11 +169,13 @@ namespace JUSToolkit.Texts.Converters
 
                     string number = entry.Context[^1..];
 
-                    if (entry.Context.Contains("enunciado")) {
+                    if (entry.Context.Contains("enunciado"))
+                    {
                         jquizEntry.Questions[int.Parse(number)] = entry.Text;
                     }
 
-                    if (entry.Context.Contains("respuesta")) {
+                    if (entry.Context.Contains("respuesta"))
+                    {
                         jquizEntry.Answers[int.Parse(number)] = entry.Text;
                     }
                 }

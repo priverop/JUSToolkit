@@ -42,13 +42,9 @@ namespace JUSToolkit.CLI.JUS
         public static void Export(string container, string output)
         {
             Node files = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>();
+                .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
 
-            if (files is null) {
-                throw new FormatException("Invalid container file");
-            }
-
-            var alarVersion = Identifier.GetAlarVersion(files.Stream);
+            Version alarVersion = Identifier.GetAlarVersion(files.Stream);
 
             // ToDo: In the future we need to encapsulate this
             if (alarVersion.Major == 3) {
@@ -57,7 +53,7 @@ namespace JUSToolkit.CLI.JUS
                 files.TransformWith<Binary2Alar2>();
             }
 
-            foreach (var node in Navigator.IterateNodes(files)) {
+            foreach (Node node in Navigator.IterateNodes(files)) {
                 if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
@@ -78,13 +74,9 @@ namespace JUSToolkit.CLI.JUS
         {
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Alar3>();
+                .TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
 
-            if (files is null) {
-                throw new FormatException("Invalid container file");
-            }
-
-            foreach (var node in Navigator.IterateNodes(files)) {
+            foreach (Node node in Navigator.IterateNodes(files)) {
                 if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
@@ -105,13 +97,9 @@ namespace JUSToolkit.CLI.JUS
         {
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Alar2>();
+                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
 
-            if (files is null) {
-                throw new FormatException("Invalid container file");
-            }
-
-            foreach (var node in Navigator.IterateNodes(files)) {
+            foreach (Node node in Navigator.IterateNodes(files)) {
                 if (!node.IsContainer) {
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
@@ -131,36 +119,32 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Import(string container, string input, string output)
         {
-            Node originalAlar = NodeFactory.FromFile(container);
+            Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
-            if (originalAlar is null) {
-                throw new FormatException("Invalid container file");
-            }
-
-            var originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
+            bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
 
             if (originalIsCompressed) {
                 originalAlar.TransformWith<LzssDecompression>();
             }
 
-            var alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
+            Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
 
-            BinaryFormat binary = new BinaryFormat();
+            var binary = new BinaryFormat();
 
             if (alarVersion.Major == 3) {
                 Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
                 .GetFormatAs<Alar3>();
                 alar.InsertModification(NodeFactory.FromDirectory(input));
-                binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+                binary = alar.ConvertWith(new Alar3ToBinary());
             } else if (alarVersion.Major == 2) {
                 Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
                 .GetFormatAs<Alar2>();
                 alar.InsertModification(NodeFactory.FromDirectory(input));
-                binary = (BinaryFormat)ConvertFormat.With<Alar2ToBinary>(alar);
+                binary = alar.ConvertWith(new Alar2ToBinary());
             }
 
             binary = originalIsCompressed ?
-                (BinaryFormat)ConvertFormat.With<LzssCompression>(binary) :
+                new LzssCompression().Convert(binary) :
                 binary;
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
@@ -178,15 +162,11 @@ namespace JUSToolkit.CLI.JUS
         {
             Alar3 alar = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>();
-
-            if (alar is null) {
-                throw new FormatException("Invalid container file");
-            }
+                .GetFormatAs<Alar3>() ?? throw new FormatException("Invalid container file");
 
             alar.InsertModification(NodeFactory.FromDirectory(input));
 
-            using var binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
 
             Console.WriteLine("Done!");
@@ -200,11 +180,7 @@ namespace JUSToolkit.CLI.JUS
         public static void ImportAlar2(string container, string output)
         {
             Node alar = NodeFactory.FromFile(container)
-                .TransformWith<Binary2Alar2>();
-
-            if (alar is null) {
-                throw new FormatException("Invalid container file");
-            }
+                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
 
             alar.TransformWith<Alar2ToBinary>();
 

@@ -52,8 +52,10 @@ namespace JUSToolkit.CLI.JUS
         {
             using Node mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read);
 
+            var binaryDig2Bitmap = new BinaryDig2Bitmap(mapsNode);
+
             using Node pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
-                .TransformWith<BinaryDig2Bitmap, Node>(mapsNode);
+                .TransformWith(binaryDig2Bitmap);
 
             pixelsPaletteNode.Stream.WriteTo(output + ".png");
 
@@ -69,11 +71,11 @@ namespace JUSToolkit.CLI.JUS
         public static void ExportDtx3(string dtx, string output)
         {
             // Sprites + pixels + palette
-            using var dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            var image = dtx3.Children["image"].GetFormatAs<Dig>();
+            Dig image = dtx3.Children["image"].GetFormatAs<Dig>();
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 FullImage = image,
@@ -86,8 +88,8 @@ namespace JUSToolkit.CLI.JUS
                 case DigSwizzling.Tiled:
                     foreach (Node nodeSprite in dtx3.Children["sprites"].Children) {
                         nodeSprite
-                            .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
-                            .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
+                            .TransformWith(new Sprite2IndexedImage(spriteParams))
+                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
                             .Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
                     }
 
@@ -95,7 +97,7 @@ namespace JUSToolkit.CLI.JUS
                 case DigSwizzling.Linear:
                     foreach (Node nodeTexture in dtx3.Children["sprites"].Children) {
                         nodeTexture
-                            .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
+                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
                             .Stream.WriteTo(Path.Combine(output, $"{nodeTexture.Name}.png"));
                     }
 
@@ -137,22 +139,23 @@ namespace JUSToolkit.CLI.JUS
                 Palettes = originalDig,
             };
 
-            var compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+            Node compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
                 .TransformWith<Bitmap2FullImage>()
-                .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
-            var newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-            var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+                .TransformWith(new FullImageMapCompression(compressionParams));
+            IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
+            ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
-            Dig newDig = new Dig(originalDig, newImage);
+            var newDig = new Dig(originalDig, newImage);
 
-            if (insertTransparent)
+            if (insertTransparent) {
                 newDig = newDig.InsertTransparentTile(map);
+            }
 
             using var binaryDig = new Dig2Binary().Convert(newDig);
 
             binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
-            Almt newAtm = new Almt(originalAtm, map);
+            var newAtm = new Almt(originalAtm, map);
             using var binaryAtm = new Almt2Binary().Convert(newAtm);
 
             binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
@@ -185,11 +188,11 @@ namespace JUSToolkit.CLI.JUS
             IndexedImage newImage = null;
 
             for (int i = 0; i < input.Length; i++) {
-                var compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
+                Node compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
                 .TransformWith<Bitmap2FullImage>()
-                .TransformWith<FullImageMapCompression, FullImageMapCompressionParams>(compressionParams);
+                .TransformWith(new FullImageMapCompression(compressionParams));
                 newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-                var map = compressed.Children[1].GetFormatAs<ScreenMap>();
+                ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
                 mergedImage = new Dig(mergedImage, newImage);
 
@@ -201,7 +204,7 @@ namespace JUSToolkit.CLI.JUS
                     Palettes = mergedImage,
                 };
 
-                var originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
+                Almt originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
                     .TransformWith<Binary2Almt>()
                     .GetFormatAs<Almt>();
                 var newAtm = new Almt(originalAtm, map);
@@ -228,12 +231,9 @@ namespace JUSToolkit.CLI.JUS
         {
             Node images = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .Children["koma"];
-            if (images is null) {
-                throw new FormatException("Invalid container file");
-            }
+                .Children["koma"] ?? throw new FormatException("Invalid container file");
 
-            var shapes = NodeFactory.FromFile(kshape)
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
                 .GetFormatAs<KShapeSprites>();
 
@@ -250,11 +250,11 @@ namespace JUSToolkit.CLI.JUS
                 }
 
                 dtx.TransformWith<BinaryDstx2SpriteImage>();
-                var image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
+                IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
                 // We ignore the sprite info from the DSTX and we take the one
                 // from the kshape
-                var sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+                Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
                 string outputFilePath = Path.Combine(
                     output,
@@ -269,8 +269,8 @@ namespace JUSToolkit.CLI.JUS
                     Palettes = image,
                 };
                 new Node("sprite", sprite)
-                    .TransformWith<Sprite2IndexedImage, Sprite2IndexedImageParams>(spriteParams)
-                    .TransformWith<IndexedImage2Bitmap, IndexedImageBitmapParams>(indexedImageParams)
+                    .TransformWith(new Sprite2IndexedImage(spriteParams))
+                    .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
                     .Stream.WriteTo(outputFilePath);
             }
 

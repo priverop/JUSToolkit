@@ -41,7 +41,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var decompressedStream = CompressionUtils.IsCompressed(source.Stream) ? Convert(source.Stream) : new DataStream(source.Stream);
+            DataStream decompressedStream = CompressionUtils.IsCompressed(source.Stream) ? Convert(source.Stream) : new DataStream(source.Stream);
 
             return new BinaryFormat(decompressedStream);
         }

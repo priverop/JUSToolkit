@@ -73,28 +73,27 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         private static void ExportBin(Node binNode, string output)
         {
-            // Detect format
-            string binFormatName = TextIdentifier.GetTextFormat(binNode.Name);
-            Console.WriteLine("File Name: " + binNode.Name + " - File Format: " + binFormatName);
+            // Detect converters
+            Type[] formatConverters = TextIdentifier.GetTextFormat(binNode.Name);
+            Type binConverterName = formatConverters[0];
+            Type poConverterName = formatConverters[1];
+            Console.WriteLine("File Name: " + binNode.Name + " - Bin Converter: " + binConverterName + " - Po Converter: " + poConverterName);
 
-            string converterName = TextConvertersNamespace + "Binary2" + binFormatName;
-            string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
-
-            // Binary -> TextFormat
-            var binFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), binNode.Format!);
+            // BinaryFormat -> TextFormat
+            object textFormat = ConvertFormat.With(binConverterName, binNode.Format!);
 
             // If instead of Po we get a Container
-            if (binFormatName == "JQuiz") {
-                var container = (NodeContainerFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
+            if (binConverterName.ToString() == "JUSToolkit.Texts.Converters.Binary2JQuiz") {
+                var container = (NodeContainerFormat)ConvertFormat.With(poConverterName, textFormat);
                 foreach (Node quiz in container.Root.Children) {
                     quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
                 }
             } else {
                 // TextFormat -> Po
-                var poFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), binFormat);
+                var poFormat = (Po)ConvertFormat.With(poConverterName, textFormat);
 
                 // Po -> Binary
-                var poBinaryFormat = (BinaryFormat)ConvertFormat.With<Po2Binary>(poFormat);
+                BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat);
 
                 string outputFile = Path.Combine(output, binNode.Name + ".po");
                 poBinaryFormat.Stream.WriteTo(outputFile);

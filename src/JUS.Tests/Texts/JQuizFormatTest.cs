@@ -68,8 +68,8 @@ namespace JUSToolkit.Tests.Containers
 
             using Node node = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
-            var jquiz = (JQuiz)ConvertFormat.With<Binary2JQuiz>(node.Format!);
-            var generatedStream = (BinaryFormat)ConvertFormat.With<Binary2JQuiz>(jquiz);
+            JQuiz jquiz = new Binary2JQuiz().Convert(node.GetFormatAs<BinaryFormat>());
+            BinaryFormat generatedStream = new Binary2JQuiz().Convert(jquiz);
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();

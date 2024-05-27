@@ -48,21 +48,18 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlar2Png(string container, string output)
         {
-            Node originalAlar = NodeFactory.FromFile(container);
+            Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
-            if (originalAlar is null) {
-                throw new FormatException("Invalid container file");
-            }
+            var alar2png = new Alar2Png(DemoImages);
 
             _ = container == "demo.aar" ? originalAlar
-                    .TransformWith<Alar2Png, Dictionary<string, int>>(DemoImages)
-                : originalAlar
-                .TransformWith<Alar2Png>();
+                    .TransformWith(alar2png)
+                : originalAlar.TransformWith<Alar2Png>();
 
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (var image in result.Root.Children) {
+            foreach (Node image in result.Root.Children) {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
@@ -80,11 +77,13 @@ namespace JUSToolkit.CLI.JUS
             Node originalAlar = NodeFactory.FromFile(container);
             Node inputFiles = NodeFactory.FromDirectory(input);
 
+            var png2Alar3 = new Png2Alar3(originalAlar);
+
             Alar3 alar = inputFiles
-                .TransformWith<Png2Alar3, Node>(originalAlar)
+                .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
-            using var binary = (BinaryFormat)ConvertFormat.With<Alar3ToBinary>(alar);
+            using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
 
