@@ -1,9 +1,9 @@
 <Project>
     <!-- Centralize dependency management -->
     <ItemGroup>
-        <PackageVersion Include="Yarhl" Version="4.0.0-preview.283" />
-        <PackageVersion Include="Yarhl.Media.Text" Version="4.0.0-preview.283" />
-        <PackageVersion Include="Texim" Version="0.1.0-preview.208" />
+        <PackageVersion Include="Yarhl" Version="4.0.0" />
+        <PackageVersion Include="Yarhl.Media.Text" Version="4.0.0" />
+        <PackageVersion Include="Texim" Version="0.1.0-preview.210" />
 
         <PackageVersion Include="FluentAssertions" Version="5.10.3" />
         <PackageVersion Include="nunit" Version="3.13.2" />
