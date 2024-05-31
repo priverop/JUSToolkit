@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.Collections.Generic;
 using System.IO;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
@@ -30,6 +31,16 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
+        private static readonly Dictionary<string, string> FileLocations = new() {
+            { "tutorial.bin", "/deckmake/tutorial.bin" },
+            { "tutorial0.bin", "/battle/tutorial0.bin" },
+            { "tutorial1.bin", "/battle/tutorial1.bin" },
+            { "tutorial2.bin", "/battle/tutorial2.bin" },
+            { "tutorial3.bin", "/battle/tutorial3.bin" },
+            { "tutorial4.bin", "/battle/tutorial4.bin" },
+            { "tutorial5.bin", "/battle/tutorial5.bin" },
+        };
+
         /// <summary>
         /// Import files into the Rom.
         /// </summary>
@@ -44,17 +55,13 @@ namespace JUSToolkit.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
 
             foreach (Node file in inputFiles.Children) {
-                // Aquí deberíamos reemplazar el fichero
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data/battle/{file.Name}");
-                Console.WriteLine(file.Name);
-                Console.WriteLine(toReplace.Format!);
-
-                toReplace.ChangeFormat(file.Format!);
-
-                Console.WriteLine(toReplace.Format!);
-
-                // Next: que este método detecte qué fichero le estás pasando (Identify) ?
-                // Deberíamos tener un diccionario con las rutas ?
+                if (FileLocations.TryGetValue(file.Name, out string value)) {
+                    Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}");
+                    toReplace.ChangeFormat(file.Format!);
+                    Console.WriteLine($"File replaced: /root/data{value}");
+                } else {
+                    Console.WriteLine($"File not compatible: {file.Name}");
+                }
             }
 
             gameNode.TransformWith<NitroRom2Binary>();
@@ -71,29 +78,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Export(string game, string input, string output)
         {
-            Node gameNode = NodeFactory.FromFile(game, "root", FileOpenMode.Read)
-                .TransformWith<Binary2NitroRom>();
-
-            Node inputFiles = NodeFactory.FromDirectory(input);
-
-            foreach (Node file in inputFiles.Children) {
-                // Aquí deberíamos reemplazar el fichero
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data/battle/{file.Name}");
-                Console.WriteLine(file.Name);
-                Console.WriteLine(toReplace.Format!);
-
-                toReplace.ChangeFormat(file.Format!);
-
-                Console.WriteLine(toReplace.Format!);
-
-                // Next: que este método detecte qué fichero le estás pasando (Identify) ?
-                // Deberíamos tener un diccionario con las rutas ?
-            }
-
-            gameNode.TransformWith<NitroRom2Binary>();
-            gameNode.Stream.WriteTo(Path.Combine(output, "new_game.nds"));
-
-            Console.WriteLine("Done!");
+            Console.WriteLine("Not yet implemented.");
         }
     }
 }
