@@ -39,6 +39,20 @@ namespace JUSToolkit.CLI.JUS
             { "tutorial3.bin", "/battle/tutorial3.bin" },
             { "tutorial4.bin", "/battle/tutorial4.bin" },
             { "tutorial5.bin", "/battle/tutorial5.bin" },
+            { "ability_t.bin", "/bin/ability_t.bin" },
+            { "bgm.bin", "/bin/bgm.bin" },
+            { "chr_b_t.bin", "/bin/chr_b_t.bin" },
+            { "chr_s_t.bin", "/bin/chr_s_t.bin" },
+            { "clearlst.bin", "/bin/clearlst.bin" },
+            { "demo.bin", "/bin/demo.bin" },
+            { "infoname.bin", "/bin/infoname.bin" },
+            { "location.bin", "/bin/location.bin" },
+            { "piece.bin", "/bin/piece.bin" },
+            { "pname.bin", "/bin/pname.bin" },
+            { "rulemess.bin", "/bin/rulemess.bin" },
+            { "stage.bin", "/bin/stage.bin" },
+            { "title.bin", "/bin/title.bin" },
+        };
         };
 
         /// <summary>
