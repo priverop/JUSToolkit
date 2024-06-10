@@ -77,7 +77,6 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Binary2NitroRom>();
 
             Node inputFiles = NodeFactory.FromDirectory(input);
-            int test = 0;
 
             foreach (Node file in inputFiles.Children) {
                 if (TextLocations.TryGetValue(file.Name, out string value)) {
@@ -85,19 +84,16 @@ namespace JUSToolkit.CLI.JUS
                     toReplace.ChangeFormat(file.Format!);
                     Console.WriteLine($"File replaced: /root/data{value}");
                 } else if (ContainerLocations.TryGetValue(file.Name, out string container)) {
-                    Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{container}");
+                    Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{container}")
+                        .TransformWith<LzssDecompression>();
 
-                    if (test == 0) {
-                        containerNode.TransformWith<LzssDecompression>();
+                    Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
 
-                        Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
-
-                        // ToDo: We need to encapsulate this
-                        if (alarVersion.Major == 3) {
-                            containerNode.TransformWith<Binary2Alar3>();
-                        } else if (alarVersion.Major == 2) {
-                            containerNode.TransformWith<Binary2Alar2>();
-                        }
+                    // ToDo: We need to encapsulate this
+                    if (alarVersion.Major == 3) {
+                        containerNode.TransformWith<Binary2Alar3>();
+                    } else if (alarVersion.Major == 2) {
+                        containerNode.TransformWith<Binary2Alar2>();
                     }
 
                     // Alar3File
@@ -112,12 +108,15 @@ namespace JUSToolkit.CLI.JUS
                         Unknown3 = alarFileOld.Unknown3,
                         Unknown4 = alarFileOld.Unknown4,
                     };
-
-                    // Necesitamos un Alar3File nuevo con el stream de file. Para eso habrá que clonar el de toReplace?
                     toReplace.ChangeFormat(newAlarFile);
-                    containerNode.TransformWith<Alar3ToBinary>();
-                    test++;
+
                     Console.WriteLine($"File replaced: /root/data{container}/jgalaxy/{file.Name}");
+                    // ToDo: We need to encapsulate this
+                    if (alarVersion.Major == 3) {
+                        containerNode.TransformWith<Alar3ToBinary>();
+                    } else if (alarVersion.Major == 2) {
+                        containerNode.TransformWith<Alar2ToBinary>();
+                    }
                 } else {
                     Console.WriteLine($"File not compatible: {file.Name}");
                 }
