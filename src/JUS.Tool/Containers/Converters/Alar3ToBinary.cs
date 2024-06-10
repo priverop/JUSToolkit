@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
+using System.IO;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -85,7 +86,7 @@ namespace JUSToolkit.Containers.Converters
                     writer.Write(alarChild.Unknown3);
                     writer.Write(alarChild.Unknown4);
 
-                    writer.Write(GetAlar3Path(alarFile.Path, alar.Root.Name), true);
+                    writer.Write(GetAlar3Path(alarFile.Path), true);
                 }
             }
 
@@ -144,11 +145,13 @@ namespace JUSToolkit.Containers.Converters
         /// <remarks>If we have '/alar.alar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
         /// </summary>
         /// <param name="fullPath">The full path of the node.</param>
-        /// <param name="alarName">The name of the root node.</param>
         /// <returns>The string.</returns>
-        private string GetAlar3Path(string fullPath, string alarName)
+        private static string GetAlar3Path(string fullPath)
         {
-            return fullPath.Substring(1).Replace(alarName, string.Empty).Substring(1);
+            string fileName = Path.GetFileName(fullPath);
+            string dir = Path.GetDirectoryName(fullPath);
+            string lastDirectory = new DirectoryInfo(dir).Name;
+            return Path.Combine(lastDirectory, fileName);
         }
     }
 }

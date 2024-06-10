@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
@@ -125,7 +126,7 @@ namespace JUSToolkit.Tests.Containers
         [Test]
         public void Alar3InsertNodesTest()
         {
-            int totalFiles = 4;
+            const int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);
@@ -185,6 +186,29 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(5, alar.Root.Children[1].GetFormatAs<Alar3File>().Offset);
             Assert.AreEqual(15, alar.Root.Children[2].GetFormatAs<Alar3File>().Offset);
             Assert.AreEqual(20, alar.Root.Children[3].GetFormatAs<Alar3File>().Offset);
+        }
+
+        // Unit test para la funcion de GetAlar3Path
+        [Test]
+        public void GetAlar3PathTest()
+        {
+            // Arrange
+            Type type = typeof(Alar3ToBinary);
+            MethodInfo method = type.GetMethod("GetAlar3Path", BindingFlags.NonPublic | BindingFlags.Static);
+
+            const string jgalaxyFilePath = "/root/data/jgalaxy/jgalaxy.aar/jgalaxy/ast_battle.aar";
+            const string vscallFilePath = "/vscall.aar/vscall/obj_a.aar";
+            const string komaFilePath = "/koma.aar/koma/bb_00.dtx";
+
+            // Act
+            string jgalaxyResult = (string)method.Invoke(null, new object[] { jgalaxyFilePath });
+            string vscallResult = (string)method.Invoke(null, new object[] { vscallFilePath });
+            string komaResult = (string)method.Invoke(null, new object[] { komaFilePath });
+
+            // Assert
+            Assert.AreEqual("jgalaxy/ast_battle.aar", jgalaxyResult);
+            Assert.AreEqual("vscall/obj_a.aar", vscallResult);
+            Assert.AreEqual("koma/bb_00.dtx", komaResult);
         }
     }
 }
