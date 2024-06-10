@@ -20,6 +20,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using JUSToolkit.Containers;
+using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -31,7 +35,8 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
-        private static readonly Dictionary<string, string> FileLocations = new() {
+        // ToDo: Remove filename of the second string, we only need the directory
+        private static readonly Dictionary<string, string> TextLocations = new() {
             { "tutorial.bin", "/deckmake/tutorial.bin" },
             { "tutorial0.bin", "/battle/tutorial0.bin" },
             { "tutorial1.bin", "/battle/tutorial1.bin" },
@@ -53,6 +58,11 @@ namespace JUSToolkit.CLI.JUS
             { "stage.bin", "/bin/stage.bin" },
             { "title.bin", "/bin/title.bin" },
         };
+
+        private static readonly Dictionary<string, string> ContainerLocations = new() {
+            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
+            { "mission.bin", "/jgalaxy/jgalaxy.aar" },
+            { "battle.bin", "/jgalaxy/jgalaxy.aar" },
         };
 
         /// <summary>
@@ -67,12 +77,47 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Binary2NitroRom>();
 
             Node inputFiles = NodeFactory.FromDirectory(input);
+            int test = 0;
 
             foreach (Node file in inputFiles.Children) {
-                if (FileLocations.TryGetValue(file.Name, out string value)) {
+                if (TextLocations.TryGetValue(file.Name, out string value)) {
                     Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}");
                     toReplace.ChangeFormat(file.Format!);
                     Console.WriteLine($"File replaced: /root/data{value}");
+                } else if (ContainerLocations.TryGetValue(file.Name, out string container)) {
+                    Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{container}");
+
+                    if (test == 0) {
+                        containerNode.TransformWith<LzssDecompression>();
+
+                        Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
+
+                        // ToDo: We need to encapsulate this
+                        if (alarVersion.Major == 3) {
+                            containerNode.TransformWith<Binary2Alar3>();
+                        } else if (alarVersion.Major == 2) {
+                            containerNode.TransformWith<Binary2Alar2>();
+                        }
+                    }
+
+                    // Alar3File
+                    Node toReplace = Navigator.SearchNode(containerNode, $"/root/data{container}/jgalaxy/{file.Name}");
+                    Alar3File alarFileOld = toReplace.GetFormatAs<Alar3File>();
+                    var newAlarFile = new Alar3File(file.Stream) {
+                        FileID = alarFileOld.FileID,
+                        Unknown = alarFileOld.Unknown,
+                        Offset = alarFileOld.Offset,
+                        Size = (uint)alarFileOld.Stream.Length,
+                        Unknown2 = alarFileOld.Unknown2,
+                        Unknown3 = alarFileOld.Unknown3,
+                        Unknown4 = alarFileOld.Unknown4,
+                    };
+
+                    // Necesitamos un Alar3File nuevo con el stream de file. Para eso habrá que clonar el de toReplace?
+                    toReplace.ChangeFormat(newAlarFile);
+                    containerNode.TransformWith<Alar3ToBinary>();
+                    test++;
+                    Console.WriteLine($"File replaced: /root/data{container}/jgalaxy/{file.Name}");
                 } else {
                     Console.WriteLine($"File not compatible: {file.Name}");
                 }
