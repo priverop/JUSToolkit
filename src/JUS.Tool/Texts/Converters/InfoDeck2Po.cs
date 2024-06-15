@@ -17,6 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
@@ -39,14 +42,25 @@ namespace JUSToolkit.Texts.Converters
         {
             Po po = JusText.GenerateJusPo();
 
-            int i = 0;
+            int context = 0;
+
+            // Each Description of a koma is 9 lines long
+            int sentenceCount = 0;
+            var fullEntry = new StringBuilder();
             foreach (string entry in infoDeck.TextEntries) {
                 string sentence = string.IsNullOrWhiteSpace(entry) ?
                                 "<!empty>" : entry;
 
-                po.Add(new PoEntry(sentence) {
-                    Context = $"{i++}",
-                });
+                if (sentenceCount < 9) {
+                    fullEntry.AppendLine(sentence);
+                    sentenceCount++;
+                } else {
+                    po.Add(new PoEntry(fullEntry.ToString()) {
+                        Context = $"{context++}",
+                    });
+                    sentenceCount = 0;
+                    fullEntry = new StringBuilder();
+                }
             }
 
             return po;
@@ -62,10 +76,12 @@ namespace JUSToolkit.Texts.Converters
             var infoDeck = new InfoDeck();
 
             foreach (PoEntry entry in po.Entries) {
-                string sentence = entry.Text == "<!empty>" ?
-                    string.Empty : entry.Text;
+                foreach (string s in entry.Text.Split("\n").ToList()) {
+                    string sentence = s == "<!empty>" ?
+                        string.Empty : s;
 
-                infoDeck.TextEntries.Add(sentence);
+                    infoDeck.TextEntries.Add(sentence);
+                }
             }
 
             return infoDeck;
