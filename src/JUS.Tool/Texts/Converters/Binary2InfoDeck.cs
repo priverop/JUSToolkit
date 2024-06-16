@@ -70,7 +70,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeck.Count);
+            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeck.Count * InfoDeckEntry.LinesPerPage);
 
             foreach (InfoDeckEntry entry in infoDeck.Entries) {
                 foreach (string s in entry.Text) {

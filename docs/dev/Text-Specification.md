@@ -152,7 +152,9 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 
 ## InfoDeck folder
 
-Starting offset + absolute pointers + just strings
+This is the explanation of the komas in the Gallery menu (9 visible lines and 1 invisible = 10 lines per page). Info are the helper dialogs.
+
+Starting offset + absolute pointers + just strings.
 
 | Name            | Format   |
 | --------------- | -------- |
@@ -240,6 +242,18 @@ Starting offset + absolute pointers + just strings
 | bin-info-tz.bin | InfoDeck |
 | bin-info-yh.bin | InfoDeck |
 | bin-info-yo.bin | InfoDeck |
+
+### Deck
+
+It's a regular file with just indirect pointers and strings.
+
+### Info
+
+| Offset | Type         | Description                      |
+| ------ | ------------ | -------------------------------- |
+| 0x00   | 64 bytes     | Header                           |
+| 0x40   | string       | Name                             |
+| ...    | zero padding | Until it reaches 92 bytes length |
 
 ## jGalaxy folder
 
