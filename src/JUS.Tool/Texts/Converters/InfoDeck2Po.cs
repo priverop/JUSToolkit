@@ -42,25 +42,11 @@ namespace JUSToolkit.Texts.Converters
         {
             Po po = JusText.GenerateJusPo();
 
-            int context = 0;
-
-            // Each Description of a koma is 9 lines long
-            int sentenceCount = 0;
-            var fullEntry = new StringBuilder();
-            foreach (string entry in infoDeck.TextEntries) {
-                string sentence = string.IsNullOrWhiteSpace(entry) ?
-                                "<!empty>" : entry;
-
-                if (sentenceCount < 9) {
-                    fullEntry.AppendLine(sentence);
-                    sentenceCount++;
-                } else {
-                    po.Add(new PoEntry(fullEntry.ToString()) {
-                        Context = $"{context++}",
-                    });
-                    sentenceCount = 0;
-                    fullEntry = new StringBuilder();
-                }
+            int i = 0;
+            foreach (InfoDeckEntry entry in infoDeck.Entries) {
+                po.Add(new PoEntry(JusText.MergeStrings(entry.Text)) {
+                    Context = $"{i++}",
+                });
             }
 
             return po;
@@ -74,13 +60,13 @@ namespace JUSToolkit.Texts.Converters
         public InfoDeck Convert(Po po)
         {
             var infoDeck = new InfoDeck();
+            InfoDeckEntry entry;
+            infoDeck.Count = po.Entries.Count;
 
-            foreach (PoEntry entry in po.Entries) {
-                foreach (string s in entry.Text.Split("\n").ToList()) {
-                    string sentence = s == "<!empty>" ?
-                        string.Empty : s;
-
-                    infoDeck.TextEntries.Add(sentence);
+            for (int i = 0; i < infoDeck.Count; i++) {
+                entry = new InfoDeckEntry();
+                foreach (string s in JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage)) {
+                    entry.Text.Add(s);
                 }
             }
 

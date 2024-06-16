@@ -23,26 +23,26 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Format for simple bin files.
+    /// Format for Deck (InfoDeck) files.
     /// </summary>
     public class InfoDeck : IFormat
     {
-        /// <summary>
-        /// Size of a <see cref="InfoDeck"/> entry.
-        /// </summary>
-        public static readonly int EntrySize = 0x04;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="InfoDeck"/> class.
         /// </summary>
         public InfoDeck()
         {
-            TextEntries = new List<string>();
+            Entries = new List<InfoDeckEntry>();
         }
 
         /// <summary>
-        /// Gets or sets the list of text entries.
+        /// Gets or sets the number of entries in <see cref="Entries"/>.
         /// </summary>
-        public List<string> TextEntries { get; set; }
+        public int Count { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of <see cref="InfoDeckEntry" />.
+        /// </summary>
+        public List<InfoDeckEntry> Entries { get; set; }
     }
 }
