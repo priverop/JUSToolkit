@@ -20,10 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using JUSToolkit.Containers;
-using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
+using System.Text.RegularExpressions;
+using JUSToolkit.CLI.JUS.Rom;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -35,34 +33,36 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
-        // ToDo: Remove filename of the second string, we only need the directory
-        private static readonly Dictionary<string, string> TextLocations = new() {
-            { "tutorial.bin", "/deckmake/tutorial.bin" },
-            { "tutorial0.bin", "/battle/tutorial0.bin" },
-            { "tutorial1.bin", "/battle/tutorial1.bin" },
-            { "tutorial2.bin", "/battle/tutorial2.bin" },
-            { "tutorial3.bin", "/battle/tutorial3.bin" },
-            { "tutorial4.bin", "/battle/tutorial4.bin" },
-            { "tutorial5.bin", "/battle/tutorial5.bin" },
-            { "ability_t.bin", "/bin/ability_t.bin" },
-            { "bgm.bin", "/bin/bgm.bin" },
-            { "chr_b_t.bin", "/bin/chr_b_t.bin" },
-            { "chr_s_t.bin", "/bin/chr_s_t.bin" },
-            { "clearlst.bin", "/bin/clearlst.bin" },
-            { "demo.bin", "/bin/demo.bin" },
-            { "infoname.bin", "/bin/infoname.bin" },
-            { "location.bin", "/bin/location.bin" },
-            { "piece.bin", "/bin/piece.bin" },
-            { "pname.bin", "/bin/pname.bin" },
-            { "rulemess.bin", "/bin/rulemess.bin" },
-            { "stage.bin", "/bin/stage.bin" },
-            { "title.bin", "/bin/title.bin" },
+        private static readonly Dictionary<string, IFileImportStrategy> ImportStrategies = new()
+        {
+            { "tutorial.bin", new TextFile() },
+            { "tutorial0.bin", new TextFile() },
+            { "tutorial1.bin", new TextFile() },
+            { "tutorial2.bin", new TextFile() },
+            { "tutorial3.bin", new TextFile() },
+            { "tutorial4.bin", new TextFile() },
+            { "tutorial5.bin", new TextFile() },
+            { "ability_t.bin", new TextFile() },
+            { "bgm.bin", new TextFile() },
+            { "chr_b_t.bin", new TextFile() },
+            { "chr_s_t.bin", new TextFile() },
+            { "clearlst.bin", new TextFile() },
+            { "demo.bin", new TextFile() },
+            { "infoname.bin", new TextFile() },
+            { "location.bin", new TextFile() },
+            { "piece.bin", new TextFile() },
+            { "pname.bin", new TextFile() },
+            { "rulemess.bin", new TextFile() },
+            { "stage.bin", new TextFile() },
+            { "title.bin", new TextFile() },
+            { "jgalaxy.bin", new ContainerFile() },
+            { "mission.bin", new ContainerFile() },
+            { "battle.bin", new ContainerFile() },
         };
 
-        private static readonly Dictionary<string, string> ContainerLocations = new() {
-            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
-            { "mission.bin", "/jgalaxy/jgalaxy.aar" },
-            { "battle.bin", "/jgalaxy/jgalaxy.aar" },
+        private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
+        {
+            (new Regex(@"^bin-.*-.*\.bin$"), new ContainerFile()),
         };
 
         /// <summary>
@@ -79,46 +79,22 @@ namespace JUSToolkit.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
 
             foreach (Node file in inputFiles.Children) {
-                if (TextLocations.TryGetValue(file.Name, out string value)) {
-                    Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}");
-                    toReplace.ChangeFormat(file.Format!);
-                    Console.WriteLine($"File replaced: /root/data{value}");
-                } else if (ContainerLocations.TryGetValue(file.Name, out string container)) {
-                    Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{container}")
-                        .TransformWith<LzssDecompression>();
-
-                    Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
-
-                    // ToDo: We need to encapsulate this
-                    if (alarVersion.Major == 3) {
-                        containerNode.TransformWith<Binary2Alar3>();
-                    } else if (alarVersion.Major == 2) {
-                        containerNode.TransformWith<Binary2Alar2>();
-                    }
-
-                    // Alar3File
-                    Node toReplace = Navigator.SearchNode(containerNode, $"/root/data{container}/jgalaxy/{file.Name}");
-                    Alar3File alarFileOld = toReplace.GetFormatAs<Alar3File>();
-                    var newAlarFile = new Alar3File(file.Stream) {
-                        FileID = alarFileOld.FileID,
-                        Unknown = alarFileOld.Unknown,
-                        Offset = alarFileOld.Offset,
-                        Size = (uint)alarFileOld.Stream.Length,
-                        Unknown2 = alarFileOld.Unknown2,
-                        Unknown3 = alarFileOld.Unknown3,
-                        Unknown4 = alarFileOld.Unknown4,
-                    };
-                    toReplace.ChangeFormat(newAlarFile);
-
-                    Console.WriteLine($"File replaced: /root/data{container}/jgalaxy/{file.Name}");
-                    // ToDo: We need to encapsulate this
-                    if (alarVersion.Major == 3) {
-                        containerNode.TransformWith<Alar3ToBinary>();
-                    } else if (alarVersion.Major == 2) {
-                        containerNode.TransformWith<Alar2ToBinary>();
-                    }
+                // Fixed names
+                if (ImportStrategies.TryGetValue(file.Name, out IFileImportStrategy strategy)) {
+                    strategy.Import(gameNode, file);
                 } else {
-                    Console.WriteLine($"File not compatible: {file.Name}");
+                    // Pattern names for InfoDeck
+                    bool matched = false;
+                    foreach ((Regex pattern, IFileImportStrategy patternStrategy) in PatternStrategies) {
+                        if (pattern.IsMatch(file.Name)) {
+                            patternStrategy.Import(gameNode, file);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if (!matched) {
+                        Console.WriteLine($"File not compatible: {file.Name}");
+                    }
                 }
             }
 
