@@ -68,6 +68,8 @@ namespace JUSToolkit.Texts.Converters
                 foreach (string s in JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage)) {
                     entry.Text.Add(s);
                 }
+
+                infoDeck.Entries.Add(entry);
             }
 
             return infoDeck;
