@@ -141,17 +141,26 @@ namespace JUSToolkit.Containers.Converters
         }
 
         /// <summary>
-        /// Removes the alar filename (the root name) from the path of the node.
-        /// <remarks>If we have '/alar.alar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
+        /// Removes the alar filename (and the root name) from the path of the node.
+        /// <remarks>If we have '/root/data/alar.alar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
         /// </summary>
         /// <param name="fullPath">The full path of the node.</param>
-        /// <returns>The string.</returns>
+        /// <returns>The clean string.</returns>
         private static string GetAlar3Path(string fullPath)
         {
-            string fileName = Path.GetFileName(fullPath);
-            string dir = Path.GetDirectoryName(fullPath);
-            string lastDirectory = new DirectoryInfo(dir).Name;
-            return Path.Combine(lastDirectory, fileName);
+            // Sometimes (like tests) paths don't have .aar, so we add it
+            fullPath = fullPath.Replace("NodeContainerRoot", "NodeContainerRoot.aar");
+            int aarIndex = fullPath.IndexOf(".aar");
+
+            if (aarIndex == -1) {
+                throw new ArgumentException("Invalid path format: '.aar' not found", fullPath);
+            }
+
+            // Skip past ".aar"
+            int startIndex = aarIndex + 4;
+
+            // From startIndex to the end
+            return fullPath[startIndex..].TrimStart('/');
         }
     }
 }

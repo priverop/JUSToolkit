@@ -104,7 +104,6 @@ namespace JUSToolkit.Containers.Converters
             string path = reader.ReadString();
             string name = Path.GetFileName(path);
             string dir = Path.GetDirectoryName(path);
-            // ToDo: Creo que habria que meter el new DirectoryInfo(dir).Name; para que solo cree el ultimo
             var child = new Node(name, alarFile);
 
             NodeFactory.CreateContainersForChild(alar.Root, dir, child);

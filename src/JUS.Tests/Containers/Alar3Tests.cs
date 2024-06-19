@@ -197,16 +197,19 @@ namespace JUSToolkit.Tests.Containers
             MethodInfo method = type.GetMethod("GetAlar3Path", BindingFlags.NonPublic | BindingFlags.Static);
 
             const string jgalaxyFilePath = "/root/data/jgalaxy/jgalaxy.aar/jgalaxy/ast_battle.aar";
+            const string infodeckFilePath = "/root/data/bin/InfoDeck.aar/bin/deck/bb.bin";
             const string vscallFilePath = "/vscall.aar/vscall/obj_a.aar";
             const string komaFilePath = "/koma.aar/koma/bb_00.dtx";
 
             // Act
             string jgalaxyResult = (string)method.Invoke(null, new object[] { jgalaxyFilePath });
+            string infodeckyResult = (string)method.Invoke(null, new object[] { infodeckFilePath });
             string vscallResult = (string)method.Invoke(null, new object[] { vscallFilePath });
             string komaResult = (string)method.Invoke(null, new object[] { komaFilePath });
 
             // Assert
             Assert.AreEqual("jgalaxy/ast_battle.aar", jgalaxyResult);
+            Assert.AreEqual("bin/deck/bb.bin", infodeckyResult);
             Assert.AreEqual("vscall/obj_a.aar", vscallResult);
             Assert.AreEqual("koma/bb_00.dtx", komaResult);
         }
