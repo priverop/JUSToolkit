@@ -70,7 +70,6 @@ namespace JUSToolkit.CLI.JUS.Rom
         {
             Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{paths[0]}")
                                 .TransformWith<LzssDecompression>();
-            // containerNode.Stream.WriteTo($"infodeck_{file.Name}_inicio.aar");
 
             Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
 
@@ -101,7 +100,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             } else if (alarVersion.Major == 2) {
                 containerNode.TransformWith<Alar2ToBinary>();
             }
-            // containerNode.Stream.WriteTo($"infodeck_{file.Name}_final.aar");
+
             Console.WriteLine($"File replaced: /root/data{paths[0]}{paths[1]}{file.Name}");
         }
 
