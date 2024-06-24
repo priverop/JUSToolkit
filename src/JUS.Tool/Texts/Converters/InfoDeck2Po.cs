@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -65,7 +66,14 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < infoDeck.Count; i++) {
                 entry = new InfoDeckEntry();
-                foreach (string s in JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage)) {
+                List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', InfoDeckEntry.LinesPerPage);
+                List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage);
+
+                if (originalLines.Count != translatedLines.Count) {
+                    throw new FormatException($"Wrong number of lines in {po.Entries[i].Text}");
+                }
+
+                foreach (string s in translatedLines) {
                     entry.Text.Add(s);
                 }
 
