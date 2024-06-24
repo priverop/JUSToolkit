@@ -64,11 +64,12 @@ namespace JUSToolkit.Containers
         /// <summary>
         /// Inserts a new Node into the current Alar3 Container.
         /// </summary>
-        /// <param name="filesToInsert">Alar2 NodeContainerFormat.</param>
+        /// <param name="filesToInsert">NodeContainerFormat.</param>
         public void InsertModification(Node filesToInsert)
         {
             foreach (Node nNew in filesToInsert.Children) {
                 uint nextFileOffset = 0;
+                bool found = false; // infodeck.aar has the same file twice (different folders)... maybe we need to redo this
 
                 foreach (Node nOld in Navigator.IterateNodes(Root)) {
                     if (!nOld.IsContainer) {
@@ -79,8 +80,9 @@ namespace JUSToolkit.Containers
                             alarFileOld.Offset = nextFileOffset;
                         }
 
-                        if (nOld.Name == nNew.Name) {
+                        if (nOld.Name == nNew.Name && !found) {
                             alarFileOld.ReplaceStream(nNew.Stream);
+                            found = true;
                         }
 
                         nextFileOffset = alarFileOld.Offset + alarFileOld.Size;

@@ -124,13 +124,16 @@ namespace JUSToolkit.Tests.Containers
         }
 
         [Test]
-        public void Alar3InsertNodesTest()
+        public void InsertNodes()
         {
             const int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);
+            // ToDo: Deberíamos meterle un alar.DataOffset
+            // ToDo: El offset del fichero 0 deberá ser el DataOffset
             for (int i = 0; i < totalFiles; i++) {
+                // Creamos un fichero de 5bytes.
                 var child = new Alar3File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
                     Size = 5,
                     Offset = (uint)(i * 5),
@@ -139,7 +142,8 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar3File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
+            var newStream = new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }));
+            var modifiedChild1 = new Alar3File(newStream) {
                 Size = 10,
                 Offset = 5,
             };
@@ -186,6 +190,9 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(5, alar.Root.Children[1].GetFormatAs<Alar3File>().Offset);
             Assert.AreEqual(15, alar.Root.Children[2].GetFormatAs<Alar3File>().Offset);
             Assert.AreEqual(20, alar.Root.Children[3].GetFormatAs<Alar3File>().Offset);
+
+            // Comprobamos el contenido del fichero insertado
+            Assert.AreEqual(newStream, alar.Root.Children[1].Stream);
         }
 
         // Unit test para la funcion de GetAlar3Path
