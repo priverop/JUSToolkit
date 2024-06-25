@@ -34,8 +34,6 @@ namespace JUSToolkit.CLI.JUS
     /// </summary>
     public static class TextImportCommands
     {
-        private const string TextConvertersNamespace = "JUSToolkit.Texts.Converters.";
-
         /// <summary>
         /// Import a .po file to a .bin file.
         /// </summary>
@@ -90,29 +88,26 @@ namespace JUSToolkit.CLI.JUS
         /// <summary>
         /// Import a single .po file to a .bin file.
         /// </summary>
-        /// <param name="poNode">The Node with the po file.</param>
+        /// <param name="poNode">The Node with the po file in Po Format.</param>
         /// <param name="output">The output directory.</param>
         private static void ImportBin(Node poNode, string output)
         {
-            // string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
+            string cleanFileName = Path.GetFileNameWithoutExtension(poNode.Name);
 
-            // Detect format
-            // string binFormatName = TextIdentifier.GetTextFormat(cleanFileName);
-            // Console.WriteLine("File Format: " + binFormatName);
+            // Detect converter
+            Type[] formatConverters = TextIdentifier.GetTextFormat(cleanFileName);
+            Type binConverterName = formatConverters[0];
+            Type poConverterName = formatConverters[1];
+            Console.WriteLine("File Name: " + cleanFileName + " - Bin Converter: " + binConverterName + " - Po Converter: " + poConverterName);
 
-            // string converterPoName = TextConvertersNamespace + binFormatName + "2Po";
-            // string converterName = TextConvertersNamespace + "Binary2" + binFormatName;
-
-            // // Po -> Text Format
-            // // ToDo: Pleo
-            // var textFormat = (IFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterPoName), poNode.Format!);
+            // Po -> Text Format
+            object textFormat = ConvertFormat.With(poConverterName, poNode.Format!);
 
             // // Text Format -> Binary
-            // // ToDo: Pleo
-            // var binaryFormat = (BinaryFormat)ConvertFormat.With(FormatDiscovery.GetConverter(converterName), textFormat);
+            var binaryFormat = (BinaryFormat)ConvertFormat.With(binConverterName, textFormat);
 
-            // string outputFile = Path.Combine(output, cleanFileName);
-            // binaryFormat.Stream.WriteTo(outputFile);
+            string outputFile = Path.Combine(output, cleanFileName);
+            binaryFormat.Stream.WriteTo(outputFile);
         }
     }
 }

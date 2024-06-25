@@ -57,7 +57,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void BatchExport(string directory, string output)
         {
-            Node inputFiles = NodeFactory.FromDirectory(directory);
+            Node inputFiles = NodeFactory.FromDirectory(directory, "*.bin");
             Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
 
             foreach (Node file in inputFiles.Children) {
@@ -73,11 +73,13 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         private static void ExportBin(Node binNode, string output)
         {
+            string filename = binNode.Name;
+
             // Detect converters
-            Type[] formatConverters = TextIdentifier.GetTextFormat(binNode.Name);
+            Type[] formatConverters = TextIdentifier.GetTextFormat(filename);
             Type binConverterName = formatConverters[0];
             Type poConverterName = formatConverters[1];
-            Console.WriteLine("File Name: " + binNode.Name + " - Bin Converter: " + binConverterName + " - Po Converter: " + poConverterName);
+            Console.WriteLine("File Name: " + filename + " - Bin Converter: " + binConverterName + " - Po Converter: " + poConverterName);
 
             // BinaryFormat -> TextFormat
             object textFormat = ConvertFormat.With(binConverterName, binNode.Format!);
@@ -95,7 +97,7 @@ namespace JUSToolkit.CLI.JUS
                 // Po -> Binary
                 BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat);
 
-                string outputFile = Path.Combine(output, binNode.Name + ".po");
+                string outputFile = Path.Combine(output, filename + ".po");
                 poBinaryFormat.Stream.WriteTo(outputFile);
             }
         }

@@ -17,6 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
@@ -40,11 +44,8 @@ namespace JUSToolkit.Texts.Converters
             Po po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (string entry in infoDeck.TextEntries) {
-                string sentence = string.IsNullOrWhiteSpace(entry) ?
-                                "<!empty>" : entry;
-
-                po.Add(new PoEntry(sentence) {
+            foreach (InfoDeckEntry entry in infoDeck.Entries) {
+                po.Add(new PoEntry(JusText.MergeStrings(entry.Text)) {
                     Context = $"{i++}",
                 });
             }
@@ -60,12 +61,23 @@ namespace JUSToolkit.Texts.Converters
         public InfoDeck Convert(Po po)
         {
             var infoDeck = new InfoDeck();
+            InfoDeckEntry entry;
+            infoDeck.Count = po.Entries.Count;
 
-            foreach (PoEntry entry in po.Entries) {
-                string sentence = entry.Text == "<!empty>" ?
-                    string.Empty : entry.Text;
+            for (int i = 0; i < infoDeck.Count; i++) {
+                entry = new InfoDeckEntry();
+                List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', InfoDeckEntry.LinesPerPage);
+                List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage);
 
-                infoDeck.TextEntries.Add(sentence);
+                if (originalLines.Count != translatedLines.Count) {
+                    throw new FormatException($"Wrong number of lines in {po.Entries[i].Text}");
+                }
+
+                foreach (string s in translatedLines) {
+                    entry.Text.Add(s);
+                }
+
+                infoDeck.Entries.Add(entry);
             }
 
             return infoDeck;
