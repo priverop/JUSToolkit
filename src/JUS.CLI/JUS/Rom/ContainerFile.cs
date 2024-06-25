@@ -24,7 +24,9 @@ using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics.Converters;
 using JUSToolkit.Utils;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUSToolkit.CLI.JUS.Rom
 {
@@ -73,33 +75,22 @@ namespace JUSToolkit.CLI.JUS.Rom
 
             Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
 
-            // ToDo: We need to encapsulate this
+            var newBinary = new BinaryFormat();
+
+            // ToDo: We need to encapsulate/improve this
             if (alarVersion.Major == 3) {
-                containerNode.TransformWith<Binary2Alar3>();
+                Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
+                .GetFormatAs<Alar3>();
+                alar.InsertModification(file);
+                newBinary = alar.ConvertWith(new Alar3ToBinary());
             } else if (alarVersion.Major == 2) {
-                containerNode.TransformWith<Binary2Alar2>();
+                Alar2 alar = containerNode.TransformWith<Binary2Alar2>()
+                .GetFormatAs<Alar2>();
+                alar.InsertModification(file);
+                newBinary = alar.ConvertWith(new Alar2ToBinary());
             }
 
-            // Alar3File
-            Node toReplace = Navigator.SearchNode(containerNode, $"/root/data{paths[0]}{paths[1]}{file.Name}");
-            Alar3File alarFileOld = toReplace.GetFormatAs<Alar3File>();
-            var newAlarFile = new Alar3File(file.Stream) {
-                FileID = alarFileOld.FileID,
-                Unknown = alarFileOld.Unknown,
-                Offset = alarFileOld.Offset,
-                Size = (uint)alarFileOld.Stream.Length,
-                Unknown2 = alarFileOld.Unknown2,
-                Unknown3 = alarFileOld.Unknown3,
-                Unknown4 = alarFileOld.Unknown4,
-            };
-            toReplace.ChangeFormat(newAlarFile);
-
-            // ToDo: We need to encapsulate this
-            if (alarVersion.Major == 3) {
-                containerNode.TransformWith<Alar3ToBinary>();
-            } else if (alarVersion.Major == 2) {
-                containerNode.TransformWith<Alar2ToBinary>();
-            }
+            containerNode.ChangeFormat(newBinary);
 
             Console.WriteLine($"File replaced: /root/data{paths[0]}{paths[1]}{file.Name}");
         }
