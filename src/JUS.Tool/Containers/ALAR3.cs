@@ -64,29 +64,38 @@ namespace JUSToolkit.Containers
         /// <summary>
         /// Inserts a new Node into the current Alar3 Container.
         /// </summary>
-        /// <param name="filesToInsert">NodeContainerFormat.</param>
-        public void InsertModification(Node filesToInsert)
+        /// <param name="filesToInsert">NodeContainerFormat with multiple files.</param>
+        public void InsertModification(NodeContainerFormat filesToInsert)
         {
-            foreach (Node nNew in filesToInsert.Children) {
-                uint nextFileOffset = 0;
-                bool found = false; // infodeck.aar has the same file twice (different folders)... maybe we need to redo this
+            foreach (Node nNew in filesToInsert.Root.Children) {
+                InsertModification(nNew);
+            }
+        }
 
-                foreach (Node nOld in Navigator.IterateNodes(Root)) {
-                    if (!nOld.IsContainer) {
-                        Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>();
+        /// <summary>
+        /// Inserts a new Node into the current Alar3 Container.
+        /// </summary>
+        /// <param name="nNew">Node to insert.</param>
+        public void InsertModification(Node nNew)
+        {
+            uint nextFileOffset = 0;
+            bool found = false; // infodeck.aar has the same file twice (different folders)... maybe we need to redo this
 
-                        // Ignoring first file (0 offset)
-                        if (nextFileOffset > 0) {
-                            alarFileOld.Offset = nextFileOffset;
-                        }
+            foreach (Node nOld in Navigator.IterateNodes(Root)) {
+                if (!nOld.IsContainer) {
+                    Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>();
 
-                        if (nOld.Name == nNew.Name && !found) {
-                            alarFileOld.ReplaceStream(nNew.Stream);
-                            found = true;
-                        }
-
-                        nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
+                    // Ignoring first file (0 offset)
+                    if (nextFileOffset > 0) {
+                        alarFileOld.Offset = nextFileOffset;
                     }
+
+                    if (nOld.Name == nNew.Name && !found) {
+                        alarFileOld.ReplaceStream(nNew.Stream);
+                        found = true;
+                    }
+
+                    nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                 }
             }
         }

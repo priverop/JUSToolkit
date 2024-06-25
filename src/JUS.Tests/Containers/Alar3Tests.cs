@@ -153,7 +153,7 @@ namespace JUSToolkit.Tests.Containers
 
             // Comprobamos que todo se haya creado bien:
             // Cuántos hijos tiene el Alar3
-            Assert.AreEqual(totalFiles, alar.Root.Children.Count());
+            Assert.AreEqual(totalFiles, alar.Root.Children.Count);
 
             // Tamaños
             Assert.AreEqual(5, alar.Root.Children[0].GetFormatAs<Alar3File>().Size);
@@ -174,7 +174,7 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(1, modifiedFiles.Root.Children.Count());
 
             // Insertamos el Nodo con InsertModification
-            alar.InsertModification(modifiedFiles.Root);
+            alar.InsertModification(modifiedFiles);
 
             // Comprobamos los ficheros totales
             Assert.AreEqual(totalFiles, alar.Root.Children.Count());
