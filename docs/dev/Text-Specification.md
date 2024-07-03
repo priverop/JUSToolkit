@@ -152,7 +152,9 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 
 ## InfoDeck folder
 
-This is the explanation of the komas in the Gallery menu (9 visible lines and 1 invisible = 10 lines per page). Info are the helper dialogs.
+This is the explanation of the komas in the Gallery menu (9 visible lines and 1 invisible = 10 lines per page). Each line is 40 character long.
+ 
+Info are the helper dialogs.
 
 Starting offset + absolute pointers + just strings.
 
