@@ -6,7 +6,15 @@
       "version": "2.2.0",
       "commands": [
         "dotnet-cake"
-      ]
+      ],
+      "rollForward": false
+    },
+    "husky": {
+      "version": "0.7.0",
+      "commands": [
+        "husky"
+      ],
+      "rollForward": false
     }
   }
 }

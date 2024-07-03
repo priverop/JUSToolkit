@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Priverop
+// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,32 +17,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
-using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUSToolkit.CLI.JUS.Rom
 {
     /// <summary>
-    /// Format for Deck (InfoDeck) files.
+    /// Strategy Pattern: Interface for rom importing logic.
     /// </summary>
-    public class InfoDeck : IFormat
+    public interface IFileImportStrategy
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InfoDeck"/> class.
+        /// Import files into the Rom.
         /// </summary>
-        public InfoDeck()
-        {
-            Entries = new List<InfoDeckEntry>();
-        }
-
-        /// <summary>
-        /// Gets or sets the number of entries in <see cref="Entries"/>.
-        /// </summary>
-        public int Count { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of <see cref="InfoDeckEntry" />.
-        /// </summary>
-        public List<InfoDeckEntry> Entries { get; set; }
+        /// <param name="gameNode">The node of the Rom.</param>
+        /// <param name="file">The input file to import.</param>
+        void Import(Node gameNode, Node file);
     }
+
 }

@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
@@ -123,13 +124,16 @@ namespace JUSToolkit.Tests.Containers
         }
 
         [Test]
-        public void Alar3InsertNodesTest()
+        public void InsertNodes()
         {
-            int totalFiles = 4;
+            const int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);
+            // ToDo: Deberíamos meterle un alar.DataOffset
+            // ToDo: El offset del fichero 0 deberá ser el DataOffset
             for (int i = 0; i < totalFiles; i++) {
+                // Creamos un fichero de 5bytes.
                 var child = new Alar3File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
                     Size = 5,
                     Offset = (uint)(i * 5),
@@ -138,7 +142,8 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar3File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
+            var newStream = new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }));
+            var modifiedChild1 = new Alar3File(newStream) {
                 Size = 10,
                 Offset = 5,
             };
@@ -148,7 +153,7 @@ namespace JUSToolkit.Tests.Containers
 
             // Comprobamos que todo se haya creado bien:
             // Cuántos hijos tiene el Alar3
-            Assert.AreEqual(totalFiles, alar.Root.Children.Count());
+            Assert.AreEqual(totalFiles, alar.Root.Children.Count);
 
             // Tamaños
             Assert.AreEqual(5, alar.Root.Children[0].GetFormatAs<Alar3File>().Size);
@@ -169,7 +174,7 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(1, modifiedFiles.Root.Children.Count());
 
             // Insertamos el Nodo con InsertModification
-            alar.InsertModification(modifiedFiles.Root);
+            alar.InsertModification(modifiedFiles);
 
             // Comprobamos los ficheros totales
             Assert.AreEqual(totalFiles, alar.Root.Children.Count());
@@ -185,6 +190,35 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(5, alar.Root.Children[1].GetFormatAs<Alar3File>().Offset);
             Assert.AreEqual(15, alar.Root.Children[2].GetFormatAs<Alar3File>().Offset);
             Assert.AreEqual(20, alar.Root.Children[3].GetFormatAs<Alar3File>().Offset);
+
+            // Comprobamos el contenido del fichero insertado
+            Assert.AreEqual(newStream, alar.Root.Children[1].Stream);
+        }
+
+        // Unit test para la funcion de GetAlar3Path
+        [Test]
+        public void GetAlar3PathTest()
+        {
+            // Arrange
+            Type type = typeof(Alar3ToBinary);
+            MethodInfo method = type.GetMethod("GetAlar3Path", BindingFlags.NonPublic | BindingFlags.Static);
+
+            const string jgalaxyFilePath = "/root/data/jgalaxy/jgalaxy.aar/jgalaxy/ast_battle.aar";
+            const string infodeckFilePath = "/root/data/bin/InfoDeck.aar/bin/deck/bb.bin";
+            const string vscallFilePath = "/vscall.aar/vscall/obj_a.aar";
+            const string komaFilePath = "/koma.aar/koma/bb_00.dtx";
+
+            // Act
+            string jgalaxyResult = (string)method.Invoke(null, new object[] { jgalaxyFilePath });
+            string infodeckyResult = (string)method.Invoke(null, new object[] { infodeckFilePath });
+            string vscallResult = (string)method.Invoke(null, new object[] { vscallFilePath });
+            string komaResult = (string)method.Invoke(null, new object[] { komaFilePath });
+
+            // Assert
+            Assert.AreEqual("jgalaxy/ast_battle.aar", jgalaxyResult);
+            Assert.AreEqual("bin/deck/bb.bin", infodeckyResult);
+            Assert.AreEqual("vscall/obj_a.aar", vscallResult);
+            Assert.AreEqual("koma/bb_00.dtx", komaResult);
         }
     }
 }

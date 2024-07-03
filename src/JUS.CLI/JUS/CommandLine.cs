@@ -38,6 +38,7 @@ namespace JUSToolkit.CLI.JUS
                 CreateGraphicCommand(),
                 CreateTextCommand(),
                 CreateBatchCommand(),
+                CreateRomCommand(),
             };
         }
 
@@ -159,6 +160,28 @@ namespace JUSToolkit.CLI.JUS
             return new Command("batch", "Batch import/export PNG to/from Alar") {
                 importPng2Alar3,
                 exportAlar2Png,
+            };
+        }
+
+        private static Command CreateRomCommand()
+        {
+            var import = new Command("import", "Import files to the Rom") {
+                new Option<string>("--game", "the path of the rom", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            import.Handler = CommandHandler.Create<string, string, string>(RomCommands.Import);
+
+            var export = new Command("export", "export files to the Rom") {
+                new Option<string>("--game", "the path of the rom", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            export.Handler = CommandHandler.Create<string, string, string>(RomCommands.Export);
+
+            return new Command("game", "Import/export files to the Game") {
+                import,
+                export,
             };
         }
 
