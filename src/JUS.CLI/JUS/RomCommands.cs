@@ -92,6 +92,7 @@ namespace JUSToolkit.CLI.JUS
                             break;
                         }
                     }
+
                     if (!matched) {
                         Console.WriteLine($"File not compatible: {file.Name}");
                     }

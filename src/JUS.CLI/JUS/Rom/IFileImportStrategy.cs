@@ -33,5 +33,4 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <param name="file">The input file to import.</param>
         void Import(Node gameNode, Node file);
     }
-
 }

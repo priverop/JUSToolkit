@@ -36,14 +36,14 @@ namespace JUSToolkit.CLI.JUS.Rom
     public class ContainerFile : IFileImportStrategy
     {
         private static readonly Dictionary<string, string[]> ContainerLocations = new() {
-            { "jgalaxy.bin", ["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] }, // Dónde está el .aar en el juego, pero faltaría la ruta interna del fichero .bin "{container}/jgalaxy/{file.Name}"
-            { "mission.bin", ["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] },
-            { "battle.bin", ["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] },
+            { "jgalaxy.bin",["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] }, // Dónde está el .aar en el juego, pero faltaría la ruta interna del fichero .bin "{container}/jgalaxy/{file.Name}"
+            { "mission.bin",["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] },
+            { "battle.bin",["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] },
         };
 
         private static readonly List<(Regex, string[])> PatternList = new()
         {
-            (new Regex(@"^bin-.*-.*\.bin$"), ["/bin/InfoDeck.aar", "/bin/deck/"]), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^bin-.*-.*\.bin$"),["/bin/InfoDeck.aar", "/bin/deck/"]), // "{container}/bin/deck/{file.Name}"
         };
 
         /// <summary>
@@ -64,6 +64,7 @@ namespace JUSToolkit.CLI.JUS.Rom
                         return;
                     }
                 }
+
                 Console.WriteLine($"File not compatible as container: {file.Name}");
             }
         }
@@ -111,6 +112,5 @@ namespace JUSToolkit.CLI.JUS.Rom
 
             return nameWithPattern;
         }
-
     }
 }
