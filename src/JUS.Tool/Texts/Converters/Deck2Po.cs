@@ -19,45 +19,55 @@
 // SOFTWARE.
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 using Yarhl.Media.Text;
 
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between Deck format and Po.
+    /// Converts between Container of Deck files and Po.
     /// </summary>
     public class Deck2Po :
-        IConverter<Deck, Po>,
-        IConverter<Po, Deck>
+        IConverter<NodeContainerFormat, Po>,
+        IConverter<Po, NodeContainerFormat>
     {
         /// <summary>
-        /// Converts Deck format to Po.
+        /// Converts Container of Deck files to Po.
         /// </summary>
-        /// <param name="deck">TextFormat to convert.</param>
+        /// <param name="container">Container of Deck files to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(Deck deck)
+        public Po Convert(NodeContainerFormat container)
         {
             Po po = JusText.GenerateJusPo();
 
-            po.Add(new PoEntry(deck.Name) {
-                Context = "0",
-                ExtractedComments = System.Convert.ToBase64String(deck.Header),
-            });
+            foreach (Node file in container.Root.Children) {
+                Deck deck = file.GetFormatAs<Deck>();
+                po.Add(new PoEntry(deck.Name) {
+                    Context = file.Name,
+                    ExtractedComments = System.Convert.ToBase64String(deck.Header),
+                });
+            }
 
             return po;
         }
 
         /// <summary>
-        /// Converts Po to Deck format.
+        /// Converts Po to Container of Deck files format.
         /// </summary>
         /// <param name="po">Po to convert.</param>
-        /// <returns>Transformed TextFormat.</returns>
-        public Deck Convert(Po po)
+        /// <returns>Container of Deck files.</returns>
+        public NodeContainerFormat Convert(Po po)
         {
-            var deck = new Deck();
-            deck.Name = po.Entries[0].Text;
-            deck.Header = System.Convert.FromBase64String(po.Entries[0].ExtractedComments);
-            return deck;
+            var container = new NodeContainerFormat();
+            foreach (PoEntry entry in po.Entries) {
+                var deck = new Deck() {
+                    Name = entry.Text,
+                    Header = System.Convert.FromBase64String(entry.ExtractedComments),
+                };
+                container.Root.Add(new Node(entry.Context, deck));
+            }
+
+            return container;
         }
     }
 }

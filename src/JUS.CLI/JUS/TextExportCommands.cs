@@ -51,6 +51,47 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
+        /// Export a folder full of .bin files to a single .po file.
+        /// </summary>
+        /// <param name="directory">The directory with the bin files.</param>
+        /// <param name="pdeck">If the files are PDeck files.</param>
+        /// <param name="output">The output directory.</param>
+        public static void DeckExport(string directory, bool pdeck, string output)
+        {
+            // Ensure the path does not end with a directory separator
+            directory = directory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Get the last directory or file name from the path
+            string lastDirectory = Path.GetFileName(directory);
+
+            Node inputFiles = NodeFactory.FromDirectory(directory, "*.bin");
+            inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
+            Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
+
+            IConverter binConverter = pdeck ? new Binary2PDeck() : new Binary2Deck();
+            IConverter poConverter = pdeck ? new PDeck2Po() : new Deck2Po();
+
+            // NodeContainerFormat with all the (P)Deck files
+            var container = new Node("parent", new NodeContainerFormat());
+
+            foreach (Node file in inputFiles.Children) {
+                Console.WriteLine(file.Name);
+
+                // BinaryFormat -> TextFormat
+                container.Add(new Node(file).TransformWith(binConverter));
+            }
+
+            // TextFormat -> Po
+            Node poFormat = container.TransformWith(poConverter);
+
+            // Po -> Binary
+            BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat.GetFormatAs<Po>());
+
+            string outputFile = Path.Combine(output, $"deck-{lastDirectory}.po");
+            poBinaryFormat.Stream.WriteTo(outputFile);
+        }
+
+        /// <summary>
         /// Export a folder full of .bin files to .Po.
         /// </summary>
         /// <param name="directory">The directory with the bin files.</param>

@@ -19,50 +19,60 @@
 // SOFTWARE.
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 using Yarhl.Media.Text;
 
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between PDeck format and Po.
+    /// Converts between Container of PDeck files and Po.
     /// </summary>
     public class PDeck2Po :
-        IConverter<PDeck, Po>,
-        IConverter<Po, PDeck>
+        IConverter<NodeContainerFormat, Po>,
+        IConverter<Po, NodeContainerFormat>
     {
         /// <summary>
-        /// Converts PDeck format to Po.
+        /// Converts Container of PDeck files to Po.
         /// </summary>
-        /// <param name="pDeck">TextFormat to convert.</param>
+        /// <param name="container">Container of PDeck files to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(PDeck pDeck)
+        public Po Convert(NodeContainerFormat container)
         {
             Po po = JusText.GenerateJusPo();
-            string headerBase64 = System.Convert.ToBase64String(pDeck.Header);
 
-            po.Add(new PoEntry(pDeck.Name) {
-                Context = "0",
-                ExtractedComments = $"{headerBase64}-{pDeck.Unknown}",
-            });
+            foreach (Node file in container.Root.Children) {
+                PDeck pDeck = file.GetFormatAs<PDeck>();
+                string headerBase64 = System.Convert.ToBase64String(pDeck.Header);
+
+                po.Add(new PoEntry(pDeck.Name) {
+                    Context = file.Name,
+                    ExtractedComments = $"{headerBase64}-{pDeck.Unknown}",
+                });
+            }
 
             return po;
         }
 
         /// <summary>
-        /// Converts Po to PDeck format.
+        /// Converts Po to Container of PDeck files.
         /// </summary>
         /// <param name="po">Po to convert.</param>
-        /// <returns>Transformed TextFormat.</returns>
-        public PDeck Convert(Po po)
+        /// <returns>Container of PDeck files.</returns>
+        public NodeContainerFormat Convert(Po po)
         {
-            var pDeck = new PDeck();
-            string[] metadata;
+            var container = new NodeContainerFormat();
+            foreach (PoEntry entry in po.Entries) {
+                string[] metadata;
+                metadata = JusText.ParseMetadata(entry.ExtractedComments);
+                var pDeck = new PDeck() {
+                    Name = entry.Text,
+                    Header = System.Convert.FromBase64String(metadata[0]),
+                    Unknown = int.Parse(metadata[1]),
+                };
+                container.Root.Add(new Node(entry.Context, pDeck));
+            }
 
-            pDeck.Name = po.Entries[0].Text;
-            metadata = JusText.ParseMetadata(po.Entries[0].ExtractedComments);
-            pDeck.Header = System.Convert.FromBase64String(metadata[0]);
-            pDeck.Unknown = int.Parse(metadata[1]);
-            return pDeck;
+            return container;
         }
     }
 }

@@ -50,7 +50,9 @@ namespace JUSToolkit.Texts.Converters
 
             reader.Stream.Position = 0x00;
             pDeck.Header = reader.ReadBytes(pDeck.HeaderSize);
-            pDeck.Name = reader.ReadString();
+
+            int nameSize = pDeck.UnkownPosition - pDeck.HeaderSize;
+            pDeck.Name = reader.ReadString(nameSize).TrimEnd('\0');
             reader.Stream.Position = pDeck.UnkownPosition;
             pDeck.Unknown = reader.ReadInt32();
 

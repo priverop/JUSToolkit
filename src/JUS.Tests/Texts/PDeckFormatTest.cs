@@ -37,27 +37,34 @@ namespace JUS.Tests.Texts
                         Assert.Fail($"Exception BinaryFormat -> PDeck with {node.Path}\n{ex}");
                     }
 
-                    // PDeck -> Po
+                    // PDeck -> NCF (PDeck)
+                    var originalContainer = new NodeContainerFormat();
+                    originalContainer.Root.Add(new Node("test", expectedPDeck));
+
+                    // NCF (PDeck) -> Po
                     var pDeck2Po = new PDeck2Po();
                     Po expectedPo = null;
                     try {
-                        expectedPo = pDeck2Po.Convert(expectedPDeck);
+                        expectedPo = pDeck2Po.Convert(originalContainer);
                     } catch (Exception ex) {
-                        Assert.Fail($"Exception PDeck -> Po with {node.Path}\n{ex}");
+                        Assert.Fail($"Exception NCF (PDeck) -> Po with {node.Path}\n{ex}");
                     }
 
-                    // Po -> PDeck
-                    PDeck actualPDeck = null;
+                    // Po -> NCF (PDeck)
+                    NodeContainerFormat container = null;
                     try {
-                        actualPDeck = pDeck2Po.Convert(expectedPo);
+                        container = pDeck2Po.Convert(expectedPo);
                     } catch (Exception ex) {
                         Assert.Fail($"Exception Po -> PDeck with {node.Path}\n{ex}");
                     }
 
+                    // NCF -> PDeck
+                    PDeck actualDeck = container.Root.Children[0].GetFormatAs<PDeck>();
+
                     // PDeck -> BinaryFormat
                     BinaryFormat actualBin = null;
                     try {
-                        actualBin = binary2PDeck.Convert(actualPDeck);
+                        actualBin = binary2PDeck.Convert(actualDeck);
                     } catch (Exception ex) {
                         Assert.Fail($"Exception PDeck -> BinaryFormat with {node.Path}\n{ex}");
                     }
