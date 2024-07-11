@@ -212,6 +212,13 @@ namespace JUSToolkit.CLI.JUS
             };
             import.Handler = CommandHandler.Create<string, string>(TextImportCommands.Import);
 
+            var deckImport = new Command("deckImport", "Import a single po file, to multiple .bin files") {
+                new Option<string>("--po", "the po file", ArgumentArity.ExactlyOne),
+                new Option<bool>("--pdeck", "true for pdeck files", ArgumentArity.ZeroOrOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            deckImport.Handler = CommandHandler.Create<string, bool, string>(TextImportCommands.DeckImport);
+
             var batchImport = new Command("batchImport", "Import .bin files from a folder, to a .po file") {
                 new Option<string>("--directory", "the input directory with the .bin files", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
@@ -229,6 +236,7 @@ namespace JUSToolkit.CLI.JUS
                 deckExport,
                 batchExport,
                 import,
+                deckImport,
                 batchImport,
                 importJQuiz,
             };

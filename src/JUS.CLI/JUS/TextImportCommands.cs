@@ -49,6 +49,33 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
+        /// Import a .po file to multiple .bin files.
+        /// </summary>
+        /// Binary -> Po -> NCF (Deck) -> WriteOut (output)
+        /// <param name="po">The .po to import.</param>
+        /// <param name="pdeck">If the files are PDeck files.</param>
+        /// <param name="output">The output directory.</param>
+        public static void DeckImport(string po, bool pdeck, string output)
+        {
+            using Node poNode = NodeFactory.FromFile(po, FileOpenMode.Read)
+                .TransformWith<Binary2Po>() ?? throw new FormatException("Invalid po file");
+
+            IConverter binConverter = pdeck ? new Binary2PDeck() : new Binary2Deck();
+            IConverter poConverter = pdeck ? new PDeck2Po() : new Deck2Po();
+
+            // NodeContainerFormat with all the (P)Deck files
+            poNode.TransformWith(poConverter);
+
+            foreach (Node file in poNode.Children) {
+                Console.WriteLine(file.Name);
+                file.TransformWith(binConverter);
+
+                string outputFile = Path.Combine(output, file.Name);
+                file.Stream.WriteTo(outputFile);
+            }
+        }
+
+        /// <summary>
         /// Import a folder full of .po files to .bin.
         /// </summary>
         /// <param name="directory">The directory with the po files.</param>
