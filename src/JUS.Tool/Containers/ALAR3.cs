@@ -94,6 +94,7 @@ namespace JUSToolkit.Containers
                     if (parent == null && nOld.Name == nNew.Name) {
                         alarFileOld.ReplaceStream(nNew.Stream);
                     }
+
                     // Search for the specific file in case there are more than one in different directories
                     // That's why specify the parent (directory name)
                     else if (parent != null && parent == nOld.Parent.Name && nOld.Name == nNew.Name) {
