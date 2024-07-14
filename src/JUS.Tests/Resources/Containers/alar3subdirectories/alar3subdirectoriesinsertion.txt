@@ -1,0 +1,1 @@
+infoDeck.aar,infodeck/bb.bin,deck,/NodeContainerRoot/bin/deck/bb.bin
