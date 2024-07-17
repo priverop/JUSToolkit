@@ -140,6 +140,8 @@ some of them includes also p-files (a p and then the 3 digit numbers).
 | 0x40   | string       | Name                             |
 | ...    | zero padding | Until it reaches 92 bytes length |
 
+> Note: simpl 004.bin is empty.
+
 ### PDeck
 
 | Offset | Type         | Description                      |

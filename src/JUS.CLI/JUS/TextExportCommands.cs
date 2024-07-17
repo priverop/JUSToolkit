@@ -58,6 +58,8 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void DeckExport(string directory, bool pdeck, string output)
         {
+            Console.WriteLine($"Exporting {directory}");
+
             // Ensure the path does not end with a directory separator
             directory = directory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
@@ -89,6 +91,7 @@ namespace JUSToolkit.CLI.JUS
 
             string outputFile = Path.Combine(output, $"deck-{lastDirectory}.po");
             poBinaryFormat.Stream.WriteTo(outputFile);
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
