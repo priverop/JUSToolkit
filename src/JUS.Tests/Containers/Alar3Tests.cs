@@ -60,6 +60,20 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
+        public static IEnumerable<TestCaseData> GetAlar3SubDirectoriesInsertionFiles()
+        {
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Containers/alar3subdirectories");
+            string listPath = Path.Combine(basePath, "alar3subdirectoriesinsertion.txt");
+            return TestDataBase.ReadTestListFile(listPath)
+                .Select(line => line.Split(','))
+                .Select(data => new TestCaseData(
+                    Path.Combine(basePath, data[0]),
+                    Path.Combine(basePath, data[1]),
+                    data[2],
+                    data[3])
+                    .SetName($"({data[0]}, {data[1]}, {data[2]}, {data[3]})"));
+        }
+
         [TestCaseSource(nameof(GetAlar3Files))]
         public void DeserializeAlar3(string infoPath, string alarPath)
         {
@@ -130,8 +144,6 @@ namespace JUSToolkit.Tests.Containers
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
             var alar = new Alar3((uint)totalFiles);
-            // ToDo: Deberíamos meterle un alar.DataOffset
-            // ToDo: El offset del fichero 0 deberá ser el DataOffset
             for (int i = 0; i < totalFiles; i++) {
                 // Creamos un fichero de 5bytes.
                 var child = new Alar3File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
@@ -193,6 +205,24 @@ namespace JUSToolkit.Tests.Containers
 
             // Comprobamos el contenido del fichero insertado
             Assert.AreEqual(newStream, alar.Root.Children[1].Stream);
+        }
+
+        [TestCaseSource(nameof(GetAlar3SubDirectoriesInsertionFiles))]
+        // Inserting Nodes in a ALAR3 with subdirectories. What if the same node.Name is in two different subdirectories of the same ALAR3?
+        public void ReplacingNodesWithPath(string alarPath, string fileToInsert, string parent, string internalPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
+
+            using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
+            using Node fileOriginal = NodeFactory.FromFile(fileToInsert, FileOpenMode.Read);
+
+            Alar3 alar = alarOriginal.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
+            alar.InsertModification(fileOriginal, parent);
+
+            // Tenemos que comprobar si se ha introducido correctamente
+            // Obtenemos el fichero del alar3 y comprobamos el size
+            Node newFile = Navigator.SearchNode(alar.Root, internalPath);
+            Assert.AreEqual(fileOriginal.Stream.Length, newFile.Stream.Length);
         }
 
         // Unit test para la funcion de GetAlar3Path

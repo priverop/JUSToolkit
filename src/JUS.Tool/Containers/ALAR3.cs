@@ -75,11 +75,12 @@ namespace JUSToolkit.Containers
         /// <summary>
         /// Inserts a new Node into the current Alar3 Container.
         /// </summary>
+        /// We need to iterate the whole ALAR to adjust the pointers (offsets).
         /// <param name="nNew">Node to insert.</param>
-        public void InsertModification(Node nNew)
+        /// <param name="path">Path of the file to replace (insert).</param>
+        public void InsertModification(Node nNew, string parent = null)
         {
             uint nextFileOffset = 0;
-            bool found = false; // infodeck.aar has the same file twice (different folders)... maybe we need to redo this
 
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
@@ -90,9 +91,14 @@ namespace JUSToolkit.Containers
                         alarFileOld.Offset = nextFileOffset;
                     }
 
-                    if (nOld.Name == nNew.Name && !found) {
+                    if (parent == null && nOld.Name == nNew.Name) {
                         alarFileOld.ReplaceStream(nNew.Stream);
-                        found = true;
+                    }
+
+                    // Search for the specific file in case there are more than one in different directories
+                    // That's why specify the parent (directory name)
+                    else if (parent != null && parent == nOld.Parent.Name && nOld.Name == nNew.Name) {
+                        alarFileOld.ReplaceStream(nNew.Stream);
                     }
 
                     nextFileOffset = alarFileOld.Offset + alarFileOld.Size;

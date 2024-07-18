@@ -63,6 +63,7 @@ namespace JUSToolkit.CLI.JUS
         private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
         {
             (new Regex(@"^bin-.*-.*\.bin$"), new ContainerFile()),
+            (new Regex(@"^deck-.*-.*\.bin$"), new ContainerFile()),
         };
 
         /// <summary>
@@ -92,6 +93,7 @@ namespace JUSToolkit.CLI.JUS
                             break;
                         }
                     }
+
                     if (!matched) {
                         Console.WriteLine($"File not compatible: {file.Name}");
                     }

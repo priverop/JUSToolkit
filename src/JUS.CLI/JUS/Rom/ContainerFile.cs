@@ -35,15 +35,16 @@ namespace JUSToolkit.CLI.JUS.Rom
     /// </summary>
     public class ContainerFile : IFileImportStrategy
     {
-        private static readonly Dictionary<string, string[]> ContainerLocations = new() {
-            { "jgalaxy.bin", ["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] }, // Dónde está el .aar en el juego, pero faltaría la ruta interna del fichero .bin "{container}/jgalaxy/{file.Name}"
-            { "mission.bin", ["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] },
-            { "battle.bin", ["/jgalaxy/jgalaxy.aar", "/jgalaxy/"] },
+        private static readonly Dictionary<string, string> ContainerLocations = new() {
+            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" }, // Dónde está el .aar en el juego, pero faltaría la ruta interna del fichero .bin "{container}/jgalaxy/{file.Name}"
+            { "mission.bin", "/jgalaxy/jgalaxy.aar" },
+            { "battle.bin", "/jgalaxy/jgalaxy.aar" },
         };
 
-        private static readonly List<(Regex, string[])> PatternList = new()
+        private static readonly List<(Regex, string)> PatternList = new()
         {
-            (new Regex(@"^bin-.*-.*\.bin$"), ["/bin/InfoDeck.aar", "/bin/deck/"]), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^bin-.*-.*\.bin$"), "/bin/InfoDeck.aar"), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
         };
 
         /// <summary>
@@ -53,24 +54,26 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <param name="file">The input file to import.</param>
         public void Import(Node gameNode, Node file)
         {
-            if (ContainerLocations.TryGetValue(file.Name, out string[] paths)) {
-                ProcessContainer(gameNode, file, paths);
+            if (ContainerLocations.TryGetValue(file.Name, out string path)) {
+                ProcessContainer(gameNode, file, path);
             } else {
                 // Si no se encuentra, intenta encontrar la ruta interna usando patrones
-                foreach ((Regex pattern, string[] paths2) in PatternList) {
+                foreach ((Regex pattern, string containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
+                        string parent = GetParentName(file.Name);
                         file.Name = GetOriginalName(file.Name);
-                        ProcessContainer(gameNode, file, paths2);
+                        ProcessContainer(gameNode, file, containerPath, parent);
                         return;
                     }
                 }
+
                 Console.WriteLine($"File not compatible as container: {file.Name}");
             }
         }
 
-        private static void ProcessContainer(Node gameNode, Node file, string[] paths)
+        private static void ProcessContainer(Node gameNode, Node file, string containerPath, string parent = null)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{paths[0]}")
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
                                 .TransformWith<LzssDecompression>();
 
             Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
@@ -81,36 +84,56 @@ namespace JUSToolkit.CLI.JUS.Rom
             if (alarVersion.Major == 3) {
                 Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
                 .GetFormatAs<Alar3>();
-                alar.InsertModification(file);
+                alar.InsertModification(file, parent);
                 newBinary = alar.ConvertWith(new Alar3ToBinary());
             } else if (alarVersion.Major == 2) {
                 Alar2 alar = containerNode.TransformWith<Binary2Alar2>()
                 .GetFormatAs<Alar2>();
-                alar.InsertModification(file);
+                alar.InsertModification(file); // ToDo: parent
                 newBinary = alar.ConvertWith(new Alar2ToBinary());
             }
 
             containerNode.ChangeFormat(newBinary);
 
-            Console.WriteLine($"File replaced: /root/data{paths[0]}{paths[1]}{file.Name}");
+            Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
         }
 
         /// <summary>
-        /// Removes the substrings "bin-deck-" and "bin-info-" from the provided string in a case-insensitive manner.
+        /// Remove the first two words separated by dashes "x-y-".
         /// </summary>
-        /// <param name="nameWithPattern">The string containing potentially "bin-deck-" or "bin-info-" prefixes.</param>
-        /// <returns>The original name without the prefixes "bin-deck-" or "bin-info-". If the input string is null or empty, the original string is returned.</returns>
+        /// <param name="nameWithPattern">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
+        /// <returns>The original name without the prefixes. If the input string is null or empty, the original string is returned.</returns>
         private static string GetOriginalName(string nameWithPattern)
         {
-            if (string.IsNullOrEmpty(nameWithPattern)) {
+            if (string.IsNullOrEmpty(nameWithPattern) || !nameWithPattern.Contains('-')) {
                 return nameWithPattern;
             }
 
-            nameWithPattern = nameWithPattern.Replace("bin-deck-", string.Empty, StringComparison.OrdinalIgnoreCase);
-            nameWithPattern = nameWithPattern.Replace("bin-info-", string.Empty, StringComparison.OrdinalIgnoreCase);
-
-            return nameWithPattern;
+            // Regular expression to match and remove the first two words separated by dashes
+            var regex = new Regex(@"^[^-]+-[^-]+-");
+            return regex.Replace(nameWithPattern, string.Empty);
         }
 
+        /// <summary>
+        /// Gets the directory name of the file (parent). "bin-deck-bb.bin" will return "deck".
+        /// </summary>
+        /// <param name="name">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
+        /// <returns>The directory name. If the input string is null or empty, the original string is returned.</returns>
+        private static string GetParentName(string name)
+        {
+            if (string.IsNullOrEmpty(name) || !name.Contains('-')) {
+                return null;
+            }
+
+            // Regular expression to capture the second word
+            var regex = new Regex(@"^[^-]+-([^-]+)-");
+            Match match = regex.Match(name);
+
+            if (match.Success && match.Groups.Count > 1) {
+                return match.Groups[1].Value;
+            }
+
+            return null;
+        }
     }
 }

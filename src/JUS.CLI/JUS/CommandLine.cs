@@ -193,7 +193,14 @@ namespace JUSToolkit.CLI.JUS
             };
             export.Handler = CommandHandler.Create<string, string>(TextExportCommands.Export);
 
-            var batchExport = new Command("batchExport", "Export .bin files from a folder, to a .po file") {
+            var deckExport = new Command("deckExport", "Export .bin files from a folder, to a single .po file") {
+                new Option<string>("--directory", "the directory with the .bin files", ArgumentArity.ExactlyOne),
+                new Option<bool>("--pdeck", "true for pdeck files", ArgumentArity.ZeroOrOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            deckExport.Handler = CommandHandler.Create<string, bool, string>(TextExportCommands.DeckExport);
+
+            var batchExport = new Command("batchExport", "Export .bin files from a folder, to .po files") {
                 new Option<string>("--directory", "the input directory with the .bin files", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
@@ -204,6 +211,13 @@ namespace JUSToolkit.CLI.JUS
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
             import.Handler = CommandHandler.Create<string, string>(TextImportCommands.Import);
+
+            var deckImport = new Command("deckImport", "Import a single po file, to multiple .bin files") {
+                new Option<string>("--po", "the po file", ArgumentArity.ExactlyOne),
+                new Option<bool>("--pdeck", "true for pdeck files", ArgumentArity.ZeroOrOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            deckImport.Handler = CommandHandler.Create<string, bool, string>(TextImportCommands.DeckImport);
 
             var batchImport = new Command("batchImport", "Import .bin files from a folder, to a .po file") {
                 new Option<string>("--directory", "the input directory with the .bin files", ArgumentArity.ExactlyOne),
@@ -219,8 +233,10 @@ namespace JUSToolkit.CLI.JUS
 
             return new Command("texts", "Export or import bin files to Po") {
                 export,
+                deckExport,
                 batchExport,
                 import,
+                deckImport,
                 batchImport,
                 importJQuiz,
             };
