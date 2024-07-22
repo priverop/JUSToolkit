@@ -77,7 +77,7 @@ namespace JUSToolkit.Containers
         /// </summary>
         /// We need to iterate the whole ALAR to adjust the pointers (offsets).
         /// <param name="nNew">Node to insert.</param>
-        /// <param name="path">Path of the file to replace (insert).</param>
+        /// <param name="parent">Parent directory of the file to replace.</param>
         public void InsertModification(Node nNew, string parent = null)
         {
             uint nextFileOffset = 0;

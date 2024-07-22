@@ -42,6 +42,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Import(string po, string output)
         {
+            Console.WriteLine($"Importing {po}");
             using Node poNode = NodeFactory.FromFile(po, FileOpenMode.Read)
                 .TransformWith<Binary2Po>() ?? throw new FormatException("Invalid po file");
 
@@ -89,6 +90,8 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void BatchImport(string directory, string output)
         {
+            Console.WriteLine($"Importing {directory}");
+
             Node inputFiles = NodeFactory.FromDirectory(directory, "*.po");
             Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
 
@@ -96,6 +99,8 @@ namespace JUSToolkit.CLI.JUS
                 Console.WriteLine("Processing " + file.Name);
                 ImportBin(file.TransformWith<Binary2Po>(), output);
             }
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -105,6 +110,8 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ImportJQuiz(string container, string output)
         {
+            Console.WriteLine($"Importing {container}");
+
             Node inputFiles = NodeFactory.FromDirectory(container, "*.po") ?? throw new FormatException("Invalid container file");
 
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
@@ -115,7 +122,7 @@ namespace JUSToolkit.CLI.JUS
 
             using BinaryFormat binary = new Binary2JQuiz().Convert(jquiz);
 
-            binary.Stream.WriteTo(Path.Combine(output, "imported_jquiz.bin"));
+            binary.Stream.WriteTo(Path.Combine(output, "jquiz.bin"));
             Console.WriteLine("Done!");
         }
 
@@ -160,7 +167,7 @@ namespace JUSToolkit.CLI.JUS
             Match match = regex.Match(name);
 
             if (match.Success && match.Groups.Count > 1) {
-                return match.Groups[1].Value.Replace("_p", string.Empty); ;
+                return match.Groups[1].Value.Replace("_p", string.Empty);
             }
 
             return null;

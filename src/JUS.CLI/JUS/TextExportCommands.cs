@@ -43,6 +43,8 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Export(string bin, string output)
         {
+            Console.WriteLine($"Exporting {bin}");
+
             using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read) ?? throw new FormatException("Invalid bin file");
 
             ExportBin(binNode, output);
@@ -95,6 +97,30 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
+        /// Export a jquiz.bin file to multiple .po files.
+        /// </summary>
+        /// <param name="bin">The path of the input bin file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void JQuizExport(string bin, string output)
+        {
+            Console.WriteLine($"Exporting {bin}");
+
+            using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read) ?? throw new FormatException("Invalid bin file");
+
+            // BinaryFormat -> JQuiz Format
+            binNode.TransformWith<Binary2JQuiz>();
+
+            // JQuiz -> NCF (Po)
+            binNode.TransformWith<JQuiz2Po>();
+
+            foreach (Node quiz in binNode.Children) {
+                quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
+            }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
         /// Export a folder full of .bin files to .Po.
         /// </summary>
         /// <param name="directory">The directory with the bin files.</param>
@@ -128,22 +154,15 @@ namespace JUSToolkit.CLI.JUS
             // BinaryFormat -> TextFormat
             object textFormat = ConvertFormat.With(binConverterName, binNode.Format!);
 
-            // If instead of Po we get a Container
-            if (binConverterName.ToString() == "JUSToolkit.Texts.Converters.Binary2JQuiz") {
-                var container = (NodeContainerFormat)ConvertFormat.With(poConverterName, textFormat);
-                foreach (Node quiz in container.Root.Children) {
-                    quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
-                }
-            } else {
-                // TextFormat -> Po
-                var poFormat = (Po)ConvertFormat.With(poConverterName, textFormat);
+            // TextFormat -> Po
+            var poFormat = (Po)ConvertFormat.With(poConverterName, textFormat);
 
-                // Po -> Binary
-                BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat);
+            // Po -> Binary
+            BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat);
 
-                string outputFile = Path.Combine(output, filename + ".po");
-                poBinaryFormat.Stream.WriteTo(outputFile);
-            }
+            string outputFile = Path.Combine(output, filename + ".po");
+            poBinaryFormat.Stream.WriteTo(outputFile);
+
         }
     }
 }
