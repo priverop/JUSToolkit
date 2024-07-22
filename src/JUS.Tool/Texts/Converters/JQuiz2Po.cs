@@ -138,12 +138,10 @@ namespace JUSToolkit.Texts.Converters
             var jquiz = new JQuiz();
             int questionCount = 0;
             var jquizEntry = new JQuizEntry();
-            var questionErrors = 0;
-            var answersErrors = 0;
 
             foreach (Node file in poFiles.Root.Children) {
                 Po po = file.TransformWith<Binary2Po>().GetFormatAs<Po>();
-                bool hasPhoto = false;
+                bool hasPhoto = false; // esto una vez entra a true se queda ahí, no vuelve a false
                 foreach (PoEntry entry in po.Entries) {
                     if (entry.Context.Contains("foto")) {
                         if (questionCount != 0) {
@@ -165,36 +163,36 @@ namespace JUSToolkit.Texts.Converters
                     }
 
                     string number = entry.Context[^1..];
+                    string sentence = entry.Text;
 
                     if (entry.Context.Contains("enunciado")) {
-                        if (entry.Text.Length > 38 && !hasPhoto) {
-                            Console.WriteLine($"Limit of 38 chars reached in {file.Name}: {entry.Context}");
-                            questionErrors++;
+                        if (sentence.Length > 39 && !hasPhoto) {
+                            Console.WriteLine($"Limit of 39 chars reached in {file.Name}: {entry.Context}");
+                            sentence = sentence[0..39];
                         }
 
-                        if (entry.Text.Length > 24 && hasPhoto) {
+                        if (sentence.Length > 24 && hasPhoto) {
                             Console.WriteLine($"Limit of 24 chars reached in {file.Name}: {entry.Context}");
-                            questionErrors++;
+                            sentence = sentence[0..24];
                         }
 
-                        jquizEntry.Questions[int.Parse(number)] = entry.Text;
+                        jquizEntry.Questions[int.Parse(number)] = sentence;
                     }
 
                     if (entry.Context.Contains("respuesta")) {
-                        if (entry.Text.Length > 36) {
-                            Console.WriteLine($"Limit of 36 chars reached in {file.Name}: {entry.Context}");
-                            answersErrors++;
+                        if (sentence.Length > 39) {
+                            Console.WriteLine($"Limit of 39 chars reached in {file.Name}: {entry.Context}");
+                            sentence = sentence[0..39];
                         }
 
-                        jquizEntry.Answers[int.Parse(number)] = entry.Text;
+                        jquizEntry.Answers[int.Parse(number)] = sentence;
+                        hasPhoto = false;
                     }
                 }
             }
 
             jquiz.Entries.Add(jquizEntry);
             jquiz.NumQuestions = questionCount;
-            Console.WriteLine(answersErrors);
-            Console.WriteLine(questionErrors);
             return jquiz;
         }
     }
