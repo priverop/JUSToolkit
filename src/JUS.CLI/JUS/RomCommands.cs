@@ -58,6 +58,7 @@ namespace JUSToolkit.CLI.JUS
             { "jgalaxy.bin", new ContainerFile() },
             { "mission.bin", new ContainerFile() },
             { "battle.bin", new ContainerFile() },
+            { "jquiz.bin", new ContainerFile() },
         };
 
         private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
