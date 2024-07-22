@@ -43,6 +43,8 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Export(string bin, string output)
         {
+            Console.WriteLine($"Exporting {bin}");
+
             using Node binNode = NodeFactory.FromFile(bin, FileOpenMode.Read) ?? throw new FormatException("Invalid bin file");
 
             ExportBin(binNode, output);
