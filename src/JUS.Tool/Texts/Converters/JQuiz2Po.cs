@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
 using System.Collections.Generic;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
@@ -33,7 +34,7 @@ namespace JUSToolkit.Texts.Converters
         IConverter<JQuiz, NodeContainerFormat>,
         IConverter<NodeContainerFormat, JQuiz>
     {
-        private readonly Dictionary<int, string> mangaIndex = new () {
+        private readonly Dictionary<int, string> mangaIndex = new() {
             { 0x00, "Shonen Jump" },
             { 0x01, "Eyeshield 21" },
             { 0x02, "I's" },
@@ -93,10 +94,8 @@ namespace JUSToolkit.Texts.Converters
             int currentManga = 0xFF;
             int mangaCount = 0;
             int questionCount = 0;
-            foreach (JQuizEntry entry in jquiz.Entries)
-            {
-                if (entry.MangaID != currentManga)
-                {
+            foreach (JQuizEntry entry in jquiz.Entries) {
+                if (entry.MangaID != currentManga) {
                     poBin = po.ConvertWith(new Po2Binary());
                     container.Root.Add(new Node($"jquiz-{mangaCount:00}-{mangaIndex[currentManga]}.po", poBin));
                     po = JusText.GenerateJusPo();
@@ -104,23 +103,18 @@ namespace JUSToolkit.Texts.Converters
                     currentManga = entry.MangaID;
                 }
 
-                po.Add(new PoEntry(JusText.CleanString(entry.Photo))
-                {
+                po.Add(new PoEntry(JusText.CleanString(entry.Photo)) {
                     Context = $"Pregunta {questionCount} foto",
                     ExtractedComments = $"{entry.MangaID}-{entry.Unknown}-{entry.Unknown2}",
                 });
-                for (int j = 0; j < entry.Questions.Length; j++)
-                {
-                    po.Add(new PoEntry(JusText.CleanString(entry.Questions[j]))
-                    {
+                for (int j = 0; j < entry.Questions.Length; j++) {
+                    po.Add(new PoEntry(JusText.CleanString(entry.Questions[j])) {
                         Context = $"Pregunta {questionCount} enunciado {j}",
                     });
                 }
 
-                for (int k = 0; k < entry.Answers.Length; k++)
-                {
-                    po.Add(new PoEntry(JusText.CleanString(entry.Answers[k]))
-                    {
+                for (int k = 0; k < entry.Answers.Length; k++) {
+                    po.Add(new PoEntry(JusText.CleanString(entry.Answers[k])) {
                         Context = $"Pregunta {questionCount} respuesta {k}",
                     });
                 }
@@ -144,21 +138,24 @@ namespace JUSToolkit.Texts.Converters
             var jquiz = new JQuiz();
             int questionCount = 0;
             var jquizEntry = new JQuizEntry();
+            var questionErrors = 0;
+            var answersErrors = 0;
 
-            foreach (Node file in poFiles.Root.Children)
-            {
+            foreach (Node file in poFiles.Root.Children) {
                 Po po = file.TransformWith<Binary2Po>().GetFormatAs<Po>();
-                foreach (PoEntry entry in po.Entries)
-                {
-                    if (entry.Context.Contains("foto"))
-                    {
-                        if (questionCount != 0)
-                        {
+                bool hasPhoto = false;
+                foreach (PoEntry entry in po.Entries) {
+                    if (entry.Context.Contains("foto")) {
+                        if (questionCount != 0) {
                             jquiz.Entries.Add(jquizEntry);
                             jquizEntry = new JQuizEntry();
                         }
 
                         jquizEntry.Photo = entry.Text;
+                        if (!jquizEntry.Photo.Equals("<!empty>")) {
+                            hasPhoto = true;
+                        }
+
                         string[] metadata = JusText.ParseMetadata(entry.ExtractedComments);
                         jquizEntry.MangaID = byte.Parse(metadata[0]);
                         jquizEntry.Unknown = byte.Parse(metadata[1]);
@@ -169,13 +166,26 @@ namespace JUSToolkit.Texts.Converters
 
                     string number = entry.Context[^1..];
 
-                    if (entry.Context.Contains("enunciado"))
-                    {
+                    if (entry.Context.Contains("enunciado")) {
+                        if (entry.Text.Length > 38 && !hasPhoto) {
+                            Console.WriteLine($"Limit of 38 chars reached in {file.Name}: {entry.Context}");
+                            questionErrors++;
+                        }
+
+                        if (entry.Text.Length > 24 && hasPhoto) {
+                            Console.WriteLine($"Limit of 24 chars reached in {file.Name}: {entry.Context}");
+                            questionErrors++;
+                        }
+
                         jquizEntry.Questions[int.Parse(number)] = entry.Text;
                     }
 
-                    if (entry.Context.Contains("respuesta"))
-                    {
+                    if (entry.Context.Contains("respuesta")) {
+                        if (entry.Text.Length > 36) {
+                            Console.WriteLine($"Limit of 36 chars reached in {file.Name}: {entry.Context}");
+                            answersErrors++;
+                        }
+
                         jquizEntry.Answers[int.Parse(number)] = entry.Text;
                     }
                 }
@@ -183,7 +193,8 @@ namespace JUSToolkit.Texts.Converters
 
             jquiz.Entries.Add(jquizEntry);
             jquiz.NumQuestions = questionCount;
-
+            Console.WriteLine(answersErrors);
+            Console.WriteLine(questionErrors);
             return jquiz;
         }
     }
