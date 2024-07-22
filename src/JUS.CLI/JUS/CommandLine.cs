@@ -193,6 +193,12 @@ namespace JUSToolkit.CLI.JUS
             };
             export.Handler = CommandHandler.Create<string, string>(TextExportCommands.Export);
 
+            var exportJQuiz = new Command("exportJQuiz", "Export JQuiz .bin file to multiple .po files") {
+                new Option<string>("--bin", "the input jquiz.bin file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportJQuiz.Handler = CommandHandler.Create<string, string>(TextExportCommands.JQuizExport);
+
             var deckExport = new Command("deckExport", "Export .bin files from a folder, to a single .po file") {
                 new Option<string>("--directory", "the directory with the .bin files", ArgumentArity.ExactlyOne),
                 new Option<bool>("--pdeck", "true for pdeck files", ArgumentArity.ZeroOrOne),
@@ -234,6 +240,7 @@ namespace JUSToolkit.CLI.JUS
             return new Command("texts", "Export or import bin files to Po") {
                 export,
                 deckExport,
+                exportJQuiz,
                 batchExport,
                 import,
                 deckImport,
