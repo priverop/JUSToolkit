@@ -108,14 +108,32 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
-        /// Import files into the Rom.
+        /// Import a font into the Rom.
         /// </summary>
         /// <param name="game">The path to the Rom.</param>
-        /// <param name="input">The path with the files to import.</param>
+        /// <param name="font">The path with the font to import.</param>
         /// <param name="output">The output directory.</param>
-        public static void Export(string game, string input, string output)
+        public static void ImportFont(string game, string font, string output)
         {
-            Console.WriteLine("Not yet implemented.");
+            Node gameNode = NodeFactory.FromFile(game, "root", FileOpenMode.Read)
+                .TransformWith<Binary2NitroRom>();
+
+            Node fontNode = NodeFactory.FromFile(font, FileOpenMode.Read);
+
+            // Regular Font
+            Node toReplace = Navigator.SearchNode(gameNode, "/root/data/font/jskfont.aft");
+            toReplace.ChangeFormat(fontNode.Format!);
+            Console.WriteLine("File replaced: /root/data/font/jskfont.aft");
+
+            // JQuiz Font
+            Node toReplace_q = Navigator.SearchNode(gameNode, "/root/data/font/jskfont_q.aft");
+            toReplace_q.ChangeFormat(fontNode.Format!);
+            Console.WriteLine("File replaced: /root/data/font/jskfont_q.aft");
+
+            gameNode.TransformWith<NitroRom2Binary>();
+            gameNode.Stream.WriteTo(Path.Combine(output, "new_game_font.nds"));
+
+            Console.WriteLine("Done!");
         }
     }
 }
