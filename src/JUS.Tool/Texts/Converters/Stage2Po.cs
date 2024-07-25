@@ -63,7 +63,7 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < po.Entries.Count; i++) {
                 entry = new StageEntry();
-                entry.Name = po.Entries[i].Text;
+                entry.Name = Table.Instance.Encode(po.Entries[i].Text);
 
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
                 entry.Unk1 = short.Parse(metadata[0]);

@@ -63,7 +63,7 @@ namespace JUSToolkit.Texts.Converters
 
             foreach (PoEntry entry in po.Entries) {
                 var jgalaxyEntry = new JGalaxyEntry {
-                    Description = entry.Text,
+                    Description = Table.Instance.Encode(entry.Text),
                     Unknown = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
 

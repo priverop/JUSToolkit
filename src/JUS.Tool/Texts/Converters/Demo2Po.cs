@@ -69,9 +69,9 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < demo.Count; i++) {
                 entry = new DemoEntry();
-                entry.Title = po.Entries[i * 2].Text;
+                entry.Title = Table.Instance.Encode(po.Entries[i * 2].Text);
 
-                description = JusText.SplitStringToList(po.Entries[(i * 2) + 1].Text, '\n', 3);
+                description = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[(i * 2) + 1].Text), '\n', 3);
                 entry.Desc1 = description[0];
                 entry.Desc2 = description[1];
                 entry.Desc3 = description[2];

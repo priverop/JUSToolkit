@@ -74,7 +74,7 @@ namespace JUSToolkit.Texts.Converters
                 }
 
                 foreach (string s in translatedLines) {
-                    entry.Text.Add(s);
+                    entry.Text.Add(Table.Instance.Encode(s));
                 }
 
                 infoDeck.Entries.Add(entry);

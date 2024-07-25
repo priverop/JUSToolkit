@@ -138,6 +138,7 @@ namespace JUSToolkit.Texts.Converters
             var jquiz = new JQuiz();
             int questionCount = 0;
             var jquizEntry = new JQuizEntry();
+            Table table = Table.Instance;
 
             foreach (Node file in poFiles.Root.Children) {
                 Po po = file.TransformWith<Binary2Po>().GetFormatAs<Po>();
@@ -163,7 +164,7 @@ namespace JUSToolkit.Texts.Converters
                     }
 
                     string number = entry.Context[^1..];
-                    string sentence = entry.Text;
+                    string sentence = table.Encode(entry.Text);
 
                     if (entry.Context.Contains("enunciado")) {
                         if (sentence.Length > 39 && !hasPhoto) {

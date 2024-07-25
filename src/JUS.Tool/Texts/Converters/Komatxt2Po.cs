@@ -63,7 +63,7 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < po.Entries.Count; i++) {
                 entry = new KomatxtEntry();
-                entry.Name = po.Entries[i].Text;
+                entry.Name = Table.Instance.Encode(po.Entries[i].Text);
 
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
                 entry.Unk1 = int.Parse(metadata[0]);

@@ -172,16 +172,16 @@ namespace JUSToolkit.CLI.JUS
             };
             import.Handler = CommandHandler.Create<string, string, string>(RomCommands.Import);
 
-            var export = new Command("export", "export files to the Rom") {
+            var importFont = new Command("importFont", "Import the translated font to the Rom") {
                 new Option<string>("--game", "the path of the rom", ArgumentArity.ExactlyOne),
-                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
+                new Option<string>("--font", "the font to insert", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            export.Handler = CommandHandler.Create<string, string, string>(RomCommands.Export);
+            importFont.Handler = CommandHandler.Create<string, string, string>(RomCommands.ImportFont);
 
-            return new Command("game", "Import/export files to the Game") {
+            return new Command("game", "Import files to the Game") {
                 import,
-                export,
+                importFont,
             };
         }
 

@@ -69,7 +69,7 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 1; i < po.Entries.Count; i++) {
                 entry = new TutorialEntry();
-                entry.Description = po.Entries[i].Text;
+                entry.Description = Table.Instance.Encode(po.Entries[i].Text);
 
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
                 entry.Unknowns = metadata.Select(int.Parse).ToList();

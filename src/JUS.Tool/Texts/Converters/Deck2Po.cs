@@ -61,7 +61,7 @@ namespace JUSToolkit.Texts.Converters
             var container = new NodeContainerFormat();
             foreach (PoEntry entry in po.Entries) {
                 var deck = new Deck() {
-                    Name = entry.Text,
+                    Name = Table.Instance.Encode(entry.Text),
                     Header = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
                 container.Root.Add(new Node(entry.Context, deck));

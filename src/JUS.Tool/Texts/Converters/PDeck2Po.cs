@@ -65,7 +65,7 @@ namespace JUSToolkit.Texts.Converters
                 string[] metadata;
                 metadata = JusText.ParseMetadata(entry.ExtractedComments);
                 var pDeck = new PDeck() {
-                    Name = entry.Text,
+                    Name = Table.Instance.Encode(entry.Text),
                     Header = System.Convert.FromBase64String(metadata[0]),
                     Unknown = int.Parse(metadata[1]),
                 };

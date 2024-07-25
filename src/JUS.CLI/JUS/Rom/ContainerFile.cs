@@ -57,9 +57,6 @@ namespace JUSToolkit.CLI.JUS.Rom
         {
             if (ContainerLocations.TryGetValue(file.Name, out string path)) {
                 ProcessContainer(gameNode, file, path);
-                if (file.Name == "jquiz.bin") {
-                    ModifyJQuizFont(gameNode);
-                }
             } else {
                 // Si no se encuentra, intenta encontrar la ruta interna usando patrones
                 foreach ((Regex pattern, string containerPath) in PatternList) {
@@ -100,18 +97,6 @@ namespace JUSToolkit.CLI.JUS.Rom
             containerNode.ChangeFormat(newBinary);
 
             Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
-        }
-
-        /// <summary>
-        /// Copies the regular font to the jquiz font.
-        /// </summary>
-        /// <param name="gameNode">The rom.</param>
-        private static void ModifyJQuizFont(Node gameNode)
-        {
-            Node regularFont = Navigator.SearchNode(gameNode, "/root/data/font/jskfont.aft");
-            Node jquizFont = Navigator.SearchNode(gameNode, "/root/data/font/jskfont_q.aft");
-
-            jquizFont.ChangeFormat(regularFont.Format!);
         }
 
         /// <summary>
