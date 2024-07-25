@@ -45,23 +45,23 @@ We store the unused pointers in the Po file as comments.
 
 The Format class has the main properties of the file and a list of Entries.
 
-| Name          | Format                   | Location                                            |
-| ------------- | ------------------------ | --------------------------------------------------- |
-| ability_t.bin | Ability + AbilityEntry   | Koma list, helper (koma size 1) ability description |
-| bgm.bin       | Bgm + BgmEntry           | Battle stage Background Music (Database menu)       |
-| chr_b_t.bin   | BtlChr + BtlChrEntry     | Koma abilities info                                 |
-| chr_s_t.bin   | SuppChr + SuppChrEntry   | Koma abilities info support komas                   |
-| clearlst.bin  | SimpleBin                | Stage goals                                         |
-| commwin.bin   | Commwin + CommwinEntry   | Common window messages                              |
-| demo.bin      | Demo + DemoEntry         | World names (demo player menu, database)            |
-| infoname.bin  | SimpleBin                | Main menu helper names                              |
-| komatxt.bin   | Komatxt + KomatxtEntry   | Koma names                                          |
-| location.bin  | Location + LocationEntry | Player location                                     |
-| piece.bin     | Piece + PieceEntry       | Manga author and info (database menu)               |
-| pname.bin     | Pname                    | Player name titles (player settings)                |
-| rulemess.bin  | Rulemess + RulemessEntry | Stage rules                                         |
-| stage.bin     | Stage + StageEntry       | Stage names                                         |
-| title.bin     | SimpleBin                | Manga names                                         |
+| Image                                             | Name          | Format                   | Location                                            |
+| ------------------------------------------------- | ------------- | ------------------------ | --------------------------------------------------- |
+| ![ability_t.bin](../images/formats/ability_t.png) | ability_t.bin | Ability + AbilityEntry   | Koma list, helper (koma size 1) ability description |
+| ![bgm.bin](../images/formats/bgm.png)             | bgm.bin       | Bgm + BgmEntry           | Battle stage Background Music (Database menu)       |
+| ![chr_b_t.bin](../images/formats/chr_b_t.png)     | chr_b_t.bin   | BtlChr + BtlChrEntry     | Koma abilities info                                 |
+| ![chr_s_t.bin](../images/formats/chr_s_t.png)     | chr_s_t.bin   | SuppChr + SuppChrEntry   | Koma abilities info support komas                   |
+| ![clearlst.bin](../images/formats/clearlst.png)   | clearlst.bin  | SimpleBin                | Stage goals                                         |
+| ![commwin.bin](../images/formats/commwin.png)     | commwin.bin   | Commwin + CommwinEntry   | Common window messages                              |
+| ![demo.bin](../images/formats/demo.png)           | demo.bin      | Demo + DemoEntry         | World names (demo player menu, database)            |
+| ![infoname.bin](../images/formats/infoname.png)   | infoname.bin  | SimpleBin                | Main menu helper names                              |
+| ![komatxt.bin](../images/formats/komatxt.png)     | komatxt.bin   | Komatxt + KomatxtEntry   | Koma names                                          |
+| ![location.bin](../images/formats/location.png)   | location.bin  | Location + LocationEntry | Player location                                     |
+| ![piece.bin](../images/formats/piece.png)         | piece.bin     | Piece + PieceEntry       | Manga author and info (database menu)               |
+| ![pname.bin](../images/formats/pname.png)         | pname.bin     | Pname                    | Player name titles (player settings)                |
+| ![rulemess.bin](../images/formats/rulemess.png)   | rulemess.bin  | Rulemess + RulemessEntry | Stage rules                                         |
+| ![stage.bin](../images/formats/stage.png)         | stage.bin     | Stage + StageEntry       | Stage names                                         |
+| ![title.bin](../images/formats/title.png)         | title.bin     | SimpleBin                | Manga names                                         |
 
 ### Formats
 
