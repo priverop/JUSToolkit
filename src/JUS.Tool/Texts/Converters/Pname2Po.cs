@@ -60,7 +60,7 @@ namespace JUSToolkit.Texts.Converters
 
             pname.Count = po.Entries.Count;
             foreach (PoEntry entry in po.Entries) {
-                pname.TextEntries.Add(entry.Text);
+                pname.TextEntries.Add(Table.Instance.Encode(entry.Text));
             }
 
             return pname;

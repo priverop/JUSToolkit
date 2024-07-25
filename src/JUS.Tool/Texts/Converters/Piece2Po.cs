@@ -72,19 +72,19 @@ namespace JUSToolkit.Texts.Converters
                 entry.Title = po.Entries[i * 5].Text;
 
                 foreach (string s in JusText.SplitStringToList(po.Entries[(i * 5) + 1].Text, '\n', 2)) {
-                    entry.Authors.Add(s);
+                    entry.Authors.Add(Table.Instance.Encode(s));
                 }
 
                 foreach (string s in JusText.SplitStringToList(po.Entries[(i * 5) + 2].Text, '\n', 2)) {
-                    entry.Info.Add(s);
+                    entry.Info.Add(Table.Instance.Encode(s));
                 }
 
                 foreach (string s in JusText.SplitStringToList(po.Entries[(i * 5) + 3].Text, '\n', 9)) {
-                    entry.Page1.Add(s);
+                    entry.Page1.Add(Table.Instance.Encode(s));
                 }
 
                 foreach (string s in JusText.SplitStringToList(po.Entries[(i * 5) + 4].Text, '\n', 9)) {
-                    entry.Page2.Add(s);
+                    entry.Page2.Add(Table.Instance.Encode(s));
                 }
 
                 metadata = JusText.ParseMetadata(po.Entries[i * 5].ExtractedComments);

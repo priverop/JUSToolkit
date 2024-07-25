@@ -89,25 +89,25 @@ namespace JUSToolkit.Texts.Converters
             for (int i = 0; i < po.Entries.Count / 26; i++) {
                 entry = new BtlChrEntry();
 
-                entry.ChrName = po.Entries[i * 26].Text;
-                splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 1].Text, '\n', 2);
+                entry.ChrName = Table.Instance.Encode(po.Entries[i * 26].Text);
+                splitText = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[(i * 26) + 1].Text), '\n', 2);
                 entry.PassiveName = splitText[0];
                 entry.PassiveFurigana = splitText[1];
-                splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 2].Text, '\n', 2);
+                splitText = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[(i * 26) + 2].Text), '\n', 2);
                 entry.PassiveDescription1 = splitText[0];
                 entry.PassiveDescription2 = splitText[1];
 
                 for (int j = 0; j < 10; j++) {
-                    splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 3 + (j * 2)].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[(i * 26) + 3 + (j * 2)].Text), '\n', 2);
                     entry.AbilityNames.Add(splitText[0]);
                     entry.AbilityFuriganas.Add(splitText[1]);
-                    splitText = JusText.SplitStringToList(po.Entries[(i * 26) + 4 + (j * 2)].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[(i * 26) + 4 + (j * 2)].Text), '\n', 2);
                     entry.AbilityDescriptions.Add(splitText[0]);
                     entry.AbilityDescriptions.Add(splitText[1]);
                 }
 
                 for (int j = 23; j < 26; j++) {
-                    splitText = JusText.SplitStringToList(po.Entries[(i * 26) + j].Text, '\n', 2);
+                    splitText = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[(i * 26) + j].Text), '\n', 2);
                     entry.Interactions.Add(splitText[0]);
                     entry.Interactions.Add(splitText[1]);
                 }

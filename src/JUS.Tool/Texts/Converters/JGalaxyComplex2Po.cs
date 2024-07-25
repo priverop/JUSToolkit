@@ -87,7 +87,7 @@ namespace JUSToolkit.Texts.Converters
                 i++;
 
                 var jgalaxyEntry = new JGalaxyEntry {
-                    Description = entry.Text,
+                    Description = Table.Instance.Encode(entry.Text),
                 };
 
                 string[] metadata = JusText.ParseMetadata(entry.ExtractedComments);

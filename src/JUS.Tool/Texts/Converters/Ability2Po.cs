@@ -71,9 +71,9 @@ namespace JUSToolkit.Texts.Converters
             for (int i = 0; i < ability.Count; i++) {
                 entry = new AbilityEntry();
 
-                entry.Title = po.Entries[i * 2].Text;
+                entry.Title = Table.Instance.Encode(po.Entries[i * 2].Text);
 
-                string descriptionEntry = po.Entries[(i * 2) + 1].Text;
+                string descriptionEntry = Table.Instance.Encode(po.Entries[(i * 2) + 1].Text);
                 if (descriptionEntry == "<!empty>") {
                     entry.Description1 = string.Empty;
                     entry.Description2 = string.Empty;

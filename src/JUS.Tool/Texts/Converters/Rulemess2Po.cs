@@ -65,7 +65,7 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < po.Entries.Count; i++) {
                 entry = new RulemessEntry();
-                description = JusText.SplitStringToList(po.Entries[i].Text, '\n', 3);
+                description = JusText.SplitStringToList(Table.Instance.Encode(po.Entries[i].Text), '\n', 3);
                 entry.Description1 = description[0];
                 entry.Description2 = description[1];
                 entry.Description3 = description[2];

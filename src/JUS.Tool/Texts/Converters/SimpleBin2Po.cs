@@ -59,7 +59,7 @@ namespace JUSToolkit.Texts.Converters
             var simpleBin = new SimpleBin();
 
             foreach (PoEntry entry in po.Entries) {
-                simpleBin.TextEntries.Add(entry.Text);
+                simpleBin.TextEntries.Add(Table.Instance.Encode(entry.Text));
             }
 
             return simpleBin;
