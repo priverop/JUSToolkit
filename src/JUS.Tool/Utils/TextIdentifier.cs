@@ -35,6 +35,7 @@ namespace JUSToolkit.Utils
             { "chr_b_t.bin", [typeof(Binary2BtlChr), typeof(BtlChr2Po)] },
             { "chr_s_t.bin", [typeof(Binary2SuppChr), typeof(SuppChr2Po)] },
             { "clearlst.bin", [typeof(Binary2SimpleBin), typeof(SimpleBin2Po)] },
+            { "commwin.bin", [typeof(Binary2Commwin), typeof(Commwin2Po)] },
             { "demo.bin", [typeof(Binary2Demo), typeof(Demo2Po)] },
             { "infoname.bin", [typeof(Binary2SimpleBin), typeof(SimpleBin2Po)] },
             { "komatxt.bin", [typeof(Binary2Komatxt), typeof(Komatxt2Po)] },
