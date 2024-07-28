@@ -42,6 +42,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             { "chr_b_t.bin", "/bin/chr_b_t.bin" },
             { "chr_s_t.bin", "/bin/chr_s_t.bin" },
             { "clearlst.bin", "/bin/clearlst.bin" },
+            { "commwin.bin", "/bin/commwin.bin" },
             { "demo.bin", "/bin/demo.bin" },
             { "infoname.bin", "/bin/infoname.bin" },
             { "location.bin", "/bin/location.bin" },
