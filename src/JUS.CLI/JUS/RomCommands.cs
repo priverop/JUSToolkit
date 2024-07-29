@@ -50,6 +50,7 @@ namespace JUSToolkit.CLI.JUS
             { "commwin.bin", new TextFile() },
             { "demo.bin", new TextFile() },
             { "infoname.bin", new TextFile() },
+            { "komatxt.bin", new TextFile() },
             { "location.bin", new TextFile() },
             { "piece.bin", new TextFile() },
             { "pname.bin", new TextFile() },

@@ -45,6 +45,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             { "commwin.bin", "/bin/commwin.bin" },
             { "demo.bin", "/bin/demo.bin" },
             { "infoname.bin", "/bin/infoname.bin" },
+            { "komatxt.bin", "/bin/komatxt.bin" },
             { "location.bin", "/bin/location.bin" },
             { "piece.bin", "/bin/piece.bin" },
             { "pname.bin", "/bin/pname.bin" },
