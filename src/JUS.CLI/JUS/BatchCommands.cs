@@ -70,12 +70,12 @@ namespace JUSToolkit.CLI.JUS
         /// Import PNG files into an Alar3 container.
         /// </summary>
         /// <param name="container">The path to the original alar3 file.</param>
-        /// <param name="input">The path to the directory of the PNGs we want to add, with the original .dig and .atm.</param>
+        /// <param name="input">The path to the directory of the PNGs we want to add.</param>
         /// <param name="output">The output directory.</param>
         public static void ImportPng2Alar3(string container, string input, string output)
         {
             Node originalAlar = NodeFactory.FromFile(container);
-            Node inputFiles = NodeFactory.FromDirectory(input);
+            Node inputFiles = NodeFactory.FromFile(input);
 
             var png2Alar3 = new Png2Alar3(originalAlar);
 
