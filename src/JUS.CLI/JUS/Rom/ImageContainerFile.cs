@@ -19,11 +19,17 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
+using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
 using JUSToolkit.Utils;
+using Texim.Compressions.Nitro;
+using Texim.Formats;
+using Texim.Images;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -33,19 +39,15 @@ namespace JUSToolkit.CLI.JUS.Rom
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.
     /// </summary>
-    public class ContainerFile : IFileImportStrategy
+    public class ImageContainerFile : IFileImportStrategy
     {
         private static readonly Dictionary<string, string> ContainerLocations = new() {
-            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" }, // Dónde está el .aar en el juego, pero faltaría la ruta interna del fichero .bin "{container}/jgalaxy/{file.Name}"
-            { "mission.bin", "/jgalaxy/jgalaxy.aar" },
-            { "battle.bin", "/jgalaxy/jgalaxy.aar" },
-            { "jquiz.bin", "/jquiz/jquiz_pack.aar" },
+            { "menu-option-option.png", "/option/option.aar" },
         };
 
         private static readonly List<(Regex, string)> PatternList = new()
         {
-            (new Regex(@"^bin-.*-.*\.bin$"), "/bin/InfoDeck.aar"), // "{container}/bin/deck/{file.Name}"
-            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^demo-.*-.*\.bin$"), "/demo/Demo.aar"), // "{container}/bin/deck/{file.Name}"
         };
 
         /// <summary>
@@ -74,29 +76,34 @@ namespace JUSToolkit.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node file, string containerPath, string parent = null)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
-                                .TransformWith<LzssDecompression>();
+            // // Original Alar3
+            // Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
+            //                     .TransformWith<LzssDecompression>();
 
-            Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
+            // var png2Alar3 = new Png2Alar3(containerNode);
 
-            var newBinary = new BinaryFormat();
+            // Alar3 alar = inputFiles
+            //     .TransformWith(png2Alar3)
+            //     .GetFormatAs<Alar3>();
 
-            // ToDo: We need to encapsulate/improve this
-            if (alarVersion.Major == 3) {
-                Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>();
-                alar.InsertModification(file, parent);
-                newBinary = alar.ConvertWith(new Alar3ToBinary());
-            } else if (alarVersion.Major == 2) {
-                Alar2 alar = containerNode.TransformWith<Binary2Alar2>()
-                .GetFormatAs<Alar2>();
-                alar.InsertModification(file); // ToDo: parent
-                newBinary = alar.ConvertWith(new Alar2ToBinary());
-            }
+            // using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
 
-            containerNode.ChangeFormat(newBinary);
+            // var newBinary = new BinaryFormat();
 
-            Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
+            // Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
+            // // ToDo: We need to encapsulate/improve this
+            // if (alarVersion.Major == 3) {
+            //     Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
+            //     .GetFormatAs<Alar3>();
+            //     alar.InsertModification(file, parent);
+            //     newBinary = alar.ConvertWith(new Alar3ToBinary());
+            // } else if (alarVersion.Major == 2) {
+            //     throw new FormatException("Not implemented yet!")
+            // }
+
+            // containerNode.ChangeFormat(newBinary);
+
+            // Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
         }
 
         /// <summary>

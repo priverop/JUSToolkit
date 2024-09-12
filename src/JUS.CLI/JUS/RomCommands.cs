@@ -57,16 +57,17 @@ namespace JUSToolkit.CLI.JUS
             { "rulemess.bin", new TextFile() },
             { "stage.bin", new TextFile() },
             { "title.bin", new TextFile() },
-            { "jgalaxy.bin", new ContainerFile() },
-            { "mission.bin", new ContainerFile() },
-            { "battle.bin", new ContainerFile() },
-            { "jquiz.bin", new ContainerFile() },
+            { "jgalaxy.bin", new TextContainerFile() },
+            { "mission.bin", new TextContainerFile() },
+            { "battle.bin", new TextContainerFile() },
+            { "jquiz.bin", new TextContainerFile() },
         };
 
         private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
         {
-            (new Regex(@"^bin-.*-.*\.bin$"), new ContainerFile()),
-            (new Regex(@"^deck-.*-.*\.bin$"), new ContainerFile()),
+            (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
+            (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
+            (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
         };
 
         /// <summary>
