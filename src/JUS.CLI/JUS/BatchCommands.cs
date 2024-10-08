@@ -59,7 +59,8 @@ namespace JUSToolkit.CLI.JUS
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (Node image in result.Root.Children) {
+            foreach (Node image in result.Root.Children)
+            {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
@@ -75,11 +76,12 @@ namespace JUSToolkit.CLI.JUS
         public static void ImportPng2Alar3(string container, string input, string output)
         {
             Node originalAlar = NodeFactory.FromFile(container);
-            Node inputFiles = NodeFactory.FromFile(input);
+            Node inputFile = NodeFactory.FromFile(input);
 
-            var png2Alar3 = new Png2Alar3(originalAlar);
+            var png2Alar3 = new Png2Alar3(originalAlar, inputFile.Name);
 
-            Alar3 alar = inputFiles
+            // ToDo: este alar es un NCF con Root inputFile y eso no está bien, debería ser originalAlar
+            Alar3 alar = inputFile
                 .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 

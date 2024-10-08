@@ -65,7 +65,7 @@ namespace JUSToolkit.Tests.Batch
             NodeContainerFormat inputPngs = new NodeContainerFormat();
             // Continuar
 
-            var png2Alar3 = new Png2Alar3(originalAlar);
+            var png2Alar3 = new Png2Alar3(originalAlar, nodePng.Name);
 
             Alar3 alar = nodePng
                 .TransformWith(png2Alar3)
