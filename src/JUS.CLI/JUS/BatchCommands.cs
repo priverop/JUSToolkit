@@ -23,6 +23,7 @@ using System.IO;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics.Converters;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -59,8 +60,7 @@ namespace JUSToolkit.CLI.JUS
             NodeContainerFormat result = originalAlar
                 .GetFormatAs<NodeContainerFormat>();
 
-            foreach (Node image in result.Root.Children)
-            {
+            foreach (Node image in result.Root.Children) {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
@@ -75,19 +75,18 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ImportPng2Alar3(string container, string input, string output)
         {
-            Node originalAlar = NodeFactory.FromFile(container);
-            Node inputFile = NodeFactory.FromFile(input);
+            Node originalAlar = NodeFactory.FromFile(container).TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
+            Node inputPNG = NodeFactory.FromFile(input);
 
-            var png2Alar3 = new Png2Alar3(originalAlar, inputFile.Name);
+            var png2Alar3 = new Png2Alar3(inputPNG);
 
-            // ToDo: este alar es un NCF con Root inputFile y eso no está bien, debería ser originalAlar
-            Alar3 alar = inputFile
+            Alar3 newAlar = originalAlar
                 .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
-            using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
+            using BinaryFormat binary = newAlar.ConvertWith(new Alar3ToBinary());
 
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + originalAlar.Name));
 
             Console.WriteLine("Done!");
         }

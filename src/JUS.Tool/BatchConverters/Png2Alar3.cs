@@ -21,7 +21,6 @@ using System;
 using System.IO;
 using System.Linq;
 using JUSToolkit.Containers;
-using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
 using JUSToolkit.Utils;
@@ -35,59 +34,49 @@ using Yarhl.IO;
 namespace JUSToolkit.BatchConverters
 {
     /// <summary>
-    /// Converts a bunch of PNGs to and Alar3.
+    /// Inserts a PNG into an Alar3.
     /// </summary>
     public class Png2Alar3 :
-        IConverter<BinaryFormat, Alar3>
+        IConverter<Alar3, Alar3>
     {
         private NodeContainerFormat transformedFiles; // Dig+Atm to insert in the Alar3
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Png2Alar3"/> class.
         /// </summary>
-        /// <param name="alar">Original Alar.</param>
-        /// <param name="imageName">Name of the PNG to insert.</param>
-        public Png2Alar3(Node alar, string imageName)
+        /// <param name="image">PNG to insert.</param>
+        public Png2Alar3(Node image)
         {
-            OriginalAlar = alar;
-            ImageName = imageName;
+            Image = image;
         }
 
         /// <summary>
-        /// Gets or sets the Original Alar.
+        /// Gets or sets the PNG we are inserting.
         /// </summary>
-        public Node OriginalAlar { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Name of the PNG we are converting.
-        /// </summary>
-        public string ImageName { get; set; }
+        public Node Image { get; set; }
 
         /// <summary>
         /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar3"/> container.
         /// </summary>
-        /// <param name="source">File (png) to convert.</param>
-        /// <returns><see cref="Alar3"/>.</returns>
-        public Alar3 Convert(BinaryFormat source)
+        /// <param name="originalAlar">Original Alar3.</param>
+        /// <returns><see cref="Alar3"/>Alar3 with the PNG inserted.</returns>
+        public Alar3 Convert(Alar3 originalAlar)
         {
-            if (Path.GetExtension(ImageName) != ".png") {
+            if (Path.GetExtension(Image.Name) != ".png") {
                 throw new FormatException("Invalid png file");
             }
-
-            Alar3 alar = OriginalAlar
-                .TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>() ?? throw new FormatException("Invalid container file");
 
             transformedFiles = new NodeContainerFormat();
 
             // Obtaining the name without extension to find the .dig and .atm with the same name
-            string cleanName = Path.GetFileNameWithoutExtension(ImageName);
-            NodeContainerFormat originals = GetOriginals(alar, cleanName);
-            Transform(new Node(ImageName, source), originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
+            string cleanName = Path.GetFileNameWithoutExtension(Image.Name);
+            NodeContainerFormat originals = GetOriginals(originalAlar, cleanName);
+            Transform(Image, originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
 
-            alar.InsertModification(transformedFiles.Root);
+            // TransformedFiles tiene el dig nuevo?
+            originalAlar.InsertModification(transformedFiles);
 
-            return alar; // Here alar is a NCF with correct Root (OriginalAlar)
+            return originalAlar;
         }
 
         private static NodeContainerFormat GetOriginals(Alar3 alar, string name)
@@ -97,9 +86,11 @@ namespace JUSToolkit.BatchConverters
             Node dig = Navigator.IterateNodes(alar.Root).First(n => n.Name == name + ".dig") ?? throw new FormatException("Dig doesn't exist: " + name + ".dig");
             Node atm = Navigator.IterateNodes(alar.Root).First(n => n.Name == name + ".atm") ?? throw new FormatException("Atm doesn't exist: " + name + ".atm");
 
-            // Do we need to copy them?
-            originals.Root.Add(dig);
-            originals.Root.Add(atm);
+            // Clone the nodes
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
+            originals.Root.Add(new Node(dig.Name, dig_clone));
+            originals.Root.Add(new Node(atm.Name, atm_clone));
 
             return originals;
         }
@@ -155,6 +146,8 @@ namespace JUSToolkit.BatchConverters
                 binaryAtm;
 
             transformedFiles.Root.Add(new Node(atm.Name, compressedAtm));
+
+
         }
     }
 }
