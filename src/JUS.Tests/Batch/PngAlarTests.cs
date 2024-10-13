@@ -60,20 +60,19 @@ namespace JUSToolkit.Tests.Batch
             TestDataBase.IgnoreIfFileDoesNotExist(pngPath);
 
             using Node originalAlar = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
-            using Node nodePng = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
+            using Node inputPNG = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
-            NodeContainerFormat inputPngs = new NodeContainerFormat();
-            // Continuar
+            var originalStream = new DataStream(originalAlar.Stream!, 0, originalAlar.Stream.Length);
 
-            var png2Alar3 = new Png2Alar3(originalAlar, nodePng.Name);
+            var png2Alar3 = new Png2Alar3(inputPNG);
 
-            Alar3 alar = nodePng
+            Alar3 newAlar = originalAlar
+                .TransformWith<Binary2Alar3>()
                 .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
-            using BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
+            using BinaryFormat generatedStream = newAlar.ConvertWith(new Alar3ToBinary());
 
-            var originalStream = new DataStream(originalAlar.Stream!, 0, originalAlar.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }
