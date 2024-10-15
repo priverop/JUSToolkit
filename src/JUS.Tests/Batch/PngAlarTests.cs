@@ -52,17 +52,19 @@ namespace JUSToolkit.Tests.Batch
                     .SetName($"({data[0]}, {data[1]}"));
         }
 
+        // Pleonex's NDS Image Compression algorithm is better than Nintendo's, so the output .aar is smaller than the original.
+        // So we test that the original png and the output one is the same:
+        // PNG + Alar -> Alar -> PNG
         [TestCaseSource(nameof(GetFiles))]
-        public void TwoWaysIdenticalAlarStream(string alarPath, string pngPath)
+        public void TwoWaysIdenticalPngStream(string alarPath, string pngPath)
         {
-            Assert.Ignore();
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
             TestDataBase.IgnoreIfFileDoesNotExist(pngPath);
 
             using Node originalAlar = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node inputPNG = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
-            var originalStream = new DataStream(originalAlar.Stream!, 0, originalAlar.Stream.Length);
+            var originalStream = new DataStream(inputPNG.Stream!, 0, inputPNG.Stream.Length);
 
             var png2Alar3 = new Png2Alar3(inputPNG);
 
@@ -71,10 +73,20 @@ namespace JUSToolkit.Tests.Batch
                 .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
-            using BinaryFormat generatedStream = newAlar.ConvertWith(new Alar3ToBinary());
+            string originalName = Path.GetFileNameWithoutExtension(pngPath);
 
-            generatedStream.Stream.Length.Should().Be(originalStream.Length);
-            generatedStream.Stream.Compare(originalStream).Should().BeTrue();
+            // Extracting the png from the newAlar to compare it with the original
+            Node dig = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");
+            Node atm = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".atm") ?? throw new FormatException("Atm doesn't exist: " + originalName + ".atm");
+
+            var binaryDig2Bitmap = new BinaryDig2Bitmap(atm);
+
+            using Node pixelsPaletteNode = dig.TransformWith(binaryDig2Bitmap);
+
+            pixelsPaletteNode.Stream.WriteTo("testing_.png");
+
+            pixelsPaletteNode.Stream.Length.Should().Be(originalStream.Length);
+            pixelsPaletteNode.Stream.Compare(originalStream).Should().BeTrue();
         }
     }
 }
