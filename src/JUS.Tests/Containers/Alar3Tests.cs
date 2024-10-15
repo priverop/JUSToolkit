@@ -207,8 +207,8 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(newStream, alar.Root.Children[1].Stream);
         }
 
-        [TestCaseSource(nameof(GetAlar3SubDirectoriesInsertionFiles))]
         // Inserting Nodes in a ALAR3 with subdirectories. What if the same node.Name is in two different subdirectories of the same ALAR3?
+        [TestCaseSource(nameof(GetAlar3SubDirectoriesInsertionFiles))]
         public void ReplacingNodesWithPath(string alarPath, string fileToInsert, string parent, string internalPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);

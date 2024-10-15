@@ -146,8 +146,6 @@ namespace JUSToolkit.BatchConverters
                 binaryAtm;
 
             transformedFiles.Root.Add(new Node(atm.Name, compressedAtm));
-
-
         }
     }
 }
