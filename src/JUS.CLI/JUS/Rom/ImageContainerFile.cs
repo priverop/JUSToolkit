@@ -47,6 +47,7 @@ namespace JUSToolkit.CLI.JUS.Rom
 
         private static readonly List<(Regex, string)> PatternList = new()
         {
+
             (new Regex(@"^demo-.*-.*\.bin$"), "/demo/Demo.aar"), // "{container}/bin/deck/{file.Name}"
         };
 
@@ -58,14 +59,13 @@ namespace JUSToolkit.CLI.JUS.Rom
         public void Import(Node gameNode, Node file)
         {
             if (ContainerLocations.TryGetValue(file.Name, out string path)) {
+                file.Name = GetOriginalName(file.Name);
                 ProcessContainer(gameNode, file, path);
             } else {
                 // Si no se encuentra, intenta encontrar la ruta interna usando patrones
                 foreach ((Regex pattern, string containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
-                        string parent = GetParentName(file.Name);
-                        file.Name = GetOriginalName(file.Name);
-                        ProcessContainer(gameNode, file, containerPath, parent);
+                        ProcessContainer(gameNode, file, containerPath);
                         return;
                     }
                 }
@@ -74,42 +74,31 @@ namespace JUSToolkit.CLI.JUS.Rom
             }
         }
 
-        private static void ProcessContainer(Node gameNode, Node file, string containerPath, string parent = null)
+        private static void ProcessContainer(Node gameNode, Node file, string containerPath)
         {
-            // // Original Alar3
-            // Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
-            //                     .TransformWith<LzssDecompression>();
+            // 1 - Buscar el Alar3 Original
+            Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
+                                .TransformWith<Binary2Alar3>();
 
-            // var png2Alar3 = new Png2Alar3(containerNode);
+            // 2 - Hacer el Png2Alar
+            var png2Alar3 = new Png2Alar3(file);
 
-            // Alar3 alar = inputFiles
-            //     .TransformWith(png2Alar3)
-            //     .GetFormatAs<Alar3>();
+            Alar3 newAlar = originalAlar
+                .TransformWith(png2Alar3)
+                .GetFormatAs<Alar3>();
 
-            // using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
+            BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
 
-            // var newBinary = new BinaryFormat();
+            // 3 - Sustituirlo
+            originalAlar.ChangeFormat(newBinary);
 
-            // Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
-            // // ToDo: We need to encapsulate/improve this
-            // if (alarVersion.Major == 3) {
-            //     Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
-            //     .GetFormatAs<Alar3>();
-            //     alar.InsertModification(file, parent);
-            //     newBinary = alar.ConvertWith(new Alar3ToBinary());
-            // } else if (alarVersion.Major == 2) {
-            //     throw new FormatException("Not implemented yet!")
-            // }
-
-            // containerNode.ChangeFormat(newBinary);
-
-            // Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
+            Console.WriteLine($"File replaced: /root/data{containerPath}/{file.Name}");
         }
 
         /// <summary>
         /// Remove the first two words separated by dashes "x-y-".
         /// </summary>
-        /// <param name="nameWithPattern">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
+        /// <param name="nameWithPattern">The string containing potentially "menu-option-", "menu-start-", "menu-whatever"... prefixes.</param>
         /// <returns>The original name without the prefixes. If the input string is null or empty, the original string is returned.</returns>
         private static string GetOriginalName(string nameWithPattern)
         {
@@ -120,28 +109,6 @@ namespace JUSToolkit.CLI.JUS.Rom
             // Regular expression to match and remove the first two words separated by dashes
             var regex = new Regex(@"^[^-]+-[^-]+-");
             return regex.Replace(nameWithPattern, string.Empty);
-        }
-
-        /// <summary>
-        /// Gets the directory name of the file (parent). "bin-deck-bb.bin" will return "deck".
-        /// </summary>
-        /// <param name="name">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
-        /// <returns>The directory name. If the input string is null or empty, the original string is returned.</returns>
-        private static string GetParentName(string name)
-        {
-            if (string.IsNullOrEmpty(name) || !name.Contains('-')) {
-                return null;
-            }
-
-            // Regular expression to capture the second word
-            var regex = new Regex(@"^[^-]+-([^-]+)-");
-            Match match = regex.Match(name);
-
-            if (match.Success && match.Groups.Count > 1) {
-                return match.Groups[1].Value;
-            }
-
-            return null;
         }
     }
 }

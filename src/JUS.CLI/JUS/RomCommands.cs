@@ -88,7 +88,7 @@ namespace JUSToolkit.CLI.JUS
                 if (ImportStrategies.TryGetValue(file.Name, out IFileImportStrategy strategy)) {
                     strategy.Import(gameNode, file);
                 } else {
-                    // Pattern names for InfoDeck
+                    // Pattern names
                     bool matched = false;
                     foreach ((Regex pattern, IFileImportStrategy patternStrategy) in PatternStrategies) {
                         if (pattern.IsMatch(file.Name)) {

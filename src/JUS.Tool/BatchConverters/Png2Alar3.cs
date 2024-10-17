@@ -73,7 +73,6 @@ namespace JUSToolkit.BatchConverters
             NodeContainerFormat originals = GetOriginals(originalAlar, cleanName);
             Transform(Image, originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
 
-            // TransformedFiles tiene el dig nuevo?
             originalAlar.InsertModification(transformedFiles);
 
             return originalAlar;
