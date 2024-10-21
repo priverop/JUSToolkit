@@ -68,7 +68,7 @@ namespace JUSToolkit.CLI.JUS.Rom
                     }
                 }
 
-                Console.WriteLine($"File not compatible as container: {file.Name}");
+                Console.WriteLine($"File not compatible as text container: {file.Name}");
             }
         }
 

@@ -19,17 +19,10 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
-using Texim.Images;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -42,12 +35,41 @@ namespace JUSToolkit.CLI.JUS.Rom
     public class ImageContainerFile : IFileImportStrategy
     {
         private static readonly Dictionary<string, string> ContainerLocations = new() {
+            { "menu-Commu-code.png", "/Commu/commu_pack.aar" },
+            { "menu-Commu-sure02.png", "/Commu/commu_pack.aar" },
+            { "menu-Commu-top_left.png", "/Commu/commu_pack.aar" },
+            { "menu-Commu-top_right.png", "/Commu/commu_pack.aar" },
+            { "menu-JArena-a_result01.png", "/JArena/JArena.aar" },
+            { "menu-JArena-congra_top00.png", "/JArena/JArena.aar" },
+            { "menu-JArena-mis01.png", "/JArena/JArena.aar" },
+            { "menu-JArena-mis_top10.png", "/JArena/JArena.aar" },
+            { "menu-JArena-ranking_list.png", "/JArena/JArena.aar" },
+            { "menu-database-list_bg0.png", "/database/database.aar" },
+            { "menu-database-personal_bg.png", "/database/database.aar" },
+            { "menu-database-personal_bg2.png", "/database/database.aar" },
+            { "menu-database-playing.png", "/database/database.aar" },
+            { "menu-database-story_bg0.png", "/database/database.aar" },
+            { "menu-database-story_bg1.png", "/database/database.aar" },
+            { "menu-deckselect-deck_standby00.png", "/deckselect/deckselect.aar" },
+            { "menu-deckselect-deck_standby01.png", "/deckselect/deckselect.aar" },
+            { "menu-input-mode_bg0.png", "/input/input.aar" },
+            { "menu-input-mode_bg1.png", "/input/input.aar" },
+            { "menu-input-mode_bg2.png", "/input/input.aar" },
+            { "menu-input-mode_bg3.png", "/input/input.aar" },
+            { "menu-jgalaxy-ba_m_sel01.png", "/jgalaxy/jgalaxy.aar" },
+            { "menu-jgalaxy-victory00.png", "/jgalaxy/jgalaxy.aar" },
+            { "menu-jgalaxy-win_sel.png", "/jgalaxy/jgalaxy.aar" },
+            { "menu-jpower-jp.png", "/jpower/jpower.aar" },
+            { "menu-jpower-jp_top.png", "/jpower/jpower.aar" },
+            { "menu-option-info00.png", "/option/option.aar" },
             { "menu-option-option.png", "/option/option.aar" },
+            { "menu-ruleselect-rule_sel00.png", "/ruleselect/ruleselect.aar" },
+            { "menu-stageselect-st_sel01.png", "/stageselect/stageselect.aar" },
+            { "menu-topmenu-top_bg01.png", "/topmenu/topmenu.aar" },
         };
 
         private static readonly List<(Regex, string)> PatternList = new()
         {
-
             (new Regex(@"^demo-.*-.*\.bin$"), "/demo/Demo.aar"), // "{container}/bin/deck/{file.Name}"
         };
 
@@ -70,15 +92,15 @@ namespace JUSToolkit.CLI.JUS.Rom
                     }
                 }
 
-                Console.WriteLine($"File not compatible as container: {file.Name}");
+                Console.WriteLine($"File not compatible as image container: {file.Name}");
             }
         }
 
         private static void ProcessContainer(Node gameNode, Node file, string containerPath)
         {
             // 1 - Buscar el Alar3 Original
-            Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
-                                .TransformWith<Binary2Alar3>();
+            Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
+            originalAlar.TransformWith<Binary2Alar3>();
 
             // 2 - Hacer el Png2Alar
             var png2Alar3 = new Png2Alar3(file);
