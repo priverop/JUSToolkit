@@ -20,10 +20,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -71,14 +74,23 @@ namespace JUSToolkit.CLI.JUS
         /// Import PNG files into an Alar3 container.
         /// </summary>
         /// <param name="container">The path to the original alar3 file.</param>
-        /// <param name="input">The path to the directory of the PNGs we want to add.</param>
+        /// <param name="input">The path to the PNG we want to insert.</param>
         /// <param name="output">The output directory.</param>
         public static void ImportPng2Alar3(string container, string input, string output)
         {
             Node originalAlar = NodeFactory.FromFile(container).TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
             Node inputPNG = NodeFactory.FromFile(input);
 
-            var png2Alar3 = new Png2Alar3(inputPNG);
+            string cleanName = StringFunctions.GetOriginalName(inputPNG.Name);
+
+            // Get the Dig and the Atm from the original Alar3
+            Node dig = Navigator.IterateNodes(originalAlar).First(n => n.Name == cleanName) ?? throw new FormatException("Dig doesn't exist: " + cleanName + ".dig");
+            Node atm = Navigator.IterateNodes(originalAlar).First(n => n.Name == cleanName) ?? throw new FormatException("Atm doesn't exist: " + cleanName + ".atm");
+
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
+
+            var png2Alar3 = new Png2Alar3(inputPNG, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
 
             Alar3 newAlar = originalAlar
                 .TransformWith(png2Alar3)

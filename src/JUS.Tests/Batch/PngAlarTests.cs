@@ -27,6 +27,7 @@ using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using NUnit.Framework;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
@@ -61,27 +62,34 @@ namespace JUSToolkit.Tests.Batch
             TestDataBase.IgnoreIfFileDoesNotExist(alarPath);
             TestDataBase.IgnoreIfFileDoesNotExist(pngPath);
 
-            using Node originalAlar = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
+            using Node originalAlar = NodeFactory.FromFile(alarPath, FileOpenMode.Read)
+            .TransformWith<Binary2Alar3>();
             using Node inputPNG = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
             var originalStream = new DataStream(inputPNG.Stream!, 0, inputPNG.Stream.Length);
 
-            var png2Alar3 = new Png2Alar3(inputPNG);
+            string originalName = Path.GetFileNameWithoutExtension(pngPath);
+
+            // Get the Dig and the Atm from the original Alar3
+            Node dig = Navigator.IterateNodes(originalAlar).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");
+            Node atm = Navigator.IterateNodes(originalAlar).First(n => n.Name == originalName + ".atm") ?? throw new FormatException("Atm doesn't exist: " + originalName + ".atm");
+
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
+
+            var png2Alar3 = new Png2Alar3(inputPNG, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
 
             Alar3 newAlar = originalAlar
-                .TransformWith<Binary2Alar3>()
                 .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
-            string originalName = Path.GetFileNameWithoutExtension(pngPath);
-
             // Extracting the png from the newAlar to compare it with the original
-            Node dig = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");
-            Node atm = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".atm") ?? throw new FormatException("Atm doesn't exist: " + originalName + ".atm");
+            Node newDig = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");
+            Node newAtm = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".atm") ?? throw new FormatException("Atm doesn't exist: " + originalName + ".atm");
 
-            var binaryDig2Bitmap = new BinaryDig2Bitmap(atm);
+            var binaryDig2Bitmap = new BinaryDig2Bitmap(newAtm);
 
-            using Node pixelsPaletteNode = dig.TransformWith(binaryDig2Bitmap);
+            using Node pixelsPaletteNode = newDig.TransformWith(binaryDig2Bitmap);
 
             pixelsPaletteNode.Stream.WriteTo("testing_.png");
 

@@ -39,21 +39,33 @@ namespace JUSToolkit.BatchConverters
     public class Png2Alar3 :
         IConverter<Alar3, Alar3>
     {
-        private NodeContainerFormat transformedFiles; // Dig+Atm to insert in the Alar3
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Png2Alar3"/> class.
         /// </summary>
         /// <param name="image">PNG to insert.</param>
-        public Png2Alar3(Node image)
+        /// <param name="dig">Dig of the image we are inserting.</param>
+        /// <param name="atm">Atm of the image we are inserting.</param>
+        public Png2Alar3(Node image, Node dig, Node atm)
         {
             Image = image;
+            Dig = dig;
+            Atm = atm;
         }
 
         /// <summary>
         /// Gets or sets the PNG we are inserting.
         /// </summary>
         public Node Image { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Original Dig of the image we are inserting.
+        /// </summary>
+        public Node Dig { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Original Atm of the image we are inserting.
+        /// </summary>
+        public Node Atm { get; set; }
 
         /// <summary>
         /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar3"/> container.
@@ -66,61 +78,33 @@ namespace JUSToolkit.BatchConverters
                 throw new FormatException("Invalid png file");
             }
 
-            transformedFiles = new NodeContainerFormat();
+            var transformedFiles = new NodeContainerFormat();
 
-            // Obtaining the name without extension to find the .dig and .atm with the same name
-            string cleanName = Path.GetFileNameWithoutExtension(Image.Name);
-            NodeContainerFormat originals = GetOriginals(originalAlar, cleanName);
-            Transform(Image, originals.Root.Children[cleanName + ".dig"], originals.Root.Children[cleanName + ".atm"]);
-
-            originalAlar.InsertModification(transformedFiles);
-
-            return originalAlar;
-        }
-
-        private static NodeContainerFormat GetOriginals(Alar3 alar, string name)
-        {
-            var originals = new NodeContainerFormat();
-
-            Node dig = Navigator.IterateNodes(alar.Root).First(n => n.Name == name + ".dig") ?? throw new FormatException("Dig doesn't exist: " + name + ".dig");
-            Node atm = Navigator.IterateNodes(alar.Root).First(n => n.Name == name + ".atm") ?? throw new FormatException("Atm doesn't exist: " + name + ".atm");
-
-            // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-            originals.Root.Add(new Node(dig.Name, dig_clone));
-            originals.Root.Add(new Node(atm.Name, atm_clone));
-
-            return originals;
-        }
-
-        private void Transform(Node png, Node dig, Node atm)
-        {
-            bool digIsCompressed = CompressionUtils.IsCompressed(dig);
+            bool digIsCompressed = CompressionUtils.IsCompressed(Dig);
             Node uncompressedDig = digIsCompressed ?
-                dig.TransformWith<LzssDecompression>() :
-                dig;
+                Dig.TransformWith<LzssDecompression>() :
+                Dig;
 
             Dig originalDig = uncompressedDig
                 .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
+                .GetFormatAs<Dig>() ?? throw new FormatException("Invalid Dig file");
 
-            bool atmIsCompressed = CompressionUtils.IsCompressed(atm);
+            bool atmIsCompressed = CompressionUtils.IsCompressed(Atm);
             Node uncompressedAtm = atmIsCompressed ?
-                atm.TransformWith<LzssDecompression>() :
-                atm;
+                Atm.TransformWith<LzssDecompression>() :
+                Atm;
 
             Almt originalAtm = uncompressedAtm
                     .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
+                    .GetFormatAs<Almt>() ?? throw new FormatException("Invalid Atm file");
 
             var compressionParams = new FullImageMapCompressionParams {
                 Palettes = originalDig,
             };
 
-            png.Stream.Position = 0;
+            Image.Stream.Position = 0;
             var mapCompression = new FullImageMapCompression(compressionParams);
-            Node compressed = png
+            Node compressed = Image
                 .TransformWith<Bitmap2FullImage>()
                 .TransformWith(mapCompression);
             IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
@@ -134,7 +118,7 @@ namespace JUSToolkit.BatchConverters
                 new LzssCompression().Convert(binaryDig) :
                 binaryDig;
 
-            transformedFiles.Root.Add(new Node(dig.Name, compressedDig));
+            transformedFiles.Root.Add(new Node(Dig.Name, compressedDig));
 
             // Atm
             var newAtm = new Almt(originalAtm, map);
@@ -144,7 +128,11 @@ namespace JUSToolkit.BatchConverters
                 new LzssCompression().Convert(binaryAtm) :
                 binaryAtm;
 
-            transformedFiles.Root.Add(new Node(atm.Name, compressedAtm));
+            transformedFiles.Root.Add(new Node(Atm.Name, compressedAtm));
+
+            originalAlar.InsertModification(transformedFiles);
+
+            return originalAlar;
         }
     }
 }

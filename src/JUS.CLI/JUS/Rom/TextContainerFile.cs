@@ -62,7 +62,7 @@ namespace JUSToolkit.CLI.JUS.Rom
                 foreach ((Regex pattern, string containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
                         string parent = GetParentName(file.Name);
-                        file.Name = GetOriginalName(file.Name);
+                        file.Name = StringFunctions.GetOriginalName(file.Name);
                         ProcessContainer(gameNode, file, containerPath, parent);
                         return;
                     }
@@ -85,22 +85,6 @@ namespace JUSToolkit.CLI.JUS.Rom
             containerNode.ChangeFormat(newBinary);
 
             Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
-        }
-
-        /// <summary>
-        /// Remove the first two words separated by dashes "x-y-".
-        /// </summary>
-        /// <param name="nameWithPattern">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
-        /// <returns>The original name without the prefixes. If the input string is null or empty, the original string is returned.</returns>
-        private static string GetOriginalName(string nameWithPattern)
-        {
-            if (string.IsNullOrEmpty(nameWithPattern) || !nameWithPattern.Contains('-')) {
-                return nameWithPattern;
-            }
-
-            // Regular expression to match and remove the first two words separated by dashes
-            var regex = new Regex(@"^[^-]+-[^-]+-");
-            return regex.Replace(nameWithPattern, string.Empty);
         }
 
         /// <summary>
