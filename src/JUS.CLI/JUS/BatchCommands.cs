@@ -83,14 +83,7 @@ namespace JUSToolkit.CLI.JUS
 
             string cleanName = StringFunctions.GetOriginalName(inputPNG.Name);
 
-            // Get the Dig and the Atm from the original Alar3
-            Node dig = Navigator.IterateNodes(originalAlar).First(n => n.Name == cleanName) ?? throw new FormatException("Dig doesn't exist: " + cleanName + ".dig");
-            Node atm = Navigator.IterateNodes(originalAlar).First(n => n.Name == cleanName) ?? throw new FormatException("Atm doesn't exist: " + cleanName + ".atm");
-
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-
-            var png2Alar3 = new Png2Alar3(inputPNG, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
+            var png2Alar3 = new Png2Alar3(inputPNG, cleanName + ".dig", cleanName + ".atm");
 
             Alar3 newAlar = originalAlar
                 .TransformWith(png2Alar3)

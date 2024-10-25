@@ -104,15 +104,8 @@ namespace JUSToolkit.CLI.JUS.Rom
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{imageInfo[2]}") ?? throw new FormatException($"Container not found /root/data{imageInfo[2]}");
             originalAlar.TransformWith<Binary2Alar3>();
 
-            // 2 - Get the Dig and the Atm from the original Alar3
-            Node dig = Navigator.IterateNodes(originalAlar).First(n => n.Name == imageInfo[0]) ?? throw new FormatException("Dig doesn't exist: " + imageInfo[0] + ".dig");
-            Node atm = Navigator.IterateNodes(originalAlar).First(n => n.Name == imageInfo[1]) ?? throw new FormatException("Atm doesn't exist: " + imageInfo[1] + ".atm");
-
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-
-            // 2 - Hacer el Png2Alar
-            var png2Alar3 = new Png2Alar3(pngFile, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
+            // 2 - Insert the Png into the Alar3
+            var png2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]);
 
             Alar3 newAlar = originalAlar
                 .TransformWith(png2Alar3)
