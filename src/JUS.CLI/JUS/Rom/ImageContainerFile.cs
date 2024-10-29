@@ -38,6 +38,10 @@ namespace JUSToolkit.CLI.JUS.Rom
     {
         private static readonly Dictionary<string, string[]> ContainerLocations = new() {
             { "menu-Commu-code.png", ["code.dig", "code.atm", "/Commu/commu_pack.aar"] },
+            { "menu-Commu-matchmake.png", ["matchmake.dig", "matchmake.atm", "/Commu/commu_pack.aar"] },
+            { "menu-Commu-member.png", ["member.dig", "member.atm", "/Commu/commu_pack.aar"] },
+            { "menu-Commu-member_data.png", ["member.dig", "member_data.atm", "/Commu/commu_pack.aar"] },
+            { "menu-Commu-member_wireless.png", ["member.dig", "member_wireless.atm", "/Commu/commu_pack.aar"] },
             { "menu-Commu-sure02.png", ["sure02.dig", "sure02.atm", "/Commu/commu_pack.aar"] },
             { "menu-Commu-top_left.png", ["top_left.dig", "top_left.atm", "/Commu/commu_pack.aar"] },
             { "menu-Commu-top_right.png", ["top_right.dig", "top_right.atm", "/Commu/commu_pack.aar"] },
@@ -52,6 +56,8 @@ namespace JUSToolkit.CLI.JUS.Rom
             { "menu-database-playing.png", ["playing.dig", "playing.atm", "/database/database.aar"] },
             { "menu-database-story_bg0.png", ["story_bg0.dig", "story_bg0.atm", "/database/database.aar"] },
             { "menu-database-story_bg1.png", ["story_bg1.dig", "story_bg1.atm", "/database/database.aar"] },
+            { "menu-deckcheck-win_a.png", ["win.dig", "win_a.atm", "/deckcheck/deckcheck.aar"] },
+            { "menu-deckcheck-win_g.png", ["win.dig", "win_g.atm", "/deckcheck/deckcheck.aar"] },
             { "menu-deckselect-deck_standby00.png", ["deck_standby00.dig", "deck_standby00.atm", "/deckselect/deckselect.aar"] },
             { "menu-deckselect-deck_standby01.png", ["deck_standby01.dig", "deck_standby01.atm", "/deckselect/deckselect.aar"] },
             { "menu-input-mode_bg0.png", ["mode_bg0.dig", "mode_bg0.atm", "/input/input.aar"] },
@@ -60,6 +66,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             { "menu-input-mode_bg3.png", ["mode_bg3.dig", "mode_bg3.atm", "/input/input.aar"] },
             { "menu-jgalaxy-ba_m_sel01.png", ["ba_m_sel01.dig", "ba_m_sel01.atm", "/jgalaxy/jgalaxy.aar"] },
             { "menu-jgalaxy-victory00.png", ["victory00.dig", "victory00.atm", "/jgalaxy/jgalaxy.aar"] },
+            { "menu-jgalaxy-victory01.png", ["victory00.dig", "victory01.atm", "/jgalaxy/jgalaxy.aar"] },
             { "menu-jgalaxy-win_sel.png", ["win_sel.dig", "win_sel.atm", "/jgalaxy/jgalaxy.aar"] },
             { "menu-jpower-jp.png", ["jp.dig", "jp.atm", "/jpower/jpower.aar"] },
             { "menu-jpower-jp_top.png", ["jp_top.dig", "jp_top.atm", "/jpower/jpower.aar"] },
