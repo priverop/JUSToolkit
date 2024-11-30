@@ -124,7 +124,7 @@ namespace JUSToolkit.CLI.JUS
             bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
 
             if (originalIsCompressed) {
-                originalAlar.TransformWith<LzssDecompression>();
+                _ = originalAlar.TransformWith<LzssDecompression>();
             }
 
             Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
@@ -160,14 +160,21 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ImportAlar3(string container, string input, string output)
         {
+            Console.WriteLine("Container: " + container);
+            Console.WriteLine("Input files from: " + input);
+
             Alar3 alar = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
                 .GetFormatAs<Alar3>() ?? throw new FormatException("Invalid container file");
 
-            alar.InsertModification(NodeFactory.FromDirectory(input));
+            var filesToInsert = new NodeContainerFormat();
+            Node factory = NodeFactory.FromDirectory(input);
+            filesToInsert.Root.Add(factory);
+
+            alar.InsertModification(filesToInsert);
 
             using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
-            binary.Stream.WriteTo(Path.Combine(output, "imported"));
+            binary.Stream.WriteTo(Path.Combine(output, "imported.aar"));
 
             Console.WriteLine("Done!");
         }
