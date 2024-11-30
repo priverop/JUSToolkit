@@ -47,11 +47,27 @@ namespace JUSToolkit.BatchConverters
         /// <param name="image">PNG to insert.</param>
         /// <param name="digName">Name of the Dig.</param>
         /// <param name="atmName">Name of the atm.</param>
+        /// <param name="insertTransparent">Label to add a transparent pixel in the image.</param>
+        public Png2Alar3(Node image, string digName, string atmName, bool insertTransparent)
+        {
+            Image = image;
+            DigName = digName;
+            AtmName = atmName;
+            TransparentTile = insertTransparent;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Png2Alar3"/> class.
+        /// </summary>
+        /// <param name="image">PNG to insert.</param>
+        /// <param name="digName">Name of the Dig.</param>
+        /// <param name="atmName">Name of the atm.</param>
         public Png2Alar3(Node image, string digName, string atmName)
         {
             Image = image;
             DigName = digName;
             AtmName = atmName;
+            TransparentTile = false;
         }
 
         /// <summary>
@@ -68,6 +84,11 @@ namespace JUSToolkit.BatchConverters
         /// Gets or sets the original name of the Atm of the image.
         /// </summary>
         public string AtmName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the transparent pixel mode.
+        /// </summary>
+        public bool TransparentTile { get; set; }
 
         /// <summary>
         /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar3"/> container.
@@ -100,6 +121,7 @@ namespace JUSToolkit.BatchConverters
 
         private void Transform(Node png, Node dig, Node atm)
         {
+            // Original Dig
             bool digIsCompressed = CompressionUtils.IsCompressed(dig);
             Node uncompressedDig = digIsCompressed ?
                 dig.TransformWith<LzssDecompression>() :
@@ -109,6 +131,7 @@ namespace JUSToolkit.BatchConverters
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
 
+            // Original Atm
             bool atmIsCompressed = CompressionUtils.IsCompressed(atm);
             Node uncompressedAtm = atmIsCompressed ?
                 atm.TransformWith<LzssDecompression>() :
@@ -118,20 +141,25 @@ namespace JUSToolkit.BatchConverters
                     .TransformWith<Binary2Almt>()
                     .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
 
+            // Transform PNG into a FullImage (Pixels + Map) using the Dig Palette
             var compressionParams = new FullImageMapCompressionParams {
                 Palettes = originalDig,
             };
 
             png.Stream.Position = 0;
-            var mapCompression = new FullImageMapCompression(compressionParams);
             Node compressed = png
                 .TransformWith<Bitmap2FullImage>()
-                .TransformWith(mapCompression);
+                .TransformWith(new FullImageMapCompression(compressionParams));
             IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
             ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
 
-            // Dig
+            // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(originalDig, newImage);
+
+            if (TransparentTile) {
+                newDig = newDig.InsertTransparentTile(map);
+            }
+
             BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
             BinaryFormat compressedDig = digIsCompressed ?
@@ -140,7 +168,7 @@ namespace JUSToolkit.BatchConverters
 
             transformedFiles.Root.Add(new Node(dig.Name, compressedDig));
 
-            // Atm
+            // New Atm: original atm changing height, width and maps
             var newAtm = new Almt(originalAtm, map);
             BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
 
