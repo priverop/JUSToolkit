@@ -85,6 +85,7 @@ namespace JUSToolkit.Texts.Converters
                     writer.Write(commwin.UnknownEntries[j]);
                     j++;
                 }
+
                 JusText.WriteStringPointer(entry, writer, jit);
                 i++;
             }

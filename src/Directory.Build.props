@@ -13,6 +13,8 @@
         <NoWarn>NETSDK1179</NoWarn>
         <NoWarn>NU1507</NoWarn>
         <NoWarn>IDE0058</NoWarn>
+        <NoWarn>SA1010</NoWarn>
+        <NoWarn>SA1000</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

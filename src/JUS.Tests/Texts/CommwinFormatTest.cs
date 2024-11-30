@@ -61,6 +61,7 @@ namespace JUS.Tests.Texts
                     } catch (Exception ex) {
                         Assert.Fail($"Exception Commwin -> BinaryFormat with {node.Path}\n{ex}");
                     }
+
                     actualBin.Stream.WriteTo("test.bin");
 
                     // Comparing Binaries

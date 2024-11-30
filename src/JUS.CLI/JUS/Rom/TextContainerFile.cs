@@ -82,7 +82,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             alar.InsertModification(file, parent);
             BinaryFormat newBinary = alar.ConvertWith(new Alar3ToBinary());
 
-            containerNode.ChangeFormat(newBinary);
+            _ = containerNode.ChangeFormat(newBinary);
 
             Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
         }
