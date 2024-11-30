@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JUSToolkit.BatchConverters;
@@ -77,9 +78,16 @@ namespace JUSToolkit.CLI.JUS.Rom
             { "menu-topmenu-top_bg01.png", ["top_bg01.dig", "top_bg01.atm", "/topmenu/topmenu.aar"] },
         };
 
+        private static readonly Dictionary<char, char> SpecialDigNumbers = new() {
+            { '0', '3' },
+            { '1', '5' },
+            { '2', '7' },
+            { '3', '9' },
+        };
+
         private static readonly List<(Regex, string[])> PatternList = new()
         {
-            (new Regex(@"^demo-.*-.*\.bin$"), ["/demo/Demo.aar"]), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^demo-.*\.png$"), ["/demo/demo.aar"]),
         };
 
         /// <summary>
@@ -96,7 +104,9 @@ namespace JUSToolkit.CLI.JUS.Rom
                 // Si no se encuentra, intenta encontrar la ruta interna usando patrones
                 foreach ((Regex pattern, string[] containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
-                        ProcessContainer(gameNode, file, containerPath);
+                        file.Name = StringFunctions.GetDemoName(file.Name);
+                        string[] demoInfo = GetDemoInfo(file.Name, containerPath);
+                        ProcessContainer(gameNode, file, demoInfo, true);
                         return;
                     }
                 }
@@ -105,14 +115,14 @@ namespace JUSToolkit.CLI.JUS.Rom
             }
         }
 
-        private static void ProcessContainer(Node gameNode, Node pngFile, string[] imageInfo)
+        private static void ProcessContainer(Node gameNode, Node pngFile, string[] imageInfo, bool transparentTile = false)
         {
             // 1 - Search the Original Alar3
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{imageInfo[2]}") ?? throw new FormatException($"Container not found /root/data{imageInfo[2]}");
-            originalAlar.TransformWith<Binary2Alar3>();
+            _ = originalAlar.TransformWith<Binary2Alar3>();
 
             // 2 - Insert the Png into the Alar3
-            var png2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]);
+            var png2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1], transparentTile);
 
             Alar3 newAlar = originalAlar
                 .TransformWith(png2Alar3)
@@ -121,9 +131,44 @@ namespace JUSToolkit.CLI.JUS.Rom
             BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
 
             // 3 - Sustituirlo
-            originalAlar.ChangeFormat(newBinary);
+            _ = originalAlar.ChangeFormat(newBinary);
 
             Console.WriteLine($"File replaced: /root/data{imageInfo[2]}/{pngFile.Name}");
+        }
+
+        /// <summary>
+        /// Get the atm and dig names.
+        /// </summary>
+        /// <param name="pngName">The name of the Png we are importing.</param>
+        /// <param name="containerPath">The path of the alar container of the file.</param>
+        /// <returns>An array with the DIG, ATM, and ContainerPath names.</returns>
+        private static string[] GetDemoInfo(string pngName, string[] containerPath) => [GetDemoDigName(pngName) + ".dig", Path.GetFileNameWithoutExtension(pngName) + ".atm", containerPath[0]];
+
+        // Obtain the name of the specials Dig
+        // bb_00.png => bb_00.dig
+        // bb_m_00.png => bb_03.dig
+        // bb_n_00.png => bb_03.dig
+        // bb_m_01.png => bb_05.dig
+        // bb_n_01.png => bb_05.dig
+        // bb_m_02.png => bb_07.dig
+        // bb_n_02.png => bb_07.dig
+        // bb_m_03.png => bb_09.dig
+        // bb_n_03.png => bb_09.dig
+        private static string GetDemoDigName(string pngName)
+        {
+            // SpecialChar is the 4th character of the demo png name.
+            // jj_m_00.png => m
+            // jj_n_00.png => n
+            // jj_03.png => not n nor m, so it's not a special one
+            char specialChar = pngName[3];
+            if (specialChar is 'm' or 'n') {
+                // jj_m_01.png => 1
+                char number = pngName[6];
+                string manga = pngName[..2];
+                return manga + "_0" + SpecialDigNumbers.GetValueOrDefault(number);
+            } else {
+                return Path.GetFileNameWithoutExtension(pngName);
+            }
         }
     }
 }

@@ -44,5 +44,20 @@ namespace JUSToolkit.Utils
             var regex = new Regex(@"^[^-]+-[^-]+-");
             return regex.Replace(nameWithPattern, string.Empty);
         }
+
+        /// <summary>
+        /// Remove the "demo" substring.
+        /// </summary>
+        /// <param name="nameWithPattern">The string containing potentially the "demo-" prefix.</param>
+        /// <returns>The original name without the prefix. If the input string is null or empty, the original string is returned.</returns>
+        public static string GetDemoName(string nameWithPattern)
+        {
+            if (string.IsNullOrEmpty(nameWithPattern) || !nameWithPattern.Contains('-')) {
+                return nameWithPattern;
+            }
+
+            // "demo-" has 5 characters
+            return nameWithPattern[5..];
+        }
     }
 }

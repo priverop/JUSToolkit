@@ -117,7 +117,11 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ImportDig(string input, bool insertTransparent, string dig, string atm, string output)
         {
-            Dig originalDig = NodeFactory.FromFile(dig)
+            Console.WriteLine(input);
+            Console.WriteLine(dig);
+            Console.WriteLine(atm);
+
+            Dig originalDig = NodeFactory.FromFile(dig, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>();
@@ -164,18 +168,20 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
-        /// Import multiple PNGs into multiple ATMs that share the same DIG.
+        /// Import multiple PNGs into multiple ATMs that share the same DIG. The result is multiple atm and a single dig.
         /// </summary>
         /// <param name="input">The pngs to import.</param>
         /// <param name="insertTransparent">Insert a transparent tile at the start of the image.</param>
-        /// <param name="dig">The original .dig file.</param>
+        /// <param name="dig">The original .dig file (merged image).</param>
         /// <param name="atm">The original .atm files.</param>
         /// <param name="output">The output folder.</param>
         public static void MergeDig(string[] input, bool insertTransparent, string dig, string[] atm, string output)
         {
-            if (input.Length != atm.Length)
+            if (input.Length != atm.Length) {
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
+            }
 
+            // 1 - Get the DIG
             Dig mergedImage = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
@@ -187,33 +193,44 @@ namespace JUSToolkit.CLI.JUS
 
             IndexedImage newImage = null;
 
+            // 2 - Iterate the input PNGs
             for (int i = 0; i < input.Length; i++) {
-                Node compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
-                .TransformWith<Bitmap2FullImage>()
-                .TransformWith(new FullImageMapCompression(compressionParams));
-                newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-                ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
+                // Transform the PNG into FullImage (Pixels + Map) using the palette of the original DIG
+                Node png = NodeFactory.FromFile(input[i], FileOpenMode.Read)
+                    .TransformWith<Bitmap2FullImage>()
+                    .TransformWith(new FullImageMapCompression(compressionParams));
 
+                // Pixels
+                newImage = png.Children[0].GetFormatAs<IndexedImage>();
+
+                // Map
+                ScreenMap map = png.Children[1].GetFormatAs<ScreenMap>();
+
+                // 3 - Clone original
                 mergedImage = new Dig(mergedImage, newImage);
 
-                if (insertTransparent && i == 0)
+                if (insertTransparent && i == 0) {
                     mergedImage = mergedImage.InsertTransparentTile(map);
+                }
 
                 compressionParams = new FullImageMapCompressionParams {
                     MergeImage = mergedImage,
                     Palettes = mergedImage,
                 };
 
+                // New Atm: original atm changing height, width and maps
                 Almt originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
                     .TransformWith<Binary2Almt>()
                     .GetFormatAs<Almt>();
                 var newAtm = new Almt(originalAtm, map);
 
+                // Export ATM
                 new Almt2Binary().Convert(newAtm)
                     .Stream.WriteTo(Path.Combine(output, Path.GetFileName(atm[i])));
             }
 
-            Dig newDig = new Dig(mergedImage, newImage);
+            // New Dig: original dig changing height, width and pixels
+            var newDig = new Dig(mergedImage, newImage);
             new Dig2Binary().Convert(newDig)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dig)));
 
@@ -249,7 +266,7 @@ namespace JUSToolkit.CLI.JUS
                     continue;
                 }
 
-                dtx.TransformWith<BinaryDstx2SpriteImage>();
+                _ = dtx.TransformWith<BinaryDstx2SpriteImage>();
                 IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
                 // We ignore the sprite info from the DSTX and we take the one

@@ -68,6 +68,7 @@ namespace JUSToolkit.CLI.JUS
             (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
             (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
             (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
+            (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
         };
 
         /// <summary>
@@ -82,6 +83,7 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Binary2NitroRom>();
 
             Node inputFiles = NodeFactory.FromDirectory(input);
+            inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
             foreach (Node file in inputFiles.Children) {
                 // Fixed names
@@ -104,7 +106,7 @@ namespace JUSToolkit.CLI.JUS
                 }
             }
 
-            gameNode.TransformWith<NitroRom2Binary>();
+            _ = gameNode.TransformWith<NitroRom2Binary>();
             gameNode.Stream.WriteTo(Path.Combine(output, "new_game.nds"));
 
             Console.WriteLine("Done!");
