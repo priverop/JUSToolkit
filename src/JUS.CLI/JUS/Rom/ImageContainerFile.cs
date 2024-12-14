@@ -105,8 +105,10 @@ namespace JUSToolkit.CLI.JUS.Rom
                 foreach ((Regex pattern, string[] containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
                         file.Name = StringFunctions.GetDemoName(file.Name);
-                        string[] demoInfo = GetDemoInfo(file.Name, containerPath);
-                        ProcessContainer(gameNode, file, demoInfo, true);
+                        if (!IsSpecialDemoNM(file.Name)) {
+                            string[] demoInfo = GetDemoInfo(file.Name, containerPath);
+                            ProcessContainer(gameNode, file, demoInfo, true);
+                        }
                         return;
                     }
                 }
@@ -122,10 +124,18 @@ namespace JUSToolkit.CLI.JUS.Rom
             _ = originalAlar.TransformWith<Binary2Alar3>();
 
             // 2 - Insert the Png into the Alar3
-            var png2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1], transparentTile);
+            IConverter image2Alar3;
+            if (IsSpecialDemo(pngFile.Name)) {
+                string[] atms = GetSpecialAtms(pngFile, imageInfo[1]);
+                Node[] pngs = GetSpecialPngs(pngFile);
+                // ¿Qué hacemos con el imageInfo?
+                image2Alar3 = new Demo2Alar3(pngs, imageInfo[0], atms, transparentTile);
+            } else {
+                image2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1], transparentTile);
+            }
 
             Alar3 newAlar = originalAlar
-                .TransformWith(png2Alar3)
+                .TransformWith(image2Alar3)
                 .GetFormatAs<Alar3>();
 
             BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
@@ -142,18 +152,47 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <param name="pngName">The name of the Png we are importing.</param>
         /// <param name="containerPath">The path of the alar container of the file.</param>
         /// <returns>An array with the DIG, ATM, and ContainerPath names.</returns>
-        private static string[] GetDemoInfo(string pngName, string[] containerPath) => [GetDemoDigName(pngName) + ".dig", Path.GetFileNameWithoutExtension(pngName) + ".atm", containerPath[0]];
+        private static string[] GetDemoInfo(string pngName, string[] containerPath)
+            => [GetDemoDigName(pngName) + ".dig",
+                Path.GetFileNameWithoutExtension(pngName) + ".atm",
+                containerPath[0]];
 
-        // Obtain the name of the specials Dig
-        // bb_00.png => bb_00.dig
-        // bb_m_00.png => bb_03.dig
-        // bb_n_00.png => bb_03.dig
-        // bb_m_01.png => bb_05.dig
-        // bb_n_01.png => bb_05.dig
-        // bb_m_02.png => bb_07.dig
-        // bb_n_02.png => bb_07.dig
-        // bb_m_03.png => bb_09.dig
-        // bb_n_03.png => bb_09.dig
+        /// <summary>
+        /// Returns true if the png is a Special Demo Image.
+        /// </summary>
+        /// <param name="pngName">The name of the Png we are importing.</param>
+        /// <returns>True if it's a special demo image (03, 05, 07, 09, _m_ or _n_). False otherwise.</returns>
+        private static bool IsSpecialDemo(string pngName) =>
+            pngName.Contains("_03") ||
+            pngName.Contains("_05") ||
+            pngName.Contains("_07") ||
+            pngName.Contains("_09") ||
+            pngName.Contains("_m_") ||
+            pngName.Contains("_n_");
+
+        /// <summary>
+        /// Returns true if the png is a _m_ or _n_ Special Demo Image.
+        /// </summary>
+        /// <param name="pngName">The name of the Png we are importing.</param>
+        /// <returns>True if it's a special demo image (_m_ or _n_). False otherwise.</returns>
+        private static bool IsSpecialDemoNM(string pngName) =>
+            pngName.Contains("_m_") ||
+            pngName.Contains("_n_");
+
+        /// <summary>
+        /// Obtains the name of the corresponding Dig.
+        /// </summary>
+        /// <remarks>
+        /// bb_00.png => bb_00.dig
+        /// bb_m_00.png => bb_03.dig
+        /// bb_n_00.png => bb_03.dig
+        /// bb_m_01.png => bb_05.dig
+        /// bb_n_01.png => bb_05.dig
+        /// bb_m_02.png => bb_07.dig
+        /// bb_n_02.png => bb_07.dig
+        /// bb_m_03.png => bb_09.dig
+        /// bb_n_03.png => bb_09.dig
+        /// </remarks>
         private static string GetDemoDigName(string pngName)
         {
             // SpecialChar is the 4th character of the demo png name.
@@ -169,6 +208,64 @@ namespace JUSToolkit.CLI.JUS.Rom
             } else {
                 return Path.GetFileNameWithoutExtension(pngName);
             }
+        }
+
+        /// <summary>
+        /// Returns an array of Nodes with the given Node, the _m_ and the _n_ Nodes for the specified extension (png or atm).
+        /// </summary>
+        /// <param name="node">The original Node.</param>
+        /// <param name="extension">The file extension (e.g., ".png", ".atm").</param>
+        /// <returns>An array of Nodes.</returns>
+        private static Node[] GetSpecialNodes(Node node, string extension)
+        {
+            string nodeName = node.Name; // Assume node.Name is "bb_03.png" or "bb_03.atm"
+            string manga = nodeName[..2]; // "bb"
+            char number = nodeName[3]; // '3'
+
+            // Use the dictionary to find the corresponding index for _m_ and _n_
+            if (!SpecialDigNumbers.TryGetValue(number, out char specialNumber)) {
+                throw new InvalidOperationException($"Number {number} is not in SpecialDigNumbers.");
+            }
+
+            // Construct the names of the _m_ and _n_ files with the specified extension
+            string nameOfMNode = $"{manga}_m_0{specialNumber}{extension}";
+            string nameOfNNode = $"{manga}_n_0{specialNumber}{extension}";
+
+            // Retrieve the corresponding Nodes
+            Node mNode = node.Parent.Children[nameOfMNode];
+            Node nNode = node.Parent.Children[nameOfNNode];
+
+            // Return the array of Nodes
+            return new[] { node, mNode, nNode };
+        }
+
+        /// <summary>
+        /// Returns an array of Nodes for the given PNG Node.
+        /// </summary>
+        /// <remarks>
+        /// bb_03.png => [bb_03.png, bb_m_00.png, bb_n_00.png]
+        /// bb_05.png => [bb_05.png, bb_m_01.png, bb_n_01.png]
+        /// bb_07.png => [bb_07.png, bb_m_02.png, bb_n_02.png]
+        /// bb_09.png => [bb_09.png, bb_m_03.png, bb_n_03.png]
+        /// </remarks>
+        private static Node[] GetSpecialPngs(Node png)
+        {
+            return GetSpecialNodes(png, ".png");
+        }
+
+        /// <summary>
+        /// Returns an array of Nodes for the given ATM Node.
+        /// </summary>
+        /// <remarks>
+        /// bb_03.atm => [bb_03.atm, bb_m_00.atm, bb_n_00.atm]
+        /// bb_05.atm => [bb_05.atm, bb_m_01.atm, bb_n_01.atm]
+        /// bb_07.atm => [bb_07.atm, bb_m_02.atm, bb_n_02.atm]
+        /// bb_09.atm => [bb_09.atm, bb_m_03.atm, bb_n_03.atm]
+        /// </remarks>
+        private static Node[] GetSpecialAtms(Node png, string atmName)
+        {
+            Node atm = png.Parent.Children[atmName];
+            return GetSpecialNodes(atm, ".atm");
         }
     }
 }

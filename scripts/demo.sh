@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # In the DEBUGDIR I create a directory (DEMODIR) with a directory for each manga with its .png, .dig and .atm.
 
 WORKDIR='/JUSToolkit/src/JUS.CLI'

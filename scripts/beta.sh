@@ -3,12 +3,12 @@ set -e
 
 clear
 
-JUS_PATH='/JUSToolkit/src/JUS.CLI'
-BETA_PATH='/beta_textos'
+JUS_PATH='//JUSToolkit/src/JUS.CLI'
+BETA_PATH='//Romhacking/beta_textos'
 ROM_PATH=$JUS_PATH/bin/Debug/net8.0/jump_en.nds
 
-rm -f $BETA_PATH/new_game.nds
-rm -f $BETA_PATH/new_game_font.nds
+# rm -f $BETA_PATH/new_game.nds
+# rm -f $BETA_PATH/new_game_font.nds
 
 cd $JUS_PATH
 # dotnet build
@@ -18,11 +18,11 @@ cd $JUS_PATH/bin/Debug/net8.0
 # Insertar a BIN
 ./JUS.CLI jus texts batchImport --directory $BETA_PATH/new_weblate/tutorial --output $BETA_PATH/new_rom/tutorial_bin
 # Insertar a la ROM
-./JUS.CLI jus game import --game $ROM_PATH --input $BETA_PATH/new_rom/tutorial_bin --output $BETA_PATH
+./JUS.CLI jus game import --game $BETA_PATH/new_game.nds --input $BETA_PATH/new_rom/tutorial_bin --output $BETA_PATH
 
 ## UNICOS
 # Insertar a BIN
-./JUS.CLI jus texts batchImport --directory $BETA_PATH/new_weblate/bin --output $BETA_PATH/new_rom/bin_bin
+./JUS.CLI jus texts batchImport --directory $BETA_PATH/new_weblate/unicos --output $BETA_PATH/new_rom/bin_bin
 # Insertar a la ROM
 ./JUS.CLI jus game import --game $BETA_PATH/new_game.nds --input $BETA_PATH/new_rom/bin_bin --output $BETA_PATH
 
