@@ -105,7 +105,11 @@ namespace JUSToolkit.CLI.JUS.Rom
                 foreach ((Regex pattern, string[] containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
                         file.Name = StringFunctions.GetDemoName(file.Name);
+
+                        // Ignore the _n_ and _m_, because we obtain them later with the original
                         if (!IsSpecialDemoNM(file.Name)) {
+
+                            // Get the Dig, Atm and Alar
                             string[] demoInfo = GetDemoInfo(file.Name, containerPath);
                             ProcessContainer(gameNode, file, demoInfo, true);
                         }
@@ -125,10 +129,11 @@ namespace JUSToolkit.CLI.JUS.Rom
 
             // 2 - Insert the Png into the Alar3
             IConverter image2Alar3;
+
+            // Special demo needs 3 atm, 3 pngs and 1 dig (imageInfo[0])
             if (IsSpecialDemo(pngFile.Name)) {
-                string[] atms = GetSpecialAtms(pngFile, imageInfo[1]);
+                string[] atms = GetSpecialAtms(imageInfo[1]);
                 Node[] pngs = GetSpecialPngs(pngFile);
-                // ¿Qué hacemos con el imageInfo?
                 image2Alar3 = new Demo2Alar3(pngs, imageInfo[0], atms, transparentTile);
             } else {
                 image2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1], transparentTile);
@@ -151,7 +156,7 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// </summary>
         /// <param name="pngName">The name of the Png we are importing.</param>
         /// <param name="containerPath">The path of the alar container of the file.</param>
-        /// <returns>An array with the DIG, ATM, and ContainerPath names.</returns>
+        /// <returns>An array with the DIG, ATM, and ContainerPath (.aar) names.</returns>
         private static string[] GetDemoInfo(string pngName, string[] containerPath)
             => [GetDemoDigName(pngName) + ".dig",
                 Path.GetFileNameWithoutExtension(pngName) + ".atm",
@@ -211,36 +216,31 @@ namespace JUSToolkit.CLI.JUS.Rom
         }
 
         /// <summary>
-        /// Returns an array of Nodes with the given Node, the _m_ and the _n_ Nodes for the specified extension (png or atm).
+        /// Constructs the names of the _m_ and _n_ files for the given base node name and extension.
         /// </summary>
-        /// <param name="node">The original Node.</param>
+        /// <param name="nodeName">The base name of the node (e.g., "bb_03.png").</param>
         /// <param name="extension">The file extension (e.g., ".png", ".atm").</param>
-        /// <returns>An array of Nodes.</returns>
-        private static Node[] GetSpecialNodes(Node node, string extension)
+        /// <returns>An array of strings containing the names of the base, _m_, and _n_ files.</returns>
+        private static string[] GetSpecialFileNames(string nodeName, string extension)
         {
-            string nodeName = node.Name; // Assume node.Name is "bb_03.png" or "bb_03.atm"
             string manga = nodeName[..2]; // "bb"
-            char number = nodeName[3]; // '3'
+            char number = nodeName[4]; // '3'
 
             // Use the dictionary to find the corresponding index for _m_ and _n_
-            if (!SpecialDigNumbers.TryGetValue(number, out char specialNumber)) {
-                throw new InvalidOperationException($"Number {number} is not in SpecialDigNumbers.");
+            if (!SpecialDigNumbers.Any(kv => kv.Value == number)) {
+                throw new InvalidOperationException($"Value {number} is not found in SpecialDigNumbers.");
             }
+            char specialNumber = SpecialDigNumbers.First(kv => kv.Value == number).Key;
 
-            // Construct the names of the _m_ and _n_ files with the specified extension
-            string nameOfMNode = $"{manga}_m_0{specialNumber}{extension}";
-            string nameOfNNode = $"{manga}_n_0{specialNumber}{extension}";
+            // Construct the names of the _m_ and _n_ files
+            string nameOfMFile = $"{manga}_m_0{specialNumber}{extension}";
+            string nameOfNFile = $"{manga}_n_0{specialNumber}{extension}";
 
-            // Retrieve the corresponding Nodes
-            Node mNode = node.Parent.Children[nameOfMNode];
-            Node nNode = node.Parent.Children[nameOfNNode];
-
-            // Return the array of Nodes
-            return new[] { node, mNode, nNode };
+            return new[] { nodeName, nameOfMFile, nameOfNFile };
         }
 
         /// <summary>
-        /// Returns an array of Nodes for the given PNG Node.
+        /// Returns an array of Nodes with the given PNG Node, the _m_ and _n_ Nodes.
         /// </summary>
         /// <remarks>
         /// bb_03.png => [bb_03.png, bb_m_00.png, bb_n_00.png]
@@ -250,11 +250,18 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// </remarks>
         private static Node[] GetSpecialPngs(Node png)
         {
-            return GetSpecialNodes(png, ".png");
+            string[] fileNames = GetSpecialFileNames(png.Name, ".png");
+
+            // Retrieve the corresponding Nodes with the original name
+            Node mNode = png.Parent.Children["demo-" + fileNames[1]];
+            Node nNode = png.Parent.Children["demo-" + fileNames[2]];
+
+            // Return the array of Nodes
+            return new[] { png, mNode, nNode };
         }
 
         /// <summary>
-        /// Returns an array of Nodes for the given ATM Node.
+        /// Returns an array of strings with the names of the given ATM file, the _m_, and the _n_ files.
         /// </summary>
         /// <remarks>
         /// bb_03.atm => [bb_03.atm, bb_m_00.atm, bb_n_00.atm]
@@ -262,10 +269,9 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// bb_07.atm => [bb_07.atm, bb_m_02.atm, bb_n_02.atm]
         /// bb_09.atm => [bb_09.atm, bb_m_03.atm, bb_n_03.atm]
         /// </remarks>
-        private static Node[] GetSpecialAtms(Node png, string atmName)
+        private static string[] GetSpecialAtms(string atm)
         {
-            Node atm = png.Parent.Children[atmName];
-            return GetSpecialNodes(atm, ".atm");
+            return GetSpecialFileNames(atm, ".atm");
         }
     }
 }
