@@ -27,14 +27,14 @@ namespace JUSToolkit.Graphics.Converters
     /// Converts between BinaryFormat and ALMT.
     /// </summary>
     public class Binary2Almt :
-        IConverter<BinaryFormat, Almt>
+        IConverter<IBinary, Almt>
     {
         /// <summary>
-        /// Converts a BinaryFormat Node to an Almt Node.
+        /// Converts a IBinary Node to an Almt Node.
         /// </summary>
-        /// <param name="source">BinaryFormat Node.</param>
+        /// <param name="source">IBinary Node.</param>
         /// <returns>Almt Node.</returns>
-        public Almt Convert(BinaryFormat source)
+        public Almt Convert(IBinary source)
         {
             var reader = new DataReader(source.Stream);
 

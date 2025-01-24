@@ -20,9 +20,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics.Converters;
+using JUSToolkit.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -70,22 +74,24 @@ namespace JUSToolkit.CLI.JUS
         /// Import PNG files into an Alar3 container.
         /// </summary>
         /// <param name="container">The path to the original alar3 file.</param>
-        /// <param name="input">The path to the directory of the PNGs we want to add, with the original .dig and .atm.</param>
+        /// <param name="input">The path to the PNG we want to insert.</param>
         /// <param name="output">The output directory.</param>
         public static void ImportPng2Alar3(string container, string input, string output)
         {
-            Node originalAlar = NodeFactory.FromFile(container);
-            Node inputFiles = NodeFactory.FromDirectory(input);
+            Node originalAlar = NodeFactory.FromFile(container).TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
+            Node inputPNG = NodeFactory.FromFile(input);
 
-            var png2Alar3 = new Png2Alar3(originalAlar);
+            string cleanName = StringFunctions.GetOriginalName(inputPNG.Name);
 
-            Alar3 alar = inputFiles
+            var png2Alar3 = new Png2Alar3(inputPNG, cleanName + ".dig", cleanName + ".atm");
+
+            Alar3 newAlar = originalAlar
                 .TransformWith(png2Alar3)
                 .GetFormatAs<Alar3>();
 
-            using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
+            using BinaryFormat binary = newAlar.ConvertWith(new Alar3ToBinary());
 
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + container));
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + originalAlar.Name));
 
             Console.WriteLine("Done!");
         }

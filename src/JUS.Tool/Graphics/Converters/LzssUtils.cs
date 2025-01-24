@@ -43,7 +43,7 @@ namespace JUSToolkit.Graphics.Converters
         public static DataStream Lzss(DataStream input, string mode)
         {
             // We need a temporary file to execute the external program
-            string tempFile = Path.GetRandomFileName();
+            string tempFile = "tmp/" + Path.GetRandomFileName();
             input.WriteTo(tempFile);
 
             string program = Environment.OSVersion.Platform == PlatformID.Win32NT ? ProgramExe : ProgramUnix;

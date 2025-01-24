@@ -67,8 +67,11 @@ namespace JUSToolkit.Containers
         /// <param name="filesToInsert">NodeContainerFormat with multiple files.</param>
         public void InsertModification(NodeContainerFormat filesToInsert)
         {
-            foreach (Node nNew in filesToInsert.Root.Children) {
-                InsertModification(nNew);
+            foreach (Node nNew in Navigator.IterateNodes(filesToInsert.Root)) {
+                if (!nNew.IsContainer) {
+                    Console.WriteLine("Inserting " + nNew.Name);
+                    InsertModification(nNew);
+                }
             }
         }
 
@@ -92,6 +95,7 @@ namespace JUSToolkit.Containers
                     }
 
                     if (parent == null && nOld.Name == nNew.Name) {
+                        Console.WriteLine("Replacing: " + nNew.Name);
                         alarFileOld.ReplaceStream(nNew.Stream);
                     }
 

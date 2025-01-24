@@ -33,10 +33,10 @@ namespace JUSToolkit.CLI.JUS.Rom
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.
     /// </summary>
-    public class ContainerFile : IFileImportStrategy
+    public class TextContainerFile : IFileImportStrategy
     {
         private static readonly Dictionary<string, string> ContainerLocations = new() {
-            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" }, // Dónde está el .aar en el juego, pero faltaría la ruta interna del fichero .bin "{container}/jgalaxy/{file.Name}"
+            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
             { "mission.bin", "/jgalaxy/jgalaxy.aar" },
             { "battle.bin", "/jgalaxy/jgalaxy.aar" },
             { "jquiz.bin", "/jquiz/jquiz_pack.aar" },
@@ -62,13 +62,13 @@ namespace JUSToolkit.CLI.JUS.Rom
                 foreach ((Regex pattern, string containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
                         string parent = GetParentName(file.Name);
-                        file.Name = GetOriginalName(file.Name);
+                        file.Name = StringFunctions.GetOriginalName(file.Name);
                         ProcessContainer(gameNode, file, containerPath, parent);
                         return;
                     }
                 }
 
-                Console.WriteLine($"File not compatible as container: {file.Name}");
+                Console.WriteLine($"File not compatible as text container: {file.Name}");
             }
         }
 
@@ -77,42 +77,14 @@ namespace JUSToolkit.CLI.JUS.Rom
             Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
                                 .TransformWith<LzssDecompression>();
 
-            Version alarVersion = Identifier.GetAlarVersion(containerNode.Stream);
+            Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
+            .GetFormatAs<Alar3>();
+            alar.InsertModification(file, parent);
+            BinaryFormat newBinary = alar.ConvertWith(new Alar3ToBinary());
 
-            var newBinary = new BinaryFormat();
-
-            // ToDo: We need to encapsulate/improve this
-            if (alarVersion.Major == 3) {
-                Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>();
-                alar.InsertModification(file, parent);
-                newBinary = alar.ConvertWith(new Alar3ToBinary());
-            } else if (alarVersion.Major == 2) {
-                Alar2 alar = containerNode.TransformWith<Binary2Alar2>()
-                .GetFormatAs<Alar2>();
-                alar.InsertModification(file); // ToDo: parent
-                newBinary = alar.ConvertWith(new Alar2ToBinary());
-            }
-
-            containerNode.ChangeFormat(newBinary);
+            _ = containerNode.ChangeFormat(newBinary);
 
             Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
-        }
-
-        /// <summary>
-        /// Remove the first two words separated by dashes "x-y-".
-        /// </summary>
-        /// <param name="nameWithPattern">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
-        /// <returns>The original name without the prefixes. If the input string is null or empty, the original string is returned.</returns>
-        private static string GetOriginalName(string nameWithPattern)
-        {
-            if (string.IsNullOrEmpty(nameWithPattern) || !nameWithPattern.Contains('-')) {
-                return nameWithPattern;
-            }
-
-            // Regular expression to match and remove the first two words separated by dashes
-            var regex = new Regex(@"^[^-]+-[^-]+-");
-            return regex.Replace(nameWithPattern, string.Empty);
         }
 
         /// <summary>

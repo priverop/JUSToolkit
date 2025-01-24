@@ -57,16 +57,18 @@ namespace JUSToolkit.CLI.JUS
             { "rulemess.bin", new TextFile() },
             { "stage.bin", new TextFile() },
             { "title.bin", new TextFile() },
-            { "jgalaxy.bin", new ContainerFile() },
-            { "mission.bin", new ContainerFile() },
-            { "battle.bin", new ContainerFile() },
-            { "jquiz.bin", new ContainerFile() },
+            { "jgalaxy.bin", new TextContainerFile() },
+            { "mission.bin", new TextContainerFile() },
+            { "battle.bin", new TextContainerFile() },
+            { "jquiz.bin", new TextContainerFile() },
         };
 
         private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
         {
-            (new Regex(@"^bin-.*-.*\.bin$"), new ContainerFile()),
-            (new Regex(@"^deck-.*-.*\.bin$"), new ContainerFile()),
+            (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
+            (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
+            (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
+            (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
         };
 
         /// <summary>
@@ -81,13 +83,14 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Binary2NitroRom>();
 
             Node inputFiles = NodeFactory.FromDirectory(input);
+            inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
             foreach (Node file in inputFiles.Children) {
                 // Fixed names
                 if (ImportStrategies.TryGetValue(file.Name, out IFileImportStrategy strategy)) {
                     strategy.Import(gameNode, file);
                 } else {
-                    // Pattern names for InfoDeck
+                    // Pattern names
                     bool matched = false;
                     foreach ((Regex pattern, IFileImportStrategy patternStrategy) in PatternStrategies) {
                         if (pattern.IsMatch(file.Name)) {
@@ -103,7 +106,7 @@ namespace JUSToolkit.CLI.JUS
                 }
             }
 
-            gameNode.TransformWith<NitroRom2Binary>();
+            _ = gameNode.TransformWith<NitroRom2Binary>();
             gameNode.Stream.WriteTo(Path.Combine(output, "new_game.nds"));
 
             Console.WriteLine("Done!");

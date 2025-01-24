@@ -162,7 +162,6 @@ namespace JUSToolkit.CLI.JUS
 
             string outputFile = Path.Combine(output, filename + ".po");
             poBinaryFormat.Stream.WriteTo(outputFile);
-
         }
     }
 }

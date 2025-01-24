@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.IO;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -152,6 +151,7 @@ namespace JUSToolkit.Containers.Converters
             fullPath = fullPath.Replace("NodeContainerRoot", "NodeContainerRoot.aar");
             int aarIndex = fullPath.IndexOf(".aar");
 
+            // ToDo: Aquí falla, salta la excepción. fullPath: "/option.png/option/info00.atm"
             if (aarIndex == -1) {
                 throw new ArgumentException("Invalid path format: '.aar' not found", fullPath);
             }
