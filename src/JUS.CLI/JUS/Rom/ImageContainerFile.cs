@@ -131,7 +131,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             IConverter image2Alar3;
 
             // Special demo needs 3 atm, 3 pngs and 1 dig (imageInfo[0])
-            if (IsSpecialDemo(pngFile.Name)) {
+            if (IsSpecialDemo(pngFile.Name) && !pngFile.Name.Contains("opening")) {
                 string[] atms = GetSpecialAtms(imageInfo[1]);
                 Node[] pngs = GetSpecialPngs(pngFile);
                 image2Alar3 = new Demo2Alar3(pngs, imageInfo[0], atms, transparentTile);
@@ -204,8 +204,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             // jj_m_00.png => m
             // jj_n_00.png => n
             // jj_03.png => not n nor m, so it's not a special one
-            char specialChar = pngName[3];
-            if (specialChar is 'm' or 'n') {
+            if (pngName.Contains("_m_") || pngName.Contains("_n_")) {
                 // jj_m_01.png => 1
                 char number = pngName[6];
                 string manga = pngName[..2];
@@ -253,8 +252,10 @@ namespace JUSToolkit.CLI.JUS.Rom
             string[] fileNames = GetSpecialFileNames(png.Name, ".png");
 
             // Retrieve the corresponding Nodes with the original name
-            Node mNode = png.Parent.Children["demo-" + fileNames[1]];
-            Node nNode = png.Parent.Children["demo-" + fileNames[2]];
+            Node mNode = png.Parent.Children["demo-" + fileNames[1]] ??
+                    throw new FormatException("Special m file not found: " + fileNames[1]);
+            Node nNode = png.Parent.Children["demo-" + fileNames[2]] ??
+                    throw new FormatException("Special nfile not found: " + fileNames[2]);
 
             // Return the array of Nodes
             return new[] { png, mNode, nNode };
