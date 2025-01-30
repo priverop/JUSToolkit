@@ -17,7 +17,7 @@ namespace JUS.Tests.Texts
         public void BinInfoDeckTest()
         {
             Assert.AreEqual(typeof(Binary2InfoDeckInfo), TextIdentifier.GetTextFormat("bin-info-jump.bin")[0]);
-            Assert.AreEqual(typeof(InfoDeck2Po), TextIdentifier.GetTextFormat("bin-deck-bb.bin")[1]);
+            Assert.AreEqual(typeof(InfoDeckDeck2Po), TextIdentifier.GetTextFormat("bin-deck-bb.bin")[1]);
         }
     }
 }

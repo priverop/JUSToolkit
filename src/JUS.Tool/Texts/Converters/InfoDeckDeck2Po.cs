@@ -26,18 +26,18 @@ using Yarhl.Media.Text;
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between InfoDeck (generic bin) format and Po.
+    /// Converts between InfoDeckDeck (generic bin) format and Po.
     /// </summary>
-    public class InfoDeck2Po :
-        IConverter<InfoDeck, Po>,
-        IConverter<Po, InfoDeck>
+    public class InfoDeckDeck2Po :
+        IConverter<InfoDeckDeck, Po>,
+        IConverter<Po, InfoDeckDeck>
     {
         /// <summary>
-        /// Converts InfoDeck format to Po.
+        /// Converts InfoDeckDeck format to Po.
         /// </summary>
         /// <param name="infoDeck">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(InfoDeck infoDeck)
+        public Po Convert(InfoDeckDeck infoDeck)
         {
             Po po = JusText.GenerateJusPo();
 
@@ -52,13 +52,13 @@ namespace JUSToolkit.Texts.Converters
         }
 
         /// <summary>
-        /// Converts Po to InfoDeck format.
+        /// Converts Po to InfoDeckDeck format.
         /// </summary>
         /// <param name="po">Po to convert.</param>
         /// <returns>Transformed TextFormat.</returns>
-        public InfoDeck Convert(Po po)
+        public InfoDeckDeck Convert(Po po)
         {
-            var infoDeck = new InfoDeck();
+            var infoDeck = new InfoDeckDeck();
             InfoDeckEntry entry;
             infoDeck.Count = po.Entries.Count;
 

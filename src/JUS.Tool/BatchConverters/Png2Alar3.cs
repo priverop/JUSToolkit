@@ -86,7 +86,7 @@ namespace JUSToolkit.BatchConverters
         public string AtmName { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating the transparent pixel mode.
+        /// Gets or sets a value indicating whether gets or sets a value indicating the transparent pixel mode.
         /// </summary>
         public bool TransparentTile { get; set; }
 

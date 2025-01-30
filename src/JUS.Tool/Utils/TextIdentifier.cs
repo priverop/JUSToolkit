@@ -66,7 +66,7 @@ namespace JUSToolkit.Utils
         public static Type[] GetTextFormat(string fileName)
         {
             if (IsInfoDeckFormat(fileName)) {
-                return [typeof(Binary2InfoDeck), typeof(InfoDeck2Po)];
+                return [typeof(Binary2InfoDeckDeck), typeof(InfoDeckDeck2Po)];
             } else if (IsInfoDeckInfoFormat(fileName)) {
                 return [typeof(Binary2InfoDeckInfo), typeof(InfoDeckInfo2Po)];
             } else {

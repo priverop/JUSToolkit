@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Single entry in a <see cref="InfoDeck"/> file.
+    /// Single entry in a <see cref="InfoDeckDeck"/> file.
     /// </summary>
     public class InfoDeckEntry
     {

@@ -25,12 +25,12 @@ namespace JUSToolkit.Texts.Formats
     /// <summary>
     /// Format for Deck (InfoDeck) files.
     /// </summary>
-    public class InfoDeck : IFormat
+    public class InfoDeckDeck : IFormat
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InfoDeck"/> class.
+        /// Initializes a new instance of the <see cref="InfoDeckDeck"/> class.
         /// </summary>
-        public InfoDeck()
+        public InfoDeckDeck()
         {
             Entries = new List<InfoDeckEntry>();
         }

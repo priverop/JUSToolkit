@@ -25,54 +25,54 @@ using Yarhl.IO;
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between InfoDeck format and BinaryFormat.
+    /// Converts between InfoDeckDeck format and BinaryFormat.
     /// </summary>
-    public class Binary2InfoDeck :
-        IConverter<BinaryFormat, InfoDeck>,
-        IConverter<InfoDeck, BinaryFormat>
+    public class Binary2InfoDeckDeck :
+        IConverter<BinaryFormat, InfoDeckDeck>,
+        IConverter<InfoDeckDeck, BinaryFormat>
     {
         private DataReader reader;
 
         /// <summary>
-        /// Converts BinaryFormat to InfoDeck format.
+        /// Converts BinaryFormat to InfoDeckDeck format.
         /// </summary>
         /// <param name="source">BinaryFormat to convert.</param>
         /// <returns>Text format.</returns>
         /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
-        public InfoDeck Convert(BinaryFormat source)
+        public InfoDeckDeck Convert(BinaryFormat source)
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            var infodeck = new InfoDeck();
+            var infodeckDeck = new InfoDeckDeck();
             reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            infodeck.Count = reader.ReadInt32() / InfoDeckEntry.EntrySize / InfoDeckEntry.LinesPerPage;
+            infodeckDeck.Count = reader.ReadInt32() / InfoDeckEntry.EntrySize / InfoDeckEntry.LinesPerPage;
             reader.Stream.Position = 0x00;
 
-            for (int i = 0; i < infodeck.Count; i++) {
-                infodeck.Entries.Add(ReadEntry());
+            for (int i = 0; i < infodeckDeck.Count; i++) {
+                infodeckDeck.Entries.Add(ReadEntry());
             }
 
-            return infodeck;
+            return infodeckDeck;
         }
 
         /// <summary>
-        /// Converts InfoDeck format to BinaryFormat.
+        /// Converts InfoDeckDeck format to BinaryFormat.
         /// </summary>
-        /// <param name="infoDeck">TextFormat to convert.</param>
+        /// <param name="infoDeckDeck">TextFormat to convert.</param>
         /// <returns>BinaryFormat.</returns>
-        public BinaryFormat Convert(InfoDeck infoDeck)
+        public BinaryFormat Convert(InfoDeckDeck infoDeckDeck)
         {
             var bin = new BinaryFormat();
             var writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeck.Count * InfoDeckEntry.LinesPerPage);
+            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeckDeck.Count * InfoDeckEntry.LinesPerPage);
 
-            foreach (InfoDeckEntry entry in infoDeck.Entries) {
+            foreach (InfoDeckEntry entry in infoDeckDeck.Entries) {
                 foreach (string s in entry.Text) {
                     JusText.WriteStringPointer(s, writer, jit);
                 }
