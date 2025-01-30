@@ -63,20 +63,39 @@ namespace JUSToolkit.Utils
         /// </summary>
         /// <param name="fileName">The name of the file we want to check.</param>
         /// <returns>The format.</returns>
-        public static Type[] GetTextFormat(string fileName) => IsInfoDeckFormat(fileName) ? [typeof(Binary2InfoDeck), typeof(InfoDeck2Po)] : BinDictionary[fileName];
-
-        /// <summary>
-        /// Checks if the fileName correspond with the InfoDeck format files.
-        /// Example of correct format:  "bin-info-jump.bin" or "bin-deck-bb.bin".
-        /// </summary>
-        /// <param name="fileName">The name of the file we want to check.</param>
-        /// <returns>True if the filename follows the pattern bin-info|deck-manga.bin.</returns>
-        private static bool IsInfoDeckFormat(string fileName)
+        public static Type[] GetTextFormat(string fileName)
         {
-            var regex = new Regex("^bin-.*-.*.bin$"); // ToDo: info or deck
-            return regex.IsMatch(fileName);
+            if (IsInfoDeckFormat(fileName)) {
+                return [typeof(Binary2InfoDeck), typeof(InfoDeck2Po)];
+            } else if (IsInfoDeckInfoFormat(fileName)) {
+                return [typeof(Binary2InfoDeckInfo), typeof(InfoDeckInfo2Po)];
+            } else {
+                return BinDictionary[fileName];
+            }
         }
 
-        // ToDo: Testing
+        /// <summary>
+        /// Checks if the fileName corresponds with the InfoDeck format.
+        /// Example of correct format: "bin-deck-*.bin".
+        /// </summary>
+        /// <param name="fileName">The name of the file we want to check.</param>
+        /// <returns>True if the filename follows the pattern bin-deck-*.bin.</returns>
+        private static bool IsInfoDeckFormat(string fileName)
+        {
+            var regexDeck = new Regex("^bin-deck-.*.bin$");
+            return regexDeck.IsMatch(fileName);
+        }
+
+        /// <summary>
+        /// Checks if the fileName corresponds with the InfoDeckInfo format.
+        /// Example of correct format: "bin-info-*.bin".
+        /// </summary>
+        /// <param name="fileName">The name of the file we want to check.</param>
+        /// <returns>True if the filename follows the pattern bin-info-*.bin.</returns>
+        private static bool IsInfoDeckInfoFormat(string fileName)
+        {
+            var regexInfo = new Regex("^bin-info-.*.bin$");
+            return regexInfo.IsMatch(fileName);
+        }
     }
 }

@@ -26,24 +26,24 @@ using Yarhl.Media.Text;
 namespace JUSToolkit.Texts.Converters
 {
     /// <summary>
-    /// Converts between InfoDeck (generic bin) format and Po.
+    /// Converts between InfoDeckInfo (generic bin) format and Po.
     /// </summary>
-    public class InfoDeck2Po :
-        IConverter<InfoDeck, Po>,
-        IConverter<Po, InfoDeck>
+    public class InfoDeckInfo2Po :
+        IConverter<InfoDeckInfo, Po>,
+        IConverter<Po, InfoDeckInfo>
     {
         /// <summary>
-        /// Converts InfoDeck format to Po.
+        /// Converts InfoDeckInfo format to Po.
         /// </summary>
-        /// <param name="infoDeck">TextFormat to convert.</param>
+        /// <param name="infoDeckInfo">TextFormat to convert.</param>
         /// <returns>Po format.</returns>
-        public Po Convert(InfoDeck infoDeck)
+        public Po Convert(InfoDeckInfo infoDeckInfo)
         {
             Po po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (InfoDeckEntry entry in infoDeck.Entries) {
-                po.Add(new PoEntry(JusText.MergeStrings(entry.Text)) {
+            foreach (string entry in infoDeckInfo.TextEntries) {
+                po.Add(new PoEntry(JusText.CleanString(entry)) {
                     Context = $"{i++}",
                 });
             }
@@ -52,33 +52,19 @@ namespace JUSToolkit.Texts.Converters
         }
 
         /// <summary>
-        /// Converts Po to InfoDeck format.
+        /// Converts Po to InfoDeckInfo format.
         /// </summary>
         /// <param name="po">Po to convert.</param>
         /// <returns>Transformed TextFormat.</returns>
-        public InfoDeck Convert(Po po)
+        public InfoDeckInfo Convert(Po po)
         {
-            var infoDeck = new InfoDeck();
-            InfoDeckEntry entry;
-            infoDeck.Count = po.Entries.Count;
+            var infoDeckInfo = new InfoDeckInfo();
 
-            for (int i = 0; i < infoDeck.Count; i++) {
-                entry = new InfoDeckEntry();
-                List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', InfoDeckEntry.LinesPerPage);
-                List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage);
-
-                if (originalLines.Count != translatedLines.Count) {
-                    throw new FormatException($"Wrong number of lines in {po.Entries[i].Text}");
-                }
-
-                foreach (string s in translatedLines) {
-                    entry.Text.Add(Table.Instance.Encode(JusText.WriteCleanString(s)));
-                }
-
-                infoDeck.Entries.Add(entry);
+            foreach (PoEntry entry in po.Entries) {
+                infoDeckInfo.TextEntries.Add(JusText.WriteCleanString(entry.Text));
             }
 
-            return infoDeck;
+            return infoDeckInfo;
         }
     }
 }
