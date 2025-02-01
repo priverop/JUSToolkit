@@ -73,7 +73,13 @@ namespace JUSToolkit.Texts.Converters
                 }
 
                 foreach (string s in translatedLines) {
-                    entry.Text.Add(Table.Instance.Encode(JusText.WriteCleanString(s)));
+                    string sentence = Table.Instance.Encode(JusText.WriteCleanString(s));
+                    if (sentence.Length > 40) {
+                        Console.WriteLine($"Limit of 40 chars reached in entry {i}: {sentence}");
+                        sentence = sentence[0..40];
+                    }
+
+                    entry.Text.Add(sentence);
                 }
 
                 infoDeck.Entries.Add(entry);
