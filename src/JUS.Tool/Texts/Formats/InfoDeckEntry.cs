@@ -13,11 +13,6 @@ namespace JUSToolkit.Texts.Formats
         public static readonly int EntrySize = 0x04;
 
         /// <summary>
-        /// Lines per page. 9 in game but 10 so the software works.
-        /// </summary>
-        public static readonly int LinesPerPage = 10;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="InfoDeckEntry"/> class.
         /// </summary>
         public InfoDeckEntry()

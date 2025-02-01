@@ -31,6 +31,8 @@ namespace JUSToolkit.Texts.Converters
         IConverter<BinaryFormat, InfoDeckInfo>,
         IConverter<InfoDeckInfo, BinaryFormat>
     {
+        private DataReader reader;
+
         /// <summary>
         /// Converts BinaryFormat to InfoDeckInfo format.
         /// </summary>
@@ -42,15 +44,15 @@ namespace JUSToolkit.Texts.Converters
             ArgumentNullException.ThrowIfNull(source);
 
             var infodeck = new InfoDeckInfo();
-            var reader = new DataReader(source.Stream) {
+            reader = new DataReader(source.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            int count = reader.ReadInt32() / InfoDeckInfo.EntrySize;
+            int count = reader.ReadInt32() / InfoDeckEntry.EntrySize / infodeck.LinesPerPage;
             reader.Stream.Position = 0x00;
 
             for (int i = 0; i < count; i++) {
-                infodeck.TextEntries.Add(JusText.ReadIndirectString(reader));
+                infodeck.Entries.Add(ReadEntry());
             }
 
             return infodeck;
@@ -68,15 +70,28 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(InfoDeckInfo.EntrySize * infoDeckInfo.TextEntries.Count);
+            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeckInfo.Entries.Count * infoDeckInfo.LinesPerPage);
 
-            foreach (string entry in infoDeckInfo.TextEntries) {
-                JusText.WriteStringPointer(entry, writer, jit);
+            foreach (InfoDeckEntry entry in infoDeckInfo.Entries) {
+                foreach (string s in entry.Text) {
+                    JusText.WriteStringPointer(s, writer, jit);
+                }
             }
 
             JusText.WriteAllStrings(writer, jit);
 
             return bin;
+        }
+
+        private InfoDeckEntry ReadEntry()
+        {
+            var entry = new InfoDeckEntry();
+            var infodeck = new InfoDeckInfo();
+            for (int i = 0; i < infodeck.LinesPerPage; i++) {
+                entry.Text.Add(JusText.ReadIndirectString(reader));
+            }
+
+            return entry;
         }
     }
 }

@@ -42,8 +42,8 @@ namespace JUSToolkit.Texts.Converters
             Po po = JusText.GenerateJusPo();
 
             int i = 0;
-            foreach (string entry in infoDeckInfo.TextEntries) {
-                po.Add(new PoEntry(JusText.CleanString(entry)) {
+            foreach (InfoDeckEntry entry in infoDeckInfo.Entries) {
+                po.Add(new PoEntry(JusText.MergeStrings(entry.Text)) {
                     Context = $"{i++}",
                 });
             }
@@ -58,13 +58,28 @@ namespace JUSToolkit.Texts.Converters
         /// <returns>Transformed TextFormat.</returns>
         public InfoDeckInfo Convert(Po po)
         {
-            var infoDeckInfo = new InfoDeckInfo();
+            var infoDeck = new InfoDeckInfo();
 
-            foreach (PoEntry entry in po.Entries) {
-                infoDeckInfo.TextEntries.Add(JusText.WriteCleanString(entry.Text));
+            InfoDeckEntry entry;
+            infoDeck.Count = po.Entries.Count;
+
+            for (int i = 0; i < infoDeck.Count; i++) {
+                entry = new InfoDeckEntry();
+                List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', infoDeck.LinesPerPage);
+                List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', infoDeck.LinesPerPage);
+
+                if (originalLines.Count != translatedLines.Count) {
+                    throw new FormatException($"Wrong number of lines in {po.Entries[i].Text}");
+                }
+
+                foreach (string s in translatedLines) {
+                    entry.Text.Add(Table.Instance.Encode(JusText.WriteCleanString(s)));
+                }
+
+                infoDeck.Entries.Add(entry);
             }
 
-            return infoDeckInfo;
+            return infoDeck;
         }
     }
 }

@@ -64,8 +64,8 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < infoDeck.Count; i++) {
                 entry = new InfoDeckEntry();
-                List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', InfoDeckEntry.LinesPerPage);
-                List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', InfoDeckEntry.LinesPerPage);
+                List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', infoDeck.LinesPerPage);
+                List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', infoDeck.LinesPerPage);
 
                 if (originalLines.Count != translatedLines.Count) {
                     throw new FormatException($"Wrong number of lines in {po.Entries[i].Text}");

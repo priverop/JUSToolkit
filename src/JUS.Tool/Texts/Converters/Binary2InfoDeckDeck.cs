@@ -48,7 +48,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            infodeckDeck.Count = reader.ReadInt32() / InfoDeckEntry.EntrySize / InfoDeckEntry.LinesPerPage;
+            infodeckDeck.Count = reader.ReadInt32() / InfoDeckEntry.EntrySize / infodeckDeck.LinesPerPage;
             reader.Stream.Position = 0x00;
 
             for (int i = 0; i < infodeckDeck.Count; i++) {
@@ -70,7 +70,7 @@ namespace JUSToolkit.Texts.Converters
                 DefaultEncoding = JusText.JusEncoding,
             };
 
-            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeckDeck.Count * InfoDeckEntry.LinesPerPage);
+            var jit = new IndirectTextWriter(InfoDeckEntry.EntrySize * infoDeckDeck.Count * infoDeckDeck.LinesPerPage);
 
             foreach (InfoDeckEntry entry in infoDeckDeck.Entries) {
                 foreach (string s in entry.Text) {
@@ -86,7 +86,8 @@ namespace JUSToolkit.Texts.Converters
         private InfoDeckEntry ReadEntry()
         {
             var entry = new InfoDeckEntry();
-            for (int i = 0; i < InfoDeckEntry.LinesPerPage; i++) {
+            var infodeckDeck = new InfoDeckDeck();
+            for (int i = 0; i < infodeckDeck.LinesPerPage; i++) {
                 entry.Text.Add(JusText.ReadIndirectString(reader));
             }
 

@@ -25,24 +25,11 @@ namespace JUSToolkit.Texts.Formats
     /// <summary>
     /// Format for Deck (InfoDeckInfo) files.
     /// </summary>
-    public class InfoDeckInfo : IFormat
+    public class InfoDeckInfo : InfoDeckBase
     {
         /// <summary>
-        /// Entry size in bytes.
+        /// Gets the number of lines per page.
         /// </summary>
-        public static readonly int EntrySize = 0x04;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InfoDeckInfo"/> class.
-        /// </summary>
-        public InfoDeckInfo()
-        {
-            TextEntries = new List<string>();
-        }
-
-        /// <summary>
-        /// Gets or sets the list of entries (strings).
-        /// </summary>
-        public List<string> TextEntries { get; set; }
+        public override int LinesPerPage => 3;
     }
 }
