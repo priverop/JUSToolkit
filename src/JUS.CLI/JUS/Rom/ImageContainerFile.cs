@@ -108,11 +108,11 @@ namespace JUSToolkit.CLI.JUS.Rom
 
                         // Ignore the _n_ and _m_, because we obtain them later with the original
                         if (!IsSpecialDemoNM(file.Name)) {
-
                             // Get the Dig, Atm and Alar
                             string[] demoInfo = GetDemoInfo(file.Name, containerPath);
                             ProcessContainer(gameNode, file, demoInfo, true);
                         }
+
                         return;
                     }
                 }
@@ -196,7 +196,7 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// bb_m_02.png => bb_07.dig
         /// bb_n_02.png => bb_07.dig
         /// bb_m_03.png => bb_09.dig
-        /// bb_n_03.png => bb_09.dig
+        /// bb_n_03.png => bb_09.dig.
         /// </remarks>
         private static string GetDemoDigName(string pngName)
         {
@@ -229,6 +229,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             if (!SpecialDigNumbers.Any(kv => kv.Value == number)) {
                 throw new InvalidOperationException($"Value {number} is not found in SpecialDigNumbers.");
             }
+
             char specialNumber = SpecialDigNumbers.First(kv => kv.Value == number).Key;
 
             // Construct the names of the _m_ and _n_ files
@@ -245,7 +246,7 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// bb_03.png => [bb_03.png, bb_m_00.png, bb_n_00.png]
         /// bb_05.png => [bb_05.png, bb_m_01.png, bb_n_01.png]
         /// bb_07.png => [bb_07.png, bb_m_02.png, bb_n_02.png]
-        /// bb_09.png => [bb_09.png, bb_m_03.png, bb_n_03.png]
+        /// bb_09.png => [bb_09.png, bb_m_03.png, bb_n_03.png].
         /// </remarks>
         private static Node[] GetSpecialPngs(Node png)
         {
@@ -268,7 +269,7 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// bb_03.atm => [bb_03.atm, bb_m_00.atm, bb_n_00.atm]
         /// bb_05.atm => [bb_05.atm, bb_m_01.atm, bb_n_01.atm]
         /// bb_07.atm => [bb_07.atm, bb_m_02.atm, bb_n_02.atm]
-        /// bb_09.atm => [bb_09.atm, bb_m_03.atm, bb_n_03.atm]
+        /// bb_09.atm => [bb_09.atm, bb_m_03.atm, bb_n_03.atm].
         /// </remarks>
         private static string[] GetSpecialAtms(string atm)
         {

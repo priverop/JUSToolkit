@@ -1,4 +1,4 @@
-infoDeck.aar,infodeck/bb.bin,deck,/NodeContainerRoot/bin/deck/bb.bin
-infoDeck.aar,infodeck/bb.bin,info,/NodeContainerRoot/bin/info/bb.bin
+InfoDeck.aar,infodeck/bb.bin,deck,/NodeContainerRoot/bin/deck/bb.bin
+InfoDeck.aar,infodeck/bb.bin,info,/NodeContainerRoot/bin/info/bb.bin
 Deck.aar,deck/001.bin,play,/NodeContainerRoot/deck/play/001.bin
 Deck.aar,deck/001.bin,jarg,/NodeContainerRoot/deck/jarg/001.bin

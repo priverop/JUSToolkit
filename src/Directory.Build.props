@@ -3,18 +3,14 @@
         <Product>JUSToolkit</Product>
         <Authors>Priverop</Authors>
         <Company>None</Company>
-        <Copyright>Copyright (C) 2023 Priverop</Copyright>
+        <Copyright>Copyright (C) 2025 Priverop</Copyright>
 
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
         <!-- Due to known issues, .NET 6 SDK may give a false warning
              when packing apps if the SelfContained value is in the csproj
              instead in the CLI command. -->
-        <NoWarn>NETSDK1179</NoWarn>
-        <NoWarn>NU1507</NoWarn>
-        <NoWarn>IDE0058</NoWarn>
-        <NoWarn>SA1010</NoWarn>
-        <NoWarn>SA1000</NoWarn>
+        <NoWarn>NETSDK1179;NU1507;IDE0058;SA1010;SA1000</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -23,26 +23,13 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Texts.Formats
 {
     /// <summary>
-    /// Format for Deck (InfoDeck) files.
+    /// Format for Deck (InfoDeckInfo) files.
     /// </summary>
-    public class InfoDeck : IFormat
+    public class InfoDeckInfo : InfoDeckBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InfoDeck"/> class.
+        /// Gets the number of lines per page.
         /// </summary>
-        public InfoDeck()
-        {
-            Entries = new List<InfoDeckEntry>();
-        }
-
-        /// <summary>
-        /// Gets or sets the number of entries in <see cref="Entries"/>.
-        /// </summary>
-        public int Count { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of <see cref="InfoDeckEntry" />.
-        /// </summary>
-        public List<InfoDeckEntry> Entries { get; set; }
+        public override int LinesPerPage => 3;
     }
 }
