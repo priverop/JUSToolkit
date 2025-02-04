@@ -69,14 +69,15 @@ namespace JUSToolkit.Texts.Converters
                 List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', infoDeck.LinesPerPage);
 
                 if (originalLines.Count != translatedLines.Count) {
-                    throw new FormatException($"Wrong number of lines in {po.Entries[i].Text}");
+                    Console.WriteLine($"Wrong number of lines in {po.Entries[i].Text}");
+                    continue;
                 }
 
                 foreach (string s in translatedLines) {
                     string sentence = Table.Instance.Encode(JusText.WriteCleanString(s));
-                    if (sentence.Length > 40) {
-                        Console.WriteLine($"Limit of 40 chars reached in entry {i}: {sentence}");
-                        sentence = sentence[0..40];
+                    if (sentence.Length > 38) {
+                        Console.WriteLine($"Limit of 38 chars reached in entry {i}: {sentence}");
+                        sentence = sentence[0..38];
                     }
 
                     entry.Text.Add(sentence);
