@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+## This is the script I was to import the Demo images into the game.
+
 # In the DEBUGDIR I create a directory (DEMODIR) with a directory for each manga with its .png, .dig and .atm.
 
 WORKDIR='/JUSToolkit/src/JUS.CLI'
