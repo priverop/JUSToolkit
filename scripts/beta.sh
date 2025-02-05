@@ -1,18 +1,36 @@
 #!/bin/bash
-set -e
+# Translate this into English:
+# Script to generate a demo with the translated data from the Git repo.
+# Usage: ./script.sh [debug]
+#   - debug: Debug mode (avoid compiling the project, git pull and the rom name doesn't change).
+set -eu
 
 clear
 
-# Check for DEBUG mode
+# ----------------------------
+# DEBUG mode
+# ----------------------------
 DEBUG=false
 if [ "$1" == "debug" ]; then
     DEBUG=true
     echo "DEBUG mode activated"
 fi
 
-## VARIABLES
-# Absolute Path of the Tool
-JUS_PATH='//JUSToolkit/src/JUS.CLI'
+## ToDo:
+# - [x] Hacer git pull del repo de Weblate
+# - [x] Setear el GIT_REPO_PATH con el repo de Weblate.
+# - [x] Adaptar todos los directorios de los archivos a los nuevos directorios de Weblate.
+# - [ ] Añadir los menús
+# - [ ] Añadir las imágenes DEMO
+
+# ----------------------------
+# VARIABLES: modify as necessary
+# ----------------------------
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Absolute Path of the JUSToolKit
+JUS_PATH="$BASE_DIR/src/JUS.CLI"
 # Absolute path for the beta root directory. 
 # In this directory we will have the Weblate git repository, a folder for the generated .bin and another folder for the Demos (DEMO_PATH).
 BETA_PATH='/'
@@ -20,6 +38,8 @@ BETA_PATH='/'
 GIT_REPO_PATH=$BETA_PATH'/jus-translation-repo'
 # Directory where the demo will be saved
 DEMO_PATH=$BETA_PATH'/demos'
+# Emulator path
+EMULATOR_PATH=melonDS.AppImage # MacOS: /Applications/melonDS.app/Contents/MacOS/melonDS
 
 # Path of the English ROM
 ROM_PATH=$JUS_PATH/bin/Debug/net8.0/jump_en.nds
@@ -34,75 +54,85 @@ else
     DEMO_NAME='new_game_font.nds'
 fi
 
-echo '==='
-echo $DEMO_NAME
+# ----------------------------
+# Setting up
+# ----------------------------
+
 ## Deleting temporary demo files:
-rm -f $DEMO_PATH/new_game.nds
-rm -f $DEMO_PATH/new_game_font.nds
+find $DEMO_PATH -name "new_game*.nds" -exec rm -f {} \;
+
+# Create the directory for the bin files
+mkdir -p "$BETA_PATH/new_rom" 
+# Backup the rom
+cp "$ROM_PATH" "$DEMO_PATH/new_game.nds"
 
 ## Updating repository
-# cd $GIT_REPO_PATH
-# git pull
-# Exit if issues with the git pull:
-if [ $? -ne 0 ]; then
-    echo "Error: There was an issue with the git pull."
-    exit 1
+if [ "$DEBUG" == false ]; then
+    cd $GIT_REPO_PATH
+    git pull
+    # Exit if issues with the git pull:
+    if [ $? -ne 0 ]; then
+        echo "Error: There was an issue with the git pull."
+        exit 1
+    fi
 fi
 
 # Compile the project
 cd $JUS_PATH
 if [ "$DEBUG" == false ]; then
-    dotnet build
+    if ! dotnet build; then
+        echo "Error: dotnet build failed."
+        exit 1
+    fi
 fi
 cd $JUS_PATH/bin/Debug/net8.0
 
-# Start the process:
+# ----------------------------
+# FUNCTIONS
+# ----------------------------
+import_texts_to_game() {
+    local text_format=$1
+    local output_bin=$2
 
-echo 'Creating '$DEMO_NAME
+    echo "Importing $text_format..."
+    ./JUS.CLI jus texts batchImport --directory "$TEXT_DIRECTORY/$text_format" --output "$BETA_PATH/new_rom/$output_bin"
+    ./JUS.CLI jus game import --game "$DEMO_PATH/new_game.nds" --input "$BETA_PATH/new_rom/$output_bin" --output "$DEMO_PATH"
+}
 
-echo 'Importing 7 text formats:'
+# ----------------------------
+# START the process
+# ----------------------------
+echo -e '\n\033[1;34m🚀 Starting the importing process...\033[0m'
+echo -e '\n\033[1;34m📄 Importing texts\033[0m'
 
-## TUTORIAL
+## TEXTS
+
+# TUTORIAL
 echo ''
 echo '1 - TUTORIAL'
-# Insertar a BIN
-./JUS.CLI jus texts batchImport --directory $TEXT_DIRECTORY/tutorial --output $BETA_PATH/new_rom/tutorial_bin
-# Insertar a la ROM
-./JUS.CLI jus game import --game $ROM_PATH --input $BETA_PATH/new_rom/tutorial_bin --output $DEMO_PATH
+import_texts_to_game "tutorial" "tutorial_bin"
 
-## UNICOS
+# UNICOS
 echo ''
 echo '2 - UNICOS'
-# Insertar a BIN
-./JUS.CLI jus texts batchImport --directory $TEXT_DIRECTORY/unicos --output $BETA_PATH/new_rom/bin_bin
-# Insertar a la ROM
-./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/bin_bin --output $DEMO_PATH
+import_texts_to_game "unicos" "bin_bin"
 
-## JGALAXY
+# JGALAXY
 echo ''
 echo '3 - JGALAXY'
-# Insertar a BIN
-./JUS.CLI jus texts batchImport --directory $TEXT_DIRECTORY/jgalaxy --output $BETA_PATH/new_rom/jgalaxy_bin
-# Insertar a la ROM
-./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/jgalaxy_bin --output $DEMO_PATH
+import_texts_to_game "jgalaxy" "jgalaxy_bin"
 
-## INFODECK (Deck)
+# INFODECK (Deck)
 echo ''
 echo '4 - INFODECK-DECK:'
-# Insertar a BIN
-./JUS.CLI jus texts batchImport --directory $TEXT_DIRECTORY/InfoDeck --output $BETA_PATH/new_rom/InfoDeck_bin
-# Insertar a la ROM
-./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/InfoDeck_bin --output $DEMO_PATH
+import_texts_to_game "InfoDeck" "InfoDeck_bin"
 
-## INFODECK (INFO)
+# INFODECK (INFO)
 echo ''
 echo '5 - INFODECK-INFO:'
-# Insertar a BIN
-./JUS.CLI jus texts batchImport --directory $TEXT_DIRECTORY/InfoDeck-Info --output $BETA_PATH/new_rom/InfoDeckInfo_bin
-# Insertar a la ROM
-./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/InfoDeckInfo_bin --output $DEMO_PATH
+import_texts_to_game "InfoDeck-Info" "InfoDeckInfo_bin"
 
-## DECK
+# DECK texts
 echo ''
 echo '6 - DECK'
 # Insertar a BIN
@@ -125,7 +155,7 @@ echo '6 - DECK'
 ./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/deck_bin/smpl --output $DEMO_PATH
 ./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/deck_bin/test --output $DEMO_PATH
 
-## JQuiz
+# JQUIZ
 echo ''
 echo '7 - JQuiz'
 # Insertar a BIN
@@ -133,18 +163,23 @@ echo '7 - JQuiz'
 # Importar al juego
 ./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/jquiz_bin/ --output $DEMO_PATH
 
-## Font
+## IMAGES
+# echo -e '\n\033[1;34m🖼  Importing images\033[0m'
+
+# Updating Font
+echo ''
 echo 'Modifying font...'
 ./JUS.CLI jus game importFont --game $DEMO_PATH/new_game.nds --font $FONTS_DIRECTORY/jskfont_esp.aft --output $DEMO_PATH
 
+# ----------------------------
+# Finishing...
+# ----------------------------
 ## Renaming Demo
 if [ "$DEBUG" == false ]; then
     mv $DEMO_PATH/new_game_font.nds "$DEMO_PATH/$DEMO_NAME"
 fi
 
-echo 'Finished!'
-echo "Created $DEMO_PATH/$DEMO_NAME"
+echo -e '\n\033[1;32m✅ Finished! File created at \033[0m'$DEMO_PATH/$DEMO_NAME
 
-# Abrimos el juego
-# MacOS: /Applications/melonDS.app/Contents/MacOS/melonDS $GIT_REPO_PATH/new_game_font.nds
-melonDS.AppImage "$DEMO_PATH/$DEMO_NAME"
+# Opening the new game
+$EMULATOR_PATH "$DEMO_PATH/$DEMO_NAME"
