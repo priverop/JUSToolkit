@@ -16,13 +16,6 @@ if [ "$1" == "debug" ]; then
     echo "DEBUG mode activated"
 fi
 
-## ToDo:
-# - [x] Hacer git pull del repo de Weblate
-# - [x] Setear el GIT_REPO_PATH con el repo de Weblate.
-# - [x] Adaptar todos los directorios de los archivos a los nuevos directorios de Weblate.
-# - [ ] Añadir los menús
-# - [ ] Añadir las imágenes DEMO
-
 # ----------------------------
 # VARIABLES: modify as necessary
 # ----------------------------
@@ -163,10 +156,22 @@ echo '7 - JQuiz'
 # Importar al juego
 ./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $BETA_PATH/new_rom/jquiz_bin/ --output $DEMO_PATH
 
+#--------------------------
 ## IMAGES
-# echo -e '\n\033[1;34m🖼  Importing images\033[0m'
+echo -e '\n\033[1;34m🖼  Importing images\033[0m'
 
-# Updating Font
+# MENUS
+echo ''
+echo 'MENUS'
+./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $IMAGES_DIRECTORY/menus --output $DEMO_PATH
+
+# COMICS
+echo ''
+echo 'COMICS'
+./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $IMAGES_DIRECTORY/comics --output $DEMO_PATH
+
+#--------------------------
+## Updating Font
 echo ''
 echo 'Modifying font...'
 ./JUS.CLI jus game importFont --game $DEMO_PATH/new_game.nds --font $FONTS_DIRECTORY/jskfont_esp.aft --output $DEMO_PATH
