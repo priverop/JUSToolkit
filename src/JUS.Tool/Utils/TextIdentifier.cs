@@ -52,9 +52,9 @@ namespace JUSToolkit.Utils
             { "tutorial3.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
             { "tutorial4.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
             { "tutorial5.bin", [typeof(Binary2Tutorial), typeof(Tutorial2Po)] },
-            { "battle.bin", [typeof(Binary2JGalaxySimple), typeof(JGalaxySimple2Po)] },
-            { "mission.bin", [typeof(Binary2JGalaxySimple), typeof(JGalaxySimple2Po)] },
-            { "jgalaxy.bin", [typeof(Binary2JGalaxyComplex), typeof(JGalaxyComplex2Po)] },
+            { "jgalaxy-battle.bin", [typeof(Binary2JGalaxySimple), typeof(JGalaxySimple2Po)] },
+            { "jgalaxy-mission.bin", [typeof(Binary2JGalaxySimple), typeof(JGalaxySimple2Po)] },
+            { "jgalaxy-jgalaxy.bin", [typeof(Binary2JGalaxyComplex), typeof(JGalaxyComplex2Po)] },
             { "jquiz.bin", [typeof(Binary2JQuiz), typeof(JQuiz2Po)] },
         };
 

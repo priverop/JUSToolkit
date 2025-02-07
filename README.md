@@ -23,12 +23,18 @@ Done ✔️ To test / with issues ⚠️ Not done 🛑
 
 ### Texts
 
-- In progress, mostly done 🛑
+- Extract and import ✔️
 
 ### Batch Features
 
 - Extract every .dig from any .aar (ALAR2/ALAR3) to PNG ✔️
 - Import multiple PNGs to an .aar ALAR3 container ✔️
+
+### Scripts
+
+- **beta.sh:** generates a new beta translation rom if you have access to the Translation repo.
+- **copy_text_format:** generates a new text format.
+- The rest are testing scripts for devs.
 
 ## Tinke
 
@@ -37,27 +43,7 @@ containers and view .dig files.
 
 ## Build
 
-The project requires to build .NET 6.0 SDK (Linux and MacOS require also Mono).
-If you open the project with VS Code and you did install the
-[VS Code Remote Containers](https://code.visualstudio.com/docs/remote/containers)
-extension, you can have an already pre-configured development environment with
-Docker or Podman.
-
-To build, test and generate artifacts run:
-
-```sh
-# Only required the first time
-dotnet tool restore
-
-# Default target is Stage-Artifacts
-dotnet cake
-```
-
-To just build and test quickly, run:
-
-```sh
-dotnet cake --target=BuildTest
-```
+The project requires to build .NET Core 8.0.
 
 ## How To Use
 
@@ -72,9 +58,13 @@ dotnet cake --target=BuildTest
   - import-alar3
   - export-alar2
   - import-alar2
+  - import
+  - export
 - batch
   - export-alar-png
   - import-png-alar3
+- game
+  - import
 
 To get the arguments of a feature you can use:
 `./JUS.CLI jus [type] [feature] -h`
@@ -90,6 +80,7 @@ Examples:
 You can find these documents in our `docs/dev` folder:
 
 - Alar Specification
+- Text Specification
 - DTX Specification by PleoNex
 - DTX Research by PleoNex
 - [FileFormats by Uknown Hacker](https://web.archive.org/web/20100111220659/http://jumpstars.wikispaces.com/File+Formats#toc10)
@@ -104,7 +95,7 @@ PleoNex did some research on Streaming:
 
 ## Stack
 
-- C# Net Core 6
+- C# Net Core 8
 - [YARHL by PleoNex](https://github.com/SceneGate/Yarhl)
 - [PleOps by PleoNex](https://github.com/pleonex/PleOps.Cake)
 

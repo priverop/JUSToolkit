@@ -1,4 +1,7 @@
 #!/bin/bash
+
+## This script was used to migrate the translations from the old format in Weblate to the new format, for Weblate.
+
 set -e
 
 clear

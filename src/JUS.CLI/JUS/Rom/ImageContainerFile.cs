@@ -131,7 +131,7 @@ namespace JUSToolkit.CLI.JUS.Rom
             IConverter image2Alar3;
 
             // Special demo needs 3 atm, 3 pngs and 1 dig (imageInfo[0])
-            if (IsSpecialDemo(pngFile.Name) && !pngFile.Name.Contains("opening")) {
+            if (IsSpecialDemo(pngFile.Name) && !pngFile.Name.Contains("opening") && !pngFile.Name.Contains("sel01")) {
                 string[] atms = GetSpecialAtms(imageInfo[1]);
                 Node[] pngs = GetSpecialPngs(pngFile);
                 image2Alar3 = new Demo2Alar3(pngs, imageInfo[0], atms, transparentTile);

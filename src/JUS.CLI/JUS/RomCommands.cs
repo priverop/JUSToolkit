@@ -57,9 +57,9 @@ namespace JUSToolkit.CLI.JUS
             { "rulemess.bin", new TextFile() },
             { "stage.bin", new TextFile() },
             { "title.bin", new TextFile() },
-            { "jgalaxy.bin", new TextContainerFile() },
-            { "mission.bin", new TextContainerFile() },
-            { "battle.bin", new TextContainerFile() },
+            { "jgalaxy-jgalaxy.bin", new TextContainerFile() },
+            { "jgalaxy-mission.bin", new TextContainerFile() },
+            { "jgalaxy-battle.bin", new TextContainerFile() },
             { "jquiz.bin", new TextContainerFile() },
         };
 

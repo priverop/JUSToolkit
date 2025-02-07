@@ -36,9 +36,9 @@ namespace JUSToolkit.CLI.JUS.Rom
     public class TextContainerFile : IFileImportStrategy
     {
         private static readonly Dictionary<string, string> ContainerLocations = new() {
-            { "jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
-            { "mission.bin", "/jgalaxy/jgalaxy.aar" },
-            { "battle.bin", "/jgalaxy/jgalaxy.aar" },
+            { "jgalaxy-jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
+            { "jgalaxy-mission.bin", "/jgalaxy/jgalaxy.aar" },
+            { "jgalaxy-battle.bin", "/jgalaxy/jgalaxy.aar" },
             { "jquiz.bin", "/jquiz/jquiz_pack.aar" },
         };
 
