@@ -25,8 +25,7 @@ namespace JUS.Tool.Graphics.Converters
         private const int Version = 0x01;
         private const int Type = 0x03;
         private const int PointerOffset = 0x0A;
-
-        private readonly Binary2Dig digConverter = new ();
+        private readonly Binary2Dig digConverter = new();
 
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a dtx3 <see cref="NodeContainerFormat"/>.
@@ -35,9 +34,7 @@ namespace JUS.Tool.Graphics.Converters
         /// <returns><see cref="NodeContainerFormat"/> with all the sprites and <see cref="Dig"/> image.</returns>
         public NodeContainerFormat Convert(IBinary source)
         {
-            if (source is null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             var reader = new DataReader(source.Stream);
             source.Stream.Position = 0;
@@ -49,8 +46,8 @@ namespace JUS.Tool.Graphics.Converters
             int version = reader.ReadByte();
             int type = reader.ReadByte();
 
-            if (version != Version && type != Type) {
-                throw new FormatException($"Invalid version: {version}.{type}");
+            if (version != Version || type != Type) {
+                throw new FormatException($"Invalid version/type: {version}.{type}");
             }
 
             ushort numSprites = reader.ReadUInt16();
