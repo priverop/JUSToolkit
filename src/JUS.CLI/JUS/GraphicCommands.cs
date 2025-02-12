@@ -73,38 +73,13 @@ namespace JUSToolkit.CLI.JUS
             // Sprites + pixels + palette
             using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<BinaryToDtx3>();
+                .TransformWith<Dtx2Bitmaps>();
 
-            Dig image = dtx3.Children["image"].GetFormatAs<Dig>();
-            var spriteParams = new Sprite2IndexedImageParams {
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                FullImage = image,
-            };
-            var indexedImageParams = new IndexedImageBitmapParams {
-                Palettes = image,
-            };
-
-            switch (image.Swizzling) {
-                case DigSwizzling.Tiled:
-                    foreach (Node nodeSprite in dtx3.Children["sprites"].Children) {
-                        nodeSprite
-                            .TransformWith(new Sprite2IndexedImage(spriteParams))
-                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
-                            .Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
-                    }
-
-                    break;
-                case DigSwizzling.Linear:
-                    foreach (Node nodeTexture in dtx3.Children["sprites"].Children) {
-                        nodeTexture
-                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
-                            .Stream.WriteTo(Path.Combine(output, $"{nodeTexture.Name}.png"));
-                    }
-
-                    break;
-                default:
-                    throw new FormatException("Invalid swizzling");
+            foreach (Node nodeSprite in dtx3.Children) {
+                nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
             }
+
+
         }
 
         /// <summary>
