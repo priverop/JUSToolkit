@@ -151,15 +151,22 @@ namespace JUSToolkit.CLI.JUS
             };
             importPng2Alar3.Handler = CommandHandler.Create<string, string, string>(BatchCommands.ImportPng2Alar3);
 
-            var exportAlar2Png = new Command("export-alar-png", "Batch export PNGs from alar") {
+            var exportAlarDig2Png = new Command("export-alar-dig-png", "Batch export PNGs from alar digs files") {
                 new Option<string>("--container", "the alar container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportAlar2Png.Handler = CommandHandler.Create<string, string>(BatchCommands.ExportAlar2Png);
+            exportAlarDig2Png.Handler = CommandHandler.Create<string, string>(BatchCommands.ExportAlarDig2Png);
+
+            var exportAlarDtx2Png = new Command("export-alar-dtx-png", "Batch export PNGs from alar dtxs files") {
+                new Option<string>("--container", "the alar container", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportAlarDtx2Png.Handler = CommandHandler.Create<string, string>(BatchCommands.ExportAlarDtx2Png);
 
             return new Command("batch", "Batch import/export PNG to/from Alar") {
                 importPng2Alar3,
-                exportAlar2Png,
+                exportAlarDig2Png,
+                exportAlarDtx2Png,
             };
         }
 
