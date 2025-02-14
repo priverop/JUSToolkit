@@ -46,11 +46,11 @@ namespace JUSToolkit.CLI.JUS
         };
 
         /// <summary>
-        /// Export PNG files from an Alar container.
+        /// Export PNG files from the .dig files of an Alar container. Includes special demo files.
         /// </summary>
         /// <param name="container">The path to the alar file.</param>
         /// <param name="output">The output directory.</param>
-        public static void ExportAlar2Png(string container, string output)
+        public static void ExportAlarDig2Png(string container, string output)
         {
             Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
@@ -65,6 +65,44 @@ namespace JUSToolkit.CLI.JUS
 
             foreach (Node image in result.Root.Children) {
                 image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
+            }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Export PNG files from the dtx files of an Alar container.
+        /// </summary>
+        /// <param name="container">The path to the alar file.</param>
+        /// <param name="output">The output directory.</param>
+        public static void ExportAlarDtx2Png(string container, string output)
+        {
+            Node originalAlar = NodeFactory.FromFile(container)
+                            .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
+
+            Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
+
+            // ToDo: In the future we need to encapsulate this
+            if (alarVersion.Major == 3) {
+                originalAlar.TransformWith<Binary2Alar3>();
+            } else if (alarVersion.Major == 2) {
+                originalAlar.TransformWith<Binary2Alar2>();
+            }
+
+            string originalAlarName = Path.GetFileNameWithoutExtension(originalAlar.Name);
+            Console.WriteLine($"Exporting DTX from {originalAlarName}");
+
+            foreach (Node child in Navigator.IterateNodes(originalAlar)) {
+                if (Path.GetExtension(child.Name) == ".dtx") {
+                    using Node dtx3 = child
+                        .TransformWith<LzssDecompression>()
+                        .TransformWith<Dtx2Bitmaps>();
+
+                    foreach (Node nodeSprite in dtx3.Children) {
+                        Console.WriteLine($"DTX found, exporting: {originalAlarName}/{nodeSprite.Name}.png");
+                        nodeSprite.Stream.WriteTo(Path.Combine(output, $"{originalAlarName}-{nodeSprite.Name}.png"));
+                    }
+                }
             }
 
             Console.WriteLine("Done!");

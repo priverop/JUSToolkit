@@ -45,6 +45,7 @@ namespace JUSToolkit.Containers.Converters
             }
 
             reader = new DataReader(input.Stream);
+            input.Stream.Position = 0;
 
             ReadHeader();
 

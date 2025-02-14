@@ -37,9 +37,7 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns>The decompressed stream.</returns>
         public BinaryFormat Convert(IBinary source)
         {
-            if (source == null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             DataStream decompressedStream = CompressionUtils.IsCompressed(source.Stream) ? Convert(source.Stream) : new DataStream(source.Stream);
 
