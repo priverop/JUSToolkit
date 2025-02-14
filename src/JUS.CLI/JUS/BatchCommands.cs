@@ -89,6 +89,9 @@ namespace JUSToolkit.CLI.JUS
                 originalAlar.TransformWith<Binary2Alar2>();
             }
 
+            string originalAlarName = Path.GetFileNameWithoutExtension(originalAlar.Name);
+            Console.WriteLine($"Exporting DTX from {originalAlarName}");
+
             foreach (Node child in Navigator.IterateNodes(originalAlar)) {
                 if (Path.GetExtension(child.Name) == ".dtx") {
                     using Node dtx3 = child
@@ -96,7 +99,8 @@ namespace JUSToolkit.CLI.JUS
                         .TransformWith<Dtx2Bitmaps>();
 
                     foreach (Node nodeSprite in dtx3.Children) {
-                        nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
+                        Console.WriteLine($"DTX found, exporting: {originalAlarName}/{nodeSprite.Name}.png");
+                        nodeSprite.Stream.WriteTo(Path.Combine(output, $"{originalAlarName}-{nodeSprite.Name}.png"));
                     }
                 }
             }

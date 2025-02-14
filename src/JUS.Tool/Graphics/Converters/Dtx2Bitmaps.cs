@@ -73,7 +73,7 @@ namespace JUSToolkit.Graphics.Converters
                 case DigSwizzling.Linear:
                     foreach (Node nodeTexture in dtx3.Root.Children["sprites"].Children) {
                         // Cloning the node so we can transform it
-                        bitmaps.Root.Add(new Node(nodeTexture.Name, nodeTexture.GetFormatAs<Sprite>())
+                        bitmaps.Root.Add(new Node(nodeTexture.Name, nodeTexture.GetFormatAs<Dig>())
                             .TransformWith(new IndexedImage2Bitmap(indexedImageParams)));
                     }
 
