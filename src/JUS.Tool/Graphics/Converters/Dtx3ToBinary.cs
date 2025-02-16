@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JUSToolkit.Graphics.Converters;
 using Texim.Sprites;
 using Yarhl.FileFormat;
@@ -11,12 +8,20 @@ using Yarhl.IO;
 
 namespace JUS.Tool.Graphics.Converters
 {
+    /// <summary>
+    /// Converter from DTX3 format to binary format.
+    /// </summary>
     public class Dtx3ToBinary : IConverter<NodeContainerFormat, BinaryFormat>
     {
         private const string Stamp = "DSTX";
         private const byte Version = 0x01;
         private const byte Type = 0x03;
 
+        /// <summary>
+        /// Converts a DTX3 format to a binary format.
+        /// </summary>
+        /// <param name="dtx">The DTX3 format to convert.</param>
+        /// <returns>The converted binary format.</returns>
         public BinaryFormat Convert(NodeContainerFormat dtx)
         {
             var bin = new BinaryFormat();
@@ -37,13 +42,13 @@ namespace JUS.Tool.Graphics.Converters
             }
 
             foreach (Node n in sprites) {
-                var sprite = n.GetFormatAs<Sprite>();
+                Sprite sprite = n.GetFormatAs<Sprite>();
                 writer.Write((ushort)sprite.Segments.Count);
-                foreach(ImageSegment s in sprite.Segments) {
+                foreach (IImageSegment s in sprite.Segments) {
                     writer.Write((ushort)s.TileIndex);
                     writer.Write((sbyte)s.CoordinateX);
                     writer.Write((sbyte)s.CoordinateY);
-                    writer.Write((byte)(getSize(s.Width, s.Height) + getFlip(s.HorizontalFlip, s.VerticalFlip)));
+                    writer.Write((byte)(GetSize(s.Width, s.Height) + GetFlip(s.HorizontalFlip, s.VerticalFlip)));
                     writer.Write(s.PaletteIndex);
                 }
             }
@@ -58,11 +63,17 @@ namespace JUS.Tool.Graphics.Converters
             reader.Stream.Position = 0;
             writer.Write(reader.ReadBytes((int)reader.Stream.Length));
 
-
             return bin;
         }
 
-        private byte getSize(int width, int height)
+        /// <summary>
+        /// Gets the size byte based on width and height.
+        /// </summary>
+        /// <param name="width">The width of the segment.</param>
+        /// <param name="height">The height of the segment.</param>
+        /// <returns>The size byte.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the size is invalid.</exception>
+        private static byte GetSize(int width, int height)
         {
             return (width, height) switch {
                 (8, 8) => 0x00,
@@ -77,10 +88,18 @@ namespace JUS.Tool.Graphics.Converters
                 (8, 32) => 0x09,
                 (16, 32) => 0x0A,
                 (32, 64) => 0x0B,
+                _ => throw new ArgumentOutOfRangeException(nameof(width), $"Invalid size: {width}x{height}")
             };
         }
 
-        private byte getFlip(bool hFlip, bool vFlip)
+        /// <summary>
+        /// Gets the flip byte based on horizontal and vertical flip.
+        /// </summary>
+        /// <param name="hFlip">Indicates if horizontal flip is applied.</param>
+        /// <param name="vFlip">Indicates if vertical flip is applied.</param>
+        /// <returns>The flip byte.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the flip combination is invalid.</exception>
+        private static byte GetFlip(bool hFlip, bool vFlip)
         {
             return (hFlip, vFlip) switch {
                 (false, false) => 0x00,

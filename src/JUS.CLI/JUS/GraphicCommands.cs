@@ -79,20 +79,24 @@ namespace JUSToolkit.CLI.JUS
             foreach (Node nodeSprite in dtx3.Children) {
                 nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
             }
-
-
         }
 
+        /// <summary>
+        /// Import multiple PNGs into a sprite .dtx file.
+        /// </summary>
+        /// <param name="input">The input folder containing PNGs.</param>
+        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="output">The output folder.</param>
         public static void ImportDtx3(string input, string dtx, string output)
         {
             // Sprites + pixels + palette
-            using var dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            var image = dtx3.Children["image"].GetFormatAs<Dig>();
+            Dig image = dtx3.Children["image"].GetFormatAs<Dig>();
             var palettes = new PaletteCollection();
-            foreach (var p in image.Palettes) {
+            foreach (IPalette p in image.Palettes) {
                 palettes.Palettes.Add(p);
             }
 
@@ -108,10 +112,11 @@ namespace JUSToolkit.CLI.JUS
             };
 
             foreach (string spritePath in Directory.GetFiles(input)) {
-                var sprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read)
-                .TransformWith<Bitmap2FullImage>()
-                .TransformWith<FullImage2Sprite, FullImage2SpriteParams>(spriteConverterParameters)
-                .GetFormatAs<Sprite>();
+                Node nodeSprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read);
+                nodeSprite.TransformWith<Bitmap2FullImage>();
+                var converter = new FullImage2Sprite(spriteConverterParameters);
+                nodeSprite.TransformWith(converter);
+                Sprite sprite = nodeSprite.GetFormatAs<Sprite>();
 
                 dtx3.Children["sprites"].Children[Path.GetFileNameWithoutExtension(spritePath)].ChangeFormat(sprite);
             }
@@ -121,13 +126,13 @@ namespace JUSToolkit.CLI.JUS
                 Width = 8,
                 Height = pixels.Count / 8,
             };
-            var b = new Dig2Binary().Convert(updatedImage);
-            b.Stream.WriteTo(Path.Combine(output, $"file.dig"));
+            BinaryFormat b = new Dig2Binary().Convert(updatedImage);
+            b.Stream.WriteTo(Path.Combine(output, "file.dig"));
 
             dtx3.Children["image"].ChangeFormat(updatedImage);
 
             new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
-                .Stream.WriteTo(Path.Combine(output, $"file.dtx"));
+                .Stream.WriteTo(Path.Combine(output, "file.dtx"));
         }
 
         /// <summary>
@@ -178,12 +183,12 @@ namespace JUSToolkit.CLI.JUS
                 newDig = newDig.InsertTransparentTile(map);
             }
 
-            using var binaryDig = new Dig2Binary().Convert(newDig);
+            using BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
             binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
             var newAtm = new Almt(originalAtm, map);
-            using var binaryAtm = new Almt2Binary().Convert(newAtm);
+            using BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
 
             binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 
