@@ -45,7 +45,7 @@ namespace JUSToolkit.Graphics
             new SplitSize(0, 8),
         };
 
-        public int CanvasWidth { get; set; } = 512;
+        public int CanvasWidth { get; set; } = 256;
 
         public int CanvasHeight { get; set; } = 256;
 

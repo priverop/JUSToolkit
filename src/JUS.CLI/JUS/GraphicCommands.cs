@@ -19,14 +19,11 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using SixLabors.ImageSharp.PixelFormats;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
@@ -109,11 +106,14 @@ namespace JUSToolkit.CLI.JUS
                 PixelsPerIndex = 64,
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 PixelSequences = pixels,
+                Segmentation = new NitroImageSegmentation(),
             };
 
             foreach (string spritePath in Directory.GetFiles(input)) {
                 Node nodeSprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read);
+                // PNG -> FullImage (array of colors)
                 nodeSprite.TransformWith<Bitmap2FullImage>();
+                // FullImage -> Sprite
                 var converter = new FullImage2Sprite(spriteConverterParameters);
                 nodeSprite.TransformWith(converter);
                 Sprite sprite = nodeSprite.GetFormatAs<Sprite>();
@@ -126,13 +126,13 @@ namespace JUSToolkit.CLI.JUS
                 Width = 8,
                 Height = pixels.Count / 8,
             };
-            BinaryFormat b = new Dig2Binary().Convert(updatedImage);
-            b.Stream.WriteTo(Path.Combine(output, "file.dig"));
 
             dtx3.Children["image"].ChangeFormat(updatedImage);
 
             new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
                 .Stream.WriteTo(Path.Combine(output, "file.dtx"));
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
