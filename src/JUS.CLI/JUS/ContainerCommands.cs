@@ -130,16 +130,18 @@ namespace JUSToolkit.CLI.JUS
             Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
 
             var binary = new BinaryFormat();
+            var filesToInsert = new NodeContainerFormat();
+            filesToInsert.Root.Add(NodeFactory.FromDirectory(input).Children);
 
             if (alarVersion.Major == 3) {
                 Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
                 .GetFormatAs<Alar3>();
-                alar.InsertModification(NodeFactory.FromDirectory(input));
+                alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar3ToBinary());
             } else if (alarVersion.Major == 2) {
                 Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
                 .GetFormatAs<Alar2>();
-                alar.InsertModification(NodeFactory.FromDirectory(input));
+                alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar2ToBinary());
             }
 

@@ -19,7 +19,7 @@ namespace JUSToolkit.Containers
         /// </summary>
         /// <remarks>Maybe we need to support more than one minor version, but right now.
         /// I only found the 01.</remarks>
-        public static readonly Version SupportedVersion = new (2, 1);
+        public static readonly Version SupportedVersion = new(2, 1);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar2" /> class with an empty array of IDs.
@@ -40,6 +40,20 @@ namespace JUSToolkit.Containers
         /// Gets or sets the IDs of the files.
         /// </summary>
         public byte[] IDs { get; set; }
+
+        /// <summary>
+        /// Inserts a new Node into the current Alar2 Container.
+        /// </summary>
+        /// <param name="filesToInsert">NodeContainerFormat with multiple files.</param>
+        public void InsertModification(NodeContainerFormat filesToInsert)
+        {
+            foreach (Node nNew in Navigator.IterateNodes(filesToInsert.Root)) {
+                if (!nNew.IsContainer) {
+                    Console.WriteLine("Inserting " + nNew.Name);
+                    InsertModification(nNew);
+                }
+            }
+        }
 
         /// <summary>
         /// Inserts a new Node into the current Alar2 Container.
