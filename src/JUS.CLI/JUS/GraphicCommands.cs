@@ -18,14 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.Drawing.Imaging;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using SixLabors.ImageSharp.PixelFormats;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
@@ -78,8 +76,68 @@ namespace JUSToolkit.CLI.JUS
             foreach (Node nodeSprite in dtx3.Children) {
                 nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
             }
+        }
 
+        /// <summary>
+        /// Import multiple PNGs into a sprite .dtx file.
+        /// </summary>
+        /// <param name="input">The input folder containing PNGs.</param>
+        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="output">The output folder.</param>
+        public static void ImportDtx3(string input, string dtx, string output)
+        {
+            // Sprites + pixels + palette
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
 
+            Dig image = dtx3.Children["image"].GetFormatAs<Dig>();
+            var palettes = new PaletteCollection();
+            foreach (IPalette p in image.Palettes) {
+                palettes.Palettes.Add(p);
+            }
+
+            var pixels = new List<IndexedPixel>();
+
+            var spriteConverterParameters = new FullImage2SpriteParams {
+                Palettes = palettes,
+                IsImageTiled = true,
+                MinimumPixelsPerSegment = 64,
+                PixelsPerIndex = 64,
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                PixelSequences = pixels,
+                Segmentation = new NitroImageSegmentation(),
+            };
+
+            foreach (string spritePath in Directory.GetFiles(input)) {
+                Node nodeSprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read);
+                // PNG -> FullImage (array of colors)
+                nodeSprite.TransformWith<Bitmap2FullImage>();
+                // FullImage -> Sprite
+                var converter = new FullImage2Sprite(spriteConverterParameters);
+                nodeSprite.TransformWith(converter);
+                Sprite sprite = nodeSprite.GetFormatAs<Sprite>();
+
+                // Check if there is a Children with the correct name:
+                string cleanSpriteName = Path.GetFileNameWithoutExtension(spritePath);
+                Node spriteToReplace = dtx3.Children["sprites"].Children[cleanSpriteName]
+                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
+
+                spriteToReplace.ChangeFormat(sprite);
+            }
+
+            var updatedImage = new Dig(image) {
+                Pixels = pixels.ToArray(),
+                Width = 8,
+                Height = pixels.Count / 8,
+            };
+
+            dtx3.Children["image"].ChangeFormat(updatedImage);
+
+            new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+                .Stream.WriteTo(Path.Combine(output, "file.dtx"));
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -130,12 +188,12 @@ namespace JUSToolkit.CLI.JUS
                 newDig = newDig.InsertTransparentTile(map);
             }
 
-            using var binaryDig = new Dig2Binary().Convert(newDig);
+            using BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
             binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
             var newAtm = new Almt(originalAtm, map);
-            using var binaryAtm = new Almt2Binary().Convert(newAtm);
+            using BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
 
             binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 

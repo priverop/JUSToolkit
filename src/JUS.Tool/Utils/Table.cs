@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+#nullable enable
 using System;
 using System.IO;
 using Yarhl.IO;
@@ -48,9 +49,7 @@ namespace JUSToolkit
             get {
                 if (instance == null) {
                     lock (InstanceLock) {
-                        if (instance == null) {
-                            instance = new Table();
-                        }
+                        instance ??= new Table();
                     }
                 }
 

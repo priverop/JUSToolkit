@@ -19,7 +19,7 @@ namespace JUSToolkit.Containers
         /// </summary>
         /// <remarks>Maybe we need to support more than one minor version, but right now.
         /// I only found the 01.</remarks>
-        public static readonly Version SupportedVersion = new (2, 1);
+        public static readonly Version SupportedVersion = new(2, 1);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar2" /> class with an empty array of IDs.
@@ -44,28 +44,54 @@ namespace JUSToolkit.Containers
         /// <summary>
         /// Inserts a new Node into the current Alar2 Container.
         /// </summary>
-        /// <param name="filesToInsert">Alar2 NodeContainerFormat.</param>
-        public void InsertModification(Node filesToInsert)
+        /// <param name="filesToInsert">NodeContainerFormat with multiple files.</param>
+        public void InsertModification(NodeContainerFormat filesToInsert)
         {
-            foreach (Node nNew in filesToInsert.Children) {
-                uint nextFileOffset = 0;
-
-                foreach (Node nOld in Navigator.IterateNodes(Root)) {
-                    if (!nOld.IsContainer) {
-                        Alar2File alarFileOld = nOld.GetFormatAs<Alar2File>();
-
-                        // Ignoring first file (0 offset)
-                        if (nextFileOffset > 0) {
-                            alarFileOld.Offset = nextFileOffset;
-                        }
-
-                        if (nOld.Name == nNew.Name) {
-                            alarFileOld.ReplaceStream(nNew.Stream);
-                        }
-
-                        nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
-                    }
+            foreach (Node nNew in Navigator.IterateNodes(filesToInsert.Root)) {
+                if (!nNew.IsContainer) {
+                    Console.WriteLine("Inserting " + nNew.Name);
+                    InsertModification(nNew);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Inserts a new Node into the current Alar2 Container.
+        /// </summary>
+        /// <param name="nNew">Node to insert.</param>
+        /// <param name="parent">Parent directory of the file to replace.</param>
+        public void InsertModification(Node nNew, string parent = null)
+        {
+            uint nextFileOffset = 0;
+            bool replaced = false;
+
+            foreach (Node nOld in Navigator.IterateNodes(Root)) {
+                if (!nOld.IsContainer) {
+                    Alar2File alarFileOld = nOld.GetFormatAs<Alar2File>();
+
+                    // Ignoring first file (0 offset)
+                    if (nextFileOffset > 0) {
+                        alarFileOld.Offset = nextFileOffset;
+                    }
+
+                    if (parent == null && nOld.Name == nNew.Name) {
+                        Console.WriteLine("Replacing: " + nNew.Name);
+                        alarFileOld.ReplaceStream(nNew.Stream);
+                        replaced = true;
+                    }
+
+                    // Search for the specific file in case there are more than one in different directories
+                    // That's why specify the parent (directory name)
+                    else if (parent != null && parent == nOld.Parent.Name && nOld.Name == nNew.Name) {
+                        alarFileOld.ReplaceStream(nNew.Stream);
+                    }
+
+                    nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
+                }
+            }
+
+            if (!replaced) {
+                Console.WriteLine($"{nNew.Name} node not found in the container");
             }
         }
     }
