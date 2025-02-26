@@ -118,7 +118,12 @@ namespace JUSToolkit.CLI.JUS
                 nodeSprite.TransformWith(converter);
                 Sprite sprite = nodeSprite.GetFormatAs<Sprite>();
 
-                dtx3.Children["sprites"].Children[Path.GetFileNameWithoutExtension(spritePath)].ChangeFormat(sprite);
+                // Check if there is a Children with the correct name:
+                string cleanSpriteName = Path.GetFileNameWithoutExtension(spritePath);
+                Node spriteToReplace = dtx3.Children["sprites"].Children[cleanSpriteName]
+                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
+
+                spriteToReplace.ChangeFormat(sprite);
             }
 
             var updatedImage = new Dig(image) {
