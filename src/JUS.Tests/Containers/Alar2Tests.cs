@@ -168,7 +168,7 @@ namespace JUSToolkit.Tests.Containers
             Assert.AreEqual(1, modifiedFiles.Root.Children.Count());
 
             // Insertamos el Nodo con InsertModification
-            alar.InsertModification(modifiedFiles.Root);
+            alar.InsertModification(modifiedFiles);
 
             // Comprobamos los ficheros totales
             Assert.AreEqual(totalFiles, alar.Root.Children.Count());

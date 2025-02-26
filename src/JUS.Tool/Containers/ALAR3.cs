@@ -84,6 +84,7 @@ namespace JUSToolkit.Containers
         public void InsertModification(Node nNew, string parent = null)
         {
             uint nextFileOffset = 0;
+            bool replaced = false;
 
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
@@ -97,6 +98,7 @@ namespace JUSToolkit.Containers
                     if (parent == null && nOld.Name == nNew.Name) {
                         Console.WriteLine("Replacing: " + nNew.Name);
                         alarFileOld.ReplaceStream(nNew.Stream);
+                        replaced = true;
                     }
 
                     // Search for the specific file in case there are more than one in different directories
@@ -107,6 +109,10 @@ namespace JUSToolkit.Containers
 
                     nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                 }
+            }
+
+            if (!replaced) {
+                Console.WriteLine($"{nNew.Name} node not found in the container");
             }
         }
     }
