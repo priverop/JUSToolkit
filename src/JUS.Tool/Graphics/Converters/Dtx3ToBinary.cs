@@ -31,7 +31,7 @@ namespace JUS.Tool.Graphics.Converters
             writer.Write(Version);
             writer.Write(Type);
 
-            var sprites = dtx.Root.Children["sprites"].Children;
+            NavigableNodeCollection<Node> sprites = dtx.Root.Children["sprites"].Children;
             writer.Write((ushort)sprites.Count);
             writer.WriteOfType<ushort>(0x00);
 

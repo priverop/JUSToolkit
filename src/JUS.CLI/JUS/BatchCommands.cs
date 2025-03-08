@@ -20,8 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
@@ -90,17 +88,18 @@ namespace JUSToolkit.CLI.JUS
             }
 
             string originalAlarName = Path.GetFileNameWithoutExtension(originalAlar.Name);
-            Console.WriteLine($"Exporting DTX from {originalAlarName}");
+            Console.WriteLine($"Exporting DTX files from {originalAlarName}");
 
             foreach (Node child in Navigator.IterateNodes(originalAlar)) {
                 if (Path.GetExtension(child.Name) == ".dtx") {
+                    Console.WriteLine($"DTX found, exporting: {originalAlarName}/{child.Name}");
                     using Node dtx3 = child
                         .TransformWith<LzssDecompression>()
                         .TransformWith<Dtx2Bitmaps>();
 
                     foreach (Node nodeSprite in dtx3.Children) {
-                        Console.WriteLine($"DTX found, exporting: {originalAlarName}/{nodeSprite.Name}.png");
                         nodeSprite.Stream.WriteTo(Path.Combine(output, $"{originalAlarName}-{nodeSprite.Name}.png"));
+                        Console.WriteLine($"PNG exported: {originalAlarName}/{child.Name}");
                     }
                 }
             }
