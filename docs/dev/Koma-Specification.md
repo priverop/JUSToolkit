@@ -1,6 +1,8 @@
-# Jump Ultimate Start images
+# Koma sprites
 
-## DSTX
+To export all the info from the images, we need to follow some steps detailed [here](./Koma-research.md)
+
+## DSTX04
 
 | Offset | Type    | Description        |
 | ------ | ------- | ------------------ |

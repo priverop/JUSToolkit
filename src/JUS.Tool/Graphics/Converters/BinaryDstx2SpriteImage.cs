@@ -34,7 +34,7 @@ namespace JUSToolkit.Graphics.Converters
         private const string Stamp = "DSTX";
         private const int Type = 0x04;
 
-        private readonly Binary2Dig digConverter = new ();
+        private readonly Binary2Dig digConverter = new();
 
         /// <summary>
         /// Converts a BinaryFormat (file) to a NodeContainerFormat.
@@ -43,9 +43,7 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns>NodeContainerFormat Node.</returns>
         public NodeContainerFormat Convert(IBinary source)
         {
-            if (source is null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             source.Stream.Position = 0;
             var reader = new DataReader(source.Stream);
