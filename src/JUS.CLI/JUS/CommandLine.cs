@@ -129,9 +129,10 @@ namespace JUSToolkit.CLI.JUS
 
             var importAlar2 = new Command("import-alar2", "import alar2") {
                 new Option<string>("--container", "the input alar2 container", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the input directory to insert", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            importAlar2.Handler = CommandHandler.Create<string, string>(ContainerCommands.ImportAlar2);
+            importAlar2.Handler = CommandHandler.Create<string, string, string>(ContainerCommands.ImportAlar2);
 
             var importAlar3 = new Command("import-alar3", "import alar3") {
                 new Option<string>("--container", "the input alar3 container", ArgumentArity.ExactlyOne),

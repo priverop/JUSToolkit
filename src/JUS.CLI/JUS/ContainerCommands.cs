@@ -188,12 +188,18 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ImportAlar2(string container, string output)
         {
-            Node alar = NodeFactory.FromFile(container)
-                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
+            Alar2 alar = NodeFactory.FromFile(container)
+                .TransformWith<Binary2Alar2>()
+                .GetFormatAs<Alar2>() ?? throw new FormatException("Invalid container file");
 
-            alar.TransformWith<Alar2ToBinary>();
+            var filesToInsert = new NodeContainerFormat();
+            Node factory = NodeFactory.FromDirectory(input);
+            filesToInsert.Root.Add(factory);
 
-            alar.Stream.WriteTo(Path.Combine(output, "imported_" + alar.Name));
+            alar.InsertModification(filesToInsert);
+
+            using BinaryFormat binary = alar.ConvertWith(new Alar2ToBinary());
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
