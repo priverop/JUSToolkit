@@ -1,2 +1,3 @@
 deck_obj.yml,deck_obj.aar
 start.yml,start.aar
+status_icon.yml,status_icon.aar

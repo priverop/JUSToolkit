@@ -1,0 +1,13 @@
+name: status_icon.aar
+format_type: JUSToolkit.Containers.Alar2
+tags:
+check_children: true
+children:
+  - name: status_icon.dtx
+    format_type: JUSToolkit.Containers.Alar2File
+  - name: status_icon.amt
+    format_type: JUSToolkit.Containers.Alar2File
+  - name: status_icon.aod
+    format_type: JUSToolkit.Containers.Alar2File
+  - name: status_icon.dig
+    format_type: JUSToolkit.Containers.Alar2File
