@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -15,11 +16,14 @@ namespace JUSToolkit.Containers
         public const string STAMP = "ALAR";
 
         /// <summary>
-        /// The Version of the File.
+        /// Supported Versions of the File.
         /// </summary>
-        /// <remarks>Maybe we need to support more than one minor version, but right now.
-        /// I only found the 01.</remarks>
-        public static readonly Version SupportedVersion = new(2, 1);
+        /// <remarks>I only found 1 and 3.</remarks>
+        public static readonly List<Version> SupportedVersions = new()
+        {
+            new Version(2, 1),
+            new Version(2, 3),
+        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar2" /> class with an empty array of IDs.
@@ -30,6 +34,11 @@ namespace JUSToolkit.Containers
             NumFiles = numFiles;
             IDs = new byte[8];
         }
+
+        /// <summary>
+        /// Gets or sets the Minor Version of the container.
+        /// </summary>
+        public int MinorVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the Number of files in the container.

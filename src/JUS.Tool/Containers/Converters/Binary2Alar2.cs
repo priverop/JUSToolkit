@@ -83,11 +83,12 @@ namespace JUSToolkit.Containers.Converters
             }
 
             var version = new Version(reader.ReadByte(), reader.ReadByte());
-            if (version != Alar2.SupportedVersion) {
+            if (!Alar2.SupportedVersions.Contains(version)) {
                 throw new FormatException($"Unsupported version: {version:X}");
             }
 
             alar = new Alar2(reader.ReadUInt16());
+            alar.MinorVersion = version.Minor;
 
             for (int i = 0; i < 8; i++) {
                 alar.IDs[i] = reader.ReadByte();

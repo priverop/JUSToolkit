@@ -41,6 +41,11 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Export(string container, string output)
         {
+            Console.WriteLine("Exporting Alar");
+            Console.WriteLine("Container: " + container);
+
+            PathValidator.ValidateFile(container);
+
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
 
@@ -72,6 +77,11 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlar3(string container, string output)
         {
+            Console.WriteLine("Exporting Alar3");
+            Console.WriteLine("Container: " + container);
+
+            PathValidator.ValidateFile(container);
+
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
@@ -95,6 +105,11 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlar2(string container, string output)
         {
+            Console.WriteLine("Exporting Alar2");
+            Console.WriteLine("Container: " + container);
+
+            PathValidator.ValidateFile(container);
+
             Node files = NodeFactory.FromFile(container)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
@@ -119,6 +134,13 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void Import(string container, string input, string output)
         {
+            Console.WriteLine("Importing Alar");
+            Console.WriteLine("Container: " + container);
+            Console.WriteLine("Input files from: " + input);
+
+            PathValidator.ValidateFile(container);
+            PathValidator.ValidateDirectory(input);
+
             Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
 
             bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
@@ -162,8 +184,12 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ImportAlar3(string container, string input, string output)
         {
+            Console.WriteLine("Importing Alar3");
             Console.WriteLine("Container: " + container);
             Console.WriteLine("Input files from: " + input);
+
+            PathValidator.ValidateFile(container);
+            PathValidator.ValidateDirectory(input);
 
             Alar3 alar = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
@@ -176,7 +202,7 @@ namespace JUSToolkit.CLI.JUS
             alar.InsertModification(filesToInsert);
 
             using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
-            binary.Stream.WriteTo(Path.Combine(output, "imported.aar"));
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
@@ -185,15 +211,29 @@ namespace JUSToolkit.CLI.JUS
         /// Import files into an Alar2 container.
         /// </summary>
         /// <param name="container">The path to the original alar2 file.</param>
+        /// <param name="input">The path to the directory of the files we want to add.</param>
         /// <param name="output">The output directory.</param>
-        public static void ImportAlar2(string container, string output)
+        public static void ImportAlar2(string container, string input, string output)
         {
-            Node alar = NodeFactory.FromFile(container)
-                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
+            Console.WriteLine("Importing Alar2");
+            Console.WriteLine("Container: " + container);
+            Console.WriteLine("Input files from: " + input);
 
-            alar.TransformWith<Alar2ToBinary>();
+            PathValidator.ValidateFile(container);
+            PathValidator.ValidateDirectory(input);
 
-            alar.Stream.WriteTo(Path.Combine(output, "imported_" + alar.Name));
+            Alar2 alar = NodeFactory.FromFile(container)
+                .TransformWith<Binary2Alar2>()
+                .GetFormatAs<Alar2>() ?? throw new FormatException("Invalid container file");
+
+            var filesToInsert = new NodeContainerFormat();
+            Node factory = NodeFactory.FromDirectory(input);
+            filesToInsert.Root.Add(factory);
+
+            alar.InsertModification(filesToInsert);
+
+            using BinaryFormat binary = alar.ConvertWith(new Alar2ToBinary());
+            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }

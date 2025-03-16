@@ -57,8 +57,8 @@ namespace JUSToolkit.Containers.Converters
         private void WriteHeader(Alar2 alar)
         {
             writer.Write(Alar2.STAMP, false);
-            writer.Write((byte)Alar2.SupportedVersion.Major);
-            writer.Write((byte)Alar2.SupportedVersion.Minor);
+            writer.Write((byte) 2);
+            writer.Write((byte) alar.MinorVersion);
             writer.Write(alar.NumFiles);
             writer.Write(alar.IDs);
         }
