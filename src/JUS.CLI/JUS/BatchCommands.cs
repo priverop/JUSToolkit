@@ -75,6 +75,44 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void ExportAlarDtx2Png(string container, string output)
         {
+            // Recursive method to extract .aar inside of the .aar
+            void ProcessNode(Node node, string baseOutputPath)
+            {
+                string originalAlarName = Path.GetFileNameWithoutExtension(node.Name);
+                Console.WriteLine($"Exporting DTX files from {originalAlarName}.aar");
+
+                foreach (Node child in Navigator.IterateNodes(node)) {
+                    if (Path.GetExtension(child.Name) == ".dtx") {
+                        Console.WriteLine($"DTX found, exporting: {originalAlarName}/{child.Name}");
+                        try {
+                            using Node dtx3 = child
+                                .TransformWith<LzssDecompression>()
+                                .TransformWith<Dtx2Bitmaps>();
+
+                            foreach (Node nodeSprite in dtx3.Children) {
+                                nodeSprite.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
+                                // Console.WriteLine($"PNG exported: {originalAlarName}-{child.Name}-{nodeSprite.Name}.png");
+                            }
+                        } catch (Exception ex) {
+                            Console.WriteLine($"Error processing DTX file {originalAlarName}/{child.Name}: {ex.Message}");
+                        }
+                    } else if (Path.GetExtension(child.Name) == ".aar") {
+                        Console.WriteLine($"AAR found, processing recursively: {originalAlarName}/{child.Name}");
+                        using Node nestedAlar = child.TransformWith<LzssDecompression>();
+
+                        Version nestedAlarVersion = Identifier.GetAlarVersion(nestedAlar.Stream);
+
+                        if (nestedAlarVersion.Major == 3) {
+                            nestedAlar.TransformWith<Binary2Alar3>();
+                        } else if (nestedAlarVersion.Major == 2) {
+                            nestedAlar.TransformWith<Binary2Alar2>();
+                        }
+
+                        ProcessNode(nestedAlar, Path.Combine(baseOutputPath, originalAlarName));
+                    }
+                }
+            }
+
             Node originalAlar = NodeFactory.FromFile(container)
                             .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
 
@@ -87,22 +125,7 @@ namespace JUSToolkit.CLI.JUS
                 originalAlar.TransformWith<Binary2Alar2>();
             }
 
-            string originalAlarName = Path.GetFileNameWithoutExtension(originalAlar.Name);
-            Console.WriteLine($"Exporting DTX files from {originalAlarName}");
-
-            foreach (Node child in Navigator.IterateNodes(originalAlar)) {
-                if (Path.GetExtension(child.Name) == ".dtx") {
-                    Console.WriteLine($"DTX found, exporting: {originalAlarName}/{child.Name}");
-                    using Node dtx3 = child
-                        .TransformWith<LzssDecompression>()
-                        .TransformWith<Dtx2Bitmaps>();
-
-                    foreach (Node nodeSprite in dtx3.Children) {
-                        nodeSprite.Stream.WriteTo(Path.Combine(output, $"{originalAlarName}-{nodeSprite.Name}.png"));
-                        Console.WriteLine($"PNG exported: {originalAlarName}/{child.Name}");
-                    }
-                }
-            }
+            ProcessNode(originalAlar, output);
 
             Console.WriteLine("Done!");
         }
