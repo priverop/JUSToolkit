@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics.Converters;
@@ -162,7 +163,7 @@ namespace JUSToolkit.BatchConverters
 
         private Node GetAtm(string name, Node files)
         {
-            Node atm = Navigator.SearchNode(files, name + ".atm");
+            Node atm = Navigator.IterateNodes(files).First(n => n.Name == name + ".atm");
 
             if (atm is null) {
                 Console.WriteLine("Atm doesn't exist: " + name + ".atm");
