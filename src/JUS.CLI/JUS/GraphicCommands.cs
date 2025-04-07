@@ -99,6 +99,10 @@ namespace JUSToolkit.CLI.JUS
 
             var pixels = new List<IndexedPixel>();
 
+            var segmentation = new NitroImageSegmentation() {
+                CanvasWidth = 256,
+                CanvasHeight = 256,
+            };
             var spriteConverterParameters = new FullImage2SpriteParams {
                 Palettes = palettes,
                 IsImageTiled = true,
@@ -106,7 +110,7 @@ namespace JUSToolkit.CLI.JUS
                 PixelsPerIndex = 64,
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 PixelSequences = pixels,
-                Segmentation = new NitroImageSegmentation(),
+                Segmentation = segmentation,
             };
 
             foreach (string spritePath in Directory.GetFiles(input)) {
@@ -359,6 +363,10 @@ namespace JUSToolkit.CLI.JUS
             var pixels = new List<IndexedPixel>();
 
             // Prepare the SpriteParams with the palette of the image
+            var segmentation = new NitroImageSegmentation() {
+                CanvasWidth = 240,
+                CanvasHeight = 192,
+            };
             var spriteConverterParameters = new FullImage2SpriteParams {
                 Palettes = palettes,
                 IsImageTiled = true,
@@ -366,7 +374,7 @@ namespace JUSToolkit.CLI.JUS
                 PixelsPerIndex = 64,
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 PixelSequences = pixels,
-                Segmentation = new NitroImageSegmentation(),
+                Segmentation = segmentation,
             };
 
             // PNG -> Sprite:
