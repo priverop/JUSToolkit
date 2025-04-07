@@ -45,9 +45,9 @@ namespace JUSToolkit.Graphics
             new SplitSize(0, 8),
         };
 
-        public int CanvasWidth { get; set; } = 256;
+        public int CanvasWidth { get; set; } = 240;
 
-        public int CanvasHeight { get; set; } = 256;
+        public int CanvasHeight { get; set; } = 192;
 
         public bool SkipTrimming { get; set; }
 
@@ -280,10 +280,17 @@ namespace JUSToolkit.Graphics
             if (xStart == -1) {
                 return (0, 0, image);
             }
-
+            Console.WriteLine("NitroImageSegmentation TrimImage");
+            Console.WriteLine($"Width: {width}");
+            Console.WriteLine($"Height: {height}");
             var newPixels = new Rgb[width * height];
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
+                    Console.WriteLine($"x: {x}");
+                    Console.WriteLine($"y: {y}");
+                    Console.WriteLine($"newPixels position: {(y * width) + x}");
+                    Console.WriteLine($"image.Pixels position: {((yStart + y) * image.Width) + xStart + x}");
+                    Console.WriteLine();
                     newPixels[(y * width) + x] = image.Pixels[((yStart + y) * image.Width) + xStart + x];
                 }
             }
