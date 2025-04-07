@@ -82,7 +82,7 @@ namespace JUSToolkit.CLI.JUS
         /// Import multiple PNGs into a sprite .dtx file.
         /// </summary>
         /// <param name="input">The input folder containing PNGs.</param>
-        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="dtx">The original .dtx file.</param>
         /// <param name="output">The output folder.</param>
         public static void ImportDtx3(string input, string dtx, string output)
         {
@@ -135,7 +135,7 @@ namespace JUSToolkit.CLI.JUS
             dtx3.Children["image"].ChangeFormat(updatedImage);
 
             new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
-                .Stream.WriteTo(Path.Combine(output, "file.dtx"));
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
         }
@@ -277,9 +277,9 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="koma">The koma.bin file.</param>
         /// <param name="kshape">The kshape.bin file.</param>
         /// <param name="output">The output folder.</param>
-        public static void ExportDtx(string container, string koma, string kshape, string output)
+        public static void ExportKomas(string container, string koma, string kshape, string output)
         {
-            Node images = NodeFactory.FromFile(container)
+            Node komas = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
                 .Children["koma"] ?? throw new FormatException("Invalid container file");
 
@@ -293,13 +293,13 @@ namespace JUSToolkit.CLI.JUS
             foreach (KomaElement komaElement in komaFormat) {
                 string filename = $"{komaElement.KomaName}.dtx";
 
-                Node dtx = images.Children[filename];
+                Node dtx = komas.Children[filename];
                 if (dtx is null) {
                     Console.WriteLine("- Missing: " + filename);
                     continue;
                 }
 
-                _ = dtx.TransformWith<BinaryDstx2SpriteImage>();
+                _ = dtx.TransformWith<BinaryDtx4ToSpriteImage>();
                 IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
                 // We ignore the sprite info from the DSTX and we take the one
@@ -323,6 +323,81 @@ namespace JUSToolkit.CLI.JUS
                     .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
                     .Stream.WriteTo(outputFilePath);
             }
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import a PNG into a koma .dtx file.
+        /// </summary>
+        /// <param name="png">The png to import.</param>
+        /// <param name="dtx">The .dtx koma file.</param>
+        /// <param name="koma">The koma.bin file (links the .dtx name to the kshape id).</param>
+        /// <param name="kshape">The kshape.bin file (actual sprite info of the dtx).</param>
+        /// <param name="output">The output folder.</param>
+        public static void ImportKoma(string png, string dtx, string koma, string kshape, string output)
+        {
+            // ToDo:
+            // Kshape to sort the koma
+
+
+
+
+            // First we get the original dtx
+            using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
+
+            // Get the image (dig) of the dtx
+            Dig image = dtx4.Children["image"].GetFormatAs<Dig>();
+            //DEBUG: exportar esta imgen en .png a ver qué sale xd
+            var palettes = new PaletteCollection();
+            foreach (IPalette p in image.Palettes) {
+                palettes.Palettes.Add(p);
+            }
+
+            var pixels = new List<IndexedPixel>();
+
+            // Prepare the SpriteParams with the palette of the image
+            var spriteConverterParameters = new FullImage2SpriteParams {
+                Palettes = palettes,
+                IsImageTiled = true,
+                MinimumPixelsPerSegment = 64,
+                PixelsPerIndex = 64,
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                PixelSequences = pixels,
+                Segmentation = new NitroImageSegmentation(),
+            };
+
+            // PNG -> Sprite:
+            Node pngNode = NodeFactory.FromFile(png, FileOpenMode.Read);
+
+            // PNG -> FullImage (array of colors)
+            pngNode.TransformWith<Bitmap2FullImage>();
+
+            // FullImage -> Sprite
+            var converter = new FullImage2Sprite(spriteConverterParameters);
+            pngNode.TransformWith(converter);
+            Sprite newSprite = pngNode.GetFormatAs<Sprite>();
+
+            // Replace original Sprite with the new one
+            Node spriteToReplace = dtx4.Children["sprite"] ?? throw new ArgumentException("Error getting sprite children");
+            spriteToReplace.ChangeFormat(newSprite);
+
+            // Update image with the new changes
+            var updatedImage = new Dig(image) {
+                Pixels = pixels.ToArray(),
+                Width = 8,
+                Height = pixels.Count / 8,
+            };
+
+            //DEBUG: export imge a ver qué ha pasao xd
+
+            dtx4.Children["image"].ChangeFormat(updatedImage);
+
+            // Export the new .dtx
+            new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
         }

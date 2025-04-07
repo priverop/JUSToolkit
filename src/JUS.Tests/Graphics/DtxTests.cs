@@ -84,7 +84,7 @@ namespace JUSToolkit.Tests.Containers
                     continue;
                 }
 
-                dtx.TransformWith<BinaryDstx2SpriteImage>();
+                dtx.TransformWith<BinaryDtx4ToSpriteImage>();
                 IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
                 // We ignore the sprite info from the DSTX and we take the one

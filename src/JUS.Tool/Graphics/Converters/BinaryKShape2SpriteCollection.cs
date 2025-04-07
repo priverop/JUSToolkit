@@ -46,12 +46,12 @@ namespace JUSToolkit.Graphics.Converters
         /// <summary>
         /// Size of every entry.
         /// </summary>
-        internal const int EntrySize = 0x18;
+        internal const int EntrySize = 0x18; // 24
 
         /// <summary>
         /// Width * height / (blocksize * blocksize).
         /// </summary>
-        internal const int SpriteInfoSize = 0x14;
+        internal const int SpriteInfoSize = 0x14; // 20
 
         /// <summary>
         /// Width of the Sprite.
@@ -80,22 +80,27 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns>KShapeSprites Node.</returns>
         public KShapeSprites Convert(IBinary source)
         {
-            if (source is null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             var reader = new DataReader(source.Stream);
             var kshape = new KShapeSprites();
 
+            // Console.WriteLine("Index | Position1 | Element | Position2 | NumElements | E | Position3");
+            // Console.WriteLine("------|-----------|---------|-----------|-------------|----|----------");
+
             for (int i = 0; i < NumGroups; i++) {
-                source.Stream.Position = i * 4;
+                source.Stream.Position = i * 4; // First section
+                long position1 = source.Stream.Position;
                 int firstElement = reader.ReadInt32();
 
-                source.Stream.Position = GroupSizeOffset + (i * 4);
+                source.Stream.Position = GroupSizeOffset + (i * 4); // Second section
+                long position2 = source.Stream.Position;
                 int numElements = reader.ReadInt32();
 
                 for (int e = 0; e < numElements; e++) {
-                    source.Stream.Position = DataOffset + ((firstElement + e) * EntrySize);
+                    source.Stream.Position = DataOffset + ((firstElement + e) * EntrySize); // Third section
+                    long position3 = source.Stream.Position;
+                    // Console.WriteLine($"{i,5} | {position1.ToString("X"),9} | {firstElement.ToString("X"),7} | {position2.ToString("X"),9} | {numElements.ToString("X"),11} | {e,2} | {position3.ToString("X"),9}");
                     Sprite sprite = ReadSprite(reader);
                     kshape.AddSprite(i, e, sprite);
                 }

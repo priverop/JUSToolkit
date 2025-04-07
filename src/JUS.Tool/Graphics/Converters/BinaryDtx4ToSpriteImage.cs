@@ -29,7 +29,7 @@ namespace JUSToolkit.Graphics.Converters
     /// <summary>
     /// Converts between a BinaryFormat (a file) containing a Dstx Format and a SpriteImage.
     /// </summary>
-    public class BinaryDstx2SpriteImage : IConverter<IBinary, NodeContainerFormat>
+    public class BinaryDtx4ToSpriteImage : IConverter<IBinary, NodeContainerFormat>
     {
         private const string Stamp = "DSTX";
         private const int Type = 0x04;
@@ -54,7 +54,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new FormatException($"Invalid stamp '{stamp}'");
             }
 
-            _ = reader.ReadByte(); // unknown
+            byte version = reader.ReadByte();
             byte type = reader.ReadByte();
             if (type != Type) {
                 throw new FormatException($"Invalid type: 0x{type:X2}");

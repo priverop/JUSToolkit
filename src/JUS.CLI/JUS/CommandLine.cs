@@ -44,13 +44,22 @@ namespace JUSToolkit.CLI.JUS
 
         private static Command CreateGraphicCommand()
         {
-            var exportDtx = new Command("export-dtx", "Export dtx") {
+            var exportKomas = new Command("export-komas", "Export komas") {
                 new Option<string>("--container", "the input koma.aar container", ArgumentArity.ExactlyOne),
                 new Option<string>("--koma", "the koma.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--kshape", "the kshape.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportDtx.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportDtx);
+            exportKomas.Handler = CommandHandler.Create<string, string, string, string>(GraphicCommands.ExportKomas);
+
+            var importDtx4 = new Command("import-komas", "Import komas") {
+                new Option<string>("--png", "the png to import", ArgumentArity.ExactlyOne),
+                new Option<string>("--dtx", "the original file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--koma", "the koma.bin file", ArgumentArity.ExactlyOne),
+                new Option<string>("--kshape", "the kshape.bin file", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importDtx4.Handler = CommandHandler.Create<string, string, string, string, string>(GraphicCommands.ImportKoma);
 
             var exportDtx3 = new Command("export-dtx3", "Export dtx") {
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
@@ -91,9 +100,10 @@ namespace JUSToolkit.CLI.JUS
             mergeDig.Handler = CommandHandler.Create<string[], bool, string, string[], string>(GraphicCommands.MergeDig);
 
             return new Command("graphics", "Import/Export graphic files") {
-                exportDtx,
+                exportKomas,
                 exportDtx3,
                 importDtx3,
+                importDtx4,
                 exportDsigAlmt,
                 importDig,
                 mergeDig,
