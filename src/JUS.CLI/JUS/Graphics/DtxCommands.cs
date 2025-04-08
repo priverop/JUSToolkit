@@ -182,7 +182,7 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
-        /// Export a sprite .dtx of type 04 file into PNG.
+        /// Export a sprite .dtx of type 04 into a PNG.
         /// </summary>
         /// <param name="dtx">The .dtx file.</param>
         /// <param name="output">The output folder.</param>
@@ -190,13 +190,25 @@ namespace JUSToolkit.CLI.JUS
         public static void ExportDtx4(string dtx, string output)
         {
             // Sprites + pixels + palette
-            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Dtx2Bitmaps>();
+            using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+            .TransformWith<LzssDecompression>()
+            .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
-            foreach (Node nodeSprite in dtx3.Children) {
-                nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
-            }
+            Sprite sprite = dtx4.Children["sprite"].GetFormatAs<Sprite>();
+            IndexedPaletteImage image = dtx4.Children["image"].GetFormatAs<IndexedPaletteImage>();
+
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
+                FullImage = image,
+            };
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = image,
+            };
+
+            new Node("sprite", sprite)
+                .TransformWith(new Sprite2IndexedImage(spriteParams))
+                .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + ".png"));
         }
 
         /// <summary>
@@ -211,9 +223,6 @@ namespace JUSToolkit.CLI.JUS
         {
             // ToDo:
             // Kshape to sort the koma
-
-
-
 
             // First we get the original dtx
             using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
