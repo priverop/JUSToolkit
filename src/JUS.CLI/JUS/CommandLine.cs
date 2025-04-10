@@ -63,9 +63,11 @@ namespace JUSToolkit.CLI.JUS
 
             var exportDtx4 = new Command("export-dtx4", "Export dtx") {
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--koma", "the koma.bin file", ArgumentArity.ExactlyOne),
+                new Option<string>("--kshape", "the kshape.bin file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportDtx4.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx4);
+            exportDtx4.Handler = CommandHandler.Create<string, string, string, string>(DtxCommands.ExportDtx4);
 
             var exportDtx3 = new Command("export-dtx3", "Export dtx") {
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),

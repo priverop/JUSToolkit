@@ -79,6 +79,7 @@ namespace JUSToolkit.Graphics.Converters
             return container;
         }
 
+        // The Coordinates are made up, we won't use them later, we'll use the Kshape ones.
         private static Sprite ReadSprite(DataReader reader, int numSegments)
         {
             int y = 0;

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
@@ -185,17 +186,33 @@ namespace JUSToolkit.CLI.JUS
         /// Export a sprite .dtx of type 04 into a PNG.
         /// </summary>
         /// <param name="dtx">The .dtx file.</param>
+        /// <param name="koma">The koma.bin file.</param>
+        /// <param name="kshape">The kshape.bin file.</param>
         /// <param name="output">The output folder.</param>
         /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
-        public static void ExportDtx4(string dtx, string output)
+        public static void ExportDtx4(string dtx, string koma, string kshape, string output)
         {
             // Sprites + pixels + palette
             using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
             .TransformWith<LzssDecompression>()
             .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
-            Sprite sprite = dtx4.Children["sprite"].GetFormatAs<Sprite>();
+            // Sprite sprite2 = dtx4.Children["sprite"].GetFormatAs<Sprite>();
             IndexedPaletteImage image = dtx4.Children["image"].GetFormatAs<IndexedPaletteImage>();
+
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
+                .TransformWith<BinaryKShape2SpriteCollection>()
+                .GetFormatAs<KShapeSprites>();
+
+            Koma komaFormat = NodeFactory.FromFile(koma)
+                .TransformWith<Binary2Koma>()
+                .GetFormatAs<Koma>();
+
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtx)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+
+            // We ignore the sprite info from the DSTX and we take the one
+            // from the kshape
+            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
@@ -209,6 +226,8 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith(new Sprite2IndexedImage(spriteParams))
                 .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + ".png"));
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
