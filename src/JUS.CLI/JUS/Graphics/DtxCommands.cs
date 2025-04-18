@@ -306,7 +306,7 @@ namespace JUSToolkit.CLI.JUS
             var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
             pngNode.TransformWith<Bitmap2FullImage>().TransformWith(new FullImage2IndexedPalette(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
-            new TileSwizzling<IndexedPixel>(48).Swizzle(newImage.Pixels);
+            IndexedPixel[] tiledPixels = new TileSwizzling<IndexedPixel>(48).Swizzle(newImage.Pixels);
 
             // Sprite from KShape
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
@@ -337,18 +337,18 @@ namespace JUSToolkit.CLI.JUS
             // }));
             // pngNode.Stream.WriteTo(Path.Combine(output, "newImage.png"));
             // Export all the segments with the new image
-            ImageSegment2IndexedImage segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
-                FullImage = newImage,
-                IsTiled = false,
-            });
-            int i = 0;
-            foreach (IImageSegment segment in sprite.Segments) {
-                segment.TileIndex--;
-                FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(palettes, false);
-                BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
-                pngSegment.Stream.WriteTo(Path.Combine(output, $"segment{i}.png"));
-                i++;
-            }
+            // ImageSegment2IndexedImage segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
+            //     FullImage = newImage,
+            //     IsTiled = false,
+            // });
+            // int i = 0;
+            // foreach (IImageSegment segment in sprite.Segments) {
+            //     segment.TileIndex--;
+            //     FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(palettes, false);
+            //     BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
+            //     pngSegment.Stream.WriteTo(Path.Combine(output, $"segment{i}.png"));
+            //     i++;
+            // }
             // -------------------
 
             // Replace original Sprite with the new one
@@ -357,11 +357,12 @@ namespace JUSToolkit.CLI.JUS
 
             // // Update image with the new changes
             var updatedImage = new Dig(originalImage) {
-                Pixels = newImage.Pixels,
+                Pixels = tiledPixels,
                 Width = 8,
                 Height = newImage.Pixels.Length / 8,
-                Swizzling = DigSwizzling.Linear,
-            }.InsertTransparentTile();
+                Swizzling = DigSwizzling.Tiled,
+            };
+            // }.InsertTransparentTile();
 
             // // For debugging:
             var b = new Dig2Binary().Convert(updatedImage);
