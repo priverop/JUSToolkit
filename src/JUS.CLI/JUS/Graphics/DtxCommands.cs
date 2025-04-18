@@ -19,6 +19,7 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using JUS.Tool.Graphics.Converters;
@@ -30,6 +31,7 @@ using Texim.Formats;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
+using Texim.Processing;
 using Texim.Sprites;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -197,7 +199,7 @@ namespace JUSToolkit.CLI.JUS
             .TransformWith<LzssDecompression>()
             .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
-            // Sprite sprite2 = dtx4.Children["sprite"].GetFormatAs<Sprite>();
+            Sprite sprite2 = dtx4.Children["sprite"].GetFormatAs<Sprite>();
             IndexedPaletteImage image = dtx4.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
@@ -222,6 +224,28 @@ namespace JUSToolkit.CLI.JUS
                 Palettes = image,
             };
 
+            // Debugging:
+            // Export all the segments
+            ImageSegment2IndexedImage segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
+                FullImage = image,
+                IsTiled = true,
+            });
+            int i = 0;
+            foreach (IImageSegment segment in sprite.Segments) {
+                FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(image, true);
+                BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
+                pngSegment.Stream.WriteTo(Path.Combine(output, $"segment_kshape{i}.png"));
+                i++;
+            }
+            int j = 0;
+            foreach (IImageSegment segment in sprite2.Segments) {
+                FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(image, true);
+                BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
+                pngSegment.Stream.WriteTo(Path.Combine(output, $"segment_dtx{j}.png"));
+                j++;
+            }
+            // -------------------
+
             new Node("sprite", sprite)
                 .TransformWith(new Sprite2IndexedImage(spriteParams))
                 .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
@@ -240,72 +264,113 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ImportKoma(string png, string dtx, string koma, string kshape, string output)
         {
-            // ToDo:
-            // Kshape to sort the koma
-
             // First we get the original dtx
             using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
             // Get the image (dig) of the dtx
-            Dig image = dtx4.Children["image"].GetFormatAs<Dig>();
+            Dig originalImage = dtx4.Children["image"].GetFormatAs<Dig>();
 
             // For debugging:
-            var a = new Dig2Binary().Convert(image);
+            var a = new Dig2Binary().Convert(originalImage);
             a.Stream.WriteTo(Path.Combine(output, "original.dig"));
+            // -------------------
 
             var palettes = new PaletteCollection();
-            foreach (IPalette p in image.Palettes) {
+            foreach (IPalette p in originalImage.Palettes) {
                 palettes.Palettes.Add(p);
             }
 
-            var pixels = new List<IndexedPixel>();
+            // var newPixels = new List<IndexedPixel>();
 
-            // Prepare the SpriteParams with the palette of the image
-            var segmentation = new NitroImageSegmentation() {
-                CanvasWidth = 240,
-                CanvasHeight = 192,
-            };
-            var spriteConverterParameters = new FullImage2SpriteParams {
-                Palettes = palettes,
-                IsImageTiled = true,
-                MinimumPixelsPerSegment = 64,
-                PixelsPerIndex = 64,
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                PixelSequences = pixels,
-                Segmentation = segmentation,
-            };
+            // // Prepare the SpriteParams with the palette of the image
+            // var segmentation = new NitroImageSegmentation() {
+            //     CanvasWidth = 240,
+            //     CanvasHeight = 192,
+            // };
+            // var spriteConverterParameters = new FullImage2SpriteParams {
+            //     Palettes = palettes,
+            //     IsImageTiled = true,
+            //     MinimumPixelsPerSegment = 64,
+            //     PixelsPerIndex = 64,
+            //     RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+            //     PixelSequences = newPixels,
+            //     Segmentation = segmentation,
+            // };
 
             // PNG -> Sprite:
             Node pngNode = NodeFactory.FromFile(png, FileOpenMode.Read);
 
-            // PNG -> FullImage (array of colors)
-            pngNode.TransformWith<Bitmap2FullImage>();
+            // PNG -> IndexedImage
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
+            pngNode.TransformWith<Bitmap2FullImage>().TransformWith(new FullImage2IndexedPalette(quantization));
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
+            new TileSwizzling<IndexedPixel>(48).Swizzle(newImage.Pixels);
+
+            // Sprite from KShape
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
+                .TransformWith<BinaryKShape2SpriteCollection>()
+                .GetFormatAs<KShapeSprites>();
+
+            Koma komaFormat = NodeFactory.FromFile(koma)
+                .TransformWith<Binary2Koma>()
+                .GetFormatAs<Koma>();
+
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtx)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+
+            // We ignore the sprite info from the DSTX and we take the one
+            // from the kshape
+            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+
 
             // FullImage -> Sprite
-            var converter = new FullImage2Sprite(spriteConverterParameters);
-            pngNode.TransformWith(converter);
-            Sprite newSprite = pngNode.GetFormatAs<Sprite>();
+            // var converter = new FullImage2Sprite(spriteConverterParameters);
+            // pngNode.TransformWith(converter);
+            // Sprite newSprite = pngNode.GetFormatAs<Sprite>();
+
+            // Debugging:
+            // Exporting the new image
+            // Debugging: Exporting back the IndexedImage to Bitmap to check if it worked ok
+            // pngNode.TransformWith(new IndexedImage2Bitmap(new IndexedImageBitmapParams() {
+            //     Palettes = palettes,
+            // }));
+            // pngNode.Stream.WriteTo(Path.Combine(output, "newImage.png"));
+            // Export all the segments with the new image
+            ImageSegment2IndexedImage segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
+                FullImage = newImage,
+                IsTiled = false,
+            });
+            int i = 0;
+            foreach (IImageSegment segment in sprite.Segments) {
+                segment.TileIndex--;
+                FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(palettes, false);
+                BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
+                pngSegment.Stream.WriteTo(Path.Combine(output, $"segment{i}.png"));
+                i++;
+            }
+            // -------------------
 
             // Replace original Sprite with the new one
-            Node spriteToReplace = dtx4.Children["sprite"] ?? throw new ArgumentException("Error getting sprite children");
-            spriteToReplace.ChangeFormat(newSprite);
+            // Node spriteToReplace = dtx4.Children["sprite"] ?? throw new ArgumentException("Error getting sprite children");
+            // spriteToReplace.ChangeFormat(newSprite);
 
-            // Update image with the new changes
-            var updatedImage = new Dig(image) {
-                Pixels = pixels.ToArray(),
+            // // Update image with the new changes
+            var updatedImage = new Dig(originalImage) {
+                Pixels = newImage.Pixels,
                 Width = 8,
-                Height = pixels.Count / 8,
-            };
+                Height = newImage.Pixels.Length / 8,
+                Swizzling = DigSwizzling.Linear,
+            }.InsertTransparentTile();
 
-            // For debugging:
+            // // For debugging:
             var b = new Dig2Binary().Convert(updatedImage);
             b.Stream.WriteTo(Path.Combine(output, "updated.dig"));
+            // // -------------------
 
             dtx4.Children["image"].ChangeFormat(updatedImage);
 
-            // Export the new .dtx
+            // // Export the new .dtx
             new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
