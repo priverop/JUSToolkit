@@ -39,16 +39,14 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns><see cref="Dig"/>.</returns>
         public Dig Convert(IBinary source)
         {
-            if (source is null)
-            {
+            if (source is null) {
                 throw new ArgumentNullException(nameof(source));
             }
 
             var reader = new DataReader(source.Stream);
             source.Stream.Position = 0;
 
-            if (reader.ReadString(4) != Dig.STAMP)
-            {
+            if (reader.ReadString(4) != Dig.STAMP) {
                 throw new FormatException("Invalid stamp");
             }
 
@@ -64,8 +62,7 @@ namespace JUSToolkit.Graphics.Converters
             int colorsPerPalette;
             int numPalettes;
 
-            switch (bpp)
-            {
+            switch (bpp) {
                 case DigBpp.Bpp4:
                     pixelEncoding = Indexed4Bpp.Instance;
                     colorsPerPalette = 16;
@@ -81,11 +78,9 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             // Some tiled digs have fake size params
-            if (swizzling == DigSwizzling.Tiled)
-            {
+            if (swizzling == DigSwizzling.Tiled) {
                 width = 8;
-                height = bpp switch
-                {
+                height = bpp switch {
                     DigBpp.Bpp4 => (int)(source.Stream.Length - pixelsStart) / 4,
                     DigBpp.Bpp8 => (int)(source.Stream.Length - pixelsStart) / 8,
                     _ => throw new FormatException("Invalid bpp"),
@@ -94,23 +89,20 @@ namespace JUSToolkit.Graphics.Converters
 
             var palettes = new PaletteCollection();
 
-            for (int i = 0; i < numPalettes; i++)
-            {
+            for (int i = 0; i < numPalettes; i++) {
                 palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
             }
 
             source.Stream.Position = pixelsStart;
 
-            IndexedPixel[] pixels = swizzling switch
-            {
+            IndexedPixel[] pixels = swizzling switch {
                 DigSwizzling.Tiled => pixelEncoding.Decode(source.Stream, width * height)
                         .UnswizzleWith(new TileSwizzling<IndexedPixel>(width)),
                 DigSwizzling.Linear => pixelEncoding.Decode(source.Stream, width * height),
                 _ => throw new FormatException("Invalid swizzling"),
             };
 
-            var dig = new Dig
-            {
+            var dig = new Dig {
                 Unknown = unknown,
                 ImageFormat = imageFormat,
                 NumPaletteLines = numPaletteLines,
@@ -121,8 +113,7 @@ namespace JUSToolkit.Graphics.Converters
                 Bpp = bpp,
                 Swizzling = swizzling,
             };
-            foreach (IPalette p in palettes.Palettes)
-            {
+            foreach (IPalette p in palettes.Palettes) {
                 dig.Palettes.Add(p);
             }
 
