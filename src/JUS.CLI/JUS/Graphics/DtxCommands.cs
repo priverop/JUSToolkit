@@ -360,9 +360,8 @@ namespace JUSToolkit.CLI.JUS
                 Pixels = tiledPixels,
                 Width = 8,
                 Height = newImage.Pixels.Length / 8,
-                Swizzling = DigSwizzling.Tiled,
-            };
-            // }.InsertTransparentTile();
+                Swizzling = DigSwizzling.Linear,
+            }.InsertTransparentTile();
 
             // // For debugging:
             var b = new Dig2Binary().Convert(updatedImage);

@@ -235,6 +235,20 @@ namespace JUSToolkit.Graphics
         }
 
         /// <summary>
+        /// Insert a transparent tile to the beginning of the dig.
+        /// </summary>
+        /// <returns>The <see cref="Dig"/> with the transparent tile.</returns>
+        public Dig InsertTransparentTile()
+        {
+            var newPixels = new IndexedPixel[64]; // 8x8
+
+            return new Dig(this) {
+                Pixels = newPixels.Concat(Pixels).ToArray(),
+                Height = this.Height + 8,
+            };
+        }
+
+        /// <summary>
         /// Flip pixels horizontally.
         /// </summary>
         public void FlipHorizontal()
