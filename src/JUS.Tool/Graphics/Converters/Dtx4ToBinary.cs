@@ -45,8 +45,8 @@ namespace JUS.Tool.Graphics.Converters
 
             // WriteSprite
             foreach (IImageSegment s in sprite.Segments) {
-                writer.Write((sbyte)s.Width);
-                writer.Write((sbyte)s.Height);
+                writer.Write((sbyte)(s.Width / 8));
+                writer.Write((sbyte)(s.Height / 8));
                 writer.Write((ushort)s.TileIndex);
             }
 
