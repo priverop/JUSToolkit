@@ -1,9 +1,15 @@
 
-## DTX
+## DTX 04 - Komas
 
 Investigación por Pleonex: https://www.youtube.com/watch?v=1KT4u_Kvaws + https://www.youtube.com/watch?v=R2h-UEcO_-k
 
-- DTX tipo 04.
+
+### Descripción del formato
+
+Este formato es bastante especial porque existen varios ficheros auxiliares:
+- Koma.bin: enlaza el .dtx al fichero KShape para obtener la forma y orden de la imagen.
+- KShape: toda la información del sprite. Cómo pintar los tiles.
+- Arm9.bin: aunque nosotros lo tenemos ya en el Koma.cs, aquí hay una tabla con todos los nombres de los mangas (NameTable).
 
 ### Flujo
 

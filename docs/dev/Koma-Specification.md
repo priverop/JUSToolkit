@@ -68,11 +68,11 @@ The sprite data is 4 bytes:
 
 ## KShape
 
-| Offset | Type         | Description                  |
-| ------ | ------------ | ---------------------------- |
-| 0x00   | int[]        | First group element index    |
-| 0x20   | int[]        | Number of elements per group |
-| 0x40   | KShapeInfo[] | Info to reconstruct sprites  |
+| Offset | Type         | Description                 |
+| ------ | ------------ | --------------------------- |
+| 0x00   | int[]        | First group element index   |
+| 0x20   | int[]        | Number of shapes per group  |
+| 0x40   | KShapeInfo[] | Info to reconstruct sprites |
 
 To get the `KShapeInfo` from an image, first get its
 [_Koma element_](#koma-element), then:
@@ -81,7 +81,8 @@ To get the `KShapeInfo` from an image, first get its
 2. Add to this the `KShapeElementIndex`
 3. Multiply by the size of `KShapeInfo`: `0x18` and add `0x40`.
 
-There are 8 groups.
+There are 8 groups. Each group is the number of tiles of the shape of the sprite.
+The number of shapes means the posible combinations of the sprite. If it's size 2 (group 1), we will have an horizontal shape and a vertical shape, so group 1 will have 2 shapes.
 
 ### KShapeInfo
 
