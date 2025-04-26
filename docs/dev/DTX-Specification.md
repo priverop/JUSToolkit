@@ -36,19 +36,21 @@ With Tinke, you can view the compressed image opening the .dtx as Palette (addin
 
 ### DTX 04
 
-| Offset | Type    | Description        |
-| ------ | ------- | ------------------ |
-| 0x00   | char[4] | DSTX               |
-| 0x04   | byte    | Unknown            |
-| 0x05   | byte    | Type, must be 0x04 |
-| 0x06   | short   | Number of elements |
-| 0x08   | short   | DSIG offset        |
-| 0x0A   | short   | Unknown            |
-| 0x0C   | uint[]  | Sprite data        |
-| ...    | DSIG    | Image with palette |
+| Offset | Type    | Description                                             |
+| ------ | ------- | ------------------------------------------------------- |
+| 0x00   | char[4] | DSTX                                                    |
+| 0x04   | byte    | Unknown                                                 |
+| 0x05   | byte    | Type, must be 0x04                                      |
+| 0x06   | short   | Number of elements                                      |
+| 0x08   | short   | DSIG offset                                             |
+| 0x0A   | short   | Unknown                                                 |
+| 0x0C   | uint[]  | Sprite data                                             |
+| ...    | DSIG    | Image with palette (weight 8, swizzled 48x48 tile size) |
 
 The sprite data is 4 bytes:
 
 1. byte: Width in tiles (48 pixels)
 2. byte: Height in tiles (48 pixels)
-3. short: Tile index. Only if it's 0, use 1. Tile 0 is transparent tile.
+3. short: Tile index (starting offset of the image). Only if it's 0, use 1. Tile 0 is transparent tile.
+
+However, this format uses the Sprite info from the KSHape file, we don't know why they store the sprite info in the .dtx file.

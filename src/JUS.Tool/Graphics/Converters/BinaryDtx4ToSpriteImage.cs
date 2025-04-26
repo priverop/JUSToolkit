@@ -29,7 +29,7 @@ namespace JUSToolkit.Graphics.Converters
     /// <summary>
     /// Converts between a BinaryFormat (a file) containing a Dstx Format and a SpriteImage.
     /// </summary>
-    public class BinaryDstx2SpriteImage : IConverter<IBinary, NodeContainerFormat>
+    public class BinaryDtx4ToSpriteImage : IConverter<IBinary, NodeContainerFormat>
     {
         private const string Stamp = "DSTX";
         private const int Type = 0x04;
@@ -54,7 +54,7 @@ namespace JUSToolkit.Graphics.Converters
                 throw new FormatException($"Invalid stamp '{stamp}'");
             }
 
-            _ = reader.ReadByte(); // unknown
+            byte version = reader.ReadByte();
             byte type = reader.ReadByte();
             if (type != Type) {
                 throw new FormatException($"Invalid type: 0x{type:X2}");
@@ -79,6 +79,7 @@ namespace JUSToolkit.Graphics.Converters
             return container;
         }
 
+        // The Coordinates are made up, we won't use them later, we'll use the Kshape ones.
         private static Sprite ReadSprite(DataReader reader, int numSegments)
         {
             int y = 0;
@@ -90,7 +91,8 @@ namespace JUSToolkit.Graphics.Converters
                 var segment = new ImageSegment {
                     Width = width * 8,
                     Height = height * 8,
-                    TileIndex = (tileIndex == 0) ? 1 : tileIndex,
+                    // TileIndex = (tileIndex == 0) ? 1 : tileIndex, // Pleo had this but I don't think it's necessary
+                    TileIndex = tileIndex,
                     CoordinateX = 0,
                     CoordinateY = y,
                 };

@@ -28,7 +28,7 @@ namespace JUSToolkit.Graphics
     /// </summary>
     public class KShapeSprites : IFormat
     {
-        private readonly Dictionary<(int, int), Sprite> sprites = new ();
+        private readonly Dictionary<(int, int), Sprite> sprites = new();
 
         /// <summary>
         /// Adds a new sprite to the collection.

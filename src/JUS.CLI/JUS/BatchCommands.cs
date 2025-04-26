@@ -91,7 +91,8 @@ namespace JUSToolkit.CLI.JUS
 
                             foreach (Node nodeSprite in dtx3.Children) {
                                 nodeSprite.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
-                                // Console.WriteLine($"PNG exported: {originalAlarName}-{child.Name}-{nodeSprite.Name}.png");
+
+                                // TMI: Console.WriteLine($"PNG exported: {originalAlarName}-{child.Name}-{nodeSprite.Name}.png");
                             }
                         } catch (Exception ex) {
                             Console.WriteLine($"Error processing DTX file {originalAlarName}/{child.Name}: {ex.Message}");
