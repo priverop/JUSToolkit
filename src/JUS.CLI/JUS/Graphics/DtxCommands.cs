@@ -51,6 +51,11 @@ namespace JUSToolkit.CLI.JUS
         /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
         public static void ExportDtx3(string dtx, string output)
         {
+            Console.WriteLine("Exporting Dtx3 file");
+            Console.WriteLine("DTX: " + dtx);
+
+            PathValidator.ValidateFile(dtx);
+
             // Sprites + pixels + palette
             using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
@@ -69,6 +74,13 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ImportDtx3(string input, string dtx, string output)
         {
+            Console.WriteLine("Importing DTX3");
+            Console.WriteLine("DTX: " + dtx);
+            Console.WriteLine("Input files from: " + input);
+
+            PathValidator.ValidateFile(dtx);
+            PathValidator.ValidateDirectory(input);
+
             // Sprites + pixels + palette
             using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
@@ -98,8 +110,10 @@ namespace JUSToolkit.CLI.JUS
 
             foreach (string spritePath in Directory.GetFiles(input)) {
                 Node nodeSprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read);
+
                 // PNG -> FullImage (array of colors)
                 nodeSprite.TransformWith<Bitmap2FullImage>();
+
                 // FullImage -> Sprite
                 var converter = new FullImage2Sprite(spriteConverterParameters);
                 nodeSprite.TransformWith(converter);
@@ -136,6 +150,15 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ExportKomas(string container, string koma, string kshape, string output)
         {
+            Console.WriteLine("Exporting all the komas");
+            Console.WriteLine("Koma.aar: " + container);
+            Console.WriteLine("Koma.bin: " + koma);
+            Console.WriteLine("Kshape.bin: " + kshape);
+
+            PathValidator.ValidateFile(container);
+            PathValidator.ValidateFile(koma);
+            PathValidator.ValidateFile(kshape);
+
             Node komas = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
                 .Children["koma"] ?? throw new FormatException("Invalid container file");
@@ -194,12 +217,20 @@ namespace JUSToolkit.CLI.JUS
         /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
         public static void ExportDtx4(string dtx, string koma, string kshape, string output)
         {
+            Console.WriteLine("Exporting a single Koma (DTX4)");
+            Console.WriteLine("Dtx: " + dtx);
+            Console.WriteLine("Koma.bin: " + koma);
+            Console.WriteLine("Kshape.bin: " + kshape);
+
+            PathValidator.ValidateFile(dtx);
+            PathValidator.ValidateFile(koma);
+            PathValidator.ValidateFile(kshape);
+
             // Sprites + pixels + palette
             using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
             .TransformWith<LzssDecompression>()
             .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
-            Sprite sprite2 = dtx4.Children["sprite"].GetFormatAs<Sprite>();
             IndexedPaletteImage image = dtx4.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
@@ -224,28 +255,6 @@ namespace JUSToolkit.CLI.JUS
                 Palettes = image,
             };
 
-            // Debugging:
-            // Export all the segments
-            ImageSegment2IndexedImage segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
-                FullImage = image,
-                IsTiled = true,
-            });
-            int i = 0;
-            foreach (IImageSegment segment in sprite.Segments) {
-                FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(image, true);
-                BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
-                pngSegment.Stream.WriteTo(Path.Combine(output, $"segment_kshape{i}.png"));
-                i++;
-            }
-            int j = 0;
-            foreach (IImageSegment segment in sprite2.Segments) {
-                FullImage originalSegmentImage = segment2Indexed.Convert(segment).CreateFullImage(image, true);
-                BinaryFormat pngSegment = new FullImage2Bitmap().Convert(originalSegmentImage);
-                pngSegment.Stream.WriteTo(Path.Combine(output, $"segment_dtx{j}.png"));
-                j++;
-            }
-            // -------------------
-
             new Node("sprite", sprite)
                 .TransformWith(new Sprite2IndexedImage(spriteParams))
                 .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
@@ -264,6 +273,17 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output folder.</param>
         public static void ImportKoma(string png, string dtx, string koma, string kshape, string output)
         {
+            Console.WriteLine("Importing a Koma (DTX4)");
+            Console.WriteLine("Png: " + png);
+            Console.WriteLine("Dtx: " + dtx);
+            Console.WriteLine("Koma.bin: " + koma);
+            Console.WriteLine("Kshape.bin: " + kshape);
+
+            PathValidator.ValidateFile(dtx);
+            PathValidator.ValidateFile(png);
+            PathValidator.ValidateFile(koma);
+            PathValidator.ValidateFile(kshape);
+
             // First we get the original dtx
             using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
