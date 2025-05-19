@@ -76,11 +76,18 @@ namespace JUSToolkit.CLI.JUS
             exportDtx3.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3);
 
             var importDtx3 = new Command("import-dtx3", "Import dtx3") {
-                new Option<string>("--input", "the new sprite to import", ArgumentArity.ExactlyOne),
+                new Option<string>("--input", "the folder with the .pngs to import", ArgumentArity.ExactlyOne),
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
             importDtx3.Handler = CommandHandler.Create<string, string, string>(DtxCommands.ImportDtx3);
+
+            var importDtx3Tx = new Command("import-dtx3tx", "Import dtx3") {
+                new Option<string>("--input", "the folder with the .pngs to import", ArgumentArity.ExactlyOne),
+                new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            importDtx3Tx.Handler = CommandHandler.Create<string, string, string>(DtxCommands.ImportDtx3Tx);
 
             var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
                 new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
@@ -112,6 +119,7 @@ namespace JUSToolkit.CLI.JUS
                 exportDtx3,
                 exportDtx4,
                 importDtx3,
+                importDtx3Tx,
                 importDtx4,
                 exportDsigAlmt,
                 importDig,
