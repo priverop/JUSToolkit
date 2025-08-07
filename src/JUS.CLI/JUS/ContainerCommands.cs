@@ -171,7 +171,7 @@ namespace JUSToolkit.CLI.JUS
                 new LzssCompression().Convert(binary) :
                 binary;
 
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
+            binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
@@ -202,7 +202,7 @@ namespace JUSToolkit.CLI.JUS
             alar.InsertModification(filesToInsert);
 
             using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
+            binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
@@ -233,7 +233,7 @@ namespace JUSToolkit.CLI.JUS
             alar.InsertModification(filesToInsert);
 
             using BinaryFormat binary = alar.ConvertWith(new Alar2ToBinary());
-            binary.Stream.WriteTo(Path.Combine(output, "imported_" + Path.GetFileName(container)));
+            binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
