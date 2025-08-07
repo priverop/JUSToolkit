@@ -446,5 +446,29 @@ namespace JUSToolkit.CLI.JUS
 
             Console.WriteLine("Done!");
         }
+
+        /// <summary>
+        /// Export a the segments info from a .dtx file  a YAML metadata file.
+        /// </summary>
+        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="output">The output folder.</param>
+        /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
+        public static void ExportYamlDtx3(string dtx, string output)
+        {
+            Console.WriteLine("Exporting Dtx3 file with YAML metadata");
+            Console.WriteLine("DTX: " + dtx);
+
+            PathValidator.ValidateFile(dtx);
+
+            // Sprites + pixels + palette
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
+
+            BinaryFormat segmentInfo = dtx3.Children["yaml"].GetFormatAs<BinaryFormat>();
+
+            segmentInfo.Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)) + ".yaml");
+
+        }
     }
 }

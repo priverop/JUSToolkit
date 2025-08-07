@@ -114,9 +114,16 @@ namespace JUSToolkit.CLI.JUS
             };
             mergeDig.Handler = CommandHandler.Create<string[], bool, string, string[], string>(DigCommands.MergeDig);
 
+            var exportYamlDtx3 = new Command("export-yaml-dtx3", "Export the sprite metadata") {
+                new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportYamlDtx3.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportYamlDtx3);
+
             return new Command("graphics", "Import/Export graphic files") {
                 exportKomas,
                 exportDtx3,
+                exportYamlDtx3,
                 exportDtx4,
                 importDtx3,
                 importDtx3Tx,
