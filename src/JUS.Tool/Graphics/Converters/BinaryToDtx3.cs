@@ -24,7 +24,6 @@ namespace JUS.Tool.Graphics.Converters
         private const int Type = 0x03;
         private const int PointerOffset = 0x0A;
         private readonly Binary2Dig digConverter = new();
-        private TextDataWriter yamlWriter;
         private List<SpriteDummy> spriteCollection;
 
         /// <summary>
@@ -58,7 +57,8 @@ namespace JUS.Tool.Graphics.Converters
             Dig image = digConverter.Convert(dsigBinary);
 
             var segmentsInfo = new DataStream();
-            yamlWriter = new TextDataWriter(segmentsInfo);
+
+            var yamlWriter = new TextDataWriter(segmentsInfo);
             spriteCollection = new List<SpriteDummy>();
 
             for (int i = 0; i < numSprites; i++) {
