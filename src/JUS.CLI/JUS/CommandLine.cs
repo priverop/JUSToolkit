@@ -85,9 +85,10 @@ namespace JUSToolkit.CLI.JUS
             var importDtx3Tx = new Command("import-dtx3tx", "Import dtx3") {
                 new Option<string>("--input", "the folder with the .pngs to import", ArgumentArity.ExactlyOne),
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--yaml", "segments metadata", ArgumentArity.ZeroOrOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            importDtx3Tx.Handler = CommandHandler.Create<string, string, string>(DtxCommands.ImportDtx3Tx);
+            importDtx3Tx.Handler = CommandHandler.Create<string, string, string, string>(DtxCommands.ImportDtx3Tx);
 
             var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
                 new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),

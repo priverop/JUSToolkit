@@ -35,6 +35,8 @@ using Texim.Processing;
 using Texim.Sprites;
 using Yarhl.FileSystem;
 using Yarhl.IO;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace JUSToolkit.CLI.JUS
 {
@@ -150,8 +152,9 @@ namespace JUSToolkit.CLI.JUS
         /// </summary>
         /// <param name="input">The input folder containing PNGs.</param>
         /// <param name="dtx">The original .dtx file.</param>
+        /// <param name="yaml">Segments metadata of the sprites.</param>
         /// <param name="output">The output folder.</param>
-        public static void ImportDtx3Tx(string input, string dtx, string output)
+        public static void ImportDtx3Tx(string input, string dtx, string yaml, string output)
         {
             Console.WriteLine("Importing DTX3 Texture");
             Console.WriteLine("DTX: " + dtx);
@@ -177,15 +180,6 @@ namespace JUSToolkit.CLI.JUS
                 palettes.Palettes.Add(p);
             }
 
-            // For debugging:
-            // var indexedImageParams = new IndexedImageBitmapParams {
-            //     Palettes = palettes,
-            // };
-
-            // BinaryFormat a = new IndexedImage2Bitmap(indexedImageParams).Convert(originalImage);
-            // a.Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx) + "_original.png"));
-            // --
-
             // Modified PNG to insert
             Node pngNode = NodeFactory.FromFile(input, FileOpenMode.Read);
 
@@ -194,52 +188,36 @@ namespace JUSToolkit.CLI.JUS
             pngNode.TransformWith<Bitmap2FullImage>().TransformWith(new FullImage2IndexedPalette(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
-            // var pixels = new List<IndexedPixel>();
-
-            // var segmentation = new NitroImageSegmentation() {
-            //     CanvasWidth = 256,
-            //     CanvasHeight = 256,
-            // };
-            // var spriteConverterParameters = new FullImage2SpriteParams {
-            //     Palettes = palettes,
-            //     IsImageTiled = false,
-            //     MinimumPixelsPerSegment = 64,
-            //     PixelsPerIndex = 64,
-            //     RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-            //     PixelSequences = pixels,
-            //     Segmentation = segmentation,
-            // };
-
-            // foreach (string spritePath in Directory.GetFiles(input)) {
-            //     Node nodeSprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read);
-
-            //     // PNG -> FullImage (array of colors)
-            //     nodeSprite.TransformWith<Bitmap2FullImage>();
-
-            //     // FullImage -> Sprite
-            //     var converter = new FullImage2Sprite(spriteConverterParameters);
-            //     nodeSprite.TransformWith(converter);
-            //     Sprite sprite = nodeSprite.GetFormatAs<Sprite>();
-
-            //     // Check if there is a Children with the correct name:
-            //     string cleanSpriteName = Path.GetFileNameWithoutExtension(spritePath);
-            //     Node spriteToReplace = dtx3.Children["sprites"].Children[cleanSpriteName]
-            //     ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
-
-            //     spriteToReplace.ChangeFormat(sprite);
-            // }
-
-            // Actualizamos la imagen original
+            // Update the original base image
             var updatedImage = new Dig(originalImage) {
                 Pixels = newImage.Pixels.ToArray(),
             };
 
             dtx3.Children["image"].ChangeFormat(updatedImage);
 
-            new Dtx3TxToBinary(dtxClone).Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+            Dtx3TxToBinary converter;
+
+            if (yaml != null) {
+                PathValidator.ValidateFile(yaml);
+
+                converter = new Dtx3TxToBinary(dtxClone, GetYamlInfo(yaml));
+            } else {
+                converter = new Dtx3TxToBinary(dtxClone);
+            }
+
+            converter.Convert(dtx3.GetFormatAs<NodeContainerFormat>())
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
+        }
+
+        private static List<SpriteDummy> GetYamlInfo(string path)
+        {
+            string yaml = File.ReadAllText(path);
+            return new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Deserialize<List<SpriteDummy>>(yaml);
         }
 
         /// <summary>

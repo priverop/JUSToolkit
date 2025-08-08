@@ -14,10 +14,24 @@ namespace JUS.Tool.Graphics.Converters
     /// </summary>
     public class Dtx3TxToBinary : IConverter<NodeContainerFormat, BinaryFormat>
     {
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dtx3TxToBinary"/> class.
+        /// </summary>
+        /// <param name="originalDtx">Original DTX to copy all the info from.</param>
         public Dtx3TxToBinary(BinaryFormat originalDtx)
         {
             OriginalDTX = originalDtx;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dtx3TxToBinary"/> class.
+        /// </summary>
+        /// <param name="originalDtx">Original DTX to copy all the info from.</param>
+        /// <param name="segmentsMetadata">Metadata of the Segments so we can modify them.</param>
+        public Dtx3TxToBinary(BinaryFormat originalDtx, List<SpriteDummy> segmentsMetadata)
+        {
+            OriginalDTX = originalDtx;
+            SegmentsMetadata = segmentsMetadata;
         }
 
         private const string Stamp = "DSTX";
@@ -25,6 +39,8 @@ namespace JUS.Tool.Graphics.Converters
         private const byte Type = 0x03;
 
         private BinaryFormat OriginalDTX { get; set; }
+
+        private List<SpriteDummy> SegmentsMetadata { get; set; }
 
         /// <summary>
         /// Converts a DTX3 format to a binary format.

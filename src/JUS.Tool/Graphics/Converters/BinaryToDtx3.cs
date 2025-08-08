@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
 using Texim.Formats;
@@ -23,6 +25,7 @@ namespace JUS.Tool.Graphics.Converters
         private const int PointerOffset = 0x0A;
         private readonly Binary2Dig digConverter = new();
         private TextDataWriter yamlWriter;
+        private List<SpriteDummy> spriteCollection;
 
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a dtx3 <see cref="NodeContainerFormat"/>.
@@ -56,6 +59,7 @@ namespace JUS.Tool.Graphics.Converters
 
             var segmentsInfo = new DataStream();
             yamlWriter = new TextDataWriter(segmentsInfo);
+            spriteCollection = new List<SpriteDummy>();
 
             for (int i = 0; i < numSprites; i++) {
                 switch (image.Swizzling) {
@@ -72,6 +76,13 @@ namespace JUS.Tool.Graphics.Converters
                         throw new FormatException("Invalid swizzling");
                 }
             }
+
+            // Export Segment Info to a YAML file so we can make edits later
+            ISerializer serializer = new SerializerBuilder()
+                    .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                    .Build();
+            string yaml = serializer.Serialize(spriteCollection);
+            yamlWriter.WriteLine(yaml);
 
             var container = new NodeContainerFormat();
             container.Root.Add(new Node("sprites", sprites));
@@ -119,6 +130,8 @@ namespace JUS.Tool.Graphics.Converters
             return sprite;
         }
 
+        // ToDo: I guess we could merge these two methods and add some ifs?
+
         // These false sprites (we call them Textures) have a Linear image, so we can't
         // use the Texim Sprite system. That's why we compose regular images.
         private Dig ReadTexture(DataReader reader, Dig fullImage, int index)
@@ -133,6 +146,7 @@ namespace JUS.Tool.Graphics.Converters
             reader.Stream.PushToPosition(spriteOffset);
             ushort numSegments = reader.ReadUInt16();
             Console.WriteLine($"numSegments: {numSegments}");
+            SpriteDummy sprite = new SpriteDummy();
 
             for (int i = 0; i < numSegments; i++) {
                 ushort tileIndex = reader.ReadUInt16();
@@ -171,16 +185,11 @@ namespace JUS.Tool.Graphics.Converters
                     HorizontalFlip = hFlip,
                 };
 
-                ISerializer serializer = new SerializerBuilder()
-                    .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                    .Build();
-                string yaml = serializer.Serialize(imageSegment);
-                yamlWriter.WriteLine($"Sprite: {index} ");
-                yamlWriter.WriteLine($"Segment: {i} ");
-                yamlWriter.WriteLine(yaml);
+                sprite.Segments.Add(imageSegment);
             }
 
             reader.Stream.PopPosition();
+            spriteCollection.Add(sprite);
 
             return frame;
         }
