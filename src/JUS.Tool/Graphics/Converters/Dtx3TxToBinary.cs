@@ -34,10 +34,6 @@ namespace JUS.Tool.Graphics.Converters
             SegmentsMetadata = segmentsMetadata;
         }
 
-        private const string Stamp = "DSTX";
-        private const byte Version = 0x01;
-        private const byte Type = 0x03;
-
         private BinaryFormat OriginalDTX { get; set; }
 
         private List<SpriteDummy> SegmentsMetadata { get; set; }
@@ -53,13 +49,43 @@ namespace JUS.Tool.Graphics.Converters
             var writer = new DataWriter(newBin.Stream);
             var reader = new DataReader(OriginalDTX.Stream);
 
-            // Obtenemos el DSIG offset
-            reader.Stream.Position = 0x08;
-            uint dsigOffset = reader.ReadUInt16();
-            reader.Stream.Position = 0;
+            if (SegmentsMetadata == null) {
+                // Obtenemos el DSIG offset
+                reader.Stream.Position = 0x08;
+                uint dsigOffset = reader.ReadUInt16();
 
-            // Escribimos todo hasta ese offset
-            writer.Write(reader.ReadBytes((int)dsigOffset));
+                // Escribimos todo hasta ese offset
+                writer.Write(reader.ReadBytes((int)dsigOffset));
+            } else {
+                reader.Stream.Position = 0;
+
+                // We copy the first 10 bytes from the original dtx
+                writer.Write(reader.ReadBytes(10));
+
+                Console.WriteLine("---");
+
+                Console.WriteLine($"Escribiendo {SegmentsMetadata.Count} offsets:");
+                long segmentInfoOffset = 2 * SegmentsMetadata.Count; // relative to 0x0A
+
+                foreach (SpriteDummy sprite in SegmentsMetadata) {
+                    Console.WriteLine($"Escribiendo offset 0x{segmentInfoOffset:X} ({segmentInfoOffset}) en posición 0x{writer.Stream.Position:X} ({writer.Stream.Position})");
+                    writer.WriteOfType<ushort>((ushort)segmentInfoOffset);
+                    segmentInfoOffset += 2 + (sprite.Segments.Count * 6);
+                }
+
+                foreach (SpriteDummy sprite in SegmentsMetadata) {
+                    writer.WriteOfType<short>((short)sprite.Segments.Count);
+                    foreach (ImageSegment segment in sprite.Segments) {
+                        writer.WriteOfType<ushort>((ushort)segment.TileIndex);
+                        writer.WriteOfType<sbyte>((sbyte)segment.CoordinateX);
+                        writer.WriteOfType<sbyte>((sbyte)segment.CoordinateY);
+                        writer.WriteOfType<byte>(GetSize(segment.Width, segment.Height));
+                        writer.WriteOfType<sbyte>((sbyte)segment.PaletteIndex);
+                    }
+                }
+            }
+
+            Console.WriteLine("dsigOffset: " + writer.Stream.Position.ToString("X"));
 
             var imageReader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
                 .GetFormatAs<BinaryFormat>().Stream);

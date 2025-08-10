@@ -57,7 +57,6 @@ namespace JUS.Tool.Graphics.Converters
             Dig image = digConverter.Convert(dsigBinary);
 
             var segmentsInfo = new DataStream();
-
             var yamlWriter = new TextDataWriter(segmentsInfo);
             spriteCollection = new List<SpriteDummy>();
 
@@ -67,10 +66,10 @@ namespace JUS.Tool.Graphics.Converters
                         sprites.Root.Add(new Node($"sp_{i:00}", ReadSprite(reader)));
                         break;
                     case DigSwizzling.Linear:
-                        Console.WriteLine();
-                        Console.WriteLine($"tx_{i:00}");
+                        // Console.WriteLine();
+                        // Console.WriteLine($"tx_{i:00}");
                         sprites.Root.Add(new Node($"tx_{i:00}", ReadTexture(reader, image, i)));
-                        Console.WriteLine("-----");
+                        // Console.WriteLine("-----");
                         break;
                     default:
                         throw new FormatException("Invalid swizzling");
@@ -145,7 +144,7 @@ namespace JUS.Tool.Graphics.Converters
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
             reader.Stream.PushToPosition(spriteOffset);
             ushort numSegments = reader.ReadUInt16();
-            Console.WriteLine($"numSegments: {numSegments}");
+            // Console.WriteLine($"numSegments: {numSegments}");
             SpriteDummy sprite = new SpriteDummy();
 
             for (int i = 0; i < numSegments; i++) {
@@ -156,11 +155,11 @@ namespace JUS.Tool.Graphics.Converters
                 byte paletteIndex = reader.ReadByte();
                 (int width, int height) = GetSize(shape & 0x0F);
                 (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
-                Console.WriteLine($"positions: {xPos} x {yPos}");
-                Console.WriteLine($"tileIndex: {tileIndex}");
-                Console.WriteLine($"shape: {shape}");
-                Console.WriteLine($"flip: {hFlip} x {vFlip}");
-                Console.WriteLine($"size: {width} x {height}");
+                // Console.WriteLine($"positions: {xPos} x {yPos}");
+                // Console.WriteLine($"tileIndex: {tileIndex}");
+                // Console.WriteLine($"shape: {shape}");
+                // Console.WriteLine($"flip: {hFlip} x {vFlip}");
+                // Console.WriteLine($"size: {width} x {height}");
 
                 var segment = new Dig(fullImage, width, height, tileIndex);
 
@@ -170,7 +169,7 @@ namespace JUS.Tool.Graphics.Converters
 
                 BinaryFormat a = new IndexedImage2Bitmap(indexedImageParams).Convert(segment);
                 a.Stream.WriteTo($"src/JUS.CLI/bin/Debug/net8.0/23-dtx3tx/segments_ko/{index}_segment{i}.png");
-                Console.WriteLine();
+                // Console.WriteLine();
                 frame.PasteImage(segment, xPos, yPos, hFlip, vFlip, paletteIndex);
 
                 // Export Segment Info to a YAML file so we can make edits later

@@ -7,8 +7,8 @@ import type.base;
 
 struct Segment {
     u16 tileIndex;
-    u8 xPos;
-    u8 yPos;
+    s8 xPos;
+    s8 yPos;
     u8 shape;
     u8 paletteIndex;
 };

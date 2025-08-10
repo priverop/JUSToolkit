@@ -197,7 +197,7 @@ namespace JUSToolkit.CLI.JUS
 
             Dtx3TxToBinary converter;
 
-            if (yaml != null) {
+            if (!string.IsNullOrEmpty(yaml)) {
                 PathValidator.ValidateFile(yaml);
 
                 converter = new Dtx3TxToBinary(dtxClone, GetYamlInfo(yaml));

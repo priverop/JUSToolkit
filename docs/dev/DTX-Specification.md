@@ -6,7 +6,7 @@ We have some types:
 
 - Type 01.
 - Type 02.
-- Type 03: Some of this sprites are 3D Textures. Most of the sprites are in this format. Images for menus, overlays...
+- Type 03: Some of these sprites are 3D Textures. Most of the images are in this format. Images for menus, overlays...
 - Type 04: Komas. The characters of your deck.
 - Type 05. 
 - Type 06. 
@@ -31,7 +31,7 @@ With Tinke, you can view the compressed image opening the .dtx as Palette (addin
 | 0x05   | byte    | Type, must be 0x04 |
 | 0x06   | short   | Number of elements |
 | 0x08   | short   | DSIG offset        |
-| 0x0C   | uint[]  | Sprite data        |
+| 0x0A   | uint[]  | Sprite data        |
 | ...    | DSIG    | Image with palette |
 
 ### DTX 04
