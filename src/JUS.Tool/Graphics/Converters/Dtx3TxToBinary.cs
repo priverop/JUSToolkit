@@ -62,13 +62,9 @@ namespace JUS.Tool.Graphics.Converters
                 // We copy the first 10 bytes from the original dtx
                 writer.Write(reader.ReadBytes(10));
 
-                Console.WriteLine("---");
-
-                Console.WriteLine($"Escribiendo {SegmentsMetadata.Count} offsets:");
                 long segmentInfoOffset = 2 * SegmentsMetadata.Count; // relative to 0x0A
 
                 foreach (SpriteDummy sprite in SegmentsMetadata) {
-                    Console.WriteLine($"Escribiendo offset 0x{segmentInfoOffset:X} ({segmentInfoOffset}) en posición 0x{writer.Stream.Position:X} ({writer.Stream.Position})");
                     writer.WriteOfType<ushort>((ushort)segmentInfoOffset);
                     segmentInfoOffset += 2 + (sprite.Segments.Count * 6);
                 }
@@ -84,8 +80,6 @@ namespace JUS.Tool.Graphics.Converters
                     }
                 }
             }
-
-            Console.WriteLine("dsigOffset: " + writer.Stream.Position.ToString("X"));
 
             var imageReader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
                 .GetFormatAs<BinaryFormat>().Stream);

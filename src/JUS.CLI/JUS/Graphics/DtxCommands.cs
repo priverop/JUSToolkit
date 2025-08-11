@@ -19,24 +19,22 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Processing;
 using Texim.Sprites;
-using Yarhl.FileSystem;
-using Yarhl.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUSToolkit.CLI.JUS
 {

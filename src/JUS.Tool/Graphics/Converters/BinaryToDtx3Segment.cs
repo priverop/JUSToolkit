@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
+using Texim.Formats;
 using Texim.Pixels;
 using Texim.Sprites;
 using YamlDotNet.Serialization;
@@ -13,16 +15,15 @@ using Yarhl.IO;
 namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
-    /// Converts between a .dtx 3 file and a sprite collection and a <see cref="Dig"/> image.
+    /// Exports a single Segment from a DTX file. Useful for testing.
     /// </summary>
-    public class BinaryToDtx3 : IConverter<IBinary, NodeContainerFormat>
+    public class BinaryToDtx3Segment : IConverter<IBinary, NodeContainerFormat>
     {
         private const string Stamp = "DSTX";
         private const int Version = 0x01;
         private const int Type = 0x03;
         private const int PointerOffset = 0x0A;
         private readonly Binary2Dig digConverter = new();
-        private List<SpriteDummy> spriteCollection;
 
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a dtx3 <see cref="NodeContainerFormat"/>.
@@ -54,81 +55,21 @@ namespace JUS.Tool.Graphics.Converters
             using var dsigBinary = new BinaryFormat(source.Stream, dsigOffset, source.Stream.Length - dsigOffset);
             Dig image = digConverter.Convert(dsigBinary);
 
-            var segmentsInfo = new DataStream();
-            var yamlWriter = new TextDataWriter(segmentsInfo);
-            spriteCollection = new List<SpriteDummy>();
-
             for (int i = 0; i < numSprites; i++) {
-                switch (image.Swizzling) {
-                    case DigSwizzling.Tiled:
-                        sprites.Root.Add(new Node($"sp_{i:00}", ReadSprite(reader)));
-                        break;
-                    case DigSwizzling.Linear:
-                        sprites.Root.Add(new Node($"tx_{i:00}", ReadTexture(reader, image)));
-                        break;
-                    default:
-                        throw new FormatException("Invalid swizzling");
-                }
+                Console.WriteLine();
+                Console.WriteLine($"tx_{i:00}");
+                sprites.Root.Add(new Node($"tx_{i:00}", ReadTexture(reader, image, i)));
+                Console.WriteLine("-----");
             }
 
-            // Export Segment Info to a YAML file so we can make edits later
-            ISerializer serializer = new SerializerBuilder()
-                    .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                    .Build();
-            string yaml = serializer.Serialize(spriteCollection);
-            yamlWriter.WriteLine(yaml);
-
             var container = new NodeContainerFormat();
-            container.Root.Add(new Node("sprites", sprites));
+            container.Root.Add(new Node("segment", sprites));
             container.Root.Add(new Node("image", image));
-            container.Root.Add(new Node("yaml", new BinaryFormat(segmentsInfo)));
 
             return container;
         }
 
-        private Sprite ReadSprite(DataReader reader)
-        {
-            int spriteOffset = reader.ReadUInt16() + PointerOffset;
-            reader.Stream.PushToPosition(spriteOffset);
-
-            var sprite = new Sprite();
-            ushort numSegments = reader.ReadUInt16();
-
-            for (int i = 0; i < numSegments; i++) {
-                ushort tileIndex = reader.ReadUInt16();
-                sbyte xPos = reader.ReadSByte();
-                sbyte yPos = reader.ReadSByte();
-                byte shape = reader.ReadByte();
-                byte paletteIndex = reader.ReadByte();
-                (int width, int height) = GetSize(shape & 0x0F);
-                (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
-
-                var segment = new ImageSegment() {
-                    TileIndex = tileIndex,
-                    CoordinateX = xPos,
-                    CoordinateY = yPos,
-                    PaletteIndex = paletteIndex,
-                    Width = width,
-                    Height = height,
-                    VerticalFlip = vFlip,
-                    HorizontalFlip = hFlip,
-                    Layer = numSegments - i,
-                };
-                sprite.Segments.Add(segment);
-            }
-
-            sprite.Width = 256;
-            sprite.Height = 256;
-            reader.Stream.PopPosition();
-
-            return sprite;
-        }
-
-        // ToDo: I guess we could merge these two methods and add some ifs?
-
-        // These false sprites (we call them Textures) have a Linear image, so we can't
-        // use the Texim Sprite system. That's why we compose regular images.
-        private Dig ReadTexture(DataReader reader, Dig fullImage)
+        private Dig ReadTexture(DataReader reader, Dig fullImage, int index)
         {
             var frame = new Dig(fullImage) {
                 Pixels = new IndexedPixel[256 * 256],
@@ -139,6 +80,7 @@ namespace JUS.Tool.Graphics.Converters
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
             reader.Stream.PushToPosition(spriteOffset);
             ushort numSegments = reader.ReadUInt16();
+            // Console.WriteLine($"numSegments: {numSegments}");
             SpriteDummy sprite = new SpriteDummy();
 
             for (int i = 0; i < numSegments; i++) {
@@ -149,9 +91,21 @@ namespace JUS.Tool.Graphics.Converters
                 byte paletteIndex = reader.ReadByte();
                 (int width, int height) = GetSize(shape & 0x0F);
                 (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
+                // Console.WriteLine($"positions: {xPos} x {yPos}");
+                // Console.WriteLine($"tileIndex: {tileIndex}");
+                // Console.WriteLine($"shape: {shape}");
+                // Console.WriteLine($"flip: {hFlip} x {vFlip}");
+                // Console.WriteLine($"size: {width} x {height}");
 
                 var segment = new Dig(fullImage, width, height, tileIndex);
 
+                var indexedImageParams = new IndexedImageBitmapParams {
+                    Palettes = segment,
+                };
+
+                BinaryFormat a = new IndexedImage2Bitmap(indexedImageParams).Convert(segment);
+                a.Stream.WriteTo($"src/JUS.CLI/bin/Debug/net8.0/23-dtx3tx/segments_ko/{index}_segment{i}.png");
+                // Console.WriteLine();
                 frame.PasteImage(segment, xPos, yPos, hFlip, vFlip, paletteIndex);
 
                 // Export Segment Info to a YAML file so we can make edits later
@@ -170,7 +124,6 @@ namespace JUS.Tool.Graphics.Converters
             }
 
             reader.Stream.PopPosition();
-            spriteCollection.Add(sprite);
 
             return frame;
         }
