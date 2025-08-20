@@ -28,11 +28,15 @@ With Tinke, you can view the compressed image opening the .dtx as Palette (addin
 | ------ | ------- | ------------------ |
 | 0x00   | char[4] | DSTX               |
 | 0x04   | byte    | Unknown            |
-| 0x05   | byte    | Type, must be 0x04 |
+| 0x05   | byte    | Type, must be 0x03 |
 | 0x06   | short   | Number of elements |
 | 0x08   | short   | DSIG offset        |
 | 0x0A   | uint[]  | Sprite data        |
 | ...    | DSIG    | Image with palette |
+
+This format has two different type of images depending on the tile mode (swizzling): tiled (regular sprites) or linear (regular textures/images stored as sprites). Both have the same specifications, but we work differently with them, as Texim's Sprite system can only work with tiled images.
+
+Instead, we create subimages with the segments and then we compose the full sprite. In order to import them, we use a .yaml file with all the sprite & segment info in case we want to modify them.
 
 ### DTX 04
 
