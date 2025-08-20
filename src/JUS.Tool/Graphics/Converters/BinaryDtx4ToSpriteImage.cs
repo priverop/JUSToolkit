@@ -91,8 +91,8 @@ namespace JUSToolkit.Graphics.Converters
                 var segment = new ImageSegment {
                     Width = width * 8,
                     Height = height * 8,
-                    // TileIndex = (tileIndex == 0) ? 1 : tileIndex, // Pleo had this but I don't think it's necessary
-                    TileIndex = tileIndex,
+                    TileIndex = (tileIndex == 0) ? 1 : tileIndex, // Pleo had this but I don't think it's necessary
+                    // TileIndex = tileIndex,
                     CoordinateX = 0,
                     CoordinateY = y,
                 };

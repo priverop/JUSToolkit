@@ -19,10 +19,10 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
@@ -30,19 +30,22 @@ using NUnit.Framework;
 using Texim.Formats;
 using Texim.Images;
 using Texim.Sprites;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.Tests.Containers
+namespace JUSToolkit.Tests.Graphics
 {
     [TestFixture]
+    // ToDo: DTX3 sprite deserialize & Hash, and DTX3 sprite export and import
     public class DtxTests
     {
-        public static IEnumerable<TestCaseData> GetDtxFiles()
+        public static IEnumerable<TestCaseData> GetKomaFiles()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
-            string listPath = Path.Combine(basePath, "dtx.txt");
+            string listPath = Path.Combine(basePath, "komas.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
@@ -53,8 +56,35 @@ namespace JUSToolkit.Tests.Containers
                     .SetName($"({data[0]}, {data[1]}, {data[2]}, {data[3]})"));
         }
 
-        [TestCaseSource(nameof(GetDtxFiles))]
-        public void DeserializeDtx(string infoPath, string container, string koma, string kshape)
+        public static IEnumerable<TestCaseData> GetDtx4Files()
+        {
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
+            string listPath = Path.Combine(basePath, "dtx4.txt");
+            return TestDataBase.ReadTestListFile(listPath)
+                .Select(line => line.Split(','))
+                .Select(data => new TestCaseData(
+                    Path.Combine(basePath, data[0]),
+                    Path.Combine(basePath, data[1]),
+                    Path.Combine(basePath, data[2]),
+                    Path.Combine(basePath, data[3]),
+                    Path.Combine(basePath, data[4]))
+                    .SetName($"({data[0]}, {data[1]}, {data[2]}, {data[3]}, {data[4]})"));
+        }
+
+        public static IEnumerable<TestCaseData> GetDtx3TxFiles()
+        {
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
+            string listPath = Path.Combine(basePath, "dtx3tx.txt");
+            return TestDataBase.ReadTestListFile(listPath)
+                .Select(line => line.Split(','))
+                .Select(data => new TestCaseData(
+                    Path.Combine(basePath, data[0]),
+                    Path.Combine(basePath, data[1]))
+                    .SetName($"({data[0]}, {data[1]})"));
+        }
+
+        [TestCaseSource(nameof(GetKomaFiles))]
+        public void DeserializeKomas(string infoPath, string container, string koma, string kshape)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
             TestDataBase.IgnoreIfFileDoesNotExist(container);
@@ -110,6 +140,136 @@ namespace JUSToolkit.Tests.Containers
             }
 
             resultContainer.Root.Should().MatchInfo(expected);
+        }
+
+        [TestCaseSource(nameof(GetDtx4Files))]
+        public void DeserializeDtx4AndCheckFileHash(string infoPath, string dtxPath, string container, string koma, string kshape)
+        {
+            Assert.Ignore();
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+            Console.WriteLine(Path.GetFileNameWithoutExtension(dtxPath));
+            Console.WriteLine(dtxPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(container);
+            TestDataBase.IgnoreIfFileDoesNotExist(koma);
+            TestDataBase.IgnoreIfFileDoesNotExist(kshape);
+
+            var info = BinaryInfo.FromYaml(infoPath);
+
+            // Sprites + pixels + palette
+            using Node dtx4 = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
+            .TransformWith<LzssDecompression>()
+            .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
+
+            IndexedPaletteImage image = dtx4.Children["image"].GetFormatAs<IndexedPaletteImage>();
+
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
+                .TransformWith<BinaryKShape2SpriteCollection>()
+                .GetFormatAs<KShapeSprites>();
+
+            Koma komaFormat = NodeFactory.FromFile(koma)
+                .TransformWith<Binary2Koma>()
+                .GetFormatAs<Koma>();
+
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+
+            // We ignore the sprite info from the DSTX and we take the one
+            // from the kshape
+            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
+                FullImage = image,
+            };
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = image,
+            };
+
+            new Node("sprite", sprite)
+                .TransformWith(new Sprite2IndexedImage(spriteParams))
+                .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
+                .Stream.Should().MatchInfo(info);
+        }
+
+        [TestCaseSource(nameof(GetDtx4Files))]
+        public void TwoWaysIdenticalDtx4(string infoPath, string dtxPath, string container, string koma, string kshape)
+        {
+            Assert.Ignore();
+        }
+
+        [TestCaseSource(nameof(GetDtx3TxFiles))]
+        public void DeserializeDtx3TxAndCheckFileHash(string infoPath, string dtxPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+
+            var info = BinaryInfo.FromYaml(infoPath);
+
+            using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
+                .TransformWith(new BinaryToDtx3());
+
+            Dig image = dtx.Children["image"].GetFormatAs<Dig>();
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = image,
+            };
+
+            BinaryFormat generatedStream = new IndexedImage2Bitmap(indexedImageParams).Convert(image);
+
+            generatedStream.Should().MatchInfo(info);
+        }
+
+        [TestCaseSource(nameof(GetDtx3TxFiles))]
+        public void TwoWaysIdenticalDtx3TxYaml(string infoPath, string dtxPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+
+            using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read);
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
+
+            dtx.TransformWith(new BinaryToDtx3());
+
+            BinaryFormat yaml = dtx.Children["yaml"].GetFormatAs<BinaryFormat>();
+
+            var reader = new TextDataReader(yaml.Stream);
+            reader.Stream.Position = 0;
+
+            // Import with Yaml
+            var yamlConverter = new Dtx3TxToBinary(originalDtx, GetYamlInfo(reader.ReadToEnd()));
+
+            BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>());
+
+            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            generatedStream.Stream.Length.Should().Be(originalStream.Length);
+            generatedStream.Stream.Compare(originalStream).Should().BeTrue();
+        }
+
+        [TestCaseSource(nameof(GetDtx3TxFiles))]
+        public void TwoWaysIdenticalDtx3TxNoYaml(string infoPath, string dtxPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+
+            using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read);
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
+
+            dtx.TransformWith(new BinaryToDtx3());
+
+            var yamlConverter = new Dtx3TxToBinary(originalDtx);
+
+            BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>());
+
+            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            generatedStream.Stream.Length.Should().Be(originalStream.Length);
+            generatedStream.Stream.Compare(originalStream).Should().BeTrue();
+        }
+
+        private static List<SpriteDummy> GetYamlInfo(string yamlText)
+        {
+            return new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Deserialize<List<SpriteDummy>>(yamlText);
         }
     }
 }

@@ -53,6 +53,7 @@ namespace JUS.Tool.Graphics.Converters
                 // Obtenemos el DSIG offset
                 reader.Stream.Position = 0x08;
                 uint dsigOffset = reader.ReadUInt16();
+                reader.Stream.Position = 0;
 
                 // Escribimos todo hasta ese offset
                 writer.Write(reader.ReadBytes((int)dsigOffset));
