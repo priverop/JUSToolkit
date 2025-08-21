@@ -1,0 +1,1 @@
+dtx3.yml,logo_copy.dtx

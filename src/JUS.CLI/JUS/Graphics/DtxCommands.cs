@@ -66,8 +66,6 @@ namespace JUSToolkit.CLI.JUS
             }
         }
 
-
-
         /// <summary>
         /// Import multiple PNGs into a sprite .dtx file.
         /// </summary>
@@ -207,15 +205,6 @@ namespace JUSToolkit.CLI.JUS
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
-        }
-
-        private static List<SpriteDummy> GetYamlInfo(string path)
-        {
-            string yaml = File.ReadAllText(path);
-            return new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build()
-                .Deserialize<List<SpriteDummy>>(yaml);
         }
 
         /// <summary>
@@ -444,7 +433,15 @@ namespace JUSToolkit.CLI.JUS
             BinaryFormat segmentInfo = dtx3.Children["yaml"].GetFormatAs<BinaryFormat>();
 
             segmentInfo.Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)) + ".yaml");
+        }
 
+        private static List<SpriteDummy> GetYamlInfo(string path)
+        {
+            string yaml = File.ReadAllText(path);
+            return new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Deserialize<List<SpriteDummy>>(yaml);
         }
     }
 }

@@ -84,6 +84,18 @@ namespace JUSToolkit.Tests.Graphics
                     .SetName($"({data[0]}, {data[1]})"));
         }
 
+        public static IEnumerable<TestCaseData> GetDtx3Files()
+        {
+            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
+            string listPath = Path.Combine(basePath, "dtx3.txt");
+            return TestDataBase.ReadTestListFile(listPath)
+                .Select(line => line.Split(','))
+                .Select(data => new TestCaseData(
+                    Path.Combine(basePath, data[0]),
+                    Path.Combine(basePath, data[1]))
+                    .SetName($"({data[0]}, {data[1]})"));
+        }
+
         [TestCaseSource(nameof(GetKomaFiles))]
         public void DeserializeKomas(string infoPath, string container, string koma, string kshape)
         {
@@ -265,6 +277,21 @@ namespace JUSToolkit.Tests.Graphics
             originalStream.WriteTo("original.dtx");
             generatedStream.WriteTo("generated.dtx");
             generatedStream.Compare(originalStream).Should().BeTrue();
+        }
+
+        [TestCaseSource(nameof(GetDtx3Files))]
+        public void DeserializeDtx3AndCheckFileHash(string infoPath, string dtxPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+
+            var info = NodeContainerInfo.FromYaml(infoPath);
+
+            using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Dtx2Bitmaps>();
+
+            dtx.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetDtx3TxFiles))]
