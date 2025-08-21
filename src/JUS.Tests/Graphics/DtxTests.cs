@@ -29,10 +29,11 @@ using JUSToolkit.Graphics.Converters;
 using NUnit.Framework;
 using Texim.Formats;
 using Texim.Images;
+using Texim.Pixels;
+using Texim.Processing;
 using Texim.Sprites;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -145,11 +146,8 @@ namespace JUSToolkit.Tests.Graphics
         [TestCaseSource(nameof(GetDtx4Files))]
         public void DeserializeDtx4AndCheckFileHash(string infoPath, string dtxPath, string container, string koma, string kshape)
         {
-            Assert.Ignore();
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
             TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
-            Console.WriteLine(Path.GetFileNameWithoutExtension(dtxPath));
-            Console.WriteLine(dtxPath);
             TestDataBase.IgnoreIfFileDoesNotExist(container);
             TestDataBase.IgnoreIfFileDoesNotExist(koma);
             TestDataBase.IgnoreIfFileDoesNotExist(kshape);
@@ -173,8 +171,6 @@ namespace JUSToolkit.Tests.Graphics
 
             KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
 
-            // We ignore the sprite info from the DSTX and we take the one
-            // from the kshape
             Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
             var spriteParams = new Sprite2IndexedImageParams {
@@ -194,7 +190,81 @@ namespace JUSToolkit.Tests.Graphics
         [TestCaseSource(nameof(GetDtx4Files))]
         public void TwoWaysIdenticalDtx4(string infoPath, string dtxPath, string container, string koma, string kshape)
         {
-            Assert.Ignore();
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(container);
+            TestDataBase.IgnoreIfFileDoesNotExist(koma);
+            TestDataBase.IgnoreIfFileDoesNotExist(kshape);
+
+            // Sprites + pixels + palette
+            using Node dtx4 = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
+            .TransformWith<LzssDecompression>();
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx4.Stream).DeepClone();
+
+            dtx4.TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
+
+            Dig originalImage = dtx4.Children["image"].GetFormatAs<Dig>();
+
+            KShapeSprites shapes = NodeFactory.FromFile(kshape)
+                .TransformWith<BinaryKShape2SpriteCollection>()
+                .GetFormatAs<KShapeSprites>();
+
+            Koma komaFormat = NodeFactory.FromFile(koma)
+                .TransformWith<Binary2Koma>()
+                .GetFormatAs<Koma>();
+
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+
+            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
+                FullImage = originalImage,
+            };
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = originalImage,
+            };
+
+            var pngNode = new Node("sprite", sprite)
+                .TransformWith(new Sprite2IndexedImage(spriteParams))
+                .TransformWith(new IndexedImage2Bitmap(indexedImageParams));
+
+            pngNode.Stream.Position = 0;
+
+            // Import
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
+            pngNode.TransformWith<Bitmap2FullImage>()
+                .TransformWith(new FullImage2IndexedPalette(quantization));
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
+
+            var segmentedImage = new List<IndexedPixel>();
+            foreach (IImageSegment segment in sprite.Segments) {
+                IndexedImage segmentImage = newImage.SubImage(segment.CoordinateX, segment.CoordinateY, segment.Width, segment.Height);
+                segmentedImage.AddRange(segmentImage.Pixels);
+            }
+
+            // Linear image to Tiled image (how the DTX stores them)
+            IndexedPixel[] tiledPixels = new TileSwizzling<IndexedPixel>(48).Swizzle(segmentedImage);
+
+            // Update image with the new changes
+            Dig updatedImage = new Dig(originalImage) {
+                Pixels = tiledPixels.ToArray(),
+                Width = 8,
+                Height = tiledPixels.Length / 8,
+                Swizzling = DigSwizzling.Linear,
+            }.InsertTransparentTile();
+
+            dtx4.Children["image"].ChangeFormat(updatedImage);
+
+            DataStream generatedStream = new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())
+                .Stream;
+
+            // Compare
+            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            generatedStream.Length.Should().Be(originalStream.Length);
+            originalStream.WriteTo("original.dtx");
+            generatedStream.WriteTo("generated.dtx");
+            generatedStream.Compare(originalStream).Should().BeTrue();
         }
 
         [TestCaseSource(nameof(GetDtx3TxFiles))]

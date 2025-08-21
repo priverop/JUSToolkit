@@ -47,7 +47,11 @@ namespace JUS.Tool.Graphics.Converters
             foreach (IImageSegment s in sprite.Segments) {
                 writer.Write((sbyte)(s.Width / 8));
                 writer.Write((sbyte)(s.Height / 8));
-                writer.Write((ushort)s.TileIndex);
+                if (s.TileIndex == 1) { // transparent tile
+                    writer.Write((ushort)0);
+                } else {
+                    writer.Write((ushort)s.TileIndex);
+                }
             }
 
             // WriteDig
