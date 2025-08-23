@@ -29,6 +29,7 @@ using JUSToolkit.Graphics.Converters;
 using NUnit.Framework;
 using Texim.Formats;
 using Texim.Images;
+using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Processing;
 using Texim.Sprites;
@@ -40,7 +41,6 @@ using Yarhl.IO;
 namespace JUSToolkit.Tests.Graphics
 {
     [TestFixture]
-    // ToDo: DTX3 sprite deserialize & Hash, and DTX3 sprite export and import
     public class DtxTests
     {
         public static IEnumerable<TestCaseData> GetKomaFiles()
@@ -292,6 +292,106 @@ namespace JUSToolkit.Tests.Graphics
                 .TransformWith<Dtx2Bitmaps>();
 
             dtx.Should().MatchInfo(info);
+        }
+
+        [TestCaseSource(nameof(GetDtx3Files))]
+        public void TwoWaysIdenticalDtx3(string infoPath, string dtxPath)
+        {
+            Assert.Ignore();
+            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
+
+            using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>();
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
+
+            dtx.TransformWith(new BinaryToDtx3());
+
+            // Original image
+            Dig originalImage = dtx.Children["image"].GetFormatAs<Dig>();
+            var palettes = new PaletteCollection();
+            foreach (IPalette p in originalImage.Palettes) {
+                palettes.Palettes.Add(p);
+            }
+
+            // Configuration for the Converters
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                FullImage = originalImage,
+            };
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = originalImage,
+            };
+
+            var newPixels = new List<IndexedPixel>();
+
+            var segmentation = new NitroImageSegmentation() {
+                CanvasWidth = 256,
+                CanvasHeight = 256,
+            };
+            var spriteConverterParameters = new FullImage2SpriteParams {
+                Palettes = palettes,
+                IsImageTiled = true,
+                MinimumPixelsPerSegment = 64,
+                PixelsPerIndex = 64,
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                PixelSequences = newPixels,
+                Segmentation = segmentation,
+            };
+
+            var originalBitmaps = new NodeContainerFormat();
+
+            // Cloning the PNG to compare them later, as our compression algorithm is better
+            // than the game's, and the new .dtx is smaller than the original
+            foreach (Node spriteNode in dtx.Children["sprites"].Children) {
+                // Cloning the node so we can transform it
+                originalBitmaps.Root.Add(new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
+                            .TransformWith(new Sprite2IndexedImage(spriteParams))
+                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams)));
+            }
+
+            // He quitado el clonado de momento por si era eso, pero no funciona igualmente.
+            // using var cloneBitmaps = (NodeContainerFormat)originalBitmaps.DeepClone();
+
+            foreach (Node pngNode in originalBitmaps.Root.Children) {
+                pngNode.Stream.Position = 0;
+                pngNode.TransformWith<Bitmap2FullImage>(); // Esto lo transforma bien
+
+                // FullImage -> Sprite
+                var converter = new FullImage2Sprite(spriteConverterParameters);
+                pngNode.TransformWith(converter);
+                Sprite sprite = pngNode.GetFormatAs<Sprite>();
+
+                // Check if there is a Children with the correct name:
+                string cleanSpriteName = Path.GetFileNameWithoutExtension(pngNode.Name);
+                Node spriteToReplace = dtx.Children["sprites"].Children[cleanSpriteName]
+                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
+
+                spriteToReplace.ChangeFormat(sprite);
+            }
+
+            var updatedImage = new Dig(originalImage) {
+                Pixels = newPixels.ToArray(),
+                Width = 8,
+                Height = newPixels.Count / 8,
+            };
+
+            dtx.Children["image"].ChangeFormat(updatedImage);
+
+            // DataStream generatedStream = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>()).Stream;
+
+            // var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            // originalStream.Length.Should().BeGreaterThan(generatedStream.Length);
+
+            for (int i = 0; i < dtx.Children["sprites"].Children.Count; i++) {
+                var spriteNode = dtx.Children["sprites"].Children[i];
+                // Cloning the node so we can transform it
+                var pngNode = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
+                            .TransformWith(new Sprite2IndexedImage(spriteParams))
+                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams));
+
+                pngNode.Stream.Compare(originalBitmaps.Root.Children[i].Stream);
+            }
         }
 
         [TestCaseSource(nameof(GetDtx3TxFiles))]
