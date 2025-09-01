@@ -1,1 +1,1 @@
-dtx3.yml,logo_copy.dtx
+dtx3.yml,error_2d.dtx

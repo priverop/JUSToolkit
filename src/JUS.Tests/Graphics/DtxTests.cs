@@ -297,10 +297,11 @@ namespace JUSToolkit.Tests.Graphics
         [TestCaseSource(nameof(GetDtx3Files))]
         public void TwoWaysIdenticalDtx3(string infoPath, string dtxPath)
         {
-            Assert.Ignore();
+            // 0 - Checks
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
             TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
 
+            // 1 - Dtx -> Pngs
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>();
             var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
@@ -350,12 +351,12 @@ namespace JUSToolkit.Tests.Graphics
                             .TransformWith(new IndexedImage2Bitmap(indexedImageParams)));
             }
 
-            // He quitado el clonado de momento por si era eso, pero no funciona igualmente.
-            // using var cloneBitmaps = (NodeContainerFormat)originalBitmaps.DeepClone();
+            using var cloneBitmaps = (NodeContainerFormat)originalBitmaps.DeepClone();
 
-            foreach (Node pngNode in originalBitmaps.Root.Children) {
+            // 2 - Import the PNGs into the DTX
+            foreach (Node pngNode in cloneBitmaps.Root.Children) {
                 pngNode.Stream.Position = 0;
-                pngNode.TransformWith<Bitmap2FullImage>(); // Esto lo transforma bien
+                pngNode.TransformWith<Bitmap2FullImage>();
 
                 // FullImage -> Sprite
                 var converter = new FullImage2Sprite(spriteConverterParameters);
@@ -378,19 +379,29 @@ namespace JUSToolkit.Tests.Graphics
 
             dtx.Children["image"].ChangeFormat(updatedImage);
 
-            // DataStream generatedStream = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>()).Stream;
+            BinaryFormat generatedBinary = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>());
 
-            // var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
-            // originalStream.Length.Should().BeGreaterThan(generatedStream.Length);
+            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            originalStream.Length.Should().BeGreaterThan(generatedBinary.Stream.Length);
 
-            for (int i = 0; i < dtx.Children["sprites"].Children.Count; i++) {
-                var spriteNode = dtx.Children["sprites"].Children[i];
+            NodeContainerFormat newDtx = new BinaryToDtx3().Convert(generatedBinary);
+
+            // 3 - Compare the original PNGs and the new PNGs
+            var spriteParams2 = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                FullImage = updatedImage,
+            };
+            var indexedImageParams2 = new IndexedImageBitmapParams {
+                Palettes = updatedImage,
+            };
+            for (int i = 0; i < newDtx.Root.Children["sprites"].Children.Count; i++) {
+                var spriteNode = newDtx.Root.Children["sprites"].Children[i];
                 // Cloning the node so we can transform it
                 var pngNode = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
-                            .TransformWith(new Sprite2IndexedImage(spriteParams))
-                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams));
+                            .TransformWith(new Sprite2IndexedImage(spriteParams2))
+                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams2));
 
-                pngNode.Stream.Compare(originalBitmaps.Root.Children[i].Stream);
+                pngNode.Stream.Compare(originalBitmaps.Root.Children[i].Stream).Should().BeTrue();
             }
         }
 
