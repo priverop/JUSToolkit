@@ -75,6 +75,12 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx3.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3);
 
+            var exportDtx3TxImage = new Command("export-dtx3tx-image", "Export dtx3tx image") {
+                new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportDtx3TxImage.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3TxImage);
+
             var importDtx3 = new Command("import-dtx3", "Import dtx3") {
                 new Option<string>("--input", "the folder with the .pngs to import", ArgumentArity.ExactlyOne),
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
@@ -124,6 +130,7 @@ namespace JUSToolkit.CLI.JUS
             return new Command("graphics", "Import/Export graphic files") {
                 exportKomas,
                 exportDtx3,
+                exportDtx3TxImage,
                 exportYamlDtx3,
                 exportDtx4,
                 importDtx3,

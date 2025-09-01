@@ -67,6 +67,37 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
+        /// Export the image of the .dtx file.
+        /// </summary>
+        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="output">The output folder.</param>
+        /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
+        public static void ExportDtx3TxImage(string dtx, string output)
+        {
+            Console.WriteLine("Exporting Dtx3Tx Image");
+            Console.WriteLine("DTX: " + dtx);
+
+            PathValidator.ValidateFile(dtx);
+
+            // Sprites + pixels + palette
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
+
+            Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
+
+            var indexedImageParams = new IndexedImageBitmapParams {
+                Palettes = originalImage,
+            };
+
+            BinaryFormat image = new IndexedImage2Bitmap(indexedImageParams).Convert(originalImage);
+
+            image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + ".png"));
+
+            Console.WriteLine("Done");
+        }
+
+        /// <summary>
         /// Import multiple PNGs into a sprite .dtx file.
         /// </summary>
         /// <param name="input">The input folder containing PNGs.</param>
