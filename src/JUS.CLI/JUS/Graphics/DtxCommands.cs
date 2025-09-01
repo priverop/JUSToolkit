@@ -137,24 +137,8 @@ namespace JUSToolkit.CLI.JUS
 
             dtx3.Children["image"].ChangeFormat(updatedImage);
 
-            var spriteParams2 = new Sprite2IndexedImageParams {
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                FullImage = updatedImage,
-            };
-            var indexedImageParams = new IndexedImageBitmapParams {
-                Palettes = updatedImage,
-            };
-            for (int i = 0; i < dtx3.Children["sprites"].Children.Count; i++) {
-                var spriteNode = dtx3.Children["sprites"].Children[i];
-                // Cloning the node so we can transform it
-                var pngNode = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
-                            .TransformWith(new Sprite2IndexedImage(spriteParams2))
-                            .TransformWith(new IndexedImage2Bitmap(indexedImageParams));
-                pngNode.Stream.WriteTo(Path.Combine(output, $"zzz/{pngNode.Name}.png"));
-            }
-
-            // new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
-            //     .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
+            new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
         }
