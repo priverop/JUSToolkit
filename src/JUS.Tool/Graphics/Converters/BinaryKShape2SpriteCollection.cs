@@ -121,7 +121,7 @@ namespace JUSToolkit.Graphics.Converters
                 // If the segment index is 0, then it's transparent, skip.
                 if (info[i] > 0) {
                     int segmentIdx = info[i] - 1;
-                    int tileIdx = segmentIdx * TilesPerSegment; // skip first transparent tile
+                    int tileIdx = (segmentIdx * TilesPerSegment) + 1; // skip first transparent tile
                     var segment = new ImageSegment {
                         Width = SegmentDimensions,
                         Height = SegmentDimensions,

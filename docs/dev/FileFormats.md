@@ -1,5 +1,7 @@
 # File Formats
 
+This is the format specification from the [English translation](https://web.archive.org/web/20100111220659/http://jumpstars.wikispaces.com/File+Formats#toc10).
+
 ## Compression
 ### DSCP Tag
 ```

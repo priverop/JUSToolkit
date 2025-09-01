@@ -19,20 +19,20 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using JUS.Tool.Graphics.Converters;
 using JUSToolkit.Containers.Converters;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Processing;
 using Texim.Sprites;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -81,18 +81,20 @@ namespace JUSToolkit.CLI.JUS
             PathValidator.ValidateFile(dtx);
             PathValidator.ValidateDirectory(input);
 
-            // Sprites + pixels + palette
+            // Original Sprites (textures) + Image
             using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            Dig image = dtx3.Children["image"].GetFormatAs<Dig>();
+            // Original image
+            Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
             var palettes = new PaletteCollection();
-            foreach (IPalette p in image.Palettes) {
+            foreach (IPalette p in originalImage.Palettes) {
                 palettes.Palettes.Add(p);
             }
 
-            var pixels = new List<IndexedPixel>();
+            // Configuration for the Converters
+            var newPixels = new List<IndexedPixel>();
 
             var segmentation = new NitroImageSegmentation() {
                 CanvasWidth = 256,
@@ -104,38 +106,102 @@ namespace JUSToolkit.CLI.JUS
                 MinimumPixelsPerSegment = 64,
                 PixelsPerIndex = 64,
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                PixelSequences = pixels,
+                PixelSequences = newPixels,
                 Segmentation = segmentation,
             };
 
-            foreach (string spritePath in Directory.GetFiles(input)) {
-                Node nodeSprite = NodeFactory.FromFile(spritePath, FileOpenMode.Read);
+            foreach (string pngPath in Directory.GetFiles(input)) {
+                Node pngNode = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
                 // PNG -> FullImage (array of colors)
-                nodeSprite.TransformWith<Bitmap2FullImage>();
+                pngNode.TransformWith<Bitmap2FullImage>();
 
                 // FullImage -> Sprite
                 var converter = new FullImage2Sprite(spriteConverterParameters);
-                nodeSprite.TransformWith(converter);
-                Sprite sprite = nodeSprite.GetFormatAs<Sprite>();
+                pngNode.TransformWith(converter);
+                Sprite sprite = pngNode.GetFormatAs<Sprite>();
 
                 // Check if there is a Children with the correct name:
-                string cleanSpriteName = Path.GetFileNameWithoutExtension(spritePath);
+                string cleanSpriteName = Path.GetFileNameWithoutExtension(pngPath);
                 Node spriteToReplace = dtx3.Children["sprites"].Children[cleanSpriteName]
                 ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
 
                 spriteToReplace.ChangeFormat(sprite);
             }
 
-            var updatedImage = new Dig(image) {
-                Pixels = pixels.ToArray(),
+            var updatedImage = new Dig(originalImage) {
+                Pixels = newPixels.ToArray(),
                 Width = 8,
-                Height = pixels.Count / 8,
+                Height = newPixels.Count / 8,
             };
 
             dtx3.Children["image"].ChangeFormat(updatedImage);
 
             new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Import multiple PNGs into a sprite .dtx file.
+        /// </summary>
+        /// <param name="input">The input folder containing PNGs.</param>
+        /// <param name="dtx">The original .dtx file.</param>
+        /// <param name="yaml">Segments metadata of the sprites.</param>
+        /// <param name="output">The output folder.</param>
+        public static void ImportDtx3Tx(string input, string dtx, string yaml, string output)
+        {
+            Console.WriteLine("Importing DTX3 Texture");
+            Console.WriteLine("DTX: " + dtx);
+            Console.WriteLine("Input files from: " + input);
+
+            PathValidator.ValidateFile(dtx);
+            PathValidator.ValidateFile(input);
+
+            // Sprites + pixels + palette
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>();
+
+            // Clone DTX:
+            // Clone the nodes
+            var dtxClone = (BinaryFormat)new BinaryFormat(dtx3.Stream).DeepClone();
+
+            dtx3.TransformWith<BinaryToDtx3>();
+
+            Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
+
+            var palettes = new PaletteCollection();
+            foreach (IPalette p in originalImage.Palettes) {
+                palettes.Palettes.Add(p);
+            }
+
+            // Modified PNG to insert
+            Node pngNode = NodeFactory.FromFile(input, FileOpenMode.Read);
+
+            // Get the IndexedPixels
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
+            pngNode.TransformWith<Bitmap2FullImage>().TransformWith(new FullImage2IndexedPalette(quantization));
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
+
+            // Update the original base image
+            var updatedImage = new Dig(originalImage) {
+                Pixels = newImage.Pixels.ToArray(),
+            };
+
+            dtx3.Children["image"].ChangeFormat(updatedImage);
+
+            Dtx3TxToBinary converter;
+
+            if (!string.IsNullOrEmpty(yaml)) {
+                PathValidator.ValidateFile(yaml);
+
+                converter = new Dtx3TxToBinary(dtxClone, GetYamlInfo(yaml));
+            } else {
+                converter = new Dtx3TxToBinary(dtxClone);
+            }
+
+            converter.Convert(dtx3.GetFormatAs<NodeContainerFormat>())
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
@@ -344,6 +410,38 @@ namespace JUSToolkit.CLI.JUS
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Export a the segments info from a .dtx file  a YAML metadata file.
+        /// </summary>
+        /// <param name="dtx">The .dtx file.</param>
+        /// <param name="output">The output folder.</param>
+        /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
+        public static void ExportYamlDtx3(string dtx, string output)
+        {
+            Console.WriteLine("Exporting Dtx3 file with YAML metadata");
+            Console.WriteLine("DTX: " + dtx);
+
+            PathValidator.ValidateFile(dtx);
+
+            // Sprites + pixels + palette
+            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryToDtx3>();
+
+            BinaryFormat segmentInfo = dtx3.Children["yaml"].GetFormatAs<BinaryFormat>();
+
+            segmentInfo.Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)) + ".yaml");
+        }
+
+        private static List<SpriteDummy> GetYamlInfo(string path)
+        {
+            string yaml = File.ReadAllText(path);
+            return new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Deserialize<List<SpriteDummy>>(yaml);
         }
     }
 }

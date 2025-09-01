@@ -1,0 +1,21 @@
+name: error_2d.dtx
+format_type: Yarhl.FileSystem.NodeContainerFormat
+tags: null
+check_children: true
+children:
+  - name: sp_00
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_01
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_02
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_03
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_04
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_05
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_06
+    format_type: Yarhl.IO.BinaryFormat
+  - name: sp_07
+    format_type: Yarhl.IO.BinaryFormat

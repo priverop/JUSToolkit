@@ -12,6 +12,7 @@
     <PackageReference Include="Yarhl.Media.Text" />
     <PackageReference Include="Texim" />
     <PackageReference Include="SceneGate.Ekona" />
+    <PackageReference Include="YamlDotNet" />
   </ItemGroup>
 
 </Project>

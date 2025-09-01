@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
-using SixLabors.ImageSharp.Processing;
-using Texim.Images;
 using Texim.Pixels;
 using Texim.Sprites;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -26,6 +22,7 @@ namespace JUS.Tool.Graphics.Converters
         private const int Type = 0x03;
         private const int PointerOffset = 0x0A;
         private readonly Binary2Dig digConverter = new();
+        private List<SpriteDummy> spriteCollection;
 
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a dtx3 <see cref="NodeContainerFormat"/>.
@@ -57,6 +54,10 @@ namespace JUS.Tool.Graphics.Converters
             using var dsigBinary = new BinaryFormat(source.Stream, dsigOffset, source.Stream.Length - dsigOffset);
             Dig image = digConverter.Convert(dsigBinary);
 
+            var segmentsInfo = new DataStream();
+            var yamlWriter = new TextDataWriter(segmentsInfo);
+            spriteCollection = new List<SpriteDummy>();
+
             for (int i = 0; i < numSprites; i++) {
                 switch (image.Swizzling) {
                     case DigSwizzling.Tiled:
@@ -70,9 +71,17 @@ namespace JUS.Tool.Graphics.Converters
                 }
             }
 
+            // Export Segment Info to a YAML file so we can make edits later
+            ISerializer serializer = new SerializerBuilder()
+                    .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                    .Build();
+            string yaml = serializer.Serialize(spriteCollection);
+            yamlWriter.WriteLine(yaml);
+
             var container = new NodeContainerFormat();
             container.Root.Add(new Node("sprites", sprites));
             container.Root.Add(new Node("image", image));
+            container.Root.Add(new Node("yaml", new BinaryFormat(segmentsInfo)));
 
             return container;
         }
@@ -115,6 +124,10 @@ namespace JUS.Tool.Graphics.Converters
             return sprite;
         }
 
+        // ToDo: I guess we could merge these two methods and add some ifs?
+
+        // These false sprites (we call them Textures) have a Linear image, so we can't
+        // use the Texim Sprite system. That's why we compose regular images.
         private Dig ReadTexture(DataReader reader, Dig fullImage)
         {
             var frame = new Dig(fullImage) {
@@ -126,6 +139,7 @@ namespace JUS.Tool.Graphics.Converters
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
             reader.Stream.PushToPosition(spriteOffset);
             ushort numSegments = reader.ReadUInt16();
+            SpriteDummy sprite = new SpriteDummy();
 
             for (int i = 0; i < numSegments; i++) {
                 ushort tileIndex = reader.ReadUInt16();
@@ -137,10 +151,26 @@ namespace JUS.Tool.Graphics.Converters
                 (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
 
                 var segment = new Dig(fullImage, width, height, tileIndex);
+
                 frame.PasteImage(segment, xPos, yPos, hFlip, vFlip, paletteIndex);
+
+                // Export Segment Info to a YAML file so we can make edits later
+                var imageSegment = new ImageSegment() {
+                    TileIndex = tileIndex,
+                    CoordinateX = xPos,
+                    CoordinateY = yPos,
+                    PaletteIndex = paletteIndex,
+                    Width = width,
+                    Height = height,
+                    VerticalFlip = vFlip,
+                    HorizontalFlip = hFlip,
+                };
+
+                sprite.Segments.Add(imageSegment);
             }
 
             reader.Stream.PopPosition();
+            spriteCollection.Add(sprite);
 
             return frame;
         }
