@@ -20,11 +20,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using JUS.Tool.Graphics.Converters;
 using JUSToolkit.BatchConverters;
 using JUSToolkit.Containers;
 using JUSToolkit.Containers.Converters;
+using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
 using JUSToolkit.Utils;
+using Texim.Formats;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -73,8 +76,13 @@ namespace JUSToolkit.CLI.JUS
         /// </summary>
         /// <param name="container">The path to the alar file.</param>
         /// <param name="output">The output directory.</param>
-        public static void ExportAlarDtx2Png(string container, string output)
+        /// <param name="getImage">Export only the image.</param>
+        public static void ExportAlarDtx2Png(string container, string output, bool getImage = false)
         {
+            if (string.IsNullOrEmpty(container)) {
+                throw new ArgumentNullException(nameof(container));
+            }
+
             // Recursive method to extract .aar inside of the .aar
             void ProcessNode(Node node, string baseOutputPath)
             {
@@ -85,15 +93,33 @@ namespace JUSToolkit.CLI.JUS
                     if (Path.GetExtension(child.Name) == ".dtx") {
                         Console.WriteLine($"DTX found, exporting: {originalAlarName}/{child.Name}");
                         try {
-                            using Node dtx3 = child
-                                .TransformWith<LzssDecompression>()
-                                .TransformWith<Dtx2Bitmaps>();
+                            if (getImage) {
+                                using Node dtx3 = child
+                                    .TransformWith<LzssDecompression>()
+                                    .TransformWith<BinaryToDtx3>();
 
-                            foreach (Node nodeSprite in dtx3.Children) {
-                                nodeSprite.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
+                                Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
 
-                                // TMI: Console.WriteLine($"PNG exported: {originalAlarName}-{child.Name}-{nodeSprite.Name}.png");
+                                var indexedImageParams = new IndexedImageBitmapParams {
+                                    Palettes = originalImage,
+                                };
+
+                                if (originalImage.Swizzling == DigSwizzling.Linear) {
+
+                                    BinaryFormat image = new IndexedImage2Bitmap(indexedImageParams).Convert(originalImage);
+
+                                    image.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-tx.png"));
+                                }
+                            } else {
+                                using Node dtx3 = child
+                                    .TransformWith<LzssDecompression>()
+                                    .TransformWith<Dtx2Bitmaps>();
+
+                                foreach (Node nodeSprite in dtx3.Children) {
+                                    nodeSprite.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
+                                }
                             }
+
                         } catch (Exception ex) {
                             Console.WriteLine($"Error processing DTX file {originalAlarName}/{child.Name}: {ex.Message}");
                         }
