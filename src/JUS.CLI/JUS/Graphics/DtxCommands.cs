@@ -72,7 +72,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="dtx">The .dtx file.</param>
         /// <param name="output">The output folder.</param>
         /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
-        public static void ExportDtx3Image(string dtx, string output)
+        public static void ExportDtx3TxImage(string dtx, string output)
         {
             Console.WriteLine("Exporting Dtx3 Image");
             Console.WriteLine("DTX: " + dtx);
@@ -89,9 +89,13 @@ namespace JUSToolkit.CLI.JUS
                 Palettes = originalImage,
             };
 
+            if (originalImage.Swizzling != DigSwizzling.Linear) {
+                throw new FormatException("Image is not DTX03TX");
+            }
+
             BinaryFormat image = new IndexedImage2Bitmap(indexedImageParams).Convert(originalImage);
 
-            image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + ".png"));
+            image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + "_tx.png"));
 
             Console.WriteLine("Done");
         }

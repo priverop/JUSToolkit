@@ -75,11 +75,11 @@ namespace JUSToolkit.CLI.JUS
             };
             exportDtx3.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3);
 
-            var exportDtx3Image = new Command("export-dtx3-image", "Export dtx3 image") {
+            var exportDtx3TxImage = new Command("export-dtx3tx-image", "Export dtx3 image") {
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportDtx3Image.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3Image);
+            exportDtx3TxImage.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3TxImage);
 
             var importDtx3 = new Command("import-dtx3", "Import dtx3") {
                 new Option<string>("--input", "the folder with the .pngs to import", ArgumentArity.ExactlyOne),
@@ -130,7 +130,7 @@ namespace JUSToolkit.CLI.JUS
             return new Command("graphics", "Import/Export graphic files") {
                 exportKomas,
                 exportDtx3,
-                exportDtx3Image,
+                exportDtx3TxImage,
                 exportYamlDtx3,
                 exportDtx4,
                 importDtx3,
@@ -211,8 +211,9 @@ namespace JUSToolkit.CLI.JUS
             var exportAlarDtx2Png = new Command("export-alar-dtx-png", "Batch export PNGs from alar dtxs files") {
                 new Option<string>("--container", "the alar container", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+                new Option<bool>("--getImage", "only export the image", ArgumentArity.ZeroOrOne),
             };
-            exportAlarDtx2Png.Handler = CommandHandler.Create<string, string>(BatchCommands.ExportAlarDtx2Png);
+            exportAlarDtx2Png.Handler = CommandHandler.Create<string, string, bool>(BatchCommands.ExportAlarDtx2Png);
 
             return new Command("batch", "Batch import/export PNG to/from Alar") {
                 importPng2Alar3,
