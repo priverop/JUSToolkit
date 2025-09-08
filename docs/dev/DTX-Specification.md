@@ -107,7 +107,9 @@ Row 2: [64][65]← HERE [66][67]...[95]
 
 The tile coordinates are (8, 16) to (15, 23).
 
-### DTX 04
+### DTX 04 - Komas
+
+Ver [Koma Specification](Koma-Specification.md) para más detalles.
 
 | Offset | Type    | Description                                             |
 | ------ | ------- | ------------------------------------------------------- |
