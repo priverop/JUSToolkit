@@ -121,17 +121,17 @@ namespace JUSToolkit.CLI.JUS
             };
             mergeDig.Handler = CommandHandler.Create<string[], bool, string, string[], string>(DigCommands.MergeDig);
 
-            var exportYamlDtx3 = new Command("export-yaml-dtx3", "Export the sprite metadata") {
+            var exportDtx3Segments = new Command("export-dtx3-segments", "Export the segments and yaml") {
                 new Option<string>("--dtx", "the input file.dtx", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportYamlDtx3.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportYamlDtx3);
+            exportDtx3Segments.Handler = CommandHandler.Create<string, string>(DtxCommands.ExportDtx3Segments);
 
             return new Command("graphics", "Import/Export graphic files") {
                 exportKomas,
                 exportDtx3,
                 exportDtx3TxImage,
-                exportYamlDtx3,
+                exportDtx3Segments,
                 exportDtx4,
                 importDtx3,
                 importDtx3Tx,
