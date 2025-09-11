@@ -76,7 +76,10 @@ namespace JUS.Tool.Graphics.Converters
                         writer.WriteOfType<ushort>((ushort)segment.TileIndex);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateX);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateY);
-                        writer.WriteOfType<byte>(GetSize(segment.Width, segment.Height));
+                        byte sizeValue = GetSize(segment.Width, segment.Height);
+                        byte flipValue = GetFlip(segment.HorizontalFlip, segment.VerticalFlip); // already shifted
+                        byte shapeValue = (byte)(sizeValue | flipValue);
+                        writer.WriteOfType<byte>(shapeValue);
                         writer.WriteOfType<sbyte>((sbyte)segment.PaletteIndex);
                     }
                 }
