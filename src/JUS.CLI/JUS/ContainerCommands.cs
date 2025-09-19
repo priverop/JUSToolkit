@@ -137,6 +137,7 @@ namespace JUSToolkit.CLI.JUS
             Console.WriteLine("Importing Alar");
             Console.WriteLine("Container: " + container);
             Console.WriteLine("Input files from: " + input);
+            Console.WriteLine();
 
             PathValidator.ValidateFile(container);
             PathValidator.ValidateDirectory(input);

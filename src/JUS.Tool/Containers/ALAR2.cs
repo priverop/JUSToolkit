@@ -58,7 +58,7 @@ namespace JUSToolkit.Containers
         {
             foreach (Node nNew in Navigator.IterateNodes(filesToInsert.Root)) {
                 if (!nNew.IsContainer) {
-                    Console.WriteLine("Inserting " + nNew.Name);
+                    Console.WriteLine("Searching for " + nNew.Name + "...:");
                     InsertModification(nNew);
                 }
             }
@@ -74,6 +74,7 @@ namespace JUSToolkit.Containers
             uint nextFileOffset = 0;
             bool replaced = false;
 
+            Console.ForegroundColor = ConsoleColor.Green;
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
                     Alar2File alarFileOld = nOld.GetFormatAs<Alar2File>();
@@ -84,7 +85,7 @@ namespace JUSToolkit.Containers
                     }
 
                     if (parent == null && nOld.Name == nNew.Name) {
-                        Console.WriteLine("Replacing: " + nNew.Name);
+                        Console.WriteLine("✅Replacing: " + nNew.Name);
                         alarFileOld.ReplaceStream(nNew.Stream);
                         replaced = true;
                     }
@@ -98,9 +99,9 @@ namespace JUSToolkit.Containers
                     nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                 }
             }
-
+            Console.ResetColor();
             if (!replaced) {
-                Console.WriteLine($"{nNew.Name} node not found in the container");
+                Console.WriteLine($"❌ {nNew.Name} node not found in the container");
             }
         }
     }

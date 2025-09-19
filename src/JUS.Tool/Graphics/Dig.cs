@@ -158,12 +158,12 @@ namespace JUSToolkit.Graphics
         public ushort NumPaletteLines { get; set; }
 
         /// <summary>
-        /// Gets or sets the PaletteStart value.
+        /// Gets or sets the offset where the Palettes Section starts.
         /// </summary>
         public uint PaletteStart { get; set; }
 
         /// <summary>
-        /// Gets or sets the PixelsStart value.
+        /// Gets or sets the offset where the Pixels Section starts.
         /// </summary>
         public uint PixelsStart { get; set; }
 

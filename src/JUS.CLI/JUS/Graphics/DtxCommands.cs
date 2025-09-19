@@ -65,6 +65,8 @@ namespace JUSToolkit.CLI.JUS
             foreach (Node nodeSprite in dtx3.Children) {
                 nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
             }
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace JUSToolkit.CLI.JUS
 
             image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + "_tx.png"));
 
-            Console.WriteLine("Done");
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
