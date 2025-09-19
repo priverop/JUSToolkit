@@ -138,7 +138,7 @@ namespace JUS.Tool.Graphics.Converters
                 sprite.Segments.Add(segment);
 
                 if (SegmentsOutputPath != null) {
-                    ImageSegment2IndexedImage segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
+                    var segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
                         FullImage = fullImage,
                         IsTiled = true,
                     });
