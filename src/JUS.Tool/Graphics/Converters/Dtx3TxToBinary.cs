@@ -14,6 +14,11 @@ namespace JUS.Tool.Graphics.Converters
     /// </summary>
     public class Dtx3TxToBinary : IConverter<NodeContainerFormat, BinaryFormat>
     {
+        private const string Stamp = "DSTX";
+        private const int Version = 0x01;
+        private const int Type = 0x03;
+        private const int PointerOffset = 0x0A;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Dtx3TxToBinary"/> class.
         /// </summary>
@@ -52,16 +57,20 @@ namespace JUS.Tool.Graphics.Converters
             if (SegmentsMetadata == null) {
                 // Obtenemos el DSIG offset
                 reader.Stream.Position = 0x08;
-                uint dsigOffset = reader.ReadUInt16();
+                uint digOffset = reader.ReadUInt16();
                 reader.Stream.Position = 0;
 
                 // Escribimos todo hasta ese offset
-                writer.Write(reader.ReadBytes((int)dsigOffset));
+                writer.Write(reader.ReadBytes((int)digOffset));
             } else {
                 reader.Stream.Position = 0;
 
-                // We copy the first 10 bytes from the original dtx
-                writer.Write(reader.ReadBytes(10));
+                writer.Write(Stamp, false);
+                writer.WriteOfType<byte>((byte)Version);
+                writer.WriteOfType<byte>((byte)Type);
+                writer.WriteOfType<short>((short)SegmentsMetadata.Count);
+                writer.Stream.PushCurrentPosition();
+                writer.WriteOfType<short>((short)0x02); // we'll replace this later
 
                 long segmentInfoOffset = 2 * SegmentsMetadata.Count; // relative to 0x0A
 
@@ -76,10 +85,20 @@ namespace JUS.Tool.Graphics.Converters
                         writer.WriteOfType<ushort>((ushort)segment.TileIndex);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateX);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateY);
-                        writer.WriteOfType<byte>(GetSize(segment.Width, segment.Height));
+                        byte sizeValue = GetSize(segment.Width, segment.Height);
+                        byte flipValue = GetFlip(segment.HorizontalFlip, segment.VerticalFlip); // already shifted
+                        byte shapeValue = (byte)(sizeValue | flipValue);
+                        writer.WriteOfType<byte>(shapeValue);
                         writer.WriteOfType<sbyte>((sbyte)segment.PaletteIndex);
                     }
                 }
+
+                // Replace the DsigOffset
+                long dsigOffset = writer.Stream.Position;
+
+                writer.Stream.PopPosition();
+                writer.WriteOfType<short>((short)dsigOffset);
+                writer.Stream.Position = dsigOffset;
             }
 
             var imageReader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()

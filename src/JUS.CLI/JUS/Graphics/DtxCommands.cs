@@ -32,6 +32,7 @@ using Texim.Pixels;
 using Texim.Processing;
 using Texim.Sprites;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.Converters;
 using YamlDotNet.Serialization.NamingConventions;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -64,6 +65,8 @@ namespace JUSToolkit.CLI.JUS
             foreach (Node nodeSprite in dtx3.Children) {
                 nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
             }
+
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace JUSToolkit.CLI.JUS
 
             image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + "_tx.png"));
 
-            Console.WriteLine("Done");
+            Console.WriteLine("Done!");
         }
 
         /// <summary>
@@ -447,26 +450,30 @@ namespace JUSToolkit.CLI.JUS
         }
 
         /// <summary>
-        /// Export a the segments info from a .dtx file  a YAML metadata file.
+        /// Export the segments and the YAML from a .dtx file.
         /// </summary>
         /// <param name="dtx">The .dtx file.</param>
         /// <param name="output">The output folder.</param>
         /// <exception cref="FormatException"><paramref name="dtx"/> file doesn't have a valid format.</exception>
-        public static void ExportYamlDtx3(string dtx, string output)
+        public static void ExportDtx3Segments(string dtx, string output)
         {
-            Console.WriteLine("Exporting Dtx3 file with YAML metadata");
+            Console.WriteLine("Exporting Segments and YAML from Dtx3 file");
             Console.WriteLine("DTX: " + dtx);
 
             PathValidator.ValidateFile(dtx);
 
+            var converter = new BinaryToDtx3(output);
+
             // Sprites + pixels + palette
             using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<BinaryToDtx3>();
+                .TransformWith(converter);
 
             BinaryFormat segmentInfo = dtx3.Children["yaml"].GetFormatAs<BinaryFormat>();
 
             segmentInfo.Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)) + ".yaml");
+
+            Console.WriteLine("Done!");
         }
 
         private static List<SpriteDummy> GetYamlInfo(string path)

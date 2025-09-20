@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
+using Texim.Formats;
+using Texim.Images;
 using Texim.Pixels;
 using Texim.Sprites;
 using YamlDotNet.Serialization;
@@ -23,6 +25,25 @@ namespace JUS.Tool.Graphics.Converters
         private const int PointerOffset = 0x0A;
         private readonly Binary2Dig digConverter = new();
         private List<SpriteDummy> spriteCollection;
+
+        private string SegmentsOutputPath;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BinaryToDtx3"/> class.
+        /// </summary>
+        /// <param name="segmentsOutputPath">Path to export segments.</param>
+        public BinaryToDtx3(string segmentsOutputPath)
+        {
+            SegmentsOutputPath = segmentsOutputPath;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BinaryToDtx3"/> class.
+        /// </summary>
+        public BinaryToDtx3()
+        {
+            SegmentsOutputPath = null;
+        }
 
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a dtx3 <see cref="NodeContainerFormat"/>.
@@ -61,10 +82,10 @@ namespace JUS.Tool.Graphics.Converters
             for (int i = 0; i < numSprites; i++) {
                 switch (image.Swizzling) {
                     case DigSwizzling.Tiled:
-                        sprites.Root.Add(new Node($"sp_{i:00}", ReadSprite(reader)));
+                        sprites.Root.Add(new Node($"sp_{i:00}", ReadSprite(reader, image, i)));
                         break;
                     case DigSwizzling.Linear:
-                        sprites.Root.Add(new Node($"tx_{i:00}", ReadTexture(reader, image)));
+                        sprites.Root.Add(new Node($"tx_{i:00}", ReadTexture(reader, image, i)));
                         break;
                     default:
                         throw new FormatException("Invalid swizzling");
@@ -86,7 +107,7 @@ namespace JUS.Tool.Graphics.Converters
             return container;
         }
 
-        private Sprite ReadSprite(DataReader reader)
+        private Sprite ReadSprite(DataReader reader, Dig fullImage, int index)
         {
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
             reader.Stream.PushToPosition(spriteOffset);
@@ -115,6 +136,18 @@ namespace JUS.Tool.Graphics.Converters
                     Layer = numSegments - i,
                 };
                 sprite.Segments.Add(segment);
+
+                if (SegmentsOutputPath != null) {
+                    var segment2Indexed = new ImageSegment2IndexedImage(new ImageSegment2IndexedImageParams {
+                        FullImage = fullImage,
+                        IsTiled = true,
+                    });
+
+                    FullImage segmentImage = segment2Indexed.Convert(segment).CreateFullImage(fullImage, false);
+
+                    BinaryFormat pngSegment = new FullImage2Bitmap().Convert(segmentImage);
+                    pngSegment.Stream.WriteTo($"{SegmentsOutputPath}/segments/{index}_segment{i}.png");
+                }
             }
 
             sprite.Width = 256;
@@ -128,7 +161,7 @@ namespace JUS.Tool.Graphics.Converters
 
         // These false sprites (we call them Textures) have a Linear image, so we can't
         // use the Texim Sprite system. That's why we compose regular images.
-        private Dig ReadTexture(DataReader reader, Dig fullImage)
+        private Dig ReadTexture(DataReader reader, Dig fullImage, int index)
         {
             var frame = new Dig(fullImage) {
                 Pixels = new IndexedPixel[256 * 256],
@@ -139,7 +172,7 @@ namespace JUS.Tool.Graphics.Converters
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
             reader.Stream.PushToPosition(spriteOffset);
             ushort numSegments = reader.ReadUInt16();
-            SpriteDummy sprite = new SpriteDummy();
+            var sprite = new SpriteDummy();
 
             for (int i = 0; i < numSegments; i++) {
                 ushort tileIndex = reader.ReadUInt16();
@@ -151,6 +184,15 @@ namespace JUS.Tool.Graphics.Converters
                 (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
 
                 var segment = new Dig(fullImage, width, height, tileIndex);
+
+                if (SegmentsOutputPath != null) {
+                    var indexedImageParams = new IndexedImageBitmapParams {
+                        Palettes = segment,
+                    };
+
+                    BinaryFormat a = new IndexedImage2Bitmap(indexedImageParams).Convert(segment);
+                    a.Stream.WriteTo($"{SegmentsOutputPath}/segments/{index}_segment{i}.png");
+                }
 
                 frame.PasteImage(segment, xPos, yPos, hFlip, vFlip, paletteIndex);
 
@@ -180,18 +222,18 @@ namespace JUS.Tool.Graphics.Converters
             int[] sizes = new int[4] { 8, 16, 32, 64 };
 
             return shape switch {
-                0x00 => (sizes[0], sizes[0]),   // 1x1
-                0x01 => (sizes[1], sizes[1]),   // 2x2
-                0x02 => (sizes[2], sizes[2]),   // 4x4
-                0x03 => (sizes[3], sizes[3]),   // 8x8
-                0x04 => (sizes[1], sizes[0]),   // 2x1
-                0x05 => (sizes[2], sizes[0]),   // 4x1
-                0x06 => (sizes[2], sizes[1]),   // 4x2
-                0x07 => (sizes[3], sizes[2]),   // 8x4
-                0x08 => (sizes[0], sizes[1]),   // 1x2
-                0x09 => (sizes[0], sizes[2]),   // 1x4
-                0x0A => (sizes[1], sizes[2]),   // 2x4
-                0x0B => (sizes[2], sizes[3]),   // 4x8
+                0x00 => (sizes[0], sizes[0]),   // 1x1 tiles = 8x8 pixels
+                0x01 => (sizes[1], sizes[1]),   // 2x2 tiles = 16x16 pixels
+                0x02 => (sizes[2], sizes[2]),   // 4x4 tiles = 32x32 pixels
+                0x03 => (sizes[3], sizes[3]),   // 8x8 tiles = 64x64 pixels
+                0x04 => (sizes[1], sizes[0]),   // 2x1 tiles = 16x8 pixels
+                0x05 => (sizes[2], sizes[0]),   // 4x1 tiles = 32x8 pixels
+                0x06 => (sizes[2], sizes[1]),   // 4x2 tiles = 32x16 pixels
+                0x07 => (sizes[3], sizes[2]),   // 8x4 tiles = 64x32 pixels
+                0x08 => (sizes[0], sizes[1]),   // 1x2 tiles = 8x16 pixels
+                0x09 => (sizes[0], sizes[2]),   // 1x4 tiles = 8x32 pixels
+                0x0A => (sizes[1], sizes[2]),   // 2x4 tiles = 16x32 pixels
+                0x0B => (sizes[2], sizes[3]),   // 4x8 tiles = 32x64 pixels
                 _ => throw new FormatException($"Unknown size: 0x{shape:X2}")
             };
         }

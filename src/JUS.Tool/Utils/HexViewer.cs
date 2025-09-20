@@ -20,7 +20,7 @@
 using System.IO;
 using System.Text;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUSToolkit.Utils
 {
     /// <summary>
     /// Hex and ascii viewer by Pleonex.
