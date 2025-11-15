@@ -11,6 +11,11 @@
         public static readonly int EntrySize = 0xC;
 
         /// <summary>
+        /// Length of each line in the game.
+        /// </summary>
+        public static readonly int LineLength = 17;
+
+        /// <summary>
         /// Gets or sets the name.
         /// </summary>
         public string Name { get; set; }

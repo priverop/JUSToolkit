@@ -17,6 +17,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
+
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
@@ -63,7 +65,16 @@ namespace JUSToolkit.Texts.Converters
 
             for (int i = 0; i < po.Entries.Count; i++) {
                 entry = new KomatxtEntry();
-                entry.Name = Table.Instance.Encode(po.Entries[i].Text);
+                string sentence = Table.Instance.Encode(po.Entries[i].Text);
+
+                if (sentence.Length > KomatxtEntry.LineLength) {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"❌ Limit of {KomatxtEntry.LineLength} chars reached: {sentence}.");
+                    Console.ResetColor();
+                    break;
+                }
+
+                entry.Name = AdjustLength(sentence);
 
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
                 entry.Unk1 = int.Parse(metadata[0]);
@@ -73,6 +84,18 @@ namespace JUSToolkit.Texts.Converters
             }
 
             return komatxt;
+        }
+
+        /// <summary>
+        /// Each line needs to be 17 character long, with no spaces.
+        /// </summary>
+        /// <param name="string">Line to clean.</param>
+        /// <returns>Transformed string.</returns>
+        private string AdjustLength(string input)
+        {
+            char paddingChar = '|';
+
+            return input.Replace(" ", paddingChar.ToString()).PadRight(KomatxtEntry.LineLength, paddingChar);
         }
     }
 }
