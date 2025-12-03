@@ -11,7 +11,7 @@ clear
 # DEBUG mode
 # ----------------------------
 DEBUG=false
-if [ "$1" == "debug" ]; then
+if [ "${1:-}" == "debug" ]; then
     DEBUG=true
     echo "DEBUG mode activated"
 fi
@@ -26,7 +26,7 @@ BASE_DIR="$(dirname "$SCRIPT_DIR")"
 JUS_PATH="$BASE_DIR/src/JUS.CLI"
 # Absolute path for the beta root directory. 
 # In this directory we will have the Weblate git repository, a folder for the generated .bin and another folder for the Demos (DEMO_PATH).
-BETA_PATH='/'
+BETA_PATH='/' # -------------------------> MODIFY THIS ONE
 # Weblate git directory
 GIT_REPO_PATH=$BETA_PATH'/jus-translation-repo'
 # Directory where the demo will be saved
