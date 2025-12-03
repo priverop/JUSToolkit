@@ -62,12 +62,13 @@ namespace JUSToolkit.Texts.Converters
             string[] metadata;
 
             for (int i = 0; i < po.Entries.Count; i++) {
-                entry = new KomatxtEntry();
-                entry.Name = Table.Instance.Encode(po.Entries[i].Text);
-
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
-                entry.Unk1 = int.Parse(metadata[0]);
-                entry.Unk2 = int.Parse(metadata[1]);
+
+                entry = new KomatxtEntry {
+                    Name = Table.Instance.Encode(po.Entries[i].Text),
+                    Unk1 = int.Parse(metadata[0]),
+                    Unk2 = int.Parse(metadata[1]),
+                };
 
                 komatxt.Entries.Add(entry);
             }
