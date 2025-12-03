@@ -99,13 +99,13 @@ namespace JUSToolkit.Texts.Converters
         /// <summary>
         /// Each line needs to be 17 character long, with no spaces.
         /// </summary>
-        /// <param name="string">Line to clean.</param>
+        /// <param name="input">Line to clean.</param>
         /// <returns>Transformed string.</returns>
-        private string AdjustLength(string input)
+        private static string AdjustLength(string input)
         {
-            char paddingChar = '|';
+            const char PADDING_CHAR = '|';
 
-            return input.Replace(" ", paddingChar.ToString()).PadRight(KomatxtEntry.LineLength, paddingChar);
+            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(KomatxtEntry.LineLength, PADDING_CHAR);
         }
     }
 }
