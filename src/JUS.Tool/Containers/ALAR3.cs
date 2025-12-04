@@ -95,16 +95,14 @@ namespace JUSToolkit.Containers
                         alarFileOld.Offset = nextFileOffset;
                     }
 
-                    if (parent == null && nOld.Name == nNew.Name) {
+                    // Search for the specific file in case there are more than one in different directories
+                    // That's why specify the parent (directory name)
+                    bool shouldReplace = nOld.Name == nNew.Name && (parent == null || parent == nOld.Parent.Name);
+
+                    if (shouldReplace) {
                         Console.WriteLine("Replacing: " + nNew.Name);
                         alarFileOld.ReplaceStream(nNew.Stream);
                         replaced = true;
-                    }
-
-                    // Search for the specific file in case there are more than one in different directories
-                    // That's why specify the parent (directory name)
-                    else if (parent != null && parent == nOld.Parent.Name && nOld.Name == nNew.Name) {
-                        alarFileOld.ReplaceStream(nNew.Stream);
                     }
 
                     nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
