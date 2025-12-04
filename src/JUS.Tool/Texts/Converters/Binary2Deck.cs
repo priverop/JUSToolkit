@@ -63,7 +63,7 @@ namespace JUSToolkit.Texts.Converters
         public BinaryFormat Convert(Deck deck)
         {
             var bin = new BinaryFormat();
-            DataWriter writer = new DataWriter(bin.Stream) {
+            var writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 

@@ -19,6 +19,11 @@ namespace JUSToolkit.Texts.Formats
         public readonly int FileSize = 0x5C; // 92
 
         /// <summary>
+        /// Gets the Maximum length of the lines.
+        /// </summary>
+        public static readonly int LineLength = 26;
+
+        /// <summary>
         /// Gets or sets the Name of the Deck.
         /// </summary>
         public string Name { get; set; }

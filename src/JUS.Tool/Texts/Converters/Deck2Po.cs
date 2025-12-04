@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System;
 using JUSToolkit.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -60,14 +61,35 @@ namespace JUSToolkit.Texts.Converters
         {
             var container = new NodeContainerFormat();
             foreach (PoEntry entry in po.Entries) {
+                string sentence = Table.Instance.Encode(entry.Text);
+
+                if (sentence.Length > Deck.LineLength) {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"❌ Limit of {Deck.LineLength} chars reached: {sentence}.");
+                    Console.ResetColor();
+                    break;
+                }
+
                 var deck = new Deck() {
-                    Name = Table.Instance.Encode(entry.Text),
+                    Name = AdjustLength(sentence),
                     Header = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
                 container.Root.Add(new Node(entry.Context, deck));
             }
 
             return container;
+        }
+
+        /// <summary>
+        /// Each line needs to be 26 character long, with no spaces.
+        /// </summary>
+        /// <param name="input">Line to clean.</param>
+        /// <returns>Transformed string.</returns>
+        private static string AdjustLength(string input)
+        {
+            const char PADDING_CHAR = '|';
+
+            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(Deck.LineLength, PADDING_CHAR);
         }
     }
 }
