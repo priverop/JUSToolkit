@@ -56,13 +56,19 @@ namespace JUSToolkit.Graphics.Converters
             int width = reader.ReadUInt16();
             int height = reader.ReadUInt16();
             uint pixelsStart = (uint)((numPaletteLines * 0x20) + 0xC);
-            var bpp = (DigBpp)(imageFormat & 0x0F);
+
+            DigBpp bpp = GetImageDepth(imageFormat);
             var swizzling = (DigSwizzling)(imageFormat >> 4);
             IIndexedPixelEncoding pixelEncoding;
             int colorsPerPalette;
             int numPalettes;
 
             switch (bpp) {
+                case DigBpp.Bpp2:
+                    pixelEncoding = Indexed2Bpp.Instance;
+                    colorsPerPalette = 16; // ToDo: 4 colors? 8bytes
+                    numPalettes = numPaletteLines;
+                    break;
                 case DigBpp.Bpp4:
                     pixelEncoding = Indexed4Bpp.Instance;
                     colorsPerPalette = 16;
@@ -83,7 +89,7 @@ namespace JUSToolkit.Graphics.Converters
                 height = bpp switch {
                     DigBpp.Bpp4 => (int)(source.Stream.Length - pixelsStart) / 4,
                     DigBpp.Bpp8 => (int)(source.Stream.Length - pixelsStart) / 8,
-                    _ => throw new FormatException("Invalid bpp"),
+                    _ => throw new FormatException("Invalid bpp for swizzling"),
                 };
             }
 
@@ -94,11 +100,17 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             source.Stream.Position = pixelsStart;
+            DataStream pixelsData = source.Stream;
+
+            // If the Dsig is 0x50, pixels are compressed
+            if (imageFormat == 0x50) {
+                pixelsData = new LzssDecompression().Convert(pixelsData);
+            }
 
             IndexedPixel[] pixels = swizzling switch {
-                DigSwizzling.Tiled => pixelEncoding.Decode(source.Stream, width * height)
+                DigSwizzling.Tiled => pixelEncoding.Decode(pixelsData, width * height)
                         .UnswizzleWith(new TileSwizzling<IndexedPixel>(width)),
-                DigSwizzling.Linear => pixelEncoding.Decode(source.Stream, width * height),
+                DigSwizzling.Linear => pixelEncoding.Decode(pixelsData, width * height),
                 _ => throw new FormatException("Invalid swizzling"),
             };
 
@@ -113,11 +125,17 @@ namespace JUSToolkit.Graphics.Converters
                 Bpp = bpp,
                 Swizzling = swizzling,
             };
+
             foreach (IPalette p in palettes.Palettes) {
                 dig.Palettes.Add(p);
             }
 
             return dig;
+        }
+
+        private DigBpp GetImageDepth(byte imageFormat)
+        {
+            return imageFormat == 0x50 ? DigBpp.Bpp2 : (DigBpp)(imageFormat & 0x0F);
         }
     }
 }

@@ -23,6 +23,11 @@ namespace JUSToolkit.Graphics
         /// 8 bpp mode.
         /// </summary>
         Bpp8 = 1,
+
+        /// <summary>
+        /// 2 bpp mode.
+        /// </summary>
+        Bpp2 = 2,
     }
 
     /// <summary>
