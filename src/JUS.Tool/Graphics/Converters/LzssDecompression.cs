@@ -30,6 +30,30 @@ namespace JUSToolkit.Graphics.Converters
     public class LzssDecompression :
         IConverter<IBinary, BinaryFormat>
     {
+
+        /// <summary>
+        /// Tells the converter to remove the first 4bytes of the Stream (magic ID).
+        /// </summary>
+        private readonly bool RemoveMagid;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LzssDecompression"/> class.
+        /// </summary>
+        public LzssDecompression()
+        {
+            RemoveMagid = true;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LzssDecompression"/> class with RemoveMagid param.
+        /// </summary>
+        /// <param name="removeMagid">True if the converter should remove the first 4 bytes.</param>
+        public LzssDecompression(bool removeMagid)
+        {
+            ArgumentNullException.ThrowIfNull(removeMagid);
+            RemoveMagid = removeMagid;
+        }
+
         /// <summary>
         /// Decompress a LZSS compressed IBinary stream.
         /// </summary>
@@ -55,8 +79,9 @@ namespace JUSToolkit.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            // Discard the first 4 bytes of the header (the DSCP magic ID)
-            return LzssUtils.Lzss(new DataStream(source, 4, source.Length - 4), "-d");
+            DataStream data = RemoveMagid ? new DataStream(source, 4, source.Length - 4) : new DataStream(source);
+
+            return LzssUtils.Lzss(data, "-d");
         }
     }
 }
