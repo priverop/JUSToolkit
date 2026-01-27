@@ -3,15 +3,16 @@
 DTX files contains sprites used in animations and UI layers. 
 
 ## Sprite Types 
-We have some types:
 
-- Type 01: Unknown format.
-- Type 02: Unknown format.
-- Type 03: Sprites or Textures. Most of the images are in this format. Images for menus, overlays...
-- Type 04: Komas. The characters of your deck.
-- Type 05: Unknown format.
-- Type 06: Unknown format.
-- Type 83: The DSIG is separated in a single file.
+DTX can be Type/Version 01 or 02. Subversion can be 03, 04 or 83. These are the combinations:
+
+- Type 01 03: Sprites (tiled) or Textures (linear). Most of the images are in this format. Images for menus, overlays...
+- Type 02 03: Textures (linear) for battle attacks.
+- Type 01 04: Komas. The characters of your deck.
+- Type 01 05: Unknown format.
+- Type 01 06: Unknown format.
+- Type 01 83: Battle attacks. The DSIG is separated in a single file.
+- Type 02 83: Battle attacks. The DSIG is separated in a single file.
 
 ## Tools and Specifications
 
@@ -21,7 +22,7 @@ In Ubuntu, copy it to `/usr/share/imhex/pattern` for automatic file recognition.
 
 ### Tinke Workflow:
 
-You can use my [Tinke branch](https://github.com/priverop/tinke/tree/feat/jus_dtx) to automatically watch DTX files. If you don't have it, follow these instructions:
+You can use my [Tinke branch](https://github.com/priverop/tinke/tree/feat/jus_dtx) to automatically watch some of the DTX files. If you don't have it, follow these instructions:
 
 1. Open the DTX file and decompress/unpack if necessary (pressing "D").
 2. View as Palette: DSIG offset + 0xC (16). This can vary, look for the "E0" byte.
@@ -33,7 +34,7 @@ Example: `Commu/commu_pack.aar -> leader00.dtx`
 - Palette offset: 0x264
 - Tile offset: 0x304 
 
-### DTX 03
+### DTX 01 03 (1.3)
 
 | Offset | Type                        | Description        |
 | ------ | --------------------------- | ------------------ |
@@ -73,9 +74,9 @@ Offsets are relative to position 0xA (10). Absolute address = 0xA + offset.
 
 *More info at the bottom of the document.
 
-### Image Types (DTX03)
+#### Image Types (DTX1.3)
 
-DTX03 supports two image modes based on the swizzling:
+DTX1.3 supports two image modes based on the swizzling:
 - **Tiled ("sp")**: Regular sprites compatible with Texim's sprite system. The base DSIG is tiled.
 - **Linear ("tx")**: Textures stored as sprites. The base DSIG is linear.
 
@@ -107,9 +108,29 @@ Row 2: [64][65]← HERE [66][67]...[95]
 
 The tile coordinates are (8, 16) to (15, 23).
 
-### DTX 04 - Komas
+### DTX 02 03 (2.3)
 
-Ver [Koma Specification](Koma-Specification.md) para más detalles.
+This format is pretty similar to 1.3tx. Let's see the differences:
+
+- After each segment we have coordinates to check the top left pixel and the bottom right pixel. I guess it's a check to see if everything is well built.
+- Shape has a bit to check if it's 2bpp or not. 
+- The DSIG has a byte (0x50) after the MAGIC and the Version (0x01). We don't know what is it. ImageFormat? Review.
+- Palettes are 8bytes (2bpp has 4 colors of 2 bytes), althought the space is still 32 bytes.
+- Compression. After the palettes we have a 0x10 byte, that's the LZSS compression header.
+
+Check the [Hexpat](./hexpat/dtx.hexpat) for the specification. 
+
+#### Shape
+
+Shape = 0x42 means 0100 0010. That 01 means that is 2bpp (if not, it will be 00), the next two bits are the flip transformations (false), and the four left 0010 = 2, so 4x4.
+
+Shape = 0x65 means 0110 0101 -> 01 - 2bpp, 10 (2) - vertical flip, 0101 -> 05, then 32x8.
+
+Shape = 0x75 means 0111 0101 -> 2bpp, horizontal and vertical flips, 32x8.
+
+### DTX 01 04 (1.4) - Komas
+
+See [Koma Specification](Koma-Specification.md) for more details.
 
 | Offset | Type    | Description                                             |
 | ------ | ------- | ------------------------------------------------------- |
