@@ -17,7 +17,6 @@ namespace JUS.Tool.Graphics.Converters
     /// </summary>
     public class BinaryToDtx3 : IConverter<IBinary, NodeContainerFormat>
     {
-        private const string Stamp = "DSTX";
         private const int Version = 0x01;
         private const int Type = 0x03;
         private const int PointerOffset = 0x0A;
@@ -36,15 +35,13 @@ namespace JUS.Tool.Graphics.Converters
             var reader = new DataReader(source.Stream);
             source.Stream.Position = 0;
 
-            if (reader.ReadString(4) != Stamp) {
+            if (reader.ReadString(4) != Dtx3.STAMP) {
                 throw new FormatException("Invalid stamp");
             }
 
-            int version = reader.ReadByte();
-            int type = reader.ReadByte();
-
-            if (version != Version || type != Type) {
-                throw new FormatException($"Invalid version/type: {version}.{type}");
+            var version = new Version(reader.ReadByte(), reader.ReadByte());
+            if (!Dtx3.SupportedVersions.Contains(version)) {
+                throw new FormatException($"Unsupported version: {version:X}");
             }
 
             ushort numSprites = reader.ReadUInt16();
