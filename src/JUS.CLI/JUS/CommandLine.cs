@@ -96,12 +96,18 @@ namespace JUSToolkit.CLI.JUS
             };
             importDtx3Tx.Handler = CommandHandler.Create<string, string, string, string>(DtxCommands.ImportDtx3Tx);
 
-            var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
+            var exportDsigAlmt = new Command("export-dig-atm", "Export dsig+almt") {
                 new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
                 new Option<string>("--atm", "the input map.atm file", ArgumentArity.ExactlyOne),
                 new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
             };
-            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(DigCommands.ExportDig);
+            exportDsigAlmt.Handler = CommandHandler.Create<string, string, string>(DigCommands.ExportDigAtm);
+
+            var exportDsig = new Command("export-dig", "Export dsig") {
+                new Option<string>("--dig", "the input file.dig", ArgumentArity.ExactlyOne),
+                new Option<string>("--output", "the output folder", ArgumentArity.ExactlyOne),
+            };
+            exportDsig.Handler = CommandHandler.Create<string, string>(DigCommands.ExportDig);
 
             var importDig = new Command("import-dig", "Import dsig+almt") {
                 new Option<string>("--input", "the png to import", ArgumentArity.ExactlyOne),
@@ -137,6 +143,7 @@ namespace JUSToolkit.CLI.JUS
                 importDtx3Tx,
                 importDtx4,
                 exportDsigAlmt,
+                exportDsig,
                 importDig,
                 mergeDig,
             };

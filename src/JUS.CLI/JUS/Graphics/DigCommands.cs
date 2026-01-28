@@ -24,6 +24,7 @@ using JUSToolkit.Graphics.Converters;
 using Texim.Compressions.Nitro;
 using Texim.Formats;
 using Texim.Images;
+using Texim.Palettes;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -40,7 +41,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="dig">The file.dig.</param>
         /// <param name="atm">The map.atm file.</param>
         /// <param name="output">The output folder.</param>
-        public static void ExportDig(string dig, string atm, string output)
+        public static void ExportDigAtm(string dig, string atm, string output)
         {
             using Node mapsNode = NodeFactory.FromFile(atm, FileOpenMode.Read);
 
@@ -50,6 +51,25 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith(binaryDig2Bitmap);
 
             pixelsPaletteNode.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(mapsNode.Name) + ".png"));
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Export an uncompressed DSIG into a PNG.
+        /// </summary>
+        /// <param name="dig">The file.dig.</param>
+        /// <param name="output">The output folder.</param>
+        public static void ExportDig(string dig, string output)
+        {
+            Dig digFormat = NodeFactory.FromFile(dig, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Dig>()
+                .GetFormatAs<Dig>();
+
+            BinaryFormat bitmap = new IndexedImage2Bitmap(digFormat).Convert(digFormat);
+
+            bitmap.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dig) + ".png"));
 
             Console.WriteLine("Done!");
         }
