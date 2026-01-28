@@ -195,7 +195,11 @@ namespace JUS.Tool.Graphics.Converters
 
         private (bool hFlip, bool vFlip) GetFlip(int shape)
         {
-            return shape switch {
+            // Get the last 2 bits
+            // because the first 2 are for 2bpp
+            int lastBits = shape & 0x03;
+
+            return lastBits switch {
                 0x00 => (false, false),
                 0x01 => (true, false),
                 0x02 => (false, true),

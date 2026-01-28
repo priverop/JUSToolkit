@@ -58,7 +58,7 @@ namespace JUSToolkit.Graphics.Converters
             uint pixelsStart = (uint)((numPaletteLines * 0x20) + 0xC);
 
             DigBpp bpp = GetImageDepth(imageFormat);
-            var swizzling = (DigSwizzling)(imageFormat >> 4);
+            var swizzling = GetSwizzlingType(imageFormat);
             IIndexedPixelEncoding pixelEncoding;
             int colorsPerPalette;
             int numPalettes;
@@ -100,11 +100,11 @@ namespace JUSToolkit.Graphics.Converters
             }
 
             source.Stream.Position = pixelsStart;
-            DataStream pixelsData = source.Stream;
+            var pixelsData = new DataStream(source.Stream, pixelsStart, source.Stream.Length - pixelsStart);
 
             // If the Dsig is 0x50, pixels are compressed
             if (imageFormat == 0x50) {
-                pixelsData = new LzssDecompression().Convert(pixelsData);
+                pixelsData = new LzssDecompression(false).Convert(pixelsData);
             }
 
             IndexedPixel[] pixels = swizzling switch {
@@ -136,6 +136,11 @@ namespace JUSToolkit.Graphics.Converters
         private DigBpp GetImageDepth(byte imageFormat)
         {
             return imageFormat == 0x50 ? DigBpp.Bpp2 : (DigBpp)(imageFormat & 0x0F);
+        }
+
+        private DigSwizzling GetSwizzlingType(byte imageFormat)
+        {
+            return imageFormat == 0x50 ? DigSwizzling.Linear : (DigSwizzling)(imageFormat >> 4);
         }
     }
 }

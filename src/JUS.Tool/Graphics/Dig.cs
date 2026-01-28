@@ -113,6 +113,14 @@ namespace JUSToolkit.Graphics
             Height = height;
             Width = width;
             switch (dig.Bpp) {
+                case DigBpp.Bpp2:
+                    encoding = Indexed2Bpp.Instance;
+                    size = width * height / 4; // 4 píxeles por byte
+                    nWidth = width / 4;
+                    totalWidth = dig.Width / 4;
+                    yTileIndex = tileIndex / (totalWidth / 2) * 8; // 2 bytes por tile horizontal (8px / 4px/byte)
+                    xTileIndex = (tileIndex % (totalWidth / 2)) * 2; // 8 píxeles de alto por tile
+                    break;
                 case DigBpp.Bpp4:
                     encoding = Indexed4Bpp.Instance;
                     size = width * height / 2;
