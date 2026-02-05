@@ -10,43 +10,6 @@ using Yarhl.FileFormat;
 namespace JUSToolkit.Graphics
 {
     /// <summary>
-    /// Bpp of a <see cref="Dig"/> image.
-    /// </summary>
-    public enum DigBpp
-    {
-        /// <summary>
-        /// 4 bpp mode.
-        /// </summary>
-        Bpp4 = 0,
-
-        /// <summary>
-        /// 8 bpp mode.
-        /// </summary>
-        Bpp8 = 1,
-
-        /// <summary>
-        /// 2 bpp mode.
-        /// </summary>
-        Bpp2 = 2,
-    }
-
-    /// <summary>
-    /// Swizzling of a <see cref="Dig"/> image.
-    /// </summary>
-    public enum DigSwizzling
-    {
-        /// <summary>
-        /// Tiled swizzling
-        /// </summary>
-        Tiled = 1,
-
-        /// <summary>
-        /// Linear swizzling
-        /// </summary>
-        Linear = 2,
-    }
-
-    /// <summary>
     /// Image format.
     /// </summary>
     public class Dig : IndexedPaletteImage
@@ -98,61 +61,34 @@ namespace JUSToolkit.Graphics
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Dig"/> class creating a subimage.
+        /// Initializes a new instance of the <see cref="Dig"/> class creating a subimage (segment).
         /// </summary>
-        /// <param name="dig"><see cref="Dig"/> image to create subimage from.</param>
-        /// <param name="width">Width of the subimage.</param>
-        /// <param name="height">Height of the subimage.</param>
-        /// <param name="tileIndex">Tile index where the subimage starts from.</param>
-        /// <exception cref="FormatException"><paramref name="dig"/> doesn't have a valid format.</exception>
-        public Dig(Dig dig, int width, int height, int tileIndex)
-            : this(dig)
+        /// <param name="baseImage"><see cref="Dig"/> image to create subimage from.</param>
+        /// <param name="segmentWidth">Width of the subimage.</param>
+        /// <param name="segmentHeight">Height of the subimage.</param>
+        /// <param name="startTileIndex">Tile index where the subimage starts from.</param>
+        public Dig(Dig baseImage, int segmentWidth, int segmentHeight, int startTileIndex)
+            : this(baseImage)
         {
-            IIndexedPixelEncoding encoding;
-            int size, totalWidth, nWidth, xTileIndex, yTileIndex;
-            Height = height;
-            Width = width;
-            switch (dig.Bpp) {
-                case DigBpp.Bpp2:
-                    encoding = Indexed2Bpp.Instance;
-                    size = width * height / 4; // 4 píxeles por byte
-                    nWidth = width / 4;
-                    totalWidth = dig.Width / 4;
-                    yTileIndex = tileIndex / (totalWidth / 2) * 8; // 2 bytes por tile horizontal (8px / 4px/byte)
-                    xTileIndex = (tileIndex % (totalWidth / 2)) * 2; // 8 píxeles de alto por tile
-                    break;
-                case DigBpp.Bpp4:
-                    encoding = Indexed4Bpp.Instance;
-                    size = width * height / 2;
-                    nWidth = width / 2;
-                    totalWidth = dig.Width / 2;
-                    yTileIndex = tileIndex / (totalWidth / 4) * 8;
-                    xTileIndex = (tileIndex % (totalWidth / 4)) * 4;
-                    break;
-                case DigBpp.Bpp8:
-                    encoding = Indexed4Bpp.Instance;
-                    size = width * height;
-                    nWidth = width;
-                    totalWidth = dig.Width;
-                    xTileIndex = (tileIndex % (totalWidth / 8)) * 8;
-                    yTileIndex = dig.Height / (totalWidth / 8) * 8;
-                    break;
-                default:
-                    throw new FormatException($"Invalid bpp: {dig.Bpp}");
-            }
+            IIndexedPixelEncoding encoding = DigExtension.GetEncoding(baseImage.Bpp);
 
-            byte[] rawPixels = new byte[size];
-            byte[] encoded = encoding.Encode(dig.Pixels);
+            Height = segmentHeight;
+            Width = segmentWidth;
+            DigExtension.DigSubimageParams digSubimageParams = DigExtension.GetSubImageParams(baseImage, segmentWidth, segmentHeight, startTileIndex);
 
+            byte[] subImagePixels = new byte[digSubimageParams.SubImageSizeInBytes];
+            byte[] encoded = encoding.Encode(baseImage.Pixels);
+
+            // TODO: Hay que usar el código de Texim para simplificar
             int idx = 0;
             for (int y = 0; y < Height; y++) {
-                for (int x = 0; x < nWidth; x++) {
-                    int fullIndex = ((y + yTileIndex) * totalWidth) + x + xTileIndex;
-                    rawPixels[idx++] = encoded[fullIndex];
+                for (int x = 0; x < digSubimageParams.SubImageWidthInBytes; x++) {
+                    int fullIndex = ((y + digSubimageParams.YTileIndex) * digSubimageParams.BaseImageWidthInBytes) + x + digSubimageParams.XTileIndex;
+                    subImagePixels[idx++] = encoded[fullIndex];
                 }
             }
 
-            Pixels = encoding.Decode(rawPixels);
+            Pixels = encoding.Decode(subImagePixels);
         }
 
         /// <summary>
@@ -191,7 +127,7 @@ namespace JUSToolkit.Graphics
         public DigSwizzling Swizzling { get; set; }
 
         /// <summary>
-        /// Paste a <see cref="Dig"/> subimage into this <see cref="Dig"/>.
+        /// Paste a <see cref="Dig"/> subimage into this <see cref="Dig"/>. CopySegment in Texim.
         /// </summary>
         /// <param name="subimage"><see cref="Dig"/> subimage.</param>
         /// <param name="xPos">Starting X position where the subimage will be pasted.</param>
