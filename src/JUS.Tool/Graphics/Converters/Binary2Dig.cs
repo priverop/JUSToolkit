@@ -104,6 +104,7 @@ namespace JUSToolkit.Graphics.Converters
 
             // If the Dsig is 0x50, pixels are compressed
             if (imageFormat == 0x50) {
+                width *= 2; // the width in the file is fake!
                 pixelsData = new LzssDecompression(false).Convert(pixelsData);
             }
 
