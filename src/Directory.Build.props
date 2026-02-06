@@ -10,7 +10,7 @@
         <!-- Due to known issues, .NET 6 SDK may give a false warning
              when packing apps if the SelfContained value is in the csproj
              instead in the CLI command. -->
-        <NoWarn>NETSDK1179;NU1507;IDE0058;SA1010;SA1000</NoWarn>
+        <NoWarn>NETSDK1179;NU1507;IDE0058;SA1010;SA1000;IDE0047</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
