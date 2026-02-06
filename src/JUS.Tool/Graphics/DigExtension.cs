@@ -41,7 +41,7 @@ namespace JUSToolkit.Graphics
     }
 
     // To work with subimages
-    public class DigExtension
+    public static class DigExtension
     {
         public readonly struct DigSubimageParams
         {
@@ -54,6 +54,17 @@ namespace JUSToolkit.Graphics
             public int XTileIndex { get; init; }
 
             public int YTileIndex { get; init; }
+        }
+
+        public static void CopySubImage<T>(T[] source, T[] destination, int sourceWidth, int startX, int startY, int width, int height)
+        {
+            int idx = 0;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int fullIndex = ((startY + y) * sourceWidth) + startX + x;
+                    destination[idx++] = source[fullIndex];
+                }
+            }
         }
 
         public static IIndexedPixelEncoding GetEncoding(DigBpp bpp)

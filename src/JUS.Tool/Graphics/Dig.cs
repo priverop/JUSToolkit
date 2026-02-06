@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Texim.Compressions.Nitro;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
-using Yarhl.FileFormat;
 
 namespace JUSToolkit.Graphics
 {
@@ -79,14 +77,15 @@ namespace JUSToolkit.Graphics
             byte[] subImagePixels = new byte[digSubimageParams.SubImageSizeInBytes];
             byte[] encoded = encoding.Encode(baseImage.Pixels);
 
-            // TODO: Hay que usar el código de Texim para simplificar
-            int idx = 0;
-            for (int y = 0; y < Height; y++) {
-                for (int x = 0; x < digSubimageParams.SubImageWidthInBytes; x++) {
-                    int fullIndex = ((y + digSubimageParams.YTileIndex) * digSubimageParams.BaseImageWidthInBytes) + x + digSubimageParams.XTileIndex;
-                    subImagePixels[idx++] = encoded[fullIndex];
-                }
-            }
+            DigExtension.CopySubImage(
+                encoded,
+                subImagePixels,
+                digSubimageParams.BaseImageWidthInBytes,
+                digSubimageParams.XTileIndex,
+                digSubimageParams.YTileIndex,
+                digSubimageParams.SubImageWidthInBytes,
+                Height
+            );
 
             Pixels = encoding.Decode(subImagePixels);
         }
