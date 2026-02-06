@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using SixLabors.ImageSharp;
 using Texim.Compressions.Nitro;
+using Texim.Formats;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -68,26 +70,17 @@ namespace JUSToolkit.Graphics
         public Dig(Dig baseImage, int segmentWidth, int segmentHeight, int startTileIndex)
             : this(baseImage)
         {
-            IIndexedPixelEncoding encoding = DigExtension.GetEncoding(baseImage.Bpp);
+            // (tile index / tilesPerRow) * tileWidth
+            Size tileSize = new(8, 8);
+            int tilesPerRow = baseImage.Width / tileSize.Width;
+            int startX = (startTileIndex % tilesPerRow) * tileSize.Width;
+            int startY = (startTileIndex / tilesPerRow) * tileSize.Height;
 
-            Height = segmentHeight;
-            Width = segmentWidth;
-            DigExtension.DigSubimageParams digSubimageParams = DigExtension.GetSubImageParams(baseImage, segmentWidth, segmentHeight, startTileIndex);
+            IndexedImage subimage = baseImage.SubImages(startX, startY, segmentWidth, segmentHeight);
 
-            byte[] subImagePixels = new byte[digSubimageParams.SubImageSizeInBytes];
-            byte[] encoded = encoding.Encode(baseImage.Pixels);
-
-            DigExtension.CopySubImage(
-                encoded,
-                subImagePixels,
-                digSubimageParams.BaseImageWidthInBytes,
-                digSubimageParams.XTileIndex,
-                digSubimageParams.YTileIndex,
-                digSubimageParams.SubImageWidthInBytes,
-                Height
-            );
-
-            Pixels = encoding.Decode(subImagePixels);
+            Height = subimage.Height;
+            Width = subimage.Width;
+            Pixels = subimage.Pixels;
         }
 
         /// <summary>
