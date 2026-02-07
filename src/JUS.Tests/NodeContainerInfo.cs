@@ -42,6 +42,10 @@ namespace JUSToolkit.Tests
 
         public Collection<NodeContainerInfo> Children { get; set; }
 
+        public long Length { get; set; }
+
+        public string Sha256 { get; set; }
+
         /// <summary>
         /// Gets the info from the Yaml file into the NodeContainerInfo object.
         /// </summary>

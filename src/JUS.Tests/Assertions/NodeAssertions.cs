@@ -40,6 +40,14 @@ namespace JUSToolkit.Tests.Assertions
             Subject.Name.Should().Be(info.Name);
             Subject.Format?.GetType().FullName.Should().Be(info.FormatType);
 
+            if (info.Length != 0) {
+                Subject.Stream.Length.Should().Be(info.Length);
+            }
+
+            if (!string.IsNullOrEmpty(info.Sha256)) {
+                HaveSha256(info.Sha256);
+            }
+
             if (info.Tags != null) {
                 // YAML deserializer always gets the value as a string
                 foreach (System.Collections.Generic.KeyValuePair<string, object> entry in info.Tags) {
@@ -65,6 +73,13 @@ namespace JUSToolkit.Tests.Assertions
                 }
             }
 
+            return new AndConstraint<NodeAssertions>(this);
+        }
+
+        [CustomAssertion]
+        public AndConstraint<NodeAssertions> HaveSha256(string hash)
+        {
+            Subject.Stream.Should().HaveSha256(hash);
             return new AndConstraint<NodeAssertions>(this);
         }
     }

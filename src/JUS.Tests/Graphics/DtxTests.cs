@@ -280,6 +280,7 @@ namespace JUSToolkit.Tests.Graphics
         }
 
         [TestCaseSource(nameof(GetDtx3Files))]
+        [TestCaseSource(nameof(GetDtx3TxFiles))]
         public void DeserializeDtx3AndCheckFileHash(string infoPath, string dtxPath)
         {
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
@@ -396,6 +397,7 @@ namespace JUSToolkit.Tests.Graphics
             };
             for (int i = 0; i < newDtx.Root.Children["sprites"].Children.Count; i++) {
                 var spriteNode = newDtx.Root.Children["sprites"].Children[i];
+
                 // Cloning the node so we can transform it
                 var pngNode = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
                             .TransformWith(new Sprite2IndexedImage(spriteParams2))
@@ -403,27 +405,6 @@ namespace JUSToolkit.Tests.Graphics
 
                 pngNode.Stream.Compare(originalBitmaps.Root.Children[i].Stream).Should().BeTrue();
             }
-        }
-
-        [TestCaseSource(nameof(GetDtx3TxFiles))]
-        public void DeserializeDtx3TxAndCheckFileHash(string infoPath, string dtxPath)
-        {
-            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
-            TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
-
-            var info = BinaryInfo.FromYaml(infoPath);
-
-            using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
-                .TransformWith(new BinaryToDtx3());
-
-            Dig image = dtx.Children["image"].GetFormatAs<Dig>();
-            var indexedImageParams = new IndexedImageBitmapParams {
-                Palettes = image,
-            };
-
-            BinaryFormat generatedStream = new IndexedImage2Bitmap(indexedImageParams).Convert(image);
-
-            generatedStream.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetDtx3TxFiles))]

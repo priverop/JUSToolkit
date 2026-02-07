@@ -1,3 +1,53 @@
-offset: 0
-length: 761
-sha256: f1458263dd19fddcf69d370d08187756e095dbb4aed6e98fa97c979db80258ec
+name: ko.dtx
+format_type: Yarhl.FileSystem.NodeContainerFormat
+tags:
+check_children: true
+children:
+  - name: baseImage
+    format_type: Yarhl.IO.BinaryFormat
+    length: 761
+    sha256: f1458263dd19fddcf69d370d08187756e095dbb4aed6e98fa97c979db80258ec
+  - name: tx_00
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1039
+    sha256: 6f844a81169beaae2dfb08ebfc5b963e8f9cab8aa7a456851c4d3025edeadc58
+  - name: tx_01
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1092
+    sha256: 4ae16675f41ceca70e1c28a328c780da5d19a9212915b0329775fd65542c0f49
+  - name: tx_02
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1048
+    sha256: fb393cd70d401d6e6a5cf642fc2b1b6aa5b222191dea11582678d29483c2d471
+  - name: tx_03
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1081
+    sha256: a46d8c099b95830a4c9ca49288dbb352f4ab99c258c532b2c372077765ecd2fa
+  - name: tx_04
+    format_type: Yarhl.IO.BinaryFormat
+    length: 903
+    sha256: fe86cd61574765614594d53f302b073a6d8a596adf98f4579b4d227414c76aff
+  - name: tx_05
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1032
+    sha256: 7119036bf15988400a0657b90850c7a1742f3f3d919c1daab926aabcf35dbba8
+  - name: tx_06
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1040
+    sha256: 38d1a6ca8741a71d72a9bf8e7940213d0b1e7e74368742564c42bcd6d9b1e844
+  - name: tx_07
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1034
+    sha256: 3ee55acf2b9d77ac909213b791adeee4019af206c91b0425a1a130263d19a131
+  - name: tx_08
+    format_type: Yarhl.IO.BinaryFormat
+    length: 936
+    sha256: a0fc3176b5582edfe17f7631eec3515cba2b477efa17b6e4ee50df20b0a4cb76
+  - name: tx_09
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1202
+    sha256: 3c56b61341646a949353cc2e9c448d7930a62f924092047ae36378853a94eadd
+  - name: tx_10
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1221
+    sha256: 09cd47e0a080616caf13b13884bd539724987326eaaa3289cb1d4aa283da29a5
