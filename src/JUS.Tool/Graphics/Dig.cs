@@ -76,7 +76,7 @@ namespace JUSToolkit.Graphics
             int startX = (startTileIndex % tilesPerRow) * tileSize.Width;
             int startY = (startTileIndex / tilesPerRow) * tileSize.Height;
 
-            IndexedImage subimage = baseImage.SubImages(startX, startY, segmentWidth, segmentHeight);
+            IndexedImage subimage = baseImage.SubImage(startX, startY, segmentWidth, segmentHeight);
 
             Height = subimage.Height;
             Width = subimage.Width;
@@ -129,10 +129,13 @@ namespace JUSToolkit.Graphics
         /// <param name="paletteIndex">Palette index of the subimage.</param>
         public void PasteImage(Dig subimage, int xPos, int yPos, bool horizontalFlip, bool verticalFlip, byte paletteIndex)
         {
-            if (horizontalFlip)
+            if (horizontalFlip) {
                 subimage.FlipHorizontal();
-            if (verticalFlip)
+            }
+
+            if (verticalFlip) {
                 subimage.FlipVertical();
+            }
 
             subimage.SetPalette(paletteIndex);
 

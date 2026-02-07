@@ -1,7 +1,3 @@
-using System;
-using Texim.Images;
-using Texim.Pixels;
-
 namespace JUSToolkit.Graphics
 {
     /// <summary>
@@ -39,28 +35,5 @@ namespace JUSToolkit.Graphics
         /// Linear swizzling
         /// </summary>
         Linear = 2,
-    }
-
-    // To work with subimages
-    public static class DigExtension
-    {
-        public static IndexedImage SubImages(this IIndexedImage image, int startX, int startY, int width, int height)
-        {
-            var subImage = new IndexedImage(width, height);
-            CopySubImage(image.Pixels, subImage.Pixels, image.Width, startX, startY, width, height);
-            return subImage;
-        }
-
-
-        public static void CopySubImage<T>(T[] source, T[] destination, int sourceWidth, int startX, int startY, int width, int height)
-        {
-            int idx = 0;
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int fullIndex = ((startY + y) * sourceWidth) + startX + x;
-                    destination[idx++] = source[fullIndex];
-                }
-            }
-        }
     }
 }
