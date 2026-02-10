@@ -129,28 +129,23 @@ namespace JUSToolkit.Graphics
         /// <param name="paletteIndex">Palette index of the subimage.</param>
         public void PasteImage(Dig subimage, int xPos, int yPos, bool horizontalFlip, bool verticalFlip, byte paletteIndex)
         {
+            // Span<IndexedPixel> spanSegment = subimage.Pixels;
+
             if (horizontalFlip) {
+                // spanSegment.FlipHorizontal(new Size(subimage.Width, subimage.Height));
                 subimage.FlipHorizontal();
             }
 
             if (verticalFlip) {
+                // spanSegment.FlipVertical(new Size(subimage.Width, subimage.Height));
                 subimage.FlipVertical();
             }
 
             subimage.SetPalette(paletteIndex);
 
-            for (int x = 0; x < subimage.Width; x++) {
-                for (int y = 0; y < subimage.Height; y++) {
-                    int inIdx = (y * subimage.Width) + x;
-                    IndexedPixel pixel = subimage.Pixels[inIdx];
-                    if (pixel.Alpha == 0 || pixel.Index == 0) {
-                        continue;
-                    }
+            Span<IndexedPixel> pixelsSpan = Pixels;
 
-                    int outIdx = ((yPos + 128 + y) * Width) + xPos + 128 + x;
-                    Pixels[outIdx] = pixel;
-                }
-            }
+            CopySegment(subimage, pixelsSpan, Width, new Rectangle(128, 128, subimage.Width, subimage.Height), xPos, yPos);
         }
 
         /// <summary>
@@ -234,6 +229,23 @@ namespace JUSToolkit.Graphics
         {
             for (int i = 0; i < Pixels.Length; i++)
                 Pixels[i] = new IndexedPixel(Pixels[i].Index, Pixels[i].Alpha, paletteIndex);
+        }
+
+        // TODO: Upgrade Texim to the last version to remove this method
+        private void CopySegment(IIndexedImage segmentImage, Span<IndexedPixel> output, int width, Rectangle segmentInfo, int relativeX, int relativeY)
+        {
+            for (int x = 0; x < segmentInfo.Width; x++) {
+                for (int y = 0; y < segmentInfo.Height; y++) {
+                    int inIdx = (y * segmentInfo.Width) + x;
+                    IndexedPixel pixel = segmentImage.Pixels[inIdx];
+                    if (pixel.Alpha == 0 || pixel.Index == 0) {
+                        continue;
+                    }
+
+                    int outIdx = ((relativeY + segmentInfo.Y + y) * width) + relativeX + segmentInfo.X + x;
+                    output[outIdx] = pixel;
+                }
+            }
         }
     }
 }
