@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JUSToolkit.Graphics;
 using JUSToolkit.Graphics.Converters;
+using Texim.Formats;
 using Texim.Pixels;
 using Texim.Sprites;
 using YamlDotNet.Serialization;
@@ -136,7 +137,7 @@ namespace JUS.Tool.Graphics.Converters
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
             reader.Stream.PushToPosition(spriteOffset);
             ushort numSegments = reader.ReadUInt16();
-            SpriteDummy sprite = new SpriteDummy();
+            var sprite = new SpriteDummy();
 
             for (int i = 0; i < numSegments; i++) {
                 ushort tileIndex = reader.ReadUInt16();
@@ -147,7 +148,7 @@ namespace JUS.Tool.Graphics.Converters
                 (int width, int height) = GetSize(shape & 0x0F);
                 (bool hFlip, bool vFlip) = GetFlip(shape >> 4);
 
-                var segment = new Dig(fullImage, width, height, tileIndex);
+                var segment = new Dig(fullImage, width, height, tileIndex, fullImage.Bpp == DigBpp.Bpp2);
 
                 frame.PasteImage(segment, xPos, yPos, hFlip, vFlip, paletteIndex);
 

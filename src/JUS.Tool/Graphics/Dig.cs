@@ -67,12 +67,15 @@ namespace JUSToolkit.Graphics
         /// <param name="segmentWidth">Width of the subimage.</param>
         /// <param name="segmentHeight">Height of the subimage.</param>
         /// <param name="startTileIndex">Tile index where the subimage starts from.</param>
-        public Dig(Dig baseImage, int segmentWidth, int segmentHeight, int startTileIndex)
+        /// <param name="fullWidthCanvas">DTX 02 03 uses 256 as the canvas, instead of the baseImage.</param>
+        public Dig(Dig baseImage, int segmentWidth, int segmentHeight, int startTileIndex, bool fullWidthCanvas = false)
             : this(baseImage)
         {
             // (tile index / tilesPerRow) * tileWidth
             Size tileSize = new(8, 8);
-            int tilesPerRow = baseImage.Width / tileSize.Width;
+
+            int canvasWidth = fullWidthCanvas ? 256 : baseImage.Width;
+            int tilesPerRow = canvasWidth / tileSize.Width;
             int startX = (startTileIndex % tilesPerRow) * tileSize.Width;
             int startY = (startTileIndex / tilesPerRow) * tileSize.Height;
 
