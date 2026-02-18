@@ -1,0 +1,33 @@
+name: bl_b_02_e01_.dtx
+format_type: Yarhl.FileSystem.NodeContainerFormat
+tags: null
+check_children: true
+children:
+  - name: baseImage
+    format_type: Yarhl.IO.BinaryFormat
+    length: 4143
+    sha256: aea05ee87822a5128a80d498a9bd5991a6cde14898bb50fad0a6c6913938df15
+  - name: tx_00
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1549
+    sha256: 84eb4915e966b1028876a7b5e81b58911e159f021475aff257122a95b833e0aa
+  - name: tx_01
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1363
+    sha256: c94633d748ce6660cf3ff6a86790c7553ae837a36f938e27173e9d2713c195a8
+  - name: tx_02
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1905
+    sha256: bec0b40a15ce98af04660b30ab1dfa6b0baeeab161b054f8102f2e77494964e4
+  - name: tx_03
+    format_type: Yarhl.IO.BinaryFormat
+    length: 2229
+    sha256: 043f5d6e2cc1d9a80030a3422857c972d315d386de35e92bee272a1284238daa
+  - name: tx_04
+    format_type: Yarhl.IO.BinaryFormat
+    length: 2099
+    sha256: 69def2d9a5cf0e36b803d886f063eb8104ef72ee99781e3fcf07d351ef93f605
+  - name: tx_05
+    format_type: Yarhl.IO.BinaryFormat
+    length: 1325
+    sha256: bdc1bf4a994a8fd10f1b909a350a1da983f6ef811affb05aff7841b05d023145

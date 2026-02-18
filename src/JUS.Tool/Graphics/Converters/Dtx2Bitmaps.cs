@@ -76,6 +76,7 @@ namespace JUSToolkit.Graphics.Converters
                         bitmaps.Root.Add(new Node(nodeTexture.Name, nodeTexture.GetFormatAs<Dig>())
                             .TransformWith(new IndexedImage2Bitmap(indexedImageParams)));
                     }
+
                     bitmaps.Root.Add(new Node("baseImage", image)
                             .TransformWith(new IndexedImage2Bitmap(indexedImageParams)));
 
