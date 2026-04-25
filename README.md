@@ -1,112 +1,43 @@
-# JUSToolkit
+<h1 align="center">JUSToolkit</h1>
 
-Romhacking tools for Jump Ultimate Stars! (NDS)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://choosealicense.com/licenses/mit/)
+<p align="center"><em>Romhacking tools for Jump Ultimate Stars! (NDS).</em></p>
+
+<p align="center">
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/priverop/JUSToolkit?color=blue">
+<img alt="Build and release" src="https://github.com/priverop/JUSToolkit/actions/workflows/build-and-release.yml/badge.svg?branch=master">
+<img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat">
+</p>
+
+---
 
 ## Features
 
-Done ✔️ To test / with issues ⚠️ Not done 🛑
+- **Containers** - Unpack and pack **ALAR** files (.aar).
+- **Texts** - Export and import _.bin_ files, including the **JQuiz**.
+- **Textures** - Export and import **DIG** (_.dig_) + **ALMT** (_.atm_).
+- **Sprites** - Export and import **DTX**, including **Komas**.
+- **Automatizations** - Utilities to batch export and import multiple files.
 
-### Containers
+Check [**usage**](https://priverop.github.io/JUSToolkit/docs/tool/usage.html) for more info.
 
-- Pack .aar ALAR3 ✔️
-- Unpack .aar ALAR3 ✔️
-- Pack .aar ALAR2 ✔️
-- Unpack .aar ALAR2 ✔️
+## Requirements
 
-### Graphics
-
-- Extract ALMT + DIG ✔️
-- Import ALMT + DIG ✔️
-- Extract DTX ✔️
-- Import DTX 🛑
-
-### Texts
-
-- Extract and import ✔️
-
-### Batch Features
-
-- Extract every .dig from any .aar (ALAR2/ALAR3) to PNG ✔️
-- Import multiple PNGs to an .aar ALAR3 container ✔️
-
-### Scripts
-
-- **beta.sh:** generates a new beta translation rom if you have access to the
-  Translation repo.
-- **copy_text_format:** generates a new text format.
-- The rest are testing scripts for devs.
-
-## Tinke
-
-You can use [Tinke by pleonex](https://github.com/pleonex/tinke) to unpack
-containers and view .dig files.
-
-## Build
-
-The build system requires
-[.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
-
-## How To Use
-
-`./JUS.CLI jus [type] [feature] [args]`
-
-- graphics
-  - export-dtx
-  - export-dig
-  - import-dig
-- containers
-  - export-alar3
-  - import-alar3
-  - export-alar2
-  - import-alar2
-  - import
-  - export
-- batch
-  - export-alar-png
-  - import-png-alar3
-- game
-  - import
-
-To get the arguments of a feature you can use:
-`./JUS.CLI jus [type] [feature] -h`
-
-Examples:
-`./JUS.CLI jus containers export-alar3 --container test.aar --output myDirectory`
-`./JUS.CLI jus containers export-alar3 -h`
+The utility requires the
+[.NET 10.0 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), and works in every OS.
 
 ## Documentation
 
-### Documents
+Check our [documentation page](https://priverop.github.io/JUSToolkit/docs/tool/index.html) for guides on installation, how to use the tool, scripts, format research, and more!
 
-You can find these documents in our [`docs/articles/dev`](docs/articles/)
-folder:
+## Tinke and SceneGate
 
-- Alar Specification
-- Text Specification
-- DTX Specification by pleonex
-- DTX Research by pleonex
-- [FileFormats by Uknown Hacker](https://web.archive.org/web/20100111220659/http://jumpstars.wikispaces.com/File+Formats#toc10)
+You can use [Tinke by pleonex](https://github.com/pleonex/tinke), which has a built-in plugin to unpack JUS containers, and view .dig files.
 
-### Videos
-
-pleonex did some research on Streaming:
-
-- [DIRECTO ROM Hacking: Triple reto de imágenes](https://www.youtube.com/watch?v=r1Rsx6RRe1U)
-- [DIRECTO Domingos de desensamblador: imágenes de Devil Survivor y JUS y ordenar textos de MetalMax 3](https://www.youtube.com/watch?v=R2h-UEcO_-k)
-- [DIRECTO Predomingos de desensamblador: CLYT de 3DS y el complejo caso de los sprites de JUS](https://www.youtube.com/watch?v=1KT4u_Kvaws)
-
-## Stack
-
-- C# / .NET 8.0
-- [Yarhl by pleonex](https://code.pleonex.dev/sceneGate/yarhl)
-- [PleOps.Cake by pleonex](https://codeberg.org/pleonex/PleOps.Cake)
+Also, we've developed an auto-discovery plugin for [SceneGate by pleonex](https://code.pleonex.dev/sceneGate/scenegate). Check [this article](https://priverop.github.io/JUSToolkit/docs/tool/scenegate.html) for more info.
 
 ## Credits
 
-Special thanks to [pleonex](https://fosstodon.org/@pleonex) for his help, for
-Yarhl, and PleOps.Cake.
-
-Thanks to [TraduSquare](https://tradusquare.es) for the inspiration and support.
-
-Thanks to the Jump Ultimate Stars! devs for this amazing game.
+- [**pleonex**](https://fosstodon.org/@pleonex) - Friend, creator, and maintainer of [Yarhl](https://code.pleonex.dev/sceneGate/yarhl), [Tinke](https://code.pleonex.dev/sceneGate/tinke), [Ekona](https://code.pleonex.dev/sceneGate/ekona), and [PleOps.Cake](https://codeberg.org/pleonex/PleOps.Cake).
+- [**Darkc0m**](https://github.com/Darkc0m) - Co-developer, and co-leader of the project.
+- [**TraduSquare**](https://tradusquare.es) - Spanish Fantranslation community.
+- **Ganbarion** - For creating this amazing game!
