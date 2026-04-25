@@ -1,150 +1,128 @@
-# ALAR Containers
+# ALAR container
 
-## ALAR 3
+The _ALAR_ binary format (_AL ARchive_) specifies how to pack binary files
+together. There are three versions of the format, although version 1 is used
+anymore (but some blocks of code remains in the games).
 
-This format is useful to store a lot of files. We have the header where we store all the pointers and then we have the file contents all together.
+## Format
 
-| Offset | Type       | Description                       |
-| ------ | ---------- | --------------------------------- |
-| 0x00   | char[4]    | ALAR                              |
-| 0x04   | byte       | Version (3 to follow)             |
-| 0x05   | byte       | Minor version (5, 69)             |
-| 0x06   | int        | Number of files                   |
-| 0x0A   | short      | Reserved?                         |
-| 0x0C   | int        | Number of entries (files - 1)     |
-| 0x10   | short      | Data offset (pointer section end) |
-| 0x12   | short[]    | File info absolute pointers       |
-| ..     | ..         | Padding until 04 multiple         |
-| ..     | FileInfo[] | File info list                    |
-| ..     | Stream[]   | File data                         |
+The format structure is:
 
-### File info
+- Header
+- Padding (multiple of 4)
+- File info table
+- File data
 
-36 bytes
+### Header
 
-| Offset | Type   | Description                 |
-| ------ | ------ | --------------------------- |
-| 0x00   | short  | File ID starting from 0     |
-| 0x02   | short  | Unknown: 040                |
-| 0x04   | int    | Absolute pointer            |
-| 0x08   | int    | Size                        |
-| 0x0C   | int    | Unknown: 01000080           |
-| 0x10   | short  | Unknown***                  |
-| 0x12   | string | Null-terminated file path** |
+| Offset | Type    | Description                   |
+| ------ | ------- | ----------------------------- |
+| 0x00   | char[4] | Format ID: `ALAR`             |
+| 0x04   | byte    | Version: `3`                  |
+| 0x05   | byte    | Flags: `05` or `45`           |
+| 0x06   | short   | Number of files               |
+| 0x08   | int     | Reserved: `0`                 |
+| 0x0C   | short   | Number of entries (files - 1) |
+| 0x10   | short   | Data offset                   |
+| 0x12   | short[] | File info absolute offsets    |
 
-** char FileName[18] // 14bytes string + 4bytes pad to next entry - null terminated
-*** it seems there may be a correlation but i don't know what is it
-### Example
+The flag is a bitfield:
 
-koma.aar
+- 0: always v2 and v3 (has path?)
+- 1: maybe v2: has filename?
+- 2: always v3: new fileinfo?
+- 3-5: reserved
+- 6: maybe v3: if set, use checksum version 2 instead of 1.
+- 7: reserved
 
-| Offset | Size | Hex      | Description             | Content (Hex) | Content (Decimal) |
-| ------ | ---- | -------- | ----------------------- | ------------- | ----------------- |
-| 0x00   | 4    | 414C4152 | ALAR                    |
-| 0x04   | 1    | 03       | Version                 |
-| 0x05   | 1    | 05       | Minor Version           |
-| 0x06   | 4    | 82030000 | Number of Files         | 382           | 898               |
-| 0x0A   | 2    | 000000   | Reserved                |
-| 0x0C   | 4    | 81030000 | Number of entries       | 381           | 897               |
-| 0x10   | 2    | 6085     | Data Offset             | 8560          |
-| 0x12   | 2    | 1807     | File info first pointer | 718           |
+The possible combinations are:
 
-First file: koma/bb_00.dtx
+- Version 2:
+  - `0x01`: standard format for v3
+  - `0x03`
+- Version 3:
+  - `0x05`: standard format for v3
+  - `0x45`: use newer file path hash algorithm
 
-| Offset | Size | Hex      | Description                 | Content (Hex) | Content (Decimal) |
-| ------ | ---- | -------- | --------------------------- | ------------- | ----------------- |
-| 0x718  | 2    | 0000     | ID                          |
-| 0x71A  | 2    | 0040     | Unknown                     | 40            |
-| 0x71C  | 4    | 60850000 | Absolute Pointer            | 8560          |
-| 0x720  | 4    | DC040000 | Size                        | 04DC          | 1244              |
-| 0x724  | 4    | 01000080 | Unknown                     |
-| 0x728  | 2    | 3C96     | Unknown                     |
-| 0x72A  | 18   | 1807     | File path: koma/bb_00.dtx** |
+### V2 File info
 
-** The real size is 14bytes but we have a 00 byte (null terminated)
+| Offset | Type | Description               |
+| ------ | ---- | ------------------------- |
+| 0x00   | uint | Global file ID            |
+| 0x04   | uint | File data absolute offset |
+| 0x08   | uint | File data size            |
+| 0x0C   | uint | File info flags           |
 
-## ALAR 2
+### V2 File data
 
-This format is used for pack files inside of ALAR 3 pack files. We have a small header, the info of the files and then the files one after another.
+| Offset | Type     | Description                |
+| ------ | -------- | -------------------------- |
+| 0x00   | short    | Padding                    |
+| 0x02   | char[32] | Null-terminated file path  |
+| 0x22   | ushort   | [File path hash](#hash-v1) |
+| ...    | Stream   | File data                  |
 
-| Offset | Type                 | Description          |
-| ------ | -------------------- | -------------------- |
-| 0x00   | char[4]              | ALAR                 |
-| 0x04   | byte                 | Version (2)          |
-| 0x05   | byte                 | Minor version (1, 3) |
-| 0x06   | short                | Number of files      |
-| 0x08   | byte[8]              | IDs?                 |
-| 0x10   | FileInfo[fileNumber] | File info list       |
-| ...    | FileData[fileNumber] | File data            |
+### V3 File info
 
-### File Info
+| Offset | Type     | Description                             |
+| ------ | -------- | --------------------------------------- |
+| 0x00   | uint     | Global file ID                          |
+| 0x04   | uint     | File data absolute offset               |
+| 0x08   | uint     | File data size                          |
+| 0x0C   | uint     | Flags                                   |
+| 0x10   | ushort   | [File path hash](#name-hashes)          |
+| 0x12   | char[18] | Null-terminated file path ASCII encoded |
 
-16 bytes
+The highest 8 bits of the file ID indicate the file type.
 
-| Offset | Type | Description      |
-| ------ | ---- | ---------------- |
-| 0x00   | int  | Unknown? Type?   |
-| 0x04   | int  | Absolute pointer |
-| 0x08   | int  | Size             |
-| 0x0A   | int  | Unknown          |
+The file info flags have two parts:
 
-### File Data
+- bits 0-23: format flags. Usually 1 except for `.amt` files.
+- bits 24-31: entry flags
+  - bit 31: if set, the file info entry contains the checksum and file path.
 
-36 bytes
+## Name hashes
 
-| Offset | Type              | Description                         |
-| ------ | ----------------- | ----------------------------------- |
-| 0x00   | short             | Unknown, padding?                   |
-| 0x02   | string (32 bytes) | Null-terminated file path + padding |
-| ...    | short             | Unknown                             |
-| ...    | Stream            | File Data                           |
+The format store a precomputed hash of the file name, to speed up the file
+lookup process. At runtime, the game computes the same hash of the requested
+file path, and compare with the stored value. This is faster than comparing
+paths char by char.
 
-### Example
+There are two known versions of the hash algorithm. ALAR version 2 uses the
+first version. ALAR version 3 has a flag in the header to indicate the hash
+version.
 
-deck_obj.aar
+> [!NOTE]  
+> In both versions, the hash is over the path of the file inside the ALAR
+> container **without the file extension**. If the ALAR contains a file
+> `data/file.bin`, the game computes the hash over `data/file`. The text
+> encoding is ASCII. There is also a limit of 32 bytes. Longer paths are
+> truncated.
 
-Header
+> [!WARNING]  
+> It seems the first version causes some issues (hash collisions?). The game
+> disabled file lookup by hash, when the ALAR used version 1. In those cases, it
+> performs a full path comparison char by char.
 
-| Offset | Size | Hex               | Description     | Content (Hex) | Content (Decimal) |
-| ------ | ---- | ----------------- | --------------- | ------------- | ----------------- |
-| 0x00   | 4    | 414C4152          | ALAR            |
-| 0x04   | 1    | 02                | Version         |
-| 0x05   | 1    | 01                | Minor Version   |
-| 0x06   | 2    | 0200              | Number of Files | 2             | 2                 |
-| 0x08   | 8    | 00006800 09006800 | IDs             |
+### Hash v1
 
-File info #1
+```csharp
+byte[] data = Encoding.ASCII.GetBytes(pathWithoutExtension);
 
-| Offset | Size | Hex      | Description      | Content (Hex) | Content (Decimal) |
-| ------ | ---- | -------- | ---------------- | ------------- | ----------------- |
-| 0x10   | 4    | 00006840 | ID               |
-| 0x14   | 4    | 54000000 | Absolute Pointer | 54            |
-| 0x18   | 4    | DC010000 | Size             | 1DC           | 476               |
-| 0x1C   | 4    | 01000080 | Unknown          |
+uint hash = 0;
+foreach (byte ch in data) {
+    uint tmp = (hash << 1) ^ ch;
+    hash = (tmp & 0xFFFF) ^ (tmp >> 16);
+}
+```
 
-File info #2
+### Hash v2
 
-| Offset | Size | Hex      | Description      | Content (Hex) | Content (Decimal) |
-| ------ | ---- | -------- | ---------------- | ------------- | ----------------- |
-| 0x20   | 4    | 00006840 | ID               |
-| 0x24   | 4    | 54020000 | Absolute Pointer | 254           |
-| 0x28   | 4    | 10010000 | Size             | 110           | 272               |
-| 0x2C   | 4    | 0A0000C0 | Unknown          |
+```csharp
+byte[] data = Encoding.ASCII.GetBytes(pathWithoutExtension);
 
-File data #1: deck_obj.dtx
-
-| Offset | Size | Hex                                   | Description      |
-| ------ | ---- | ------------------------------------- | ---------------- |
-| 0x30   | 2    | 0000                                  | Unkown, padding? |
-| 0x32   | 32   | 6465636B 5F6F626A 2E647478 + 20 zeros | deck_obj.dtx     |
-| 0x52   | 2    | 7A22                                  | Unknown          |
-| 0x54   | 476  | 44535458...                           | Stream           |
-
-File data #2: deck_obj.amt
-
-| Offset | Size | Hex                                   | Description      |
-| ------ | ---- | ------------------------------------- | ---------------- |
-| 0x230  | 2    | 0000                                  | Unkown, padding? |
-| 0x232  | 32   | 6465636B 5F6F626A 2E616D74 + 20 zeros | deck_obj.amt     |
-| 0x252  | 2    | 7A22                                  | Unknown          |
-| 0x254  | 272  | 44535458...                           | Stream           |
+uint hash = 0;
+foreach (byte ch in data) {
+    hash ^= (ushort)(hash << 1) | ch;
+}
+```
