@@ -21,31 +21,3 @@ Preview versions can be downloaded from the project
 But they expire after a few days. You may want to follow the
 [source code README file](https://github.com/priverop/JUSToolkit) to build the
 latest version yourself.
-
-## How to use
-
-`./JUS.CLI jus [type] [feature] [args]`
-
-- graphics
-  - export-dtx
-  - export-dig
-  - import-dig
-- containers
-  - export-alar3
-  - import-alar3
-  - export-alar2
-  - import-alar2
-  - import
-  - export
-- batch
-  - export-alar-png
-  - import-png-alar3
-- game
-  - import
-
-To get the arguments of a feature you can use:
-`./JUS.CLI jus [type] [feature] -h`
-
-Examples:
-`./JUS.CLI jus containers export-alar3 --container test.aar --output myDirectory`
-`./JUS.CLI jus containers export-alar3 -h`
