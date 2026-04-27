@@ -6,80 +6,146 @@ anymore (but some blocks of code remains in the games).
 
 ## Format
 
-The format structure is:
+The binary format changes for each version. However, the header remains the same
+across versions:
 
-- Header
-- Padding (multiple of 4)
-- File info table
-- File data
+| Offset | Type    | Description             |
+| ------ | ------- | ----------------------- |
+| 0x00   | char[4] | Format ID: `ALAR`       |
+| 0x04   | byte    | Version: `3`            |
+| 0x05   | byte    | Container feature flags |
+| 0x06   | short   | Number of files         |
 
-### Header
+The feature flag is a bit-field:
 
-| Offset | Type    | Description                   |
-| ------ | ------- | ----------------------------- |
-| 0x00   | char[4] | Format ID: `ALAR`             |
-| 0x04   | byte    | Version: `3`                  |
-| 0x05   | byte    | Flags: `05` or `45`           |
-| 0x06   | short   | Number of files               |
-| 0x08   | int     | Reserved: `0`                 |
-| 0x0C   | short   | Number of entries (files - 1) |
-| 0x10   | short   | Data offset                   |
-| 0x12   | short[] | File info absolute offsets    |
-
-The flag is a bitfield:
-
-- 0: always v2 and v3 (has path?)
-- 1: maybe v2: has filename?
-- 2: always v3: new fileinfo?
+- 0: filename support
+- 1: unknown
+- 2: folder and sub-container (ALAR) support
 - 3-5: reserved
-- 6: maybe v3: if set, use checksum version 2 instead of 1.
+- 6: path hash version: 0=v1, 1=v2
 - 7: reserved
 
 The possible combinations are:
 
-- Version 2:
-  - `0x01`: standard format for v3
-  - `0x03`
-- Version 3:
-  - `0x05`: standard format for v3
-  - `0x45`: use newer file path hash algorithm
+- Version 2: `0x01`, `0x03`
+- Version 3: `0x05`, `0x45`
+
+### Version 1
+
+The format structure is:
+
+- [Header](#format)
+- Extended header
+- Lookup table
+- File access table
+- File data
+
+#### V1 Extender header
+
+It contains of a 32-bits integer with the first file ID.
+
+#### V1 Lookup table
+
+There is one entry per file with the information to find the index of the file
+in the container by path or file ID. The size of each entry depends on the
+container features, if it supports file names or not.
+
+- (only if bit0 is set, for filename support) `char[32]` filename
+- `uint` file ID
+
+#### V1 File access table
+
+There is one entry per file with the absolute offset to the file data. Each
+entry is a 32-bits integer.
+
+#### V1 File data
+
+The file data format is:
+
+- `uint` data size
+- `byte[size]` data
+
+### Version 2
+
+The format structure is:
+
+- [Header](#format)
+- Extended header
+- File info table
+- File data
+
+#### V2 Extended header
+
+It has two additional 32-bits integers with the first, and last file ID (without
+the type). The last file ID takes into account the frame count from `ALMT` /
+`ALOD` files as it were additional files.
 
 ### V2 File info
 
+There are 16 bytes per file:
+
 | Offset | Type | Description               |
 | ------ | ---- | ------------------------- |
-| 0x00   | uint | Global file ID            |
+| 0x00   | uint | File ID                   |
 | 0x04   | uint | File data absolute offset |
 | 0x08   | uint | File data size            |
 | 0x0C   | uint | File info flags           |
 
+The highest byte of the file ID defines the [format type](#file-types).
+
+The file info flags have two parts:
+
+- bits 0-23: frame count
+- bit 24: unknown, only set for some `DSIG` formats
+- bit 25-29: reserved
+- bit 30: if set, the lower part contains the frame count
+- bit 31: if set, before the file data there is the file name and hash
+
 ### V2 File data
 
-| Offset | Type     | Description                |
-| ------ | -------- | -------------------------- |
-| 0x00   | short    | Padding                    |
-| 0x02   | char[32] | Null-terminated file path  |
-| 0x22   | ushort   | [File path hash](#hash-v1) |
-| ...    | Stream   | File data                  |
+| Offset | Type     | Description               |
+| ------ | -------- | ------------------------- |
+| -0x24  | byte[2]  | Padding                   |
+| -0x22  | char[32] | Filename (ASCII)          |
+| -0x02  | ushort   | [Filename hash](#hash-v1) |
+| 0x00   | byte[]   | File data                 |
+
+> [!NOTE]  
+> Different to version 1, the file data offset points to the start of the data.
+> The path and checksum (if available via file info flags), are 34 bytes before
+> the address of the file data offset.
+
+#### V3
+
+The format structure is:
+
+- [Header](#format)
+- Extended header
+- File info table
+- File data
+
+#### V3 Extended header
+
+| Offset | Type    | Description                  |
+| ------ | ------- | ---------------------------- |
+| 0x08   | uint    | First file ID (without type) |
+| 0x0C   | uint    | Last file ID (without type)  |
+| 0x10   | short   | Data offset                  |
+| 0x12   | short[] | File info absolute offsets   |
 
 ### V3 File info
 
 | Offset | Type     | Description                             |
 | ------ | -------- | --------------------------------------- |
-| 0x00   | uint     | Global file ID                          |
+| 0x00   | uint     | File ID                                 |
 | 0x04   | uint     | File data absolute offset               |
 | 0x08   | uint     | File data size                          |
 | 0x0C   | uint     | Flags                                   |
 | 0x10   | ushort   | [File path hash](#name-hashes)          |
 | 0x12   | char[18] | Null-terminated file path ASCII encoded |
 
-The highest 8 bits of the file ID indicate the file type.
-
-The file info flags have two parts:
-
-- bits 0-23: format flags. Usually 1 except for `.amt` files.
-- bits 24-31: entry flags
-  - bit 31: if set, the file info entry contains the checksum and file path.
+The file ID and info flags have the same meaning as in
+[version 2 file info](#v2-file-info).
 
 ## Name hashes
 
@@ -126,3 +192,14 @@ foreach (byte ch in data) {
     hash ^= (ushort)(hash << 1) | ch;
 }
 ```
+
+## File types
+
+- `0x00`: undefined format, specific binary data structure
+- `0x40`: `DSTX`
+- `0x41`: `ALMT`
+- `0x42`: `DSIG`
+- `0x43`: `ALOD`
+- `0x45`: `NCCL`
+- `0x46`: `ALTM`
+- `0x47`: `ALAR`
