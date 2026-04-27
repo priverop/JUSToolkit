@@ -1,6 +1,11 @@
-<h1 align="center">JUSToolkit</h1>
+<div align="center">
+  <h1 align="center">JUSToolkit</h1>
+</div>
+
+<div align="center"><img src="docs/images/logo_full.webp"></div>
 
 <p align="center"><em>Romhacking tools for Jump Ultimate Stars! (NDS).</em></p>
+
 
 <p align="center">
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/priverop/JUSToolkit?color=blue">
@@ -9,6 +14,7 @@
 </p>
 
 ---
+
 
 ## Features
 
@@ -35,9 +41,14 @@ You can use [Tinke by pleonex](https://github.com/pleonex/tinke), which has a bu
 
 Also, we've developed an auto-discovery plugin for [SceneGate by pleonex](https://code.pleonex.dev/sceneGate/scenegate). Check [this article](https://priverop.github.io/JUSToolkit/docs/tool/scenegate.html) for more info.
 
+
 ## Credits
 
 - [**pleonex**](https://fosstodon.org/@pleonex) - Friend, creator, and maintainer of [Yarhl](https://code.pleonex.dev/sceneGate/yarhl), [Tinke](https://code.pleonex.dev/sceneGate/tinke), [Ekona](https://code.pleonex.dev/sceneGate/ekona), and [PleOps.Cake](https://codeberg.org/pleonex/PleOps.Cake).
 - [**Darkc0m**](https://github.com/Darkc0m) - Co-developer, and co-leader of the project.
 - [**TraduSquare**](https://tradusquare.es) - Spanish Fantranslation community.
 - **Ganbarion** - For creating this amazing game!
+
+
+<div align="center"><img src="docs/images/logo_pirate.webp" width="20%">
+<p><small>Arr! Don't forget to star the repo!</small></p></div>
