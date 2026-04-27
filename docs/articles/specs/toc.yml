@@ -2,6 +2,9 @@
 - name: Overview
   href: ./summary.md
 
+- name: 🔎 Research documents
+  href: other-research.md
+
 - name: 📁 Containers
 - name: AAR / ALAR
   href: alar.md
