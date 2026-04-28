@@ -3,7 +3,7 @@
 This section list the game assets and their format. You can find more
 information about the specification in each sub-page.
 
-> [!INFO]  
+> [!TIP]  
 > **AL**  
 > There are several formats and debug text in the game with the prefix `AL`.
 > This could have been the internal code name of the game, or the game engine

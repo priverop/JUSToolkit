@@ -80,7 +80,7 @@ It has two additional 32-bits integers with the first, and last file ID (without
 the type). The last file ID takes into account the frame count from `ALMT` /
 `ALOD` files as it were additional files.
 
-### V2 File info
+#### V2 File info
 
 There are 16 bytes per file:
 
@@ -101,7 +101,7 @@ The file info flags have two parts:
 - bit 30: if set, the lower part contains the frame count
 - bit 31: if set, before the file data there is the file name and hash
 
-### V2 File data
+#### V2 File data
 
 | Offset | Type     | Description               |
 | ------ | -------- | ------------------------- |
@@ -115,7 +115,7 @@ The file info flags have two parts:
 > The path and checksum (if available via file info flags), are 34 bytes before
 > the address of the file data offset.
 
-#### V3
+### Version 3
 
 The format structure is:
 
@@ -133,7 +133,7 @@ The format structure is:
 | 0x10   | short   | Data offset                  |
 | 0x12   | short[] | File info absolute offsets   |
 
-### V3 File info
+#### V3 File info
 
 | Offset | Type     | Description                             |
 | ------ | -------- | --------------------------------------- |
