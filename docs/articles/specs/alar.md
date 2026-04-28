@@ -1,8 +1,8 @@
 # ALAR container
 
 The _ALAR_ binary format (_AL ARchive_) specifies how to pack binary files
-together. There are three versions of the format, although version 1 is used
-anymore (but some blocks of code remains in the games).
+together. There are three versions of the format, but there are no remains of
+assets with version 1.
 
 ## Format
 
@@ -12,7 +12,7 @@ across versions:
 | Offset | Type    | Description             |
 | ------ | ------- | ----------------------- |
 | 0x00   | char[4] | Format ID: `ALAR`       |
-| 0x04   | byte    | Version: `3`            |
+| 0x04   | byte    | Version                 |
 | 0x05   | byte    | Container feature flags |
 | 0x06   | short   | Number of files         |
 
@@ -149,10 +149,10 @@ The file ID and info flags have the same meaning as in
 
 ## Name hashes
 
-The format store a precomputed hash of the file name, to speed up the file
+The format stores a precomputed hash of the file name, to speed up the file
 lookup process. At runtime, the game computes the same hash of the requested
-file path, and compare with the stored value. This is faster than comparing
-paths char by char.
+file path, and compare with the stored value. If it matches, it does also
+compare the name char by char to prevent false positives due to hash collisions.
 
 There are two known versions of the hash algorithm. ALAR version 2 uses the
 first version. ALAR version 3 has a flag in the header to indicate the hash
