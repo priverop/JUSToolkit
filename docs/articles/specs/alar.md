@@ -18,27 +18,27 @@ across versions:
 
 The feature flag is a bit-field:
 
-- 0: filename support
-- 1: unknown
-- 2: folder and sub-container (ALAR) support
-- 3-5: reserved
-- 6: path hash version: 0=v1, 1=v2
-- 7: reserved
+- 0: if set, container provides filenames.
+- 1: unknown, set when the container has a file with file info flag bit 24 set.
+- 2: if set, container supports folders and sub-container (ALAR).
+- 3-5: reserved.
+- 6: [file path hash](#file-path-hashes) version: 0=v1, 1=v2.
+- 7: reserved.
 
-The possible combinations are:
+The combinations found in the game assets are:
 
-- Version 2: `0x01`, `0x03`
-- Version 3: `0x05`, `0x45`
+- Version 2: `0x01`, `0x03`.
+- Version 3: `0x05`, `0x45`.
 
 ### Version 1
 
 The format structure is:
 
-- [Header](#format)
-- Extended header
-- Lookup table
-- File access table
-- File data
+- [Header](#format).
+- Extended header.
+- Lookup table.
+- File access table.
+- File data.
 
 #### V1 Extender header
 
@@ -50,8 +50,8 @@ There is one entry per file with the information to find the index of the file
 in the container by path or file ID. The size of each entry depends on the
 container features, if it supports file names or not.
 
-- (only if bit0 is set, for filename support) `char[32]` filename
-- `uint` file ID
+- (only if bit0 is set, for filename support) `char[32]` filename.
+- `uint` file ID.
 
 #### V1 File access table
 
@@ -62,23 +62,29 @@ entry is a 32-bits integer.
 
 The file data format is:
 
-- `uint` data size
-- `byte[size]` data
+- `uint` data size.
+- `byte[size]` data.
 
 ### Version 2
 
 The format structure is:
 
-- [Header](#format)
-- Extended header
-- File info table
-- File data
+- [Header](#format).
+- Extended header.
+- File info table.
+- File data.
 
 #### V2 Extended header
 
-It has two additional 32-bits integers with the first, and last file ID (without
-the type). The last file ID takes into account the frame count from `ALMT` /
-`ALOD` files as it were additional files.
+There are four additional bytes:
+
+| Offset | Type | Description                  |
+| ------ | ---- | ---------------------------- |
+| 0x08   | uint | First file ID (without type) |
+| 0x0C   | uint | Last file ID (without type)  |
+
+The last file ID takes into account the frame count from `ALMT` / `ALOD` files
+as it were additional files.
 
 #### V2 File info
 
@@ -91,15 +97,17 @@ There are 16 bytes per file:
 | 0x08   | uint | File data size            |
 | 0x0C   | uint | File info flags           |
 
-The highest byte of the file ID defines the [format type](#file-types).
+The highest byte of the file ID defines the [format type](#file-types). The rest
+bytes identify the image.
 
 The file info flags have two parts:
 
-- bits 0-23: frame count
-- bit 24: unknown, only set for some `DSIG` formats
-- bit 25-29: reserved
-- bit 30: if set, the lower part contains the frame count
-- bit 31: if set, before the file data there is the file name and hash
+- bits 0-23: _frame count_ if bit 30 is set, otherwise `1`.
+  - This seems to be set only for `ALMT` and `ALOD` files.
+- bit 24: unknown, only set for some `DSIG` formats.
+- bit 25-29: reserved.
+- bit 30: if set, the bits 0-23 define the frame count.
+- bit 31: if set, before the file data there is the file name and hash.
 
 #### V2 File data
 
@@ -119,10 +127,10 @@ The file info flags have two parts:
 
 The format structure is:
 
-- [Header](#format)
-- Extended header
-- File info table
-- File data
+- [Header](#format).
+- Extended header.
+- File info table.
+- File data.
 
 #### V3 Extended header
 
@@ -141,18 +149,18 @@ The format structure is:
 | 0x04   | uint     | File data absolute offset               |
 | 0x08   | uint     | File data size                          |
 | 0x0C   | uint     | Flags                                   |
-| 0x10   | ushort   | [File path hash](#name-hashes)          |
+| 0x10   | ushort   | [File path hash](#file-path-hashes)     |
 | 0x12   | char[18] | Null-terminated file path ASCII encoded |
 
 The file ID and info flags have the same meaning as in
 [version 2 file info](#v2-file-info).
 
-## Name hashes
+## File path hashes
 
-The format stores a precomputed hash of the file name, to speed up the file
-lookup process. At runtime, the game computes the same hash of the requested
-file path, and compare with the stored value. If it matches, it does also
-compare the name char by char to prevent false positives due to hash collisions.
+The format stores a precomputed hash of the file path in the container, to speed
+up the file lookup process. At runtime, the game computes the same hash of the
+requested path, and compares with the stored value. If it matches, it does also
+compare the path char by char to prevent false positives due to hash collisions.
 
 There are two known versions of the hash algorithm. ALAR version 2 uses the
 first version. ALAR version 3 has a flag in the header to indicate the hash
@@ -195,7 +203,7 @@ foreach (byte ch in data) {
 
 ## File types
 
-- `0x00`: undefined format, specific binary data structure
+- `0x00`: undefined format, specific binary data structure.
 - `0x40`: `DSTX`
 - `0x41`: `ALMT`
 - `0x42`: `DSIG`
