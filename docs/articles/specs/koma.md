@@ -38,34 +38,6 @@ The sprite data is 4 bytes:
 | 0x0C   | bgr555[] | palette                                            |
 | ...    | pixels[] | image                                              |
 
-## ALAR 3
-
-| Offset | Type       | Description                 |
-| ------ | ---------- | --------------------------- |
-| 0x00   | char[4]    | ALAR                        |
-| 0x04   | byte       | Version (3 to follow)       |
-| 0x05   | byte       | Minor version?              |
-| 0x06   | int        | Number of files             |
-| 0x0A   | short      | Reserved?                   |
-| 0x0C   | int        | Number of entries           |
-| 0x10   | short      | Data offset                 |
-| 0x12   | short[]    | File info absolute pointers |
-| ..     | FileInfo[] | File info list              |
-| ..     | Stream[]   | File data                   |
-
-### File info
-
-| Offset | Type   | Description               |
-| ------ | ------ | ------------------------- |
-| 0x00   | short  | ID                        |
-| 0x02   | short  | Unknown                   |
-| 0x04   | int    | Absolute pointer          |
-| 0x08   | int    | Size                      |
-| 0x0C   | short  | Unknown                   |
-| 0x0E   | short  | Unknown                   |
-| 0x10   | short  | Unknown                   |
-| 0x12   | string | Null-terminated file path |
-
 ## KShape
 
 | Offset | Type         | Description                 |
