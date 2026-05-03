@@ -1,8 +1,8 @@
 # ALAR container
 
 The _ALAR_ binary format (_AL ARchive_) specifies how to pack binary files
-together. There are three versions of the format, but there are no remains of
-assets with version 1.
+together. There are three versions of the format, but this game only has files
+with version 2 and 3.
 
 ## Format
 
@@ -16,7 +16,7 @@ across versions:
 | 0x05   | byte    | Container feature flags |
 | 0x06   | short   | Number of files         |
 
-The feature flag is a bit-field:
+The feature flag is a bit-field with 8 bits as follows:
 
 - 0: if set, container provides filenames.
 - 1: unknown, set when the container has a file with file info flag bit 24 set.
@@ -98,7 +98,7 @@ There are 16 bytes per file:
 | 0x0C   | uint | File info flags           |
 
 The highest byte of the file ID defines the [format type](#file-types). The rest
-bytes identify the image.
+bytes identify the final asset (like an image).
 
 The file info flags have two parts:
 
