@@ -1,0 +1,52 @@
+diff --git a/desmume/src/debug.cpp b/desmume/src/debug.cpp
+index bdbee09b..4c0ea56a 100644
+--- a/desmume/src/debug.cpp
++++ b/desmume/src/debug.cpp
+ 
+ void HandleDebugEvent_Execute()
+ {
++    extern bool nds_debug_continuing[2];
++    if (nds_debug_continuing[DebugEventData.procnum]) {
++        nds_debug_continuing[DebugEventData.procnum] = false;
++        return;
++    }
++
++    nds_debug_continuing[DebugEventData.procnum] = true;
++
++    const unsigned int JUS_OPEN_AAR_FUNC = 0x020101f4;
++    const unsigned int JUS_OPEN_AAR_FILE_FUNC = 0x0203341c;
++    if (DebugEventData.addr == JUS_OPEN_AAR_FUNC) {
++	armcpu_t* cpu = DebugEventData.cpu();
++	u32 filenameAddress = cpu->R[0];
++	u32 param_2 = cpu->R[1];
++
++	char* filename = (char*)(MMU.MAIN_MEM + (filenameAddress & _MMU_MAIN_MEM_MASK32));
++	printf("[JUS] Opening AAR: %s (%d)\n", filename, param_2);
++    } else if (DebugEventData.addr == JUS_OPEN_AAR_FILE_FUNC) {
++	armcpu_t* cpu = DebugEventData.cpu();
++	u32 filenameAddress = cpu->R[0];
++	u32 param_2 = cpu->R[1];
++	u32 param_3 = cpu->R[2];
++
++	char* filename = (char*)(MMU.MAIN_MEM + (filenameAddress & _MMU_MAIN_MEM_MASK32));
++	printf("[JUS] Opening subfile: %s (%d, %d)\n", filename, param_2, param_3);
+
++    }
++
++    if (!debug_acl) return;
++    if (DebugEventData.procnum != ARMCPU_ARM9) return; //acl only valid on arm9
++    acl_check_access(DebugEventData.addr, CP15_ACCESS_EXECUTE);
+ }
+ 
+diff --git a/desmume/src/debug.h b/desmume/src/debug.h
+index 5dfda56a..a694e613 100644
+--- a/desmume/src/debug.h
++++ b/desmume/src/debug.h
+@@ -187,6 +187,7 @@ extern u32 debugFlag;
+ 
+ FORCEINLINE bool CheckDebugEvent(EDEBUG_EVENT event)
+ {
++    return true;
+ 	//for now, debug events are only handled in dev+ builds
+ #ifndef DEVELOPER
+ 	return false;

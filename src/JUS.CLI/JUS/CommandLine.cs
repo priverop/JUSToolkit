@@ -256,30 +256,6 @@ namespace JUS.CLI.JUS
                     parseResult.GetValue(exportOutput)!);
             });
 
-            var exportAlar3Container = new Option<string>("--container") { Description = "the input alar3 container" };
-            var exportAlar3Output = new Option<string>("--output") { Description = "the output folder" };
-            var exportAlar3 = new Command("export-alar3", "Export alar3") {
-                exportAlar3Container,
-                exportAlar3Output,
-            };
-            exportAlar3.SetAction(parseResult => {
-                ContainerCommands.ExportAlar3(
-                    parseResult.GetValue(exportAlar3Container)!,
-                    parseResult.GetValue(exportAlar3Output)!);
-            });
-
-            var exportAlar2Container = new Option<string>("--container") { Description = "the input alar2 container" };
-            var exportAlar2Output = new Option<string>("--output") { Description = "the output folder" };
-            var exportAlar2 = new Command("export-alar2", "Export alar2") {
-                exportAlar2Container,
-                exportAlar2Output,
-            };
-            exportAlar2.SetAction(parseResult => {
-                ContainerCommands.ExportAlar2(
-                    parseResult.GetValue(exportAlar2Container)!,
-                    parseResult.GetValue(exportAlar2Output)!);
-            });
-
             var importContainer = new Option<string>("--container") { Description = "the input alar container" };
             var importInput = new Option<string>("--input") { Description = "the input directory to insert" };
             var importOutput = new Option<string>("--output") { Description = "the output folder" };
@@ -295,43 +271,9 @@ namespace JUS.CLI.JUS
                     parseResult.GetValue(importOutput)!);
             });
 
-            var importAlar2Container = new Option<string>("--container") { Description = "the input alar2 container" };
-            var importAlar2Input = new Option<string>("--input") { Description = "the input directory to insert" };
-            var importAlar2Output = new Option<string>("--output") { Description = "the output folder" };
-            var importAlar2 = new Command("import-alar2", "import alar2") {
-                importAlar2Container,
-                importAlar2Input,
-                importAlar2Output,
-            };
-            importAlar2.SetAction(parseResult => {
-                ContainerCommands.ImportAlar2(
-                    parseResult.GetValue(importAlar2Container)!,
-                    parseResult.GetValue(importAlar2Input)!,
-                    parseResult.GetValue(importAlar2Output)!);
-            });
-
-            var importAlar3Container = new Option<string>("--container") { Description = "the input alar3 container" };
-            var importAlar3Input = new Option<string>("--input") { Description = "the input directory to insert" };
-            var importAlar3Output = new Option<string>("--output") { Description = "the output folder" };
-            var importAlar3 = new Command("import-alar3", "import alar3") {
-                importAlar3Container,
-                importAlar3Input,
-                importAlar3Output,
-            };
-            importAlar3.SetAction(parseResult => {
-                ContainerCommands.ImportAlar3(
-                    parseResult.GetValue(importAlar3Container)!,
-                    parseResult.GetValue(importAlar3Input)!,
-                    parseResult.GetValue(importAlar3Output)!);
-            });
-
             return new Command("containers", "Unpack/Repack container files") {
                 export,
-                exportAlar3,
-                exportAlar2,
                 import,
-                importAlar2,
-                importAlar3,
             };
         }
 

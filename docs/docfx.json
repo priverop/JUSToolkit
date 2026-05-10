@@ -1,66 +1,81 @@
 {
-    "metadata": [
-      {
-        "src": [
-          {
-            "files": [
-              "JUS.Tool/*.csproj"
-            ],
-            "src": "../src"
-          }
-        ],
-        "dest": "api",
-        "includePrivateMembers": false,
-        "disableGitFeatures": false,
-        "disableDefaultFilter": false,
-        "noRestore": false,
-        "namespaceLayout": "flattened",
-        "memberLayout": "samePage",
-        "EnumSortOrder": "alphabetic",
-        "allowCompilationErrors": false
-      }
-    ],
-    "build": {
-      "content": [
+  "metadata": [
+    {
+      "src": [
         {
           "files": [
-            "api/**.yml",
-            "api/index.md"
-          ]
-        },
-        { "files": "**/*.{md,yml}", "src": "articles", "dest": "docs" },
-        { "files": [ "toc.yml", "*.md" ] }
-      ],
-      "resource": [
-        {
-          "files": [ "**/images/**", "**/resources/**" ],
-          "exclude": [ "_site/**", "obj/**" ]
+            "JUS.Tool/*.csproj"
+          ],
+          "src": "../src"
         }
       ],
-      "output": "_site",
-      "globalMetadata": {
-        "_appTitle": "JUS Toolkit",
-        "_appName": "JUS Toolkit",
-        "_appFooter": "Copyright (c) 2019 Pablo Rivero",
-        // "_appLogoPath": "images/logo_48.png",
-        // "_appFaviconPath": "images/favicon.png",
-        "_enableSearch": true,
-        "_enableNewTab": true,
-        "_lang": "en"
-      },
-      "fileMetadataFiles": [],
-      "template": [
-        "default",
-        "modern",
-        "template"
-      ],
-      "postProcessors": [],
-      "keepFileLink": false,
+      "dest": "api",
+      "includePrivateMembers": false,
       "disableGitFeatures": false,
-      "sitemap": {
-        "baseUrl": "https://priverop.github.io/JUSTollkit",
-        "priority": 0.5,
-        "changefreq": "monthly"
-      }
+      "disableDefaultFilter": false,
+      "noRestore": false,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "EnumSortOrder": "alphabetic",
+      "allowCompilationErrors": false
     }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": "**/*.{md,yml}",
+        "src": "articles",
+        "dest": "docs"
+      },
+      {
+        "files": [
+          "toc.yml",
+          "*.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "**/images/**",
+          "**/resources/**"
+        ],
+        "exclude": [
+          "_site/**",
+          "obj/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "globalMetadata": {
+      "_appTitle": "JUS Toolkit",
+      "_appName": "JUS Toolkit",
+      "_appFooter": "Copyright (c) 2019 Pablo Rivero",
+      "_appLogoPath": "images/icon_50.webp",
+      "_appFaviconPath": "images/favicon.webp",
+      "_enableSearch": true,
+      "_enableNewTab": true,
+      "_lang": "en"
+    },
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "modern",
+      "template"
+    ],
+    "postProcessors": [],
+    "keepFileLink": false,
+    "disableGitFeatures": false,
+    "sitemap": {
+      "baseUrl": "https://priverop.github.io/JUSTollkit",
+      "priority": 0.5,
+      "changefreq": "monthly"
+    }
+  }
 }
