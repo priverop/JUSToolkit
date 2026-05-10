@@ -24,28 +24,38 @@
 - **Sprites** - Export and import **DTX**, including **Komas**.
 - **Automatizations** - Utilities to batch export and import multiple files.
 
-Check [**usage**](https://priverop.github.io/JUSToolkit/docs/tool/usage.html) for more info.
+Check [**usage**](https://priverop.github.io/JUSToolkit/docs/tool/usage.html) 
+for more info.
 
 ## Requirements
 
 The utility requires the
-[.NET 10.0 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), and works in every OS.
+[.NET 10.0 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), 
+and works in every OS.
 
 ## Documentation
 
-Check our [documentation page](https://priverop.github.io/JUSToolkit/docs/tool/index.html) for guides on installation, how to use the tool, scripts, format research, and more!
+Check our [documentation page](https://priverop.github.io/JUSToolkit/docs/tool/index.html) 
+for guides on installation, how to use the tool, scripts, format research, and more!
 
 ## Tinke and SceneGate
 
-You can use [Tinke by pleonex](https://github.com/pleonex/tinke), which has a built-in plugin to unpack JUS containers, and view .dig files.
+You can use [Tinke by pleonex](https://github.com/pleonex/tinke), which has a 
+built-in plugin to unpack JUS containers, and view .dig files.
 
-Also, we've developed an auto-discovery plugin for [SceneGate by pleonex](https://code.pleonex.dev/sceneGate/scenegate). Check [this article](https://priverop.github.io/JUSToolkit/docs/tool/scenegate.html) for more info.
+Also, we've developed an auto-discovery plugin for [SceneGate by pleonex](https://code.pleonex.dev/sceneGate/scenegate). 
+Check [this article](https://priverop.github.io/JUSToolkit/docs/tool/scenegate.html) for more info.
 
 
 ## Credits
 
-- [**pleonex**](https://fosstodon.org/@pleonex) - Friend, creator, and maintainer of [Yarhl](https://code.pleonex.dev/sceneGate/yarhl), [Tinke](https://code.pleonex.dev/sceneGate/tinke), [Ekona](https://code.pleonex.dev/sceneGate/ekona), and [PleOps.Cake](https://codeberg.org/pleonex/PleOps.Cake).
-- [**Darkc0m**](https://github.com/Darkc0m) - Co-developer, and co-leader of the project.
+- [**pleonex**](https://fosstodon.org/@pleonex) - Friend, creator, and maintainer 
+of [Yarhl](https://code.pleonex.dev/sceneGate/yarhl), 
+[Tinke](https://code.pleonex.dev/sceneGate/tinke), 
+[Ekona](https://code.pleonex.dev/sceneGate/ekona), and 
+[PleOps.Cake](https://codeberg.org/pleonex/PleOps.Cake).
+- [**Darkc0m**](https://github.com/Darkc0m) - Co-developer, and co-leader of the 
+  project.
 - [**TraduSquare**](https://tradusquare.es) - Spanish Fantranslation community.
 - **Ganbarion** - For creating this amazing game!
 
