@@ -69,62 +69,6 @@ namespace JUS.CLI.JUS
         }
 
         /// <summary>
-        /// Export all the files from the Alar3 container.
-        /// </summary>
-        /// <param name="container">The path to the alar3 file.</param>
-        /// <param name="output">The output directory.</param>
-        public static void ExportAlar3(string container, string output)
-        {
-            Console.WriteLine("Exporting Alar3");
-            Console.WriteLine("Container: " + container);
-
-            PathValidator.ValidateFile(container);
-
-            using Node files = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Alar3>() ?? throw new FormatException("Invalid container file");
-
-            foreach (Node node in Navigator.IterateNodes(files)) {
-                if (!node.IsContainer) {
-                    // Path.Combine ignores the relative path if there is an absolute path
-                    // so we remove the first slash of the node.Path
-                    string outputFile = Path.Combine(output, node.Path[1..]);
-                    node.Stream!.WriteTo(outputFile);
-                }
-            }
-
-            Console.WriteLine("Done!");
-        }
-
-        /// <summary>
-        /// Export all the files from the Alar2 container.
-        /// </summary>
-        /// <param name="container">The path to the alar2 file.</param>
-        /// <param name="output">The output directory.</param>
-        public static void ExportAlar2(string container, string output)
-        {
-            Console.WriteLine("Exporting Alar2");
-            Console.WriteLine("Container: " + container);
-
-            PathValidator.ValidateFile(container);
-
-            using Node files = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Alar2>() ?? throw new FormatException("Invalid container file");
-
-            foreach (Node node in Navigator.IterateNodes(files)) {
-                if (!node.IsContainer) {
-                    // Path.Combine ignores the relative path if there is an absolute path
-                    // so we remove the first slash of the node.Path
-                    string outputFile = Path.Combine(output, node.Path[1..]);
-                    node.Stream!.WriteTo(outputFile);
-                }
-            }
-
-            Console.WriteLine("Done!");
-        }
-
-        /// <summary>
         /// Import files into an Alar container.
         /// </summary>
         /// <param name="container">The path to the original alar file.</param>
@@ -176,70 +120,6 @@ namespace JUS.CLI.JUS
                     binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
                 }
             }
-
-            Console.WriteLine("Done!");
-        }
-
-        /// <summary>
-        /// Import files into an Alar3 container.
-        /// </summary>
-        /// <param name="container">The path to the original alar3 file.</param>
-        /// <param name="input">The path to the directory of the files we want to add.</param>
-        /// <param name="output">The output directory.</param>
-        public static void ImportAlar3(string container, string input, string output)
-        {
-            Console.WriteLine("Importing Alar3");
-            Console.WriteLine("Container: " + container);
-            Console.WriteLine("Input files from: " + input);
-
-            PathValidator.ValidateFile(container);
-            PathValidator.ValidateDirectory(input);
-
-            using Node containerNode = NodeFactory.FromFile(container);
-            Alar3 alar = containerNode
-                .TransformWith<Binary2Alar3>()
-                .GetFormatAs<Alar3>() ?? throw new FormatException("Invalid container file");
-
-            using var filesToInsert = new NodeContainerFormat();
-            using Node factory = NodeFactory.FromDirectory(input);
-            filesToInsert.Root.Add(factory);
-
-            alar.InsertModification(filesToInsert);
-
-            using BinaryFormat binary = alar.ConvertWith(new Alar3ToBinary());
-            binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
-
-            Console.WriteLine("Done!");
-        }
-
-        /// <summary>
-        /// Import files into an Alar2 container.
-        /// </summary>
-        /// <param name="container">The path to the original alar2 file.</param>
-        /// <param name="input">The path to the directory of the files we want to add.</param>
-        /// <param name="output">The output directory.</param>
-        public static void ImportAlar2(string container, string input, string output)
-        {
-            Console.WriteLine("Importing Alar2");
-            Console.WriteLine("Container: " + container);
-            Console.WriteLine("Input files from: " + input);
-
-            PathValidator.ValidateFile(container);
-            PathValidator.ValidateDirectory(input);
-
-            using Node containerNode = NodeFactory.FromFile(container);
-            Alar2 alar = containerNode
-                .TransformWith<Binary2Alar2>()
-                .GetFormatAs<Alar2>() ?? throw new FormatException("Invalid container file");
-
-            using var filesToInsert = new NodeContainerFormat();
-            using Node factory = NodeFactory.FromDirectory(input);
-            filesToInsert.Root.Add(factory);
-
-            alar.InsertModification(filesToInsert);
-
-            using BinaryFormat binary = alar.ConvertWith(new Alar2ToBinary());
-            binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
 
             Console.WriteLine("Done!");
         }
