@@ -40,7 +40,7 @@ for each type of file. The [text specification](./texts.md) have more details.
 - `jgalaxy/jgalaxy.aar/jgalaxy/battle.bin`: JGalaxy battle types.
 - `jgalaxy/jgalaxy.aar/jgalaxy/jgalaxy.bin`: JGalaxy world and galaxy names.
 - `jgalaxy/jgalaxy.aar/jgalaxy/mission.bin`: JGalaxy mission names.
-- `jquiz/jquiz_pack.aar/jquiz/jquiz.bin`: quiz questions
+- `jquiz/jquiz_pack.aar/jquiz/jquiz.bin`: JQuiz questions and answers.
 
 ## Fonts
 
@@ -49,17 +49,17 @@ The fonts are in the `font` folder with `ALFT` format.
 - `font/DSFont.aft`.
 - `font/js8font.aft`.
 - `font/jskfont_q.aft`.
-- `font/jskfont.aft`
+- `font/jskfont.aft`.
 
 ## Graphics
 
 The main formats for images are:
 
 - [`DSTX`](./dtx.md): textures
- . - `ALMT`: tile map.
+- `ALMT`: tile map.
 - `DSIG`: indexed image.
- . - `ALTM`: tile map.
- . - `ALOD`: unknown.
+- `ALTM`: tile map.
+- `ALOD`: unknown.
 - `NCCL`: palette.
 
 Additionally, _komas_ have their own format documented in the
@@ -74,12 +74,12 @@ Additionally, _komas_ have their own format documented in the
 The video codec is `VXDS` from Mobiclip. This codec was a previous version to
 `MODS`. There are no known documentation or tools for this format.
 
-- `opening/opening.vx`
+- `opening/opening.vx`.
 
 ## Data structures
 
 These files have different data structures to support different game features.
-.
+
 - `bin/ability.bin`.
 - `bin/chr_b.bin`.
 - `bin/chr_s.bin`.
