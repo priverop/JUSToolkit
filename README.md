@@ -35,7 +35,7 @@ and works in every OS.
 
 ## Documentation
 
-Check our [documentation page](https://priverop.github.io/JUSToolkit/docs/tool/index.html) 
+Check our [documentation page](https://priverop.github.io/JUSToolkit/index.html) 
 for guides on installation, how to use the tool, scripts, format research, and more!
 
 ## Tinke and SceneGate
