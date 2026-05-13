@@ -9,6 +9,9 @@ using Yarhl.IO;
 
 namespace JUS.Tool.Discovery;
 
+/// <summary>
+/// Discover compatible converters for binary formats based on their header bytes.
+/// </summary>
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
 {
@@ -25,6 +28,7 @@ public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
         HeaderFormat.Create<BinaryDtx4ToSpriteImage>("DSTX", 1, 4),
     ];
 
+    /// <inheritdoc />
     public ConverterMatcherResult Match(Node input, ConverterMatcherContext context)
     {
         if (input.Format is not IBinary) {

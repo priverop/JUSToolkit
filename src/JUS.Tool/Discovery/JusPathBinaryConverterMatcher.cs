@@ -8,6 +8,9 @@ using Yarhl.IO;
 
 namespace JUS.Tool.Discovery;
 
+/// <summary>
+/// Discover compatible converters for binary formats based on their path.
+/// </summary>
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class JusPathBinaryConverterMatcher : IConverterMatcher
 {
@@ -38,6 +41,7 @@ public sealed class JusPathBinaryConverterMatcher : IConverterMatcher
         FormatLocation.Create<Binary2JQuiz>("data/jquiz/jquiz_pack.aar/jquiz/jquiz.bin"),
     ];
 
+    /// <inheritdoc />
     public ConverterMatcherResult Match(Node input, ConverterMatcherContext context)
     {
         if (input.Format is not IBinary) {

@@ -8,6 +8,9 @@ using Yarhl.IO;
 
 namespace JUS.Tool.Discovery;
 
+/// <summary>
+/// Discover compatible converters for binary formats based a regex for their paths.
+/// </summary>
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class JusRegexPathBinaryConverterMatcher : IConverterMatcher
 {
@@ -20,6 +23,7 @@ public sealed class JusRegexPathBinaryConverterMatcher : IConverterMatcher
         FormatLocation.Create<Binary2PDeck>(@"data/deck/Deck\.aar/deck/\w+/p\d{3}.bin"),
     ];
 
+    /// <inheritdoc />
     public ConverterMatcherResult Match(Node input, ConverterMatcherContext context)
     {
         if (input.Format is not IBinary) {

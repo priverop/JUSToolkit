@@ -22,7 +22,7 @@ public sealed class BuildLifetime : FrostingLifetime<PleOpsBuildContext>
 {
     public override void Setup(PleOpsBuildContext context, ISetupContext info)
     {
-        context.WarningsAsErrors = false;
+        context.WarningsAsErrors = true;
         context.DotNetContext.CoverageTarget = 0;
 
         context.ReadArguments();
