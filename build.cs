@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env dotnet run
 #:property PublishAot=false
-#:package Cake.Frosting.PleOps.Recipe@1.0.4-preview.37
+#:package Cake.Frosting.PleOps.Recipe@1.0.4-preview.62
 
 using System.Diagnostics.CodeAnalysis;
 using Cake.Common.IO;
@@ -9,64 +9,36 @@ using Cake.Core;
 using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Cake.Frosting.PleOps.Recipe;
-using Cake.Frosting.PleOps.Recipe.Dotnet;
+using Cake.Frosting.PleOps.Recipe.Common;
 
 return new CakeHost()
     .AddAssembly(typeof(PleOpsBuildContext).Assembly)
-    .UseContext<BuildContext>()
+    .UseContext<PleOpsBuildContext>()
     .UseLifetime<BuildLifetime>()
     .Run(args);
 
-public sealed class BuildContext : PleOpsBuildContext
-{
-    public BuildContext(ICakeContext context)
-        : base(context)
-    {
-    }
-
-    public string? TestResourceUri { get; private set; }
-
-    public string? TestResourceName { get; private set; }
-
-    [LogIgnore]
-    public string? TestResourceUsername { get; private set; }
-
-    [LogIgnore]
-    public string? TestResourcePassword { get; private set; }
-
-    public override void ReadArguments()
-    {
-        base.ReadArguments();
-
-        Arguments.SetIfPresent("resource-uri", x => TestResourceUri = x);
-        Arguments.SetIfPresent("resource-name", x => TestResourceName = x);
-        Arguments.SetIfPresent("resource-usr", x => TestResourceUsername = x);
-        Arguments.SetIfPresent("resource-pwd", x => TestResourcePassword = x);
-    }
-}
-
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-public sealed class BuildLifetime : FrostingLifetime<BuildContext>
+public sealed class BuildLifetime : FrostingLifetime<PleOpsBuildContext>
 {
-    public override void Setup(BuildContext context, ISetupContext info)
+    public override void Setup(PleOpsBuildContext context, ISetupContext info)
     {
         context.WarningsAsErrors = false;
         context.DotNetContext.CoverageTarget = 0;
 
-        context.DotNetContext.ApplicationProjects.Add(
-            new ProjectPublicationInfo(
-                "./src/JUS.CLI",
-                [ "win-x64", "linux-x64", "osx-x64" ],
-                "net10.0"));
-
         context.ReadArguments();
 
         context.DotNetContext.PreviewNuGetFeed = "https://pkgs.dev.azure.com/SceneGate/SceneGate/_packaging/SceneGate-Preview/nuget/v3/index.json";
+        context.DotNetContext.AddApplication("./src/JUS.CLI", [ "win-x64", "linux-x64", "osx-x64" ]);
+
+        context.ResourcesContext.ResourcesDirectory = Path.GetFullPath(Path.Combine("src", "JUS.Tests"));
+        context.ResourcesContext.DownloadUser = "not_needed";
+        context.ResourcesContext.DownloadFormat = ResourcesDownloadFormat.ZipBundle;
+        context.ResourcesContext.DownloadId = "resources-0.zip";
 
         context.Print();
     }
 
-    public override void Teardown(BuildContext context, ITeardownContext info)
+    public override void Teardown(PleOpsBuildContext context, ITeardownContext info)
     {
         context.DeliveriesContext.Save();
     }
@@ -75,6 +47,7 @@ public sealed class BuildLifetime : FrostingLifetime<BuildContext>
 [TaskName("Default")]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Common.SetGitVersionTask))]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Common.CleanArtifactsTask))]
+[IsDependentOn(typeof(DownloadJusTestFilesTask))]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Dotnet.DotnetTasks.BuildProjectTask))]
 public sealed class DefaultTask : FrostingTask
 {
@@ -89,6 +62,13 @@ public sealed class BundleTask : FrostingTask
 {
 }
 
+[TaskName("Build-Bundle")]
+[IsDependentOn(typeof(DefaultTask))]
+[IsDependentOn(typeof(BundleTask))]
+public sealed class BuildBundleTask : FrostingTask
+{
+}
+
 [TaskName("Deploy")]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Common.SetGitVersionTask))]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Dotnet.DotnetTasks.DeployProjectTask))]
@@ -97,24 +77,23 @@ public sealed class DeployTask : FrostingTask
 {
 }
 
-[TaskName("Download-TestFiles")]
+[TaskName("Download-JusTestFiles")]
 [TaskDescription("Download the test resource files")]
-[IsDependeeOf(typeof(Cake.Frosting.PleOps.Recipe.Dotnet.TestTask))]
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-public class DownloadTestFilesTask : FrostingTask<BuildContext>
+public class DownloadJusTestFilesTask : FrostingTask<PleOpsBuildContext>
 {
-    public override bool ShouldRun(BuildContext context) =>
-        !string.IsNullOrEmpty(context.TestResourceUri);
+    public override bool ShouldRun(PleOpsBuildContext context) =>
+        !string.IsNullOrEmpty(context.ResourcesContext.DownloadAddress);
 
-    public override void Run(BuildContext context)
+    public override void Run(PleOpsBuildContext context)
     {
-        string resourcesPath = Path.GetFullPath(Path.Combine("src", "JUS.Tests"));
-
-        string resourceUri = string.Format(context.TestResourceUri!, context.TestResourceName);
+        ResourcesContext resourceInfo = context.ResourcesContext;
+        string resourceUri = string.Format(resourceInfo.DownloadAddress!, resourceInfo.DownloadId);
         var downloadSettings = new DownloadFileSettings {
-            Username = context.TestResourceUsername,
-            Password = context.TestResourcePassword,
-            UseDefaultCredentials = string.IsNullOrWhiteSpace(context.TestResourceUsername) || string.IsNullOrWhiteSpace(context.TestResourcePassword),
+            Username = resourceInfo.DownloadUser,
+            Password = resourceInfo.DownloadPassword,
+            UseDefaultCredentials = string.IsNullOrWhiteSpace(resourceInfo.DownloadUser)
+                || string.IsNullOrWhiteSpace(resourceInfo.DownloadPassword),
         };
         context.Log.Information(downloadSettings.UseDefaultCredentials
             ? "Download without credentials"
@@ -124,6 +103,6 @@ public class DownloadTestFilesTask : FrostingTask<BuildContext>
         var compressedResources = context.DownloadFile(resourceUri, downloadSettings);
 
         context.Log.Debug("Unzipping resource");
-        context.Unzip(compressedResources, resourcesPath, true);
+        context.Unzip(compressedResources, context.ResourcesContext.ResourcesDirectory, true);
     }
 }

@@ -4,8 +4,7 @@
 # Build outputs
 obj/
 bin/
-build/artifacts/
-build/temp/
+build/
 /CHANGELOG.md
 /CHANGELOG.NEXT.md
 
