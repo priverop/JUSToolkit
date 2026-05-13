@@ -1,4 +1,4 @@
-﻿using Texim.Games.Nitro.Backgrounds.ScreenMaps;
+﻿using Texim.TileMaps;
 
 namespace JUS.Tool.Graphics
 {
@@ -26,7 +26,7 @@ namespace JUS.Tool.Graphics
     /// <summary>
     /// Screen map with format Almt.
     /// </summary>
-    public class Almt : IScreenMap
+    public class Almt : ITileMap
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Almt"/> class.
@@ -61,7 +61,7 @@ namespace JUS.Tool.Graphics
         /// </summary>
         /// <param name="atm">Almt object to clone.</param>
         /// <param name="screenMap">ScreenMap object to clone.</param>
-        public Almt(Almt atm, IScreenMap screenMap)
+        public Almt(Almt atm, ITileMap screenMap)
             : this(atm)
         {
             Width = screenMap.Width;

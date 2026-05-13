@@ -1,12 +1,11 @@
 <Project>
   <!-- Centralize dependency management -->
   <ItemGroup>
-    <PackageVersion Include="SceneGate.UI.Formats" Version="0.1.1-preview.17" />
-    <PackageVersion Include="Yarhl" Version="4.1.0" />
-    <PackageVersion Include="Yarhl.Media.Text" Version="4.1.0" />
-    <PackageVersion Include="Texim" Version="0.1.0-preview.321" />
-    <PackageVersion Include="Texim.Games" Version="0.1.0-preview.321" />
-    <PackageVersion Include="SceneGate.Ekona" Version="1.1.1-preview.87" />
+    <PackageVersion Include="Yarhl" Version="4.1.1-preview.9" />
+    <PackageVersion Include="Yarhl.Media.Text" Version="4.1.1-preview.9" />
+    <PackageVersion Include="Texim" Version="0.1.0-preview.327" />
+    <PackageVersion Include="Texim.Games" Version="0.1.0-preview.327" />
+    <PackageVersion Include="SceneGate.Ekona" Version="1.2.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
     <PackageVersion Include="FluentAssertions" Version="7.2.1" />
     <PackageVersion Include="nunit" Version="4.5.1" />
