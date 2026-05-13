@@ -13,7 +13,6 @@
     <File Path="src/Tests.runsettings" />
   </Folder>
   <Project Path="src/JUS.CLI/JUS.CLI.csproj" />
-  <Project Path="src/JUS.SceneGatePlugin/JUS.SceneGatePlugin.csproj" />
   <Project Path="src/JUS.Tests/JUS.Tests.csproj" />
   <Project Path="src/JUS.Tool/JUS.Tool.csproj" />
 </Solution>

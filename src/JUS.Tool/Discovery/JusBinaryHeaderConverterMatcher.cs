@@ -2,11 +2,12 @@
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using SceneGate.UI.Formats.Discovery;
+using Yarhl.FileFormat;
+using Yarhl.FileFormat.Discovery;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUS.SceneGatePlugin;
+namespace JUS.Tool.Discovery;
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
@@ -45,7 +46,7 @@ public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
 
         // "should be" if header match, but we can't verify the game code
         MatchingConfidence level = compatibleSoftware == true ? MatchingConfidence.Confident : MatchingConfidence.ShouldBe;
-        object converter = compatibleFormat.ConverterFactory();
+        IConverter converter = compatibleFormat.ConverterFactory();
         return new ConverterMatcherResult(level, compatibleFormat.ConverterType, converter);
     }
 
@@ -60,7 +61,7 @@ public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
             return false;
         }
 
-        if (context.Header.ReadAsciiString(0, 4) != format.Id) {
+        if (context.Header.ReadAscii(0, 4) != format.Id) {
             return false;
         }
 
@@ -80,10 +81,10 @@ public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
         byte? Version,
         byte? Flags,
         Type ConverterType,
-        Func<object> ConverterFactory)
+        Func<IConverter> ConverterFactory)
     {
         public static HeaderFormat Create<T>(string id, byte? version, byte? flags)
-            where T : class, new()
+            where T : class, IConverter, new()
         {
             return new HeaderFormat(id, version, flags, typeof(T), () => new T());
         }

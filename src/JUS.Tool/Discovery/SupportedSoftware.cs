@@ -1,7 +1,7 @@
 ﻿using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 
-namespace JUS.SceneGatePlugin;
+namespace JUS.Tool.Discovery;
 
 public static class SupportedSoftware
 {

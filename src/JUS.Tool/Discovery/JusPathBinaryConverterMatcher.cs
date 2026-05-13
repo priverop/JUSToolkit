@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Texts.Converters;
-using SceneGate.UI.Formats.Discovery;
+using Yarhl.FileFormat;
+using Yarhl.FileFormat.Discovery;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUS.SceneGatePlugin;
+namespace JUS.Tool.Discovery;
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class JusPathBinaryConverterMatcher : IConverterMatcher
@@ -60,14 +61,14 @@ public sealed class JusPathBinaryConverterMatcher : IConverterMatcher
 
         // "should be" if header match, but we can't verify the game code
         MatchingConfidence level = compatibleSoftware == true ? MatchingConfidence.Confident : MatchingConfidence.ShouldBe;
-        object converter = compatibleFormat.ConverterFactory();
+        IConverter converter = compatibleFormat.ConverterFactory();
         return new ConverterMatcherResult(level, compatibleFormat.ConverterType, converter);
     }
 
-    private sealed record FormatLocation(string Path, Type ConverterType, Func<object> ConverterFactory)
+    private sealed record FormatLocation(string Path, Type ConverterType, Func<IConverter> ConverterFactory)
     {
         public static FormatLocation Create<T>(string path)
-            where T : class, new()
+            where T : class, IConverter, new()
         {
             return new FormatLocation(path, typeof(T), () => new T());
         }
