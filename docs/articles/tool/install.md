@@ -18,6 +18,4 @@ Download the latest stable version from the
 
 Preview versions can be downloaded from the project
 [_Actions pipeline artifacts_](https://github.com/priverop/JUSToolkit/actions/workflows/build-and-release.yml).
-But they expire after a few days. You may want to follow the
-[source code README file](https://github.com/priverop/JUSToolkit) to build the
-latest version yourself.
+But they expire after a few days, so you may need to build it locally.

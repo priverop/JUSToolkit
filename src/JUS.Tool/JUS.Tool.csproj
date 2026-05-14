@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <None Include="../../docs/images/logo_128.png" Pack="true" PackagePath="$(PackageIcon)" Visible="false" /> -->
+    <None Include="../../docs/images/icon_128.png" Pack="true" PackagePath="$(PackageIcon)" Visible="false" /> 
     <None Include="../../docs/index.md" Pack="true" PackagePath="$(PackageReadmeFile)" />
 
     <EmbeddedResource Include="Utils/jgalaxy_unknown" />
     <EmbeddedResource Include="../../Resources/table.tbl" LogicalName="JUS.Tool.Resources.table.tbl" />
+  </ItemGroup>
 
+  <ItemGroup>
     <PackageReference Include="Yarhl" />
     <PackageReference Include="Yarhl.Media.Text" />
     <PackageReference Include="Texim" />

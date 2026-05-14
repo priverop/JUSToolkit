@@ -1,6 +1,6 @@
-mode: ContinuousDeployment
+workflow: GitHubFlow/v1
+mode: ContinuousDelivery
 branches:
-  master:
-    regex: ^master$
-    tag: preview
+  main:
+    label: preview
     increment: Patch

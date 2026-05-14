@@ -1,12 +1,16 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using JUS.Tool.Texts.Converters;
-using SceneGate.UI.Formats.Discovery;
+using Yarhl.FileFormat;
+using Yarhl.FileFormat.Discovery;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUS.SceneGatePlugin;
+namespace JUS.Tool.Discovery;
 
+/// <summary>
+/// Discover compatible converters for binary formats based a regex for their paths.
+/// </summary>
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public sealed class JusRegexPathBinaryConverterMatcher : IConverterMatcher
 {
@@ -19,6 +23,7 @@ public sealed class JusRegexPathBinaryConverterMatcher : IConverterMatcher
         FormatLocation.Create<Binary2PDeck>(@"data/deck/Deck\.aar/deck/\w+/p\d{3}.bin"),
     ];
 
+    /// <inheritdoc />
     public ConverterMatcherResult Match(Node input, ConverterMatcherContext context)
     {
         if (input.Format is not IBinary) {
@@ -42,14 +47,14 @@ public sealed class JusRegexPathBinaryConverterMatcher : IConverterMatcher
 
         // "should be" if header match, but we can't verify the game code
         MatchingConfidence level = compatibleSoftware == true ? MatchingConfidence.Confident : MatchingConfidence.ShouldBe;
-        object converter = compatibleFormat.ConverterFactory();
+        IConverter converter = compatibleFormat.ConverterFactory();
         return new ConverterMatcherResult(level, compatibleFormat.ConverterType, converter);
     }
 
-    private sealed record FormatLocation(Regex Regex, Type ConverterType, Func<object> ConverterFactory)
+    private sealed record FormatLocation(Regex Regex, Type ConverterType, Func<IConverter> ConverterFactory)
     {
         public static FormatLocation Create<T>(string pattern)
-            where T : class, new()
+            where T : class, IConverter, new()
         {
             Regex regex = new(pattern, RegexOptions.Compiled);
             return new FormatLocation(regex, typeof(T), () => new T());

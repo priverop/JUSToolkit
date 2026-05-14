@@ -18,7 +18,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/priverop/JUSToolkit</PackageProjectUrl>
         <RepositoryUrl>https://github.com/priverop/JUSToolkit</RepositoryUrl>
-        <!-- <PackageIcon>icon.png</PackageIcon> -->
+         <PackageIcon>icon.png</PackageIcon>
         <PackageTags>videogames;romhacking;translating</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

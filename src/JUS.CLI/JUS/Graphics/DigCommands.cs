@@ -20,9 +20,9 @@
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using Texim.Games.Nitro.Backgrounds.ScreenMaps;
 using Texim.Images;
 using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -99,7 +99,7 @@ namespace JUS.CLI.JUS.Graphics
                 Height = compressed.Tiles.Length / 8,
                 Pixels = compressed.Tiles,
             };
-            IScreenMap map = compressed.Map;
+            ITileMap map = compressed.Map;
 
             var newDig = new Dig(originalDig, newImage);
 
@@ -158,7 +158,7 @@ namespace JUS.CLI.JUS.Graphics
                     Height = compressed.Tiles.Length / 8,
                     Pixels = compressed.Tiles,
                 };
-                IScreenMap map = compressed.Map;
+                ITileMap map = compressed.Map;
 
                 // 3 - Clone original
                 mergedImage = new Dig(mergedImage, newImage);

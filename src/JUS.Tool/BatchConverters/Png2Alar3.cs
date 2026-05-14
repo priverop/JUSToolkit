@@ -21,9 +21,9 @@ using JUS.Tool.Containers;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using Texim.Games.Nitro.Backgrounds.ScreenMaps;
 using Texim.Images;
 using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -154,7 +154,7 @@ namespace JUS.Tool.BatchConverters
                 Height = compressed.Tiles.Length / 8,
                 Pixels = compressed.Tiles,
             };
-            IScreenMap map = compressed.Map;
+            ITileMap map = compressed.Map;
 
             // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(originalDig, newImage);

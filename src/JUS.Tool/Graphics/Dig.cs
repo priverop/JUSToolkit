@@ -1,11 +1,8 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography.X509Certificates;
-using Texim.Games.Nitro.Backgrounds.ScreenMaps;
+﻿using System.Diagnostics.CodeAnalysis;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
-using Yarhl.FileFormat;
+using Texim.TileMaps;
 
 namespace JUS.Tool.Graphics
 {
@@ -217,7 +214,7 @@ namespace JUS.Tool.Graphics
         /// </summary>
         /// <param name="map">Map to modify.</param>
         /// <returns>The <see cref="Dig"/> with the transparent tile.</returns>
-        public Dig InsertTransparentTile(IScreenMap map)
+        public Dig InsertTransparentTile(ITileMap map)
         {
             var dig = new Dig(this) {
                 Pixels = new IndexedPixel[this.Pixels.Length + 64],

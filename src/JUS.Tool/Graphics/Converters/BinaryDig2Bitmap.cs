@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.Tool.Utils;
-using Texim.Games.Nitro.Backgrounds.ScreenMaps;
 using Texim.Images;
 using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;

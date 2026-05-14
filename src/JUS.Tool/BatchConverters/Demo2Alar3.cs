@@ -21,9 +21,9 @@ using JUS.Tool.Containers;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using Texim.Games.Nitro.Backgrounds.ScreenMaps;
 using Texim.Images;
 using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -144,7 +144,7 @@ namespace JUS.Tool.BatchConverters
                     Pixels = compressed.Tiles,
                 };
 
-                IScreenMap map = compressed.Map;
+                ITileMap map = compressed.Map;
 
                 // 3 - Clone original
                 mergedImage = new Dig(mergedImage, newImage);
