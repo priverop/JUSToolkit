@@ -19,7 +19,6 @@
 // SOFTWARE.
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics.Converters;
-using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -30,7 +29,7 @@ namespace JUS.Tool.BatchConverters
     /// Converts a bunch of PNGs to and Alar3.
     /// </summary>
     public class Alar2Png :
-        IConverter<BinaryFormat, NodeContainerFormat>
+        IConverter<IBinary, NodeContainerFormat>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Alar2Png"/> class.
@@ -58,21 +57,11 @@ namespace JUS.Tool.BatchConverters
         /// </summary>
         /// <param name="alar">Alar file.</param>
         /// <returns><see cref="NodeContainerFormat"/> with the PNGs.</returns>
-        public NodeContainerFormat Convert(BinaryFormat alar)
+        public NodeContainerFormat Convert(IBinary alar)
         {
             var transformedFiles = new NodeContainerFormat();
 
-            // TODO: It is compressed?
-            Version alarVersion = Identifier.GetAlarVersion(alar);
-
-            var alarNode = new NodeContainerFormat();
-
-            // In the future we need to encapsulate this
-            if (alarVersion.Major == 3) {
-                alarNode = alar.ConvertWith(new Binary2Alar3());
-            } else if (alarVersion.Major == 2) {
-                alarNode = alar.ConvertWith(new Binary2Alar2());
-            }
+            NodeContainerFormat alarNode = new Binary2Alar().Convert(alar);
 
             // Iterate alar
             foreach (Node child in Navigator.IterateNodes(alarNode.Root)) {

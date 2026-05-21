@@ -24,7 +24,7 @@ using Yarhl.IO;
 namespace JUS.Tool.Containers.Converters
 {
     /// <summary>
-    /// Converter between BinaryFormat and Alar2.
+    /// Converter between a binary format and Alar v2.
     /// </summary>
     public class Binary2Alar2 : IConverter<IBinary, Alar2>
     {

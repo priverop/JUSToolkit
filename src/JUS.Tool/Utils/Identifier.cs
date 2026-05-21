@@ -22,7 +22,7 @@ using Yarhl.IO;
 namespace JUS.Tool.Utils
 {
     /// <summary>
-    /// Compression auxiliar methods.
+    /// Identification of formats.
     /// </summary>
     public static class Identifier
     {
@@ -31,22 +31,21 @@ namespace JUS.Tool.Utils
         /// </summary>
         /// <param name="file">The File we want to check.</param>
         /// <returns>The version.</returns>
-        public static Version GetAlarVersion(BinaryFormat file) => GetAlarVersion(file.Stream);
+        public static byte GetAlarVersion(IBinary file) => GetAlarVersion(file.Stream);
 
         /// <summary>
         /// Returns the version of the Alar stream.
         /// </summary>
         /// <param name="stream">The stream we want to check.</param>
         /// <returns>The version.</returns>
-        public static Version GetAlarVersion(DataStream stream)
+        public static byte GetAlarVersion(DataStream stream)
         {
             var reader = new DataReader(stream);
-            stream.Position = 4;
-            byte majorVersion = reader.ReadByte();
-            byte minorVersion = reader.ReadByte();
-            stream.Position = 0;
+            stream.PushToPosition(4);
+            byte version = reader.ReadByte();
+            stream.PopPosition();
 
-            return new Version(majorVersion, minorVersion);
+            return version;
         }
     }
 }
