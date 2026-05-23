@@ -30,7 +30,7 @@ public sealed class BuildLifetime : FrostingLifetime<PleOpsBuildContext>
         context.ResourcesContext.ResourcesDirectory = Path.GetFullPath(Path.Combine("src", "JUS.Tests"));
         context.ResourcesContext.DownloadUser = "not_needed";
         context.ResourcesContext.DownloadFormat = ResourcesDownloadFormat.JsonManifestV1;
-        context.ResourcesContext.DownloadId = "jus-2026-05-24-0.zip";
+        context.ResourcesContext.DownloadId = "jus-2026-05-24-0.json";
         context.ResourcesContext.DownloadOverwrites = true;
 
         context.Print();
