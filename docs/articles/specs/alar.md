@@ -111,6 +111,9 @@ The file info flags have two parts:
 
 #### V2 File data
 
+The file data is at an address multiple of 4. There are padding bytes (0x00)
+if it's not. The last file does not have padding at the end of the file.
+
 | Offset | Type     | Description               |
 | ------ | -------- | ------------------------- |
 | -0x24  | byte[2]  | Padding                   |
@@ -120,7 +123,7 @@ The file info flags have two parts:
 
 > [!NOTE]  
 > Different to version 1, the file data offset points to the start of the data.
-> The path and checksum (if available via file info flags), are 34 bytes before
+> The path and checksum (if available via file info flags), are 36 bytes before
 > the address of the file data offset.
 
 ### Version 3

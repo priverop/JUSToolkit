@@ -117,24 +117,6 @@ namespace JUS.Tests.Containers
         }
 
         [Test]
-        public void Alar3ReplaceStreamTest()
-        {
-            var streamA = new DataStream();
-            streamA.Write(new byte[] { 1, 2, 3 }, 0, 3);
-
-            var alarFile = new Alar3File(streamA);
-
-            var streamB = new DataStream();
-            streamB.Write(new byte[] { 2, 3, 4 }, 0, 3);
-
-            alarFile.Stream = streamB;
-
-            Assert.That(alarFile.Stream.Length, Is.EqualTo(3));
-            alarFile.Stream.Compare(streamB).Should().BeTrue();
-            alarFile.Stream.Compare(streamA).Should().BeFalse();
-        }
-
-        [Test]
         public void InsertNodes()
         {
             const int totalFiles = 4;

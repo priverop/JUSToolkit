@@ -19,6 +19,7 @@
 // SOFTWARE.
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.Tool.Containers
 {
@@ -33,39 +34,24 @@ namespace JUS.Tool.Containers
         public const string STAMP = "ALAR";
 
         /// <summary>
-        /// Supported Versions of the File.
+        /// The supported feature flags of this tool.
         /// </summary>
-        /// <remarks>I only found 1 and 3.</remarks>
-        public static readonly IReadOnlyList<Version> SupportedVersions = new[]
-        {
-            new Version(2, 1),
-            new Version(2, 3),
-        };
+        public static byte[] SupportedFeatureFlags { get; } = [0x01, 0x03];
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Alar2" /> class with an empty array of IDs.
+        /// Gets or sets the container feature flags.
         /// </summary>
-        /// <param name="numFiles">How many files are we storing.</param>
-        public Alar2(ushort numFiles)
-        {
-            NumFiles = numFiles;
-            IDs = new byte[8];
-        }
+        public byte FeatureFlags { get; set; }
 
         /// <summary>
-        /// Gets or sets the Minor Version of the container.
+        /// Gets or sets the ID of the first file in the container.
         /// </summary>
-        public int MinorVersion { get; set; }
+        public uint FirstFileId { get; set; }
 
         /// <summary>
-        /// Gets or sets the Number of files in the container.
+        /// Gets or sets the ID of the last file in the container.
         /// </summary>
-        public ushort NumFiles { get; set; }
-
-        /// <summary>
-        /// Gets or sets the IDs of the files.
-        /// </summary>
-        public byte[] IDs { get; set; }
+        public uint LastFileId { get; set; }
 
         /// <summary>
         /// Inserts a new Node into the current Alar2 Container.
@@ -88,32 +74,23 @@ namespace JUS.Tool.Containers
         /// <param name="parent">Parent directory of the file to replace.</param>
         public void InsertModification(Node nNew, string? parent = null)
         {
-            uint nextFileOffset = 0;
             bool replaced = false;
-
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
                     Alar2File alarFileOld = nOld.GetFormatAs<Alar2File>()!;
 
-                    // Ignoring first file (0 offset)
-                    if (nextFileOffset > 0) {
-                        alarFileOld.Offset = nextFileOffset;
-                    }
-
                     if (parent == null && nOld.Name == nNew.Name) {
                         Console.WriteLine("Replacing: " + nNew.Name);
-                        alarFileOld.ReplaceStream(nNew.Stream!);
+                        alarFileOld.Stream = new DataStream(nNew.Stream!);
                         replaced = true;
                     }
 
                     // Search for the specific file in case there are more than one in different directories
                     // That's why specify the parent (directory name)
                     else if (parent != null && parent == nOld.Parent!.Name && nOld.Name == nNew.Name) {
-                        alarFileOld.ReplaceStream(nNew.Stream!);
+                        alarFileOld.Stream = new DataStream(nNew.Stream!);
                         replaced = true;
                     }
-
-                    nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                 }
             }
 

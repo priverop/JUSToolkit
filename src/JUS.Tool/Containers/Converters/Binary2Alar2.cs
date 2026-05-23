@@ -35,74 +35,76 @@ namespace JUS.Tool.Containers.Converters
         /// Converts a BinaryFormat to an Alar2 container.
         /// </summary>
         /// <param name="input">IBinary node.</param>
-        /// <returns>Alart2 NodeContainerFormat.</returns>
+        /// <returns>Alar2 NodeContainerFormat.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
         public Alar2 Convert(IBinary input)
         {
-            if (input == null) {
-                throw new ArgumentNullException(nameof(input));
-            }
+            ArgumentNullException.ThrowIfNull(input);
 
             reader = new DataReader(input.Stream);
-            input.Stream.Position = 0;
+            reader.Stream.Position = 0;
 
-            ReadHeader();
+            int numFiles = ReadHeader();
 
-            uint name_offset = (uint)(0x10 + (alar.NumFiles * 0x10));
-            for (int i = 0; i < alar.NumFiles; i++) {
-                uint fileID = reader.ReadUInt32();
+            for (int i = 0; i < numFiles; i++) {
+                uint fileId = reader.ReadUInt32();
                 uint offset = reader.ReadUInt32();
                 uint size = reader.ReadUInt32();
-                uint unknown = reader.ReadUInt32();
+                uint flags = reader.ReadUInt32();
 
                 var fileStream = new DataStream(input.Stream, offset, size);
-
                 var alarFile = new Alar2File(fileStream) {
-                    FileID = fileID,
-                    Offset = offset,
-                    Size = size,
-                    Unknown = unknown,
-                    FileNum = i + 1,
+                    FileId = fileId,
+                    Flags = flags,
                 };
 
-                input.Stream.RunInPosition(() => alarFile.Unknown2 = reader.ReadUInt16(), offset - 2);
-                input.Stream.RunInPosition(() => ReadFileInfo(alarFile), name_offset + 2);
-
-                name_offset += size + 0x24;
+                AppendChild(alarFile, offset);
             }
 
             return alar;
         }
 
-        private void ReadHeader()
+        private int ReadHeader()
         {
             string stamp = reader.ReadString(4);
             if (stamp != Alar2.STAMP) {
                 throw new FormatException("Invalid header");
             }
 
-            var version = new Version(reader.ReadByte(), reader.ReadByte());
-            if (!Alar2.SupportedVersions.Contains(version)) {
-                throw new FormatException($"Unsupported version: {version:X}");
+            if (reader.ReadByte() != 2) {
+                throw new FormatException("Invalid format version");
             }
 
-            ushort numFiles = reader.ReadUInt16();
+            byte featureFlags = reader.ReadByte();
+            if (!Alar2.SupportedFeatureFlags.Contains(featureFlags)) {
+                throw new FormatException($"Unsupported feature flags: {featureFlags:X}");
+            }
 
-            alar = new Alar2(numFiles) {
-                MinorVersion = version.Minor,
+            ushort fileCount = reader.ReadUInt16();
+            uint firstFileId = reader.ReadUInt32();
+            uint lastFileId = reader.ReadUInt32();
+
+            alar = new Alar2 {
+                FeatureFlags = featureFlags,
+                FirstFileId = firstFileId,
+                LastFileId = lastFileId,
             };
 
-            for (int i = 0; i < 8; i++) {
-                alar.IDs[i] = reader.ReadByte();
-            }
+            return fileCount;
         }
 
-        private void ReadFileInfo(Alar2File alarFile)
+        private void AppendChild(Alar2File alarFile, uint dataOffset)
         {
-            string filename = reader.ReadString();
+            string filename = "file";
+
+            bool hasFilename = (alarFile.Flags >> 31) == 1;
+            if (hasFilename) {
+                reader.Stream.PushToPosition(dataOffset - 0x22);
+                filename = reader.ReadString();
+                reader.Stream.PopPosition();
+            }
 
             var child = new Node(filename, alarFile);
-
             alar.Root.Add(child);
         }
     }

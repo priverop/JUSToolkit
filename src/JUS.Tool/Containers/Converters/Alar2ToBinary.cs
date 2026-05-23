@@ -38,17 +38,21 @@ namespace JUS.Tool.Containers.Converters
         /// <exception cref="ArgumentNullException"><paramref name="alar"/> is <c>null</c>.</exception>
         public BinaryFormat Convert(Alar2 alar)
         {
-            if (alar == null) {
-                throw new ArgumentNullException(nameof(alar));
-            }
+            ArgumentNullException.ThrowIfNull(alar);
 
             var binary = new BinaryFormat();
             writer = new DataWriter(binary.Stream);
 
             WriteHeader(alar);
-            WriteFileInfoSection(alar);
-            WriteFileDataSection(alar);
-            RewriteOffsets(alar);
+
+            // Pre-fill the file info table so we can write the file data (and know the offset)
+            int fileInfoTableLength = alar.Root.Children.Count * 0x10;
+            writer.WriteTimes(0x00, fileInfoTableLength);
+
+            writer.Stream.Position = 0x10;
+            foreach (Node child in alar.Root.Children) {
+                WriteFile(child);
+            }
 
             return binary;
         }
@@ -57,72 +61,38 @@ namespace JUS.Tool.Containers.Converters
         {
             writer.Write(Alar2.STAMP, false);
             writer.Write((byte)2);
-            writer.Write((byte)alar.MinorVersion);
-            writer.Write(alar.NumFiles);
-            writer.Write(alar.IDs);
+            writer.Write(alar.FeatureFlags);
+            writer.Write((ushort)alar.Root.Children.Count);
+            writer.Write(alar.FirstFileId);
+            writer.Write(alar.LastFileId);
         }
 
-        private void WriteFileInfoSection(Alar2 alar)
+        private void WriteFile(Node child)
         {
-            foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
-                if (!alarFile.IsContainer) {
-                    Alar2File alarChild = alarFile.GetFormatAs<Alar2File>()!;
+            Alar2File fileInfo = child.GetFormatAs<Alar2File>() ?? throw new FormatException("Invalid format");
+            bool hasFilename = (fileInfo.Flags >> 31) == 1;
 
-                    writer.Write(alarChild.FileID);
-                    writer.Write(alarChild.Offset);
-                    writer.Write(alarChild.Size);
-                    writer.Write(alarChild.Unknown);
-                }
+            uint nameLength = hasFilename ? 0x24u : 0x00;
+            uint fileOffset = (uint)writer.Stream.Length.Pad(4) + nameLength;
+
+            writer.Write(fileInfo.FileId);
+            writer.Write(fileOffset);
+            writer.Write((uint)child.Stream!.Length);
+            writer.Write(fileInfo.Flags);
+
+            writer.Stream.PushToPosition(0, SeekOrigin.End);
+            writer.WritePadding(0x00, 4);
+
+            if (hasFilename) {
+                ushort nameHash = AlarPathHash.ComputeV1(child.Name);
+
+                writer.Write((ushort)0x00); // padding
+                writer.Write(child.Name, 0x20);
+                writer.Write(nameHash);
             }
-        }
 
-        private void WriteFileDataSection(Alar2 alar)
-        {
-            foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
-                if (!alarFile.IsContainer) {
-                    writer.WriteTimes(0, 2);
-                    writer.Write(alarFile.Name);
-
-                    // Tenemos que pintar ceros hasta el offset del puntero - 02 (que hay un unknown)
-                    int times = 32 - alarFile.Name.Length - 1; // 1 null byte
-                    writer.WriteTimes(0, times);
-
-                    Alar2File alarChild = alarFile.GetFormatAs<Alar2File>()!;
-
-                    writer.Write(alarChild.Unknown2);
-                    alarChild.Stream!.WriteTo(writer.Stream);
-                }
-            }
-        }
-
-        private void RewriteOffsets(Alar2 alar)
-        {
-            int offsetPostion = 0x04; // The first file position
-            int sizePostion = 0x08; // The first file position
-            int newOffset = 0;
-            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
-                if (!node.IsContainer) {
-                    Alar2File alarFile = node.GetFormatAs<Alar2File>()!;
-
-                    // Starter Offset
-                    if (alarFile.FileNum == 1) {
-                        newOffset = (int)alarFile.Offset;
-                    }
-
-                    // Modify the size of the file
-                    writer.Stream.RunInPosition(
-                            () => writer.Write(alarFile.Size),
-                            sizePostion + (0x10 * alarFile.FileNum));
-
-                    // Add the size of the file to get the next file offset
-                    if (alarFile.FileNum != alar.NumFiles) {
-                        newOffset += (int)(alarFile.Size + 36); // 36 bytes from the file info section
-                        writer.Stream.RunInPosition(
-                            () => writer.Write(newOffset),
-                            offsetPostion + (0x10 * (alarFile.FileNum + 1))); // next file
-                    }
-                }
-            }
+            child.Stream.WriteTo(writer.Stream);
+            writer.Stream.PopPosition();
         }
     }
 }
