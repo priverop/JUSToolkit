@@ -42,7 +42,7 @@ namespace JUS.Tool.Containers.Converters
             ArgumentNullException.ThrowIfNull(source);
 
             reader = new DataReader(source.Stream);
-            source.Stream.Position = 0;
+            reader.Stream.Position = 0;
 
             int numFiles = ReadHeader();
 

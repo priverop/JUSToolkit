@@ -172,25 +172,20 @@ namespace JUS.Tests.Containers
             Assert.That(newFile.Stream!.Length, Is.EqualTo(fileOriginal.Stream!.Length));
         }
 
-        // Unit test para la funcion de GetAlar3Path
         [Test]
-        public void GetAlar3PathTest()
+        public void GetChildRelativePath()
         {
             // Arrange
-            Type type = typeof(Alar3ToBinary);
-            MethodInfo method = type.GetMethod("GetAlar3Path", BindingFlags.NonPublic | BindingFlags.Static)
-                ?? throw new InvalidOperationException("Method GetAlar3Path not found");
-
             const string jgalaxyFilePath = "/root/data/jgalaxy/jgalaxy.aar/jgalaxy/ast_battle.aar";
             const string infodeckFilePath = "/root/data/bin/InfoDeck.aar/bin/deck/bb.bin";
             const string vscallFilePath = "/vscall.aar/vscall/obj_a.aar";
             const string komaFilePath = "/koma.aar/koma/bb_00.dtx";
 
             // Act
-            string jgalaxyResult = (string)method.Invoke(null, new object[] { jgalaxyFilePath })!;
-            string infodeckyResult = (string)method.Invoke(null, new object[] { infodeckFilePath })!;
-            string vscallResult = (string)method.Invoke(null, new object[] { vscallFilePath })!;
-            string komaResult = (string)method.Invoke(null, new object[] { komaFilePath })!;
+            string jgalaxyResult = Alar3ToBinary.GetRelativeChildPath("/root/data/jgalaxy/jgalaxy.aar", jgalaxyFilePath);
+            string infodeckyResult = Alar3ToBinary.GetRelativeChildPath("/root/data/bin/InfoDeck.aar", infodeckFilePath);
+            string vscallResult = Alar3ToBinary.GetRelativeChildPath("/vscall.aar", vscallFilePath);
+            string komaResult = Alar3ToBinary.GetRelativeChildPath("/koma.aar", komaFilePath);
 
             // Assert
             Assert.That(jgalaxyResult, Is.EqualTo("jgalaxy/ast_battle.aar"));

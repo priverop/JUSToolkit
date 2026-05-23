@@ -101,6 +101,11 @@ namespace JUS.Tool.Containers.Converters
             return binary;
         }
 
+        internal static string GetRelativeChildPath(string rootPath, string childPath)
+        {
+            return Path.GetRelativePath(rootPath, childPath).Replace('\\', '/');
+        }
+
         private static FileEntry[] GetContainerEntries(Node root)
         {
             List<FileEntry> entries = [];
@@ -109,7 +114,7 @@ namespace JUS.Tool.Containers.Converters
                     continue;
                 }
 
-                string containerPath = Path.GetRelativePath(root.Path, node.Path).Replace('\\', '/');
+                string containerPath = GetRelativeChildPath(root.Path, node.Path);
                 Alar3File fileInfo = node.GetFormatAs<Alar3File>()
                     ?? throw new FormatException($"Unexpected file format for {node.Path}");
                 entries.Add(new FileEntry(node.Stream!, fileInfo, containerPath));
@@ -117,6 +122,7 @@ namespace JUS.Tool.Containers.Converters
 
             return entries.ToArray();
         }
+
 
         private sealed record FileEntry(DataStream Data, Alar3File FileInfo, string ContainerPath)
         {

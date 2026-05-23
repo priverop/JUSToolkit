@@ -20,7 +20,7 @@ namespace JUS.Tool.Containers
         public DataStream Stream { get; set; }
 
         /// <summary>
-        /// Gets or sets the FileID.
+        /// Gets or sets the internal game identifier of the file.
         /// </summary>
         public uint FileId { get; set; }
 
