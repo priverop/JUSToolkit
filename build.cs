@@ -1,12 +1,9 @@
 ﻿#!/usr/bin/env dotnet run
 #:property PublishAot=false
-#:package Cake.Frosting.PleOps.Recipe@1.0.4-preview.62
+#:package Cake.Frosting.PleOps.Recipe@1.0.4-preview.64
 
 using System.Diagnostics.CodeAnalysis;
-using Cake.Common.IO;
-using Cake.Common.Net;
 using Cake.Core;
-using Cake.Core.Diagnostics;
 using Cake.Frosting;
 using Cake.Frosting.PleOps.Recipe;
 using Cake.Frosting.PleOps.Recipe.Common;
@@ -32,8 +29,9 @@ public sealed class BuildLifetime : FrostingLifetime<PleOpsBuildContext>
 
         context.ResourcesContext.ResourcesDirectory = Path.GetFullPath(Path.Combine("src", "JUS.Tests"));
         context.ResourcesContext.DownloadUser = "not_needed";
-        context.ResourcesContext.DownloadFormat = ResourcesDownloadFormat.ZipBundle;
-        context.ResourcesContext.DownloadId = "resources-0.zip";
+        context.ResourcesContext.DownloadFormat = ResourcesDownloadFormat.JsonManifestV1;
+        context.ResourcesContext.DownloadId = "jus-2026-05-24-0.zip";
+        context.ResourcesContext.DownloadOverwrites = true;
 
         context.Print();
     }
@@ -47,7 +45,7 @@ public sealed class BuildLifetime : FrostingLifetime<PleOpsBuildContext>
 [TaskName("Default")]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Common.SetGitVersionTask))]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Common.CleanArtifactsTask))]
-[IsDependentOn(typeof(DownloadJusTestFilesTask))]
+[IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Common.DownloadResourcesTask))]
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.Dotnet.DotnetTasks.BuildProjectTask))]
 public sealed class DefaultTask : FrostingTask
 {
@@ -75,34 +73,4 @@ public sealed class BuildBundleTask : FrostingTask
 [IsDependentOn(typeof(Cake.Frosting.PleOps.Recipe.GitHub.UploadReleaseBinariesTask))]
 public sealed class DeployTask : FrostingTask
 {
-}
-
-[TaskName("Download-JusTestFiles")]
-[TaskDescription("Download the test resource files")]
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-public class DownloadJusTestFilesTask : FrostingTask<PleOpsBuildContext>
-{
-    public override bool ShouldRun(PleOpsBuildContext context) =>
-        !string.IsNullOrEmpty(context.ResourcesContext.DownloadAddress);
-
-    public override void Run(PleOpsBuildContext context)
-    {
-        ResourcesContext resourceInfo = context.ResourcesContext;
-        string resourceUri = string.Format(resourceInfo.DownloadAddress!, resourceInfo.DownloadId);
-        var downloadSettings = new DownloadFileSettings {
-            Username = resourceInfo.DownloadUser,
-            Password = resourceInfo.DownloadPassword,
-            UseDefaultCredentials = string.IsNullOrWhiteSpace(resourceInfo.DownloadUser)
-                || string.IsNullOrWhiteSpace(resourceInfo.DownloadPassword),
-        };
-        context.Log.Information(downloadSettings.UseDefaultCredentials
-            ? "Download without credentials"
-            : "Download will use provided password");
-
-        context.Log.Information("Downloading resource");
-        var compressedResources = context.DownloadFile(resourceUri, downloadSettings);
-
-        context.Log.Debug("Unzipping resource");
-        context.Unzip(compressedResources, context.ResourcesContext.ResourcesDirectory, true);
-    }
 }
