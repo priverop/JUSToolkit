@@ -148,9 +148,9 @@ namespace JUS.CLI.JUS
 
             var png2Alar3 = new Png2Alar3(inputPNG, cleanName + ".dig", cleanName + ".atm");
 
-            Alar3 newAlar = originalAlar
+            Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar3>()!;
+                .GetFormatAs<Alar>()!;
 
             using BinaryFormat binary = newAlar.ConvertWith(new Alar3ToBinary());
 

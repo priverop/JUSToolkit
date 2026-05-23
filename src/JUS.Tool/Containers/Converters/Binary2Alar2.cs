@@ -24,12 +24,12 @@ using Yarhl.IO;
 namespace JUS.Tool.Containers.Converters
 {
     /// <summary>
-    /// Converter between a binary format and Alar v2.
+    /// Converts a binary format with ALAR v2 data into a container.
     /// </summary>
-    public class Binary2Alar2 : IConverter<IBinary, Alar2>
+    public class Binary2Alar2 : IConverter<IBinary, Alar>
     {
         private DataReader reader = null!;
-        private Alar2 alar = null!;
+        private Alar alar = null!;
 
         /// <summary>
         /// Converts a BinaryFormat to an Alar2 container.
@@ -37,7 +37,7 @@ namespace JUS.Tool.Containers.Converters
         /// <param name="input">IBinary node.</param>
         /// <returns>Alar2 NodeContainerFormat.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
-        public Alar2 Convert(IBinary input)
+        public Alar Convert(IBinary input)
         {
             ArgumentNullException.ThrowIfNull(input);
 
@@ -53,7 +53,7 @@ namespace JUS.Tool.Containers.Converters
                 uint flags = reader.ReadUInt32();
 
                 var fileStream = new DataStream(input.Stream, offset, size);
-                var alarFile = new Alar2File(fileStream) {
+                var alarFile = new AlarFile(fileStream) {
                     FileId = fileId,
                     Flags = flags,
                 };
@@ -67,7 +67,7 @@ namespace JUS.Tool.Containers.Converters
         private int ReadHeader()
         {
             string stamp = reader.ReadString(4);
-            if (stamp != Alar2.STAMP) {
+            if (stamp != Alar.FormatId) {
                 throw new FormatException("Invalid header");
             }
 
@@ -75,17 +75,14 @@ namespace JUS.Tool.Containers.Converters
                 throw new FormatException("Invalid format version");
             }
 
-            byte featureFlags = reader.ReadByte();
-            if (!Alar2.SupportedFeatureFlags.Contains(featureFlags)) {
-                throw new FormatException($"Unsupported feature flags: {featureFlags:X}");
-            }
-
+            var featureFlags = (AlarFormatFeatures)reader.ReadByte();
             ushort fileCount = reader.ReadUInt16();
             uint firstFileId = reader.ReadUInt32();
             uint lastFileId = reader.ReadUInt32();
 
-            alar = new Alar2 {
-                FeatureFlags = featureFlags,
+            alar = new Alar {
+                Version = 2,
+                Features = featureFlags,
                 FirstFileId = firstFileId,
                 LastFileId = lastFileId,
             };
@@ -93,7 +90,7 @@ namespace JUS.Tool.Containers.Converters
             return fileCount;
         }
 
-        private void AppendChild(Alar2File alarFile, uint dataOffset)
+        private void AppendChild(AlarFile alarFile, uint dataOffset)
         {
             string filename = "file";
 

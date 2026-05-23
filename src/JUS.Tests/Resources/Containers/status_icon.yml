@@ -1,13 +1,13 @@
 name: status_icon.aar
-format_type: JUS.Tool.Containers.Alar2
+format_type: JUS.Tool.Containers.Alar
 tags:
 check_children: true
 children:
   - name: status_icon.dtx
-    format_type: JUS.Tool.Containers.Alar2File
+    format_type: JUS.Tool.Containers.AlarFile
   - name: status_icon.amt
-    format_type: JUS.Tool.Containers.Alar2File
+    format_type: JUS.Tool.Containers.AlarFile
   - name: status_icon.aod
-    format_type: JUS.Tool.Containers.Alar2File
+    format_type: JUS.Tool.Containers.AlarFile
   - name: status_icon.dig
-    format_type: JUS.Tool.Containers.Alar2File
+    format_type: JUS.Tool.Containers.AlarFile

@@ -24,18 +24,13 @@ using Yarhl.IO;
 namespace JUS.Tool.Containers.Converters
 {
     /// <summary>
-    /// Converts between a NodeContainerFormat and a BinaryFormat file.
+    /// Converts an ALAR container into a binary ALAR v3 format.
     /// </summary>
     public class Alar3ToBinary :
-    IConverter<Alar3, BinaryFormat>
+    IConverter<Alar, BinaryFormat>
     {
-        /// <summary>
-        /// Converts Alar3 to BinaryFormat.
-        /// </summary>
-        /// <param name="alar">Alar3 NodeContainerFormat.</param>
-        /// <returns>BinaryFormat Node.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="alar"/> is <c>null</c>.</exception>
-        public BinaryFormat Convert(Alar3 alar)
+        /// <inheritdoc/>
+        public BinaryFormat Convert(Alar alar)
         {
             ArgumentNullException.ThrowIfNull(alar);
 
@@ -50,15 +45,15 @@ namespace JUS.Tool.Containers.Converters
             int fileInfoSectionLength = entries.Sum(e => e.EncodedInfoLength);
             int fileDataSectionOffset = fileInfoSectionOffset + fileInfoSectionLength;
 
-            bool useHashV1 = (alar.FeatureFlags & 0x40) == 0;
+            bool useHashV1 = !alar.Features.HasFlag(AlarFormatFeatures.PathHashV2);
 
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
 
             // Write the header
-            writer.Write(Alar3.STAMP, false);
-            writer.Write((byte)3);
-            writer.Write(alar.FeatureFlags);
+            writer.Write(Alar.FormatId, false);
+            writer.Write(alar.Version);
+            writer.Write((byte)alar.Features);
             writer.Write((ushort)entries.Length);
             writer.Write(alar.FirstFileId);
             writer.Write(alar.LastFileId);
@@ -115,7 +110,7 @@ namespace JUS.Tool.Containers.Converters
                 }
 
                 string containerPath = GetRelativeChildPath(root.Path, node.Path);
-                Alar3File fileInfo = node.GetFormatAs<Alar3File>()
+                AlarFile fileInfo = node.GetFormatAs<AlarFile>()
                     ?? throw new FormatException($"Unexpected file format for {node.Path}");
                 entries.Add(new FileEntry(node.Stream!, fileInfo, containerPath));
             }
@@ -124,7 +119,7 @@ namespace JUS.Tool.Containers.Converters
         }
 
 
-        private sealed record FileEntry(DataStream Data, Alar3File FileInfo, string ContainerPath)
+        private sealed record FileEntry(DataStream Data, AlarFile FileInfo, string ContainerPath)
         {
             /// <summary>
             /// Gets the binary encoded length of the path, assuming ASCII characters and a null-terminator.

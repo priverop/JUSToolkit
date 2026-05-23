@@ -90,13 +90,13 @@ namespace JUS.CLI.JUS
 
             BinaryFormat binary;
             if (alarVersion == 3) {
-                Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
-                    .GetFormatAs<Alar3>()!;
+                Alar alar = originalAlar.TransformWith<Binary2Alar3>()
+                    .GetFormatAs<Alar>()!;
                 alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar3ToBinary());
             } else if (alarVersion == 2) {
-                Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
-                    .GetFormatAs<Alar2>()!;
+                Alar alar = originalAlar.TransformWith<Binary2Alar2>()
+                    .GetFormatAs<Alar>()!;
                 alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar2ToBinary());
             } else {

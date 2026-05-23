@@ -5,24 +5,24 @@ using Yarhl.IO;
 namespace JUS.Tool.Containers
 {
     /// <summary>
-    /// Alar3 Container Format.
+    /// AL ARchive container format.
     /// </summary>
-    public class Alar3 : NodeContainerFormat
+    public class Alar : NodeContainerFormat
     {
         /// <summary>
-        /// The Magic ID of the file.
+        /// The magic ID of the file.
         /// </summary>
-        public const string STAMP = "ALAR";
+        public const string FormatId = "ALAR";
 
         /// <summary>
-        /// The supported feature flags of this tool.
+        /// Gets or sets the ALAR format version.
         /// </summary>
-        public static byte[] SupportedFeatureFlags { get; } = [ 0x05, 0x45 ];
+        public byte Version { get; set; }
 
         /// <summary>
         /// Gets or sets the container feature flags.
         /// </summary>
-        public byte FeatureFlags { get; set; }
+        public AlarFormatFeatures Features { get; set; }
 
         /// <summary>
         /// Gets or sets the ID of the first file in the container.
@@ -49,7 +49,7 @@ namespace JUS.Tool.Containers
         }
 
         /// <summary>
-        /// Inserts a new Node into the current Alar3 Container.
+        /// Inserts a new Node into the current container.
         /// </summary>
         /// We need to iterate the whole ALAR to adjust the pointers (offsets).
         /// <param name="nNew">Node to insert.</param>
@@ -59,7 +59,7 @@ namespace JUS.Tool.Containers
             bool replaced = false;
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
-                    Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>()!;
+                    AlarFile alarFileOld = nOld.GetFormatAs<AlarFile>()!;
 
                     if (parent == null && nOld.Name == nNew.Name) {
                         Console.WriteLine("Replacing: " + nNew.Name);

@@ -93,7 +93,7 @@ namespace JUS.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            Alar3 alar = node.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
+            Alar alar = node.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
@@ -108,7 +108,7 @@ namespace JUS.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            Alar3 alar = alarOriginal.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
+            Alar alar = alarOriginal.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
             alar.InsertModification(fileOriginal.GetFormatAs<NodeContainerFormat>()!);
             BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
@@ -122,16 +122,16 @@ namespace JUS.Tests.Containers
             const int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
-            var alar = new Alar3();
+            var alar = new Alar();
             for (int i = 0; i < totalFiles; i++) {
                 // Creamos un fichero de 5bytes.
-                var child = new Alar3File(DataStreamFactory.FromArray([(byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4)]));
+                var child = new AlarFile(DataStreamFactory.FromArray([(byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4)]));
                 alar.Root.Add(new Node("child" + i, child));
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
             var newStream = DataStreamFactory.FromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-            var modifiedChild1 = new Alar3File(newStream);
+            var modifiedChild1 = new AlarFile(newStream);
             var modifiedNode = new Node("child1", modifiedChild1);
             var modifiedFiles = new NodeContainerFormat();
             modifiedFiles.Root.Add(modifiedNode);
@@ -141,7 +141,6 @@ namespace JUS.Tests.Containers
             Assert.That(alar.Root.Children.Count, Is.EqualTo(totalFiles));
 
             // Si el Nodo getFormat . Size está OK
-            var child2 = modifiedFiles.Root.Children[0].GetFormatAs<Alar3File>()!;
             Assert.That(modifiedFiles.Root.Children.Count, Is.EqualTo(1));
 
             // Insertamos el Nodo con InsertModification
@@ -163,7 +162,7 @@ namespace JUS.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromFile(fileToInsert, FileOpenMode.Read);
 
-            Alar3 alar = alarOriginal.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
+            Alar alar = alarOriginal.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
             alar.InsertModification(fileOriginal, parent);
 
             // Tenemos que comprobar si se ha introducido correctamente

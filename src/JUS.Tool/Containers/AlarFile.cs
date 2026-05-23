@@ -3,15 +3,15 @@
 namespace JUS.Tool.Containers
 {
     /// <summary>
-    /// Single file of an Alar2 Container.
+    /// Represents a children in an ALAR container.
     /// </summary>
-    public class Alar2File : IBinary
+    public class AlarFile : IBinary
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Alar2File"/> class passing a DataStream.
+        /// Initializes a new instance of the <see cref="AlarFile"/> class passing a DataStream.
         /// </summary>
         /// <param name="fileStream">DataStream.</param>
-        public Alar2File(DataStream fileStream)
+        public AlarFile(DataStream fileStream)
         {
             Stream = fileStream;
         }

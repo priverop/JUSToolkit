@@ -24,12 +24,12 @@ using Yarhl.IO;
 namespace JUS.Tool.Containers.Converters
 {
     /// <summary>
-    /// Converts between a binary format and <see cref="Alar3"/>.
+    /// Converts a binary format with ALAR v2 data into a container.
     /// </summary>
-    public class Binary2Alar3 : IConverter<IBinary, Alar3>
+    public class Binary2Alar3 : IConverter<IBinary, Alar>
     {
         private DataReader reader = null!;
-        private Alar3 alar = null!;
+        private Alar alar = null!;
 
         /// <summary>
         /// Converts BinaryFormat to Alar3.
@@ -37,7 +37,7 @@ namespace JUS.Tool.Containers.Converters
         /// <param name="source">File to transform.</param>
         /// <returns>Alar3.</returns>
         /// <exception cref="ArgumentNullException">source is null.</exception>
-        public Alar3 Convert(IBinary source)
+        public Alar Convert(IBinary source)
         {
             ArgumentNullException.ThrowIfNull(source);
 
@@ -57,7 +57,7 @@ namespace JUS.Tool.Containers.Converters
         private int ReadHeader()
         {
             string stamp = reader.ReadString(4);
-            if (stamp != Alar3.STAMP) {
+            if (stamp != Alar.FormatId) {
                 throw new FormatException("Invalid header");
             }
 
@@ -65,18 +65,15 @@ namespace JUS.Tool.Containers.Converters
                 throw new FormatException("Invalid format version");
             }
 
-            byte featureFlags = reader.ReadByte();
-            if (!Alar3.SupportedFeatureFlags.Contains(featureFlags)) {
-                throw new FormatException($"Unsupported feature flags: {featureFlags:X}");
-            }
-
+            var featureFlags = (AlarFormatFeatures)reader.ReadByte();
             ushort numFiles = reader.ReadUInt16();
             uint firstFileId = reader.ReadUInt32();
             uint lastFileId = reader.ReadUInt32();
             _ = reader.ReadUInt16(); // offset to file data
 
-            alar = new Alar3 {
-                FeatureFlags = featureFlags,
+            alar = new Alar {
+                Version = 3,
+                Features = featureFlags,
                 FirstFileId = firstFileId,
                 LastFileId = lastFileId,
             };
@@ -92,7 +89,7 @@ namespace JUS.Tool.Containers.Converters
             uint flags = reader.ReadUInt32();
 
             var fileStream = new DataStream(source.Stream, offset, size);
-            var alarFile = new Alar3File(fileStream) {
+            var alarFile = new AlarFile(fileStream) {
                 FileId = id,
                 Flags = flags,
             };

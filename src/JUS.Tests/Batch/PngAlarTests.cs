@@ -68,9 +68,9 @@ namespace JUS.Tests.Batch
 
             var png2Alar3 = new Png2Alar3(inputPNG, originalName + ".dig", originalName + ".atm", true);
 
-            Alar3 newAlar = originalAlar
+            Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar3>()!;
+                .GetFormatAs<Alar>()!;
 
             // Extracting the png from the newAlar
             Node newDig = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");

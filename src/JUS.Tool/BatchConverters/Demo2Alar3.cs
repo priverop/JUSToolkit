@@ -34,7 +34,7 @@ namespace JUS.Tool.BatchConverters
     /// Inserts a PNG into an Alar3.
     /// </summary>
     public class Demo2Alar3 :
-        IConverter<Alar3, Alar3>
+        IConverter<Alar, Alar>
     {
         private NodeContainerFormat transformedFiles = null!; // Dig + Atm to insert in the Alar3
 
@@ -74,11 +74,11 @@ namespace JUS.Tool.BatchConverters
         public bool TransparentTile { get; set; }
 
         /// <summary>
-        /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar3"/> container.
+        /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar"/> container.
         /// </summary>
         /// <param name="originalAlar">Original Alar3.</param>
-        /// <returns><see cref="Alar3"/>Alar3 with the PNG inserted.</returns>
-        public Alar3 Convert(Alar3 originalAlar)
+        /// <returns><see cref="Alar"/>Alar3 with the PNG inserted.</returns>
+        public Alar Convert(Alar originalAlar)
         {
             if (Images.Length != AtmNames.Length) {
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");

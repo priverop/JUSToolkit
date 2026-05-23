@@ -77,12 +77,12 @@ public class AlarTests
             original = new LzssDecompression().Convert(original);
         }
 
-        NodeContainerFormat container = new Binary2Alar().Convert(original);
+        Alar container = new Binary2Alar().Convert(original);
 
         // TODO: convert back from a single converter
         IBinary actual = container switch {
-            Alar2 alar2 => new Alar2ToBinary().Convert(alar2),
-            Alar3 alar3 => new Alar3ToBinary().Convert(alar3),
+            { Version: 2 } => new Alar2ToBinary().Convert(container),
+            { Version: 3 } => new Alar3ToBinary().Convert(container),
             _ => throw new NotSupportedException("Unsupported format"),
         };
 

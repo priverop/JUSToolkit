@@ -24,19 +24,14 @@ using Yarhl.IO;
 namespace JUS.Tool.Containers.Converters
 {
     /// <summary>
-    /// Converts between a NodeContainerFormat and a BinaryFormat file.
+    /// Converts an ALAR container into a binary ALAR v2 format.
     /// </summary>
-    public class Alar2ToBinary : IConverter<Alar2, BinaryFormat>
+    public class Alar2ToBinary : IConverter<Alar, BinaryFormat>
     {
         private DataWriter writer = null!;
 
-        /// <summary>
-        /// Converts Alar2 to BinaryFormat.
-        /// </summary>
-        /// <param name="alar">Alar2 NodeContainerFormat.</param>
-        /// <returns>BinaryFormat Node.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="alar"/> is <c>null</c>.</exception>
-        public BinaryFormat Convert(Alar2 alar)
+        /// <inheritdoc/>
+        public BinaryFormat Convert(Alar alar)
         {
             ArgumentNullException.ThrowIfNull(alar);
 
@@ -57,11 +52,11 @@ namespace JUS.Tool.Containers.Converters
             return binary;
         }
 
-        private void WriteHeader(Alar2 alar)
+        private void WriteHeader(Alar alar)
         {
-            writer.Write(Alar2.STAMP, false);
-            writer.Write((byte)2);
-            writer.Write(alar.FeatureFlags);
+            writer.Write(Alar.FormatId, false);
+            writer.Write(alar.Version);
+            writer.Write((byte)alar.Features);
             writer.Write((ushort)alar.Root.Children.Count);
             writer.Write(alar.FirstFileId);
             writer.Write(alar.LastFileId);
@@ -69,7 +64,7 @@ namespace JUS.Tool.Containers.Converters
 
         private void WriteFile(Node child)
         {
-            Alar2File fileInfo = child.GetFormatAs<Alar2File>() ?? throw new FormatException("Invalid format");
+            AlarFile fileInfo = child.GetFormatAs<AlarFile>() ?? throw new FormatException("Invalid format");
             bool hasFilename = (fileInfo.Flags >> 31) == 1;
 
             uint nameLength = hasFilename ? 0x24u : 0x00;
