@@ -73,8 +73,7 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node file, string containerPath, string? parent = null)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")!
-                                .TransformWith<LzssDecompression>();
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")!;
 
             Alar alar = containerNode.TransformWith<Binary2Alar3>()
             .GetFormatAs<Alar>()!;

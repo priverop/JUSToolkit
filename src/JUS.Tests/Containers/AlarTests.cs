@@ -78,13 +78,7 @@ public class AlarTests
         }
 
         Alar container = new Binary2Alar().Convert(original);
-
-        // TODO: convert back from a single converter
-        IBinary actual = container switch {
-            { Version: 2 } => new Alar2ToBinary().Convert(container),
-            { Version: 3 } => new Alar3ToBinary().Convert(container),
-            _ => throw new NotSupportedException("Unsupported format"),
-        };
+        BinaryFormat actual = new AlarToBinary().Convert(container);
 
         byte[] originalData = new byte[(int)original.Stream.Length];
         original.Stream.Position = 0;

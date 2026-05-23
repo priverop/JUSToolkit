@@ -1,6 +1,5 @@
 ﻿using JUS.Tool.Utils;
 using Yarhl.FileFormat;
-using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUS.Tool.Containers.Converters;
@@ -14,6 +13,8 @@ public class Binary2Alar : IConverter<IBinary, Alar>
     /// <inheritdoc />
     public Alar Convert(IBinary source)
     {
+        ArgumentNullException.ThrowIfNull(source);
+
         bool isCompressed = CompressionUtils.IsCompressed(source.Stream);
         if (isCompressed) {
             source = new LzssDecompression().Convert(source);
@@ -26,7 +27,7 @@ public class Binary2Alar : IConverter<IBinary, Alar>
             _ => throw new NotSupportedException($"Unsupported ALAR version: {version}")
         };
 
-        container.Root.Tags["jus.alar.is_compressed"] = isCompressed;
+        container.Root.Tags[Alar.CompressionTag] = isCompressed;
         return container;
     }
 }

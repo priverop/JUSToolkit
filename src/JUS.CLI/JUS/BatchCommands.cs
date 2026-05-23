@@ -115,9 +115,7 @@ namespace JUS.CLI.JUS
                         }
                     } else if (Path.GetExtension(child.Name) == ".aar") {
                         Console.WriteLine($"AAR found, processing recursively: {originalAlarName}/{child.Name}");
-                        using Node nestedAlar = child
-                            .TransformWith<LzssDecompression>()
-                            .TransformWith<Binary2Alar>();
+                        using Node nestedAlar = child.TransformWith<Binary2Alar>();
 
                         ProcessNode(nestedAlar, Path.Combine(baseOutputPath, originalAlarName));
                     }
@@ -125,7 +123,6 @@ namespace JUS.CLI.JUS
             }
 
             Node originalAlar = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar>();
 
             ProcessNode(originalAlar, output);

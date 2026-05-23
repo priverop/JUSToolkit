@@ -44,7 +44,6 @@ namespace JUS.CLI.JUS
             PathValidator.ValidateFile(container);
 
             using Node files = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Alar>();
 
             foreach (Node node in Navigator.IterateNodes(files)) {

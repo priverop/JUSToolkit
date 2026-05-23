@@ -15,6 +15,11 @@ namespace JUS.Tool.Containers
         public const string FormatId = "ALAR";
 
         /// <summary>
+        /// The node tag that indicates whether the container was compressed.
+        /// </summary>
+        public const string CompressionTag = "jus.alar.is_compressed";
+
+        /// <summary>
         /// Gets or sets the ALAR format version.
         /// </summary>
         public byte Version { get; set; }
