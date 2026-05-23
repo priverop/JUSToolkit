@@ -38,15 +38,15 @@ namespace JUS.Tests
                 string programDir = AppDomain.CurrentDomain.BaseDirectory;
                 string path = Path.Combine(
                     programDir,
-                    "..", // framework
-                    "..", // configuration
-                    "..", // bin
+                    "..", // output folder (framework) -> debug/release (configuration)
+                    "..", // -> bin
+                    "..", // -> project
                     "Resources");
                 return Path.GetFullPath(path);
             }
         }
 
-        public static string SoftwareNitroRomPath => Path.Combine(RootFromOutputPath, "JUS_AJUJ00_00.nds");
+        public static string SoftwareNitroRomPath => Path.Combine(RootFromOutputPath, "JUS_AJUJ01_00.nds");
 
         public static NitroRom ReadSoftware()
         {

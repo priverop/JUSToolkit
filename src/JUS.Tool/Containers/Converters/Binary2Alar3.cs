@@ -39,64 +39,64 @@ namespace JUS.Tool.Containers.Converters
         /// <exception cref="ArgumentNullException">source is null.</exception>
         public Alar3 Convert(IBinary source)
         {
-            if (source is null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             reader = new DataReader(source.Stream);
             source.Stream.Position = 0;
 
-            ReadHeader();
+            int numFiles = ReadHeader();
 
-            for (int i = 0; i < alar.NumFiles; i++) {
-                alar.FileInfoPointers[i] = reader.ReadUInt16();
-                source.Stream.RunInPosition(() => ReadFileInfo(source), alar.FileInfoPointers[i]);
+            for (int i = 0; i < numFiles; i++) {
+                ushort offset = reader.ReadUInt16();
+                source.Stream.RunInPosition(() => ReadFileInfo(source), offset);
             }
 
             return alar;
         }
 
-        private void ReadHeader()
+        private int ReadHeader()
         {
             string stamp = reader.ReadString(4);
             if (stamp != Alar3.STAMP) {
                 throw new FormatException("Invalid header");
             }
 
-            var version = new Version(reader.ReadByte(), reader.ReadByte());
-            if (!Alar3.SupportedVersions.Contains(version)) {
-                throw new FormatException($"Unsupported version: {version:X}");
+            if (reader.ReadByte() != 3) {
+                throw new FormatException("Invalid format version");
             }
 
-            uint numFiles = reader.ReadUInt32();
-            ushort reserved = reader.ReadUInt16();
-            uint numEntries = reader.ReadUInt32();
+            byte featureFlags = reader.ReadByte();
+            if (!Alar3.SupportedFeatureFlags.Contains(featureFlags)) {
+                throw new FormatException($"Unsupported feature flags: {featureFlags:X}");
+            }
 
-            alar = new Alar3(numFiles) {
-                NumEntries = numEntries,
-                Reserved = reserved,
-                DataOffset = reader.ReadUInt16(),
-                MinorVersion = (byte)version.Minor,
+            ushort numFiles = reader.ReadUInt16();
+            uint firstFileId = reader.ReadUInt32();
+            uint lastFileId = reader.ReadUInt32();
+            _ = reader.ReadUInt16(); // offset to file data
+
+            alar = new Alar3 {
+                FeatureFlags = featureFlags,
+                FirstFileId = firstFileId,
+                LastFileId = lastFileId,
             };
+
+            return numFiles;
         }
 
         private void ReadFileInfo(IBinary source)
         {
-            ushort id = reader.ReadUInt16();
-            ushort unknown = reader.ReadUInt16();
+            uint id = reader.ReadUInt32();
             uint offset = reader.ReadUInt32();
             uint size = reader.ReadUInt32();
 
             var fileStream = new DataStream(source.Stream, offset, size);
-
             var alarFile = new Alar3File(fileStream) {
                 FileID = id,
-                Unknown = unknown,
                 Offset = offset,
                 Size = size,
-                Unknown2 = reader.ReadUInt16(),
-                Unknown3 = reader.ReadUInt16(),
-                Unknown4 = reader.ReadUInt16(),
+                Flags = reader.ReadUInt32(),
+                FilenameHash = reader.ReadUInt16(),
             };
 
             string path = reader.ReadString();

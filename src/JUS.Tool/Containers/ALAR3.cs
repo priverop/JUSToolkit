@@ -1,4 +1,3 @@
-using System;
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
 
@@ -15,51 +14,24 @@ namespace JUS.Tool.Containers
         public const string STAMP = "ALAR";
 
         /// <summary>
-        /// The Version of the File.
+        /// The supported feature flags of this tool.
         /// </summary>
-        /// <remarks>Maybe we need to support more than one minor version, but right now.
-        /// I only found the 05 and the 69.</remarks>
-        public static readonly Version[] SupportedVersions = new Version[] { new Version(3, 5), new Version(3, 69) };
+        public static readonly byte[] SupportedFeatureFlags = [ 0x05, 0x45 ];
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Alar3" /> class with an empty array of FileInfoPointers.
+        /// Gets or sets the container feature flags.
         /// </summary>
-        /// <param name="numFiles">How many files are we storing.</param>
-        public Alar3(uint numFiles)
-        {
-            NumFiles = numFiles;
-            FileInfoPointers = new ushort[numFiles];
-        }
+        public byte FeatureFlags { get; set; }
 
         /// <summary>
-        /// Gets or sets the Minor version of the container.
+        /// Gets or sets the ID of the first file in the container.
         /// </summary>
-        public byte MinorVersion { get; set; }
+        public uint FirstFileId { get; set; }
 
         /// <summary>
-        /// Gets the Number of files in the container.
+        /// Gets or sets the ID of the last file in the container.
         /// </summary>
-        public uint NumFiles { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the Reserved section of the container.
-        /// </summary>
-        public ushort Reserved { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Number of files - 1 in the container.
-        /// </summary>
-        public uint NumEntries { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ending of the pointer section and the start of the file data.
-        /// </summary>
-        public ushort DataOffset { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pointers of the file info.
-        /// </summary>
-        public ushort[] FileInfoPointers { get; set; }
+        public uint LastFileId { get; set; }
 
         /// <summary>
         /// Inserts a new Node into the current Alar3 Container.

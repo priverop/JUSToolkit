@@ -37,129 +37,92 @@ namespace JUS.Tool.Containers.Converters
         /// <exception cref="ArgumentNullException"><paramref name="alar"/> is <c>null</c>.</exception>
         public BinaryFormat Convert(Alar3 alar)
         {
-            if (alar == null) {
-                throw new ArgumentNullException(nameof(alar));
-            }
+            ArgumentNullException.ThrowIfNull(alar);
+
+            // Iterate in the expected order and pre-compute all container paths,
+            // so we can calculate the section lengths.
+            FileEntry[] entries = GetContainerEntries(alar.Root);
+
+            int fileInfoTableOffset = 0x12;
+            int fileInfoTableLength = entries.Length * 2;
+
+            int fileInfoSectionOffset = (fileInfoTableOffset + fileInfoTableLength).Pad(4);
+            int fileInfoSectionLength = entries.Sum(e => e.EncodedInfoLength);
+            int fileDataSectionOffset = fileInfoSectionOffset + fileInfoSectionLength;
 
             var binary = new BinaryFormat();
-            var writer = new DataWriter(binary.Stream) {
-                DefaultEncoding = new Yarhl.Media.Text.Encodings.EscapeOutRangeEncoding("ascii"),
-            };
+            var writer = new DataWriter(binary.Stream);
 
-            // Write Header
+            // Write the header
             writer.Write(Alar3.STAMP, false);
             writer.Write((byte)3);
-            writer.Write(alar.MinorVersion);
-            writer.Write(alar.NumFiles);
-            writer.Write(alar.Reserved);
-            writer.Write(alar.NumEntries);
-            writer.Write(alar.DataOffset);
+            writer.Write(alar.FeatureFlags);
+            writer.Write((ushort)entries.Length);
+            writer.Write(alar.FirstFileId);
+            writer.Write(alar.LastFileId);
+            writer.Write((ushort)fileDataSectionOffset);
 
-            // Write File Pointers Section
-            for (ushort i = 0; i < alar.NumFiles; i++) {
-                writer.Write(alar.FileInfoPointers[i]);
-            }
+            // Pre-fill info table and info section so we can write everything at the same time
+            writer.WriteUntilLength(0x00, fileDataSectionOffset);
 
-            // We store the positions of the alar file Offset section
-            // so we can modify them later.
-            long[] offsetPositions = new long[alar.NumFiles];
+            // We leave the writer position at the file info section as it's variable.
+            // The other sections (file info table, file data) are easy to calculate.
+            writer.Stream.Position = fileInfoSectionOffset;
+            for (int fileIdx = 0; fileIdx < entries.Length; fileIdx++) {
+                FileEntry entry = entries[fileIdx];
 
-            // As every file has a random padding, we store it so we can write it
-            // later.
-            int[] paddings = new int[alar.NumFiles];
+                ushort fileInfoOffset = (ushort)writer.Stream.Position;
+                uint fileDataOffset = (uint)writer.Stream.Length.Pad(4); // padding written later, except last file
 
-            // Write File Info Section
-            foreach (Node alarFile in Navigator.IterateNodes(alar.Root)) {
-                if (!alarFile.IsContainer) {
-                    Alar3File alarChild = alarFile.GetFormatAs<Alar3File>()!;
+                // Write file info offset
+                writer.Stream.PushToPosition(fileInfoTableOffset + (fileIdx * 2));
+                writer.Write(fileInfoOffset);
+                writer.Stream.PopPosition();
 
-                    writer.WritePadding(0, 04);
+                // Write file info
+                writer.Write(entry.FileInfo.FileID);
+                writer.Write(fileDataOffset);
+                writer.Write((uint)entry.Data.Length);
+                writer.Write(entry.FileInfo.Flags);
+                writer.Write(entry.FileInfo.FilenameHash);
+                writer.Write(entry.ContainerPath);
+                writer.WritePadding(0, 4);
 
-                    writer.Write(alarChild.FileID);
-                    writer.Write(alarChild.Unknown);
-                    offsetPositions[alarChild.FileID] = writer.Stream.Position;
-                    writer.Write(alarChild.Offset);
-                    writer.Write(alarChild.Size);
-                    writer.Write(alarChild.Unknown2);
-                    writer.Write(alarChild.Unknown3);
-                    writer.Write(alarChild.Unknown4);
-
-                    writer.Write(GetAlar3Path(alarFile.Path), true);
-                }
-            }
-
-            writer.WritePadding(0, 04);
-
-            // Write File Data Section
-            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
-                if (!node.IsContainer) {
-                    Alar3File alarFile = node.GetFormatAs<Alar3File>()!;
-
-                    // Storing Padding for every file but the first one
-                    if (alarFile.FileID != 0) {
-                        long initPadding = writer.Stream.Position;
-                        writer.WritePadding(0, 04);
-                        long endPadding = writer.Stream.Position;
-                        int paddingSize = (int)(endPadding - initPadding);
-
-                        paddings[alarFile.FileID] = paddingSize;
-                    }
-
-                    alarFile.Stream!.WriteTo(writer.Stream);
-                }
-            }
-
-            // Rewrite Offsets
-            int newOffset = 0;
-            foreach (Node node in Navigator.IterateNodes(alar.Root)) {
-                if (!node.IsContainer) {
-                    Alar3File alarFile = node.GetFormatAs<Alar3File>()!;
-
-                    // Starter Offset
-                    if (alarFile.FileID == 0) {
-                        newOffset = (int)alarFile.Offset;
-                    }
-
-                    // Modify the size of the file
-                    writer.Stream.RunInPosition(
-                            () => writer.Write(alarFile.Size),
-                            offsetPositions[alarFile.FileID] + 4); // The size is always 4 positions ahead
-
-                    // Add the size of the file and the padding
-                    if (alarFile.FileID != alar.NumFiles - 1) {
-                        newOffset += (int)(alarFile.Size + paddings[alarFile.FileID + 1]);
-                        writer.Stream.RunInPosition(
-                            () => writer.Write(newOffset),
-                            offsetPositions[alarFile.FileID + 1]);
-                    }
-                }
+                // Write file data
+                writer.Stream.PushToPosition(0, SeekOrigin.End);
+                writer.WritePadding(0, 4);
+                entry.Data.WriteTo(writer.Stream);
+                writer.Stream.PopPosition();
             }
 
             return binary;
         }
 
-        /// <summary>
-        /// Removes the alar filename (and the root name) from the path of the node.
-        /// <remarks>If we have '/root/data/alar.alar/komas/dg_00.dtx' we will get 'komas/dg_00.dtx'.</remarks>
-        /// </summary>
-        /// <param name="fullPath">The full path of the node.</param>
-        /// <returns>The clean string.</returns>
-        private static string GetAlar3Path(string fullPath)
+        private static FileEntry[] GetContainerEntries(Node root)
         {
-            // Sometimes (like tests) paths don't have .aar, so we add it
-            fullPath = fullPath.Replace("NodeContainerRoot", "NodeContainerRoot.aar");
-            int aarIndex = fullPath.IndexOf(".aar");
+            List<FileEntry> entries = [];
+            foreach (Node node in Navigator.IterateNodes(root, NavigationMode.DepthFirst)) {
+                if (node.IsContainer) {
+                    continue;
+                }
 
-            // ToDo: Aquí falla, salta la excepción. fullPath: "/option.png/option/info00.atm"
-            if (aarIndex == -1) {
-                throw new ArgumentException("Invalid path format: '.aar' not found", fullPath);
+                string containerPath = Path.GetRelativePath(root.Path, node.Path).Replace('\\', '/');
+                Alar3File fileInfo = node.GetFormatAs<Alar3File>()
+                    ?? throw new FormatException($"Unexpected file format for {node.Path}");
+                entries.Add(new FileEntry(node.Stream!, fileInfo, containerPath));
             }
 
-            // Skip past ".aar"
-            int startIndex = aarIndex + 4;
+            return entries.ToArray();
+        }
 
-            // From startIndex to the end
-            return fullPath[startIndex..].TrimStart('/');
+        private sealed record FileEntry(DataStream Data, Alar3File FileInfo, string ContainerPath)
+        {
+            /// <summary>
+            /// Gets the binary encoded length of the path, assuming ASCII characters and a null-terminator.
+            /// </summary>
+            public int EncodedPathLength => ContainerPath.Length + 1;
+
+            public int EncodedInfoLength => (0x12 + EncodedPathLength).Pad(4);
         }
     }
 }

@@ -140,7 +140,7 @@ namespace JUS.Tests.Containers
             const int totalFiles = 4;
 
             // Alar3 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
-            var alar = new Alar3((uint)totalFiles);
+            var alar = new Alar3();
             for (int i = 0; i < totalFiles; i++) {
                 // Creamos un fichero de 5bytes.
                 var child = new Alar3File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {

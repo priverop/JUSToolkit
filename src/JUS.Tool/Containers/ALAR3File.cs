@@ -22,7 +22,7 @@ namespace JUS.Tool.Containers
         /// <summary>
         /// Gets or sets the FileID.
         /// </summary>
-        public ushort FileID { get; set; }
+        public uint FileID { get; set; }
 
         /// <summary>
         /// Gets or sets the absolute pointer of the File.
@@ -35,24 +35,14 @@ namespace JUS.Tool.Containers
         public uint Size { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unknown.
+        /// Gets or sets flags about the file content.
         /// </summary>
-        public ushort Unknown { get; set; }
+        public uint Flags { get; set; }
 
         /// <summary>
-        /// Gets or sets the Unknown2.
+        /// Gets or sets the lookup hash of the filename.
         /// </summary>
-        public ushort Unknown2 { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Unknown3.
-        /// </summary>
-        public ushort Unknown3 { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Unknown4.
-        /// </summary>
-        public ushort Unknown4 { get; set; }
+        public ushort FilenameHash { get; set; }
 
         /// <summary>
         /// We replace the Alar3File Stream and the Size.

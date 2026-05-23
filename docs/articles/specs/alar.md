@@ -132,28 +132,38 @@ The format structure is:
 - File info table.
 - File data.
 
+The file hierarchy follows a "depth-first" approach.
+
 #### V3 Extended header
 
-| Offset | Type    | Description                  |
-| ------ | ------- | ---------------------------- |
-| 0x08   | uint    | First file ID (without type) |
-| 0x0C   | uint    | Last file ID (without type)  |
-| 0x10   | short   | Data offset                  |
-| 0x12   | short[] | File info absolute offsets   |
+| Offset | Type     | Description                  |
+| ------ |----------| ---------------------------- |
+| 0x08   | uint     | First file ID (without type) |
+| 0x0C   | uint     | Last file ID (without type)  |
+| 0x10   | ushort   | Data offset                  |
+| 0x12   | ushort[] | File info absolute offsets   |
+
+The block ends with padding (0x00) until an address multiple of 4.
 
 #### V3 File info
 
-| Offset | Type     | Description                             |
-| ------ | -------- | --------------------------------------- |
-| 0x00   | uint     | File ID                                 |
-| 0x04   | uint     | File data absolute offset               |
-| 0x08   | uint     | File data size                          |
-| 0x0C   | uint     | Flags                                   |
-| 0x10   | ushort   | [File path hash](#file-path-hashes)     |
-| 0x12   | char[18] | Null-terminated file path ASCII encoded |
+The size of the entries is variable (it depends on the file path). They have
+padding bytes (0x00) to align the end position to an address multiple of 4.
+
+| Offset | Type   | Description                             |
+| ------ |--------| --------------------------------------- |
+| 0x00   | uint   | File ID                                 |
+| 0x04   | uint   | File data absolute offset               |
+| 0x08   | uint   | File data size                          |
+| 0x0C   | uint   | Flags                                   |
+| 0x10   | ushort | [File path hash](#file-path-hashes)     |
+| 0x12   | char[] | Null-terminated file path ASCII encoded |
 
 The file ID and info flags have the same meaning as in
 [version 2 file info](#v2-file-info).
+
+The file data offset is an address multiple of 4. There are padding bytes (0x00)
+if it's not. The last file does not have padding at the end of the file.
 
 ## File path hashes
 
