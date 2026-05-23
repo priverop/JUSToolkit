@@ -1,5 +1,6 @@
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.Tool.Containers
 {
@@ -16,7 +17,7 @@ namespace JUS.Tool.Containers
         /// <summary>
         /// The supported feature flags of this tool.
         /// </summary>
-        public static readonly byte[] SupportedFeatureFlags = [ 0x05, 0x45 ];
+        public static byte[] SupportedFeatureFlags { get; } = [ 0x05, 0x45 ];
 
         /// <summary>
         /// Gets or sets the container feature flags.
@@ -55,32 +56,23 @@ namespace JUS.Tool.Containers
         /// <param name="parent">Parent directory of the file to replace.</param>
         public void InsertModification(Node nNew, string? parent = null)
         {
-            uint nextFileOffset = 0;
             bool replaced = false;
-
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
                     Alar3File alarFileOld = nOld.GetFormatAs<Alar3File>()!;
 
-                    // Ignoring first file (0 offset)
-                    if (nextFileOffset > 0) {
-                        alarFileOld.Offset = nextFileOffset;
-                    }
-
                     if (parent == null && nOld.Name == nNew.Name) {
                         Console.WriteLine("Replacing: " + nNew.Name);
-                        alarFileOld.ReplaceStream(nNew.Stream!);
+                        alarFileOld.Stream = new DataStream(nNew.Stream!);
                         replaced = true;
                     }
 
                     // Search for the specific file in case there are more than one in different directories
                     // That's why specify the parent (directory name)
                     else if (parent != null && parent == nOld.Parent!.Name && nOld.Name == nNew.Name) {
-                        alarFileOld.ReplaceStream(nNew.Stream!);
+                        alarFileOld.Stream = new DataStream(nNew.Stream!);
                         replaced = true;
                     }
-
-                    nextFileOffset = alarFileOld.Offset + alarFileOld.Size;
                 }
             }
 

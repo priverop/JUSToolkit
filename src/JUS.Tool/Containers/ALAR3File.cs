@@ -17,41 +17,16 @@ namespace JUS.Tool.Containers
         }
 
         /// <inheritdoc/>
-        public DataStream Stream { get; private set; }
+        public DataStream Stream { get; set; }
 
         /// <summary>
         /// Gets or sets the FileID.
         /// </summary>
-        public uint FileID { get; set; }
-
-        /// <summary>
-        /// Gets or sets the absolute pointer of the File.
-        /// </summary>
-        public uint Offset { get; set; }
-
-        /// <summary>
-        /// Gets or sets the size of the File.
-        /// </summary>
-        public uint Size { get; set; }
+        public uint FileId { get; set; }
 
         /// <summary>
         /// Gets or sets flags about the file content.
         /// </summary>
         public uint Flags { get; set; }
-
-        /// <summary>
-        /// Gets or sets the lookup hash of the filename.
-        /// </summary>
-        public ushort FilenameHash { get; set; }
-
-        /// <summary>
-        /// We replace the Alar3File Stream and the Size.
-        /// </summary>
-        /// <param name="stream">New DataStream.</param>
-        public void ReplaceStream(DataStream stream)
-        {
-            Stream = new DataStream(stream);
-            Size = (uint)stream.Length;
-        }
     }
 }

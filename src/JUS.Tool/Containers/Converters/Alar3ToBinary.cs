@@ -50,6 +50,8 @@ namespace JUS.Tool.Containers.Converters
             int fileInfoSectionLength = entries.Sum(e => e.EncodedInfoLength);
             int fileDataSectionOffset = fileInfoSectionOffset + fileInfoSectionLength;
 
+            bool useHashV1 = (alar.FeatureFlags & 0x40) == 0;
+
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
 
@@ -80,11 +82,12 @@ namespace JUS.Tool.Containers.Converters
                 writer.Stream.PopPosition();
 
                 // Write file info
-                writer.Write(entry.FileInfo.FileID);
+                ushort nameHash = useHashV1 ? AlarPathHash.ComputeV1(entry.ContainerPath) : AlarPathHash.ComputeV2(entry.ContainerPath);
+                writer.Write(entry.FileInfo.FileId);
                 writer.Write(fileDataOffset);
                 writer.Write((uint)entry.Data.Length);
                 writer.Write(entry.FileInfo.Flags);
-                writer.Write(entry.FileInfo.FilenameHash);
+                writer.Write(nameHash);
                 writer.Write(entry.ContainerPath);
                 writer.WritePadding(0, 4);
 

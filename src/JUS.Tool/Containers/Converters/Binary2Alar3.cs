@@ -89,22 +89,28 @@ namespace JUS.Tool.Containers.Converters
             uint id = reader.ReadUInt32();
             uint offset = reader.ReadUInt32();
             uint size = reader.ReadUInt32();
+            uint flags = reader.ReadUInt32();
 
             var fileStream = new DataStream(source.Stream, offset, size);
             var alarFile = new Alar3File(fileStream) {
-                FileID = id,
-                Offset = offset,
-                Size = size,
-                Flags = reader.ReadUInt32(),
-                FilenameHash = reader.ReadUInt16(),
+                FileId = id,
+                Flags = flags,
             };
 
-            string path = reader.ReadString();
-            string name = Path.GetFileName(path);
-            string? dir = Path.GetDirectoryName(path);
-            var child = new Node(name, alarFile);
+            string dir = string.Empty;
+            Node child;
+            if ((flags >> 31) == 1) {
+                _ = reader.ReadUInt16(); // name hash
+                string path = reader.ReadString();
 
-            NodeFactory.CreateContainersForChild(alar.Root, dir!, child);
+                string name = Path.GetFileName(path);
+                dir = Path.GetDirectoryName(path)!;
+                child = new Node(name, alarFile);
+            } else {
+                child = new Node("file", alarFile);
+            }
+
+            NodeFactory.CreateContainersForChild(alar.Root, dir, child);
         }
     }
 }
