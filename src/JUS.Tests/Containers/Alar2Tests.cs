@@ -77,7 +77,7 @@ namespace JUS.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            Alar2 alar = node.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar2());
+            Alar alar = node.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar2());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
@@ -92,7 +92,7 @@ namespace JUS.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            Alar2 alar = new Binary2Alar2().Convert(alarOriginal.GetFormatAs<IBinary>()!);
+            Alar alar = new Binary2Alar2().Convert(alarOriginal.GetFormatAs<IBinary>()!);
             alar.InsertModification(fileOriginal.GetFormatAs<NodeContainerFormat>()!);
             BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
@@ -101,43 +101,19 @@ namespace JUS.Tests.Containers
         }
 
         [Test]
-        public void Alar2ReplaceStreamTest()
-        {
-            var streamA = new DataStream();
-            streamA.Write(new byte[] { 1, 2, 3 }, 0, 3);
-
-            var alarFile = new Alar2File(streamA);
-
-            var streamB = new DataStream();
-            streamB.Write(new byte[] { 2, 3, 4 }, 0, 3);
-
-            alarFile.ReplaceStream(streamB);
-
-            Assert.That(alarFile.Size, Is.EqualTo(3));
-            alarFile.Stream.Compare(streamB).Should().BeTrue();
-            alarFile.Stream.Compare(streamA).Should().BeFalse();
-        }
-
-        [Test]
         public void Alar2InsertNodesTest()
         {
             const int totalFiles = 4;
 
             // Alar2 con 4 AlarFiles (offset de 5 en 5, size 5 todos)
-            var alar = new Alar2((ushort)totalFiles);
+            var alar = new Alar();
             for (int i = 0; i < totalFiles; i++) {
-                var child = new Alar2File(new DataStream(new MemoryStream(new byte[] { (byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4) }))) {
-                    Size = 5,
-                    Offset = (uint)(i * 5),
-                };
+                var child = new AlarFile(DataStreamFactory.FromArray([(byte)i, (byte)(i + 1), (byte)(i + 2), (byte)(i + 3), (byte)(i + 4)]));
                 alar.Root.Add(new Node("child" + i, child));
             }
 
             // Node con 1 AlarFile, será el segundo (offset 5, size 10)
-            var modifiedChild1 = new Alar2File(new DataStream(new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }))) {
-                Size = 10,
-                Offset = 5,
-            };
+            var modifiedChild1 = new AlarFile(DataStreamFactory.FromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
             var modifiedNode = new Node("child1", modifiedChild1);
             var modifiedFiles = new NodeContainerFormat();
             modifiedFiles.Root.Add(modifiedNode);
@@ -146,22 +122,7 @@ namespace JUS.Tests.Containers
             // Cuántos hijos tiene el Alar2
             Assert.That(alar.Root.Children.Count, Is.EqualTo(totalFiles));
 
-            // Tamaños
-            Assert.That(alar.Root.Children[0].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[1].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[2].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[3].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-
-            // Offsets
-            Assert.That(alar.Root.Children[0].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(0));
-            Assert.That(alar.Root.Children[1].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[2].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(10));
-            Assert.That(alar.Root.Children[3].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(15));
-
             // Si el Nodo getFormat . Size está OK
-            var child2 = modifiedFiles.Root.Children[0].GetFormatAs<Alar2File>()!;
-            Assert.That(child2.Size, Is.EqualTo(10));
-            Assert.That(child2.Offset, Is.EqualTo(5));
             Assert.That(modifiedFiles.Root.Children.Count, Is.EqualTo(1));
 
             // Insertamos el Nodo con InsertModification
@@ -169,18 +130,6 @@ namespace JUS.Tests.Containers
 
             // Comprobamos los ficheros totales
             Assert.That(alar.Root.Children.Count, Is.EqualTo(totalFiles));
-
-            // Comprobamos los tamaños
-            Assert.That(alar.Root.Children[0].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[1].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(10));
-            Assert.That(alar.Root.Children[2].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[3].GetFormatAs<Alar2File>()!.Size, Is.EqualTo(5));
-
-            // Comprobamos el tema de los offsets (0, 5, 15, 20)
-            Assert.That(alar.Root.Children[0].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(0));
-            Assert.That(alar.Root.Children[1].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(5));
-            Assert.That(alar.Root.Children[2].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(15));
-            Assert.That(alar.Root.Children[3].GetFormatAs<Alar2File>()!.Offset, Is.EqualTo(20));
         }
     }
 }

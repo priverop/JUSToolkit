@@ -115,15 +115,7 @@ namespace JUS.CLI.JUS
                         }
                     } else if (Path.GetExtension(child.Name) == ".aar") {
                         Console.WriteLine($"AAR found, processing recursively: {originalAlarName}/{child.Name}");
-                        using Node nestedAlar = child.TransformWith<LzssDecompression>();
-
-                        Version nestedAlarVersion = Identifier.GetAlarVersion(nestedAlar.Stream!);
-
-                        if (nestedAlarVersion.Major == 3) {
-                            nestedAlar.TransformWith<Binary2Alar3>();
-                        } else if (nestedAlarVersion.Major == 2) {
-                            nestedAlar.TransformWith<Binary2Alar2>();
-                        }
+                        using Node nestedAlar = child.TransformWith<Binary2Alar>();
 
                         ProcessNode(nestedAlar, Path.Combine(baseOutputPath, originalAlarName));
                     }
@@ -131,16 +123,7 @@ namespace JUS.CLI.JUS
             }
 
             Node originalAlar = NodeFactory.FromFile(container)
-                            .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
-
-            Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream!);
-
-            // ToDo: In the future we need to encapsulate this
-            if (alarVersion.Major == 3) {
-                originalAlar.TransformWith<Binary2Alar3>();
-            } else if (alarVersion.Major == 2) {
-                originalAlar.TransformWith<Binary2Alar2>();
-            }
+                .TransformWith<Binary2Alar>();
 
             ProcessNode(originalAlar, output);
 
@@ -162,9 +145,9 @@ namespace JUS.CLI.JUS
 
             var png2Alar3 = new Png2Alar3(inputPNG, cleanName + ".dig", cleanName + ".atm");
 
-            Alar3 newAlar = originalAlar
+            Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar3>()!;
+                .GetFormatAs<Alar>()!;
 
             using BinaryFormat binary = newAlar.ConvertWith(new Alar3ToBinary());
 

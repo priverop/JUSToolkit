@@ -19,7 +19,6 @@
 // SOFTWARE.
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
-using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -45,16 +44,7 @@ namespace JUS.CLI.JUS
             PathValidator.ValidateFile(container);
 
             using Node files = NodeFactory.FromFile(container)
-                .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
-
-            Version alarVersion = Identifier.GetAlarVersion(files.Stream!);
-
-            // ToDo: In the future we need to encapsulate this
-            if (alarVersion.Major == 3) {
-                files.TransformWith<Binary2Alar3>();
-            } else if (alarVersion.Major == 2) {
-                files.TransformWith<Binary2Alar2>();
-            }
+                .TransformWith<Binary2Alar>();
 
             foreach (Node node in Navigator.IterateNodes(files)) {
                 if (!node.IsContainer) {
@@ -91,21 +81,21 @@ namespace JUS.CLI.JUS
                 _ = originalAlar.TransformWith<LzssDecompression>();
             }
 
-            Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream!);
+            byte alarVersion = Identifier.GetAlarVersion(originalAlar.Stream!);
 
             using var filesToInsert = new NodeContainerFormat();
             using Node inputDir = NodeFactory.FromDirectory(input);
             filesToInsert.Root.Add(inputDir.Children);
 
             BinaryFormat binary;
-            if (alarVersion.Major == 3) {
-                Alar3 alar = originalAlar.TransformWith<Binary2Alar3>()
-                    .GetFormatAs<Alar3>()!;
+            if (alarVersion == 3) {
+                Alar alar = originalAlar.TransformWith<Binary2Alar3>()
+                    .GetFormatAs<Alar>()!;
                 alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar3ToBinary());
-            } else if (alarVersion.Major == 2) {
-                Alar2 alar = originalAlar.TransformWith<Binary2Alar2>()
-                    .GetFormatAs<Alar2>()!;
+            } else if (alarVersion == 2) {
+                Alar alar = originalAlar.TransformWith<Binary2Alar2>()
+                    .GetFormatAs<Alar>()!;
                 alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar2ToBinary());
             } else {

@@ -135,9 +135,9 @@ namespace JUS.CLI.JUS.Rom
                 image2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1], transparentTile);
             }
 
-            Alar3 newAlar = originalAlar
+            Alar newAlar = originalAlar
                 .TransformWith(image2Alar3)
-                .GetFormatAs<Alar3>()!;
+                .GetFormatAs<Alar>()!;
 
             BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
 

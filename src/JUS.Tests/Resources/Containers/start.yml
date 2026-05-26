@@ -1,9 +1,9 @@
 name: start.aar
-format_type: JUS.Tool.Containers.Alar2
+format_type: JUS.Tool.Containers.Alar
 tags:
 check_children: true
 children:
   - name: start.dtx
-    format_type: JUS.Tool.Containers.Alar2File
+    format_type: JUS.Tool.Containers.AlarFile
   - name: start.amt
-    format_type: JUS.Tool.Containers.Alar2File
+    format_type: JUS.Tool.Containers.AlarFile
