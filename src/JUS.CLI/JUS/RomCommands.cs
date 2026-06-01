@@ -71,6 +71,7 @@ namespace JUS.CLI.JUS
         private static readonly IFileImportStrategy[] Strategies =
         [
             new TextFile(),
+            new TextContainerFile()
             // new DeckImporter(),
             // new InfoDeckImporter(),
             // new JQuizImporter(),
@@ -95,15 +96,19 @@ namespace JUS.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
+            bool match = false;
+
             // TODO: find a way to not do 1 by 1.
             foreach (Node file in inputFiles.Children) {
                 foreach (IFileImportStrategy strategy in Strategies) {
                     if (strategy.Matches(file.Name)) {
+                        match = true;
                         strategy.Import(gameNode, file);
                     }
-                    else {
-                        Console.WriteLine($"File not compatible: {file.Name}");
-                    }
+                }
+
+                if (!match) {
+                    Console.WriteLine($"File not compatible: {file.Name}");
                 }
             }
 
