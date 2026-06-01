@@ -68,6 +68,17 @@ namespace JUS.CLI.JUS
             (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
         };
 
+        private static readonly IFileImportStrategy[] Strategies =
+        [
+            new TextFile(),
+            // new DeckImporter(),
+            // new InfoDeckImporter(),
+            // new JQuizImporter(),
+            // new JGalaxyImporter(),
+            // new MenuImageImporter(),
+            // new DemoImporter(),
+        ];
+
         /// <summary>
         /// Import files into the Rom.
         /// </summary>
@@ -84,22 +95,13 @@ namespace JUS.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
+            // TODO: find a way to not do 1 by 1.
             foreach (Node file in inputFiles.Children) {
-                // Fixed names
-                if (ImportStrategies.TryGetValue(file.Name, out IFileImportStrategy? strategy)) {
-                    strategy.Import(gameNode, file);
-                } else {
-                    // Pattern names
-                    bool matched = false;
-                    foreach ((Regex pattern, IFileImportStrategy patternStrategy) in PatternStrategies) {
-                        if (pattern.IsMatch(file.Name)) {
-                            patternStrategy.Import(gameNode, file);
-                            matched = true;
-                            break;
-                        }
+                foreach (IFileImportStrategy strategy in Strategies) {
+                    if (strategy.Matches(file.Name)) {
+                        strategy.Import(gameNode, file);
                     }
-
-                    if (!matched) {
+                    else {
                         Console.WriteLine($"File not compatible: {file.Name}");
                     }
                 }

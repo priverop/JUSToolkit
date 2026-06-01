@@ -26,6 +26,8 @@ namespace JUS.CLI.JUS.Rom
     /// </summary>
     public interface IFileImportStrategy
     {
+        bool Matches(string filename);
+
         /// <summary>
         /// Import files into the Rom.
         /// </summary>

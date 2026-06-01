@@ -28,29 +28,33 @@ namespace JUS.CLI.JUS.Rom
     {
         // ToDo: Remove filename of the second string, we only need the directory
         private static readonly Dictionary<string, string> TextLocations = new() {
-            { "tutorial.bin", "/deckmake/tutorial.bin" },
-            { "tutorial0.bin", "/battle/tutorial0.bin" },
-            { "tutorial1.bin", "/battle/tutorial1.bin" },
-            { "tutorial2.bin", "/battle/tutorial2.bin" },
-            { "tutorial3.bin", "/battle/tutorial3.bin" },
-            { "tutorial4.bin", "/battle/tutorial4.bin" },
-            { "tutorial5.bin", "/battle/tutorial5.bin" },
-            { "ability_t.bin", "/bin/ability_t.bin" },
-            { "bgm.bin", "/bin/bgm.bin" },
-            { "chr_b_t.bin", "/bin/chr_b_t.bin" },
-            { "chr_s_t.bin", "/bin/chr_s_t.bin" },
-            { "clearlst.bin", "/bin/clearlst.bin" },
-            { "commwin.bin", "/bin/commwin.bin" },
-            { "demo.bin", "/bin/demo.bin" },
-            { "infoname.bin", "/bin/infoname.bin" },
-            { "komatxt.bin", "/bin/komatxt.bin" },
-            { "location.bin", "/bin/location.bin" },
-            { "piece.bin", "/bin/piece.bin" },
-            { "pname.bin", "/bin/pname.bin" },
-            { "rulemess.bin", "/bin/rulemess.bin" },
-            { "stage.bin", "/bin/stage.bin" },
-            { "title.bin", "/bin/title.bin" },
+            { "tutorial.bin", "/deckmake" },
+            { "tutorial0.bin", "/battle" },
+            { "tutorial1.bin", "/battle" },
+            { "tutorial2.bin", "/battle" },
+            { "tutorial3.bin", "/battle" },
+            { "tutorial4.bin", "/battle" },
+            { "tutorial5.bin", "/battle" },
+            { "ability_t.bin", "/bin" },
+            { "bgm.bin", "/bin" },
+            { "chr_b_t.bin", "/bin" },
+            { "chr_s_t.bin", "/bin" },
+            { "clearlst.bin", "/bin" },
+            { "commwin.bin", "/bin" },
+            { "demo.bin", "/bin" },
+            { "infoname.bin", "/bin" },
+            { "komatxt.bin", "/bin" },
+            { "location.bin", "/bin" },
+            { "piece.bin", "/bin" },
+            { "pname.bin", "/bin" },
+            { "rulemess.bin", "/bin" },
+            { "stage.bin", "/bin" },
+            { "title.bin", "/bin" },
         };
+
+        public bool Matches(string filename) {
+            return TextLocations.ContainsKey(filename);
+        }
 
         /// <summary>
         /// Import files into the Rom.
@@ -60,9 +64,9 @@ namespace JUS.CLI.JUS.Rom
         public void Import(Node gameNode, Node file)
         {
             if (TextLocations.TryGetValue(file.Name, out string? value)) {
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}")!;
+                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}/{file.Name}")!;
                 toReplace.ChangeFormat(file.Format!);
-                Console.WriteLine($"File replaced: /root/data{value}");
+                Console.WriteLine($"File replaced: /root/data{value}/{file.Name}");
             }
         }
     }
