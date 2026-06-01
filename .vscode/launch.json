@@ -8,8 +8,8 @@
       "name": ".NET Launch (console)",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/JUS.CLI/bin/Debug/net8.0/JUS.CLI.dll",
+      "preLaunchTask": "Build",
+      "program": "${workspaceFolder}/src/JUS.CLI/bin/Debug/net10.0/JUS.CLI.dll",
       "args": [
         "jus",
         "texts",
