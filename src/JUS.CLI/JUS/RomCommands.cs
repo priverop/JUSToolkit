@@ -30,54 +30,20 @@ namespace JUS.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
-        private static readonly Dictionary<string, IFileImportStrategy> ImportStrategies = new()
-        {
-            { "tutorial.bin", new TextFile() },
-            { "tutorial0.bin", new TextFile() },
-            { "tutorial1.bin", new TextFile() },
-            { "tutorial2.bin", new TextFile() },
-            { "tutorial3.bin", new TextFile() },
-            { "tutorial4.bin", new TextFile() },
-            { "tutorial5.bin", new TextFile() },
-            { "ability_t.bin", new TextFile() },
-            { "bgm.bin", new TextFile() },
-            { "chr_b_t.bin", new TextFile() },
-            { "chr_s_t.bin", new TextFile() },
-            { "clearlst.bin", new TextFile() },
-            { "commwin.bin", new TextFile() },
-            { "demo.bin", new TextFile() },
-            { "infoname.bin", new TextFile() },
-            { "komatxt.bin", new TextFile() },
-            { "location.bin", new TextFile() },
-            { "piece.bin", new TextFile() },
-            { "pname.bin", new TextFile() },
-            { "rulemess.bin", new TextFile() },
-            { "stage.bin", new TextFile() },
-            { "title.bin", new TextFile() },
-            { "jgalaxy-jgalaxy.bin", new TextContainerFile() },
-            { "jgalaxy-mission.bin", new TextContainerFile() },
-            { "jgalaxy-battle.bin", new TextContainerFile() },
-            { "jquiz.bin", new TextContainerFile() },
-        };
-
-        private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
-        {
-            (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
-            (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
-            (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
-            (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
-        };
+        // private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
+        // {
+        //     (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
+        //     (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
+        //     (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
+        //     (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
+        // };
 
         private static readonly IFileImportStrategy[] Strategies =
         [
             new TextFile(),
             new TextContainerFile(),
-            new TextPatternFile()
-            // new DeckImporter(),
-            // new InfoDeckImporter(),
-            // new JQuizImporter(),
-            // new JGalaxyImporter(),
-            // new MenuImageImporter(),
+            new TextPatternFile(),
+            new MenuImageFile(),
             // new DemoImporter(),
         ];
 
