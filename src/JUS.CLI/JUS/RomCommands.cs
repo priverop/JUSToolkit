@@ -44,7 +44,7 @@ namespace JUS.CLI.JUS
             new TextContainerFile(),
             new TextPatternFile(),
             new MenuImageFile(),
-            // new DemoImporter(),
+            new DemoImageFile(),
         ];
 
         /// <summary>
