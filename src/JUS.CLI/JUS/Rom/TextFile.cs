@@ -26,7 +26,6 @@ namespace JUS.CLI.JUS.Rom
     /// </summary>
     public class TextFile : IFileImportStrategy
     {
-        // ToDo: Remove filename of the second string, we only need the directory
         private static readonly Dictionary<string, string> TextLocations = new() {
             { "tutorial.bin", "/deckmake" },
             { "tutorial0.bin", "/battle" },
@@ -52,7 +51,8 @@ namespace JUS.CLI.JUS.Rom
             { "title.bin", "/bin" },
         };
 
-        public bool Matches(string filename) {
+        public bool Matches(string filename)
+        {
             return TextLocations.ContainsKey(filename);
         }
 

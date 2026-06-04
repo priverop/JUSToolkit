@@ -71,7 +71,8 @@ namespace JUS.CLI.JUS
         private static readonly IFileImportStrategy[] Strategies =
         [
             new TextFile(),
-            new TextContainerFile()
+            new TextContainerFile(),
+            new TextPatternFile()
             // new DeckImporter(),
             // new InfoDeckImporter(),
             // new JQuizImporter(),
