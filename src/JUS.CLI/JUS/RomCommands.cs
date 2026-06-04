@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Text.RegularExpressions;
 using JUS.CLI.JUS.Rom;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
@@ -30,13 +29,6 @@ namespace JUS.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
-        // private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
-        // {
-        //     (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
-        //     (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
-        //     (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
-        //     (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
-        // };
 
         private static readonly IFileImportStrategy[] Strategies =
         [
