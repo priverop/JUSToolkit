@@ -17,14 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Text.RegularExpressions;
 using JUS.Tool.BatchConverters;
-using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -96,21 +92,11 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node pngFile, string[] imageInfo)
         {
-            // 1 - Search the Original Alar3
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{imageInfo[2]}") ?? throw new FormatException($"Container not found /root/data{imageInfo[2]}");
-            _ = originalAlar.TransformWith<Binary2Alar3>();
 
-            // 2 - Insert the Png into the Alar3
-            var image2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]);
-
-            Alar newAlar = originalAlar
-                .TransformWith(image2Alar3)
-                .GetFormatAs<Alar>()!;
-
-            BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
-
-            // 3 - Override it
-            _ = originalAlar.ChangeFormat(newBinary);
+            originalAlar.TransformWith<Binary2Alar3>()
+                .TransformWith(new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]))
+                .TransformWith(new Alar3ToBinary());
 
             Console.WriteLine($"File replaced: /root/data{imageInfo[2]}/{pngFile.Name}");
         }

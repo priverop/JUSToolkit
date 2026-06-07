@@ -19,12 +19,10 @@
 // SOFTWARE.
 using System.Text.RegularExpressions;
 using JUS.Tool.BatchConverters;
-using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -66,11 +64,8 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node pngFile, string containerPath)
         {
-            // 1 - Search the Original Alar3
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
-            _ = originalAlar.TransformWith<Binary2Alar3>();
 
-            // 2 - Insert the Png into the Alar3
             IConverter image2Alar3;
 
             string digName = GetDemoDigName(pngFile.Name) + ".dig";
@@ -86,14 +81,9 @@ namespace JUS.CLI.JUS.Rom
                 image2Alar3 = new Png2Alar3(pngFile, digName, atmName, true);
             }
 
-            Alar newAlar = originalAlar
-                .TransformWith(image2Alar3)
-                .GetFormatAs<Alar>()!;
-
-            BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
-
-            // 3 - Override
-            _ = originalAlar.ChangeFormat(newBinary);
+            _ = originalAlar.TransformWith<Binary2Alar3>()
+            .TransformWith(image2Alar3)
+            .TransformWith(new Alar3ToBinary());
 
             Console.WriteLine($"File replaced: /root/data{containerPath}/{pngFile.Name}");
         }

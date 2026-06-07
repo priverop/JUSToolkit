@@ -20,11 +20,8 @@
 using System.Text.RegularExpressions;
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
-using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -33,11 +30,11 @@ namespace JUS.CLI.JUS.Rom
     /// </summary>
     public class TextPatternFile : IFileImportStrategy
     {
-        private static readonly List<(Regex Pattern, string)> PatternList = new()
-        {
+        private static readonly List<(Regex Pattern, string)> PatternList =
+        [
             (new Regex(@"^bin-.*-.*\.bin$"), "/bin/InfoDeck.aar"), // "{container}/bin/deck/{file.Name}"
             (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
-        };
+        ];
 
         public bool Matches(string filename)
         {
@@ -66,17 +63,13 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node file, string containerPath, string parent)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")!;
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
 
-            Alar alar = containerNode.TransformWith<Binary2Alar3>()
-            .GetFormatAs<Alar>()!;
+            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
             alar.InsertModification(file, parent);
-            BinaryFormat newBinary = alar.ConvertWith(new Alar3ToBinary());
+            _ = containerNode.TransformWith(new Alar3ToBinary());
 
-            _ = containerNode.ChangeFormat(newBinary);
-
-            string fullPath = $"/root/data{containerPath}/{parent}/{file.Name}";
-            Console.WriteLine($"File replaced: {fullPath}");
+            Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
         }
 
         /// <summary>

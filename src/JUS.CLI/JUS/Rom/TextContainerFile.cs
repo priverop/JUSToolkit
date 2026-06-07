@@ -19,9 +19,7 @@
 // SOFTWARE.
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -59,13 +57,11 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node file, string containerPath)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")!;
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
 
             Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
             alar.InsertModification(file);
-            BinaryFormat newBinary = alar.ConvertWith(new Alar3ToBinary());
-
-            _ = containerNode.ChangeFormat(newBinary);
+            _ = containerNode.TransformWith(new Alar3ToBinary());
 
             Console.WriteLine($"File replaced: /root/data{containerPath}/{file.Name}");
         }
