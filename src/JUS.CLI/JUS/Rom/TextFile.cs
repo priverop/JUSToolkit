@@ -51,6 +51,7 @@ namespace JUS.CLI.JUS.Rom
             { "title.bin", "/bin" },
         };
 
+        /// <inheritdoc/>
         public bool Matches(string filename)
         {
             return TextLocations.ContainsKey(filename);

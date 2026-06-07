@@ -26,6 +26,10 @@ namespace JUS.CLI.JUS.Rom
     /// </summary>
     public interface IFileImportStrategy
     {
+        /// <summary>
+        /// Checks if the strategy supports a filename.
+        /// </summary>
+        /// <param name="filename">The name of the file to check.</param>
         bool Matches(string filename);
 
         /// <summary>

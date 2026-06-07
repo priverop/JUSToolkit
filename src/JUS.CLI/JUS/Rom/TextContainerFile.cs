@@ -35,6 +35,7 @@ namespace JUS.CLI.JUS.Rom
             { "jquiz.bin", "/jquiz/jquiz_pack.aar" },
         };
 
+        /// <inheritdoc/>
         public bool Matches(string filename)
         {
             return ContainerLocations.ContainsKey(filename);

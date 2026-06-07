@@ -70,6 +70,7 @@ namespace JUS.CLI.JUS.Rom
             { "menu-topmenu-top_bg01.png", ["top_bg01.dig", "top_bg01.atm", "/topmenu/topmenu.aar"] },
         };
 
+        /// <inheritdoc/>
         public bool Matches(string filename)
         {
             return ContainerLocations.ContainsKey(filename);

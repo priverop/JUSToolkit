@@ -40,6 +40,7 @@ namespace JUS.CLI.JUS.Rom
 
         private static readonly Regex DemoPattern = new(@"^demo-.*\.png$");
 
+        /// <inheritdoc/>
         public bool Matches(string filename)
         {
             return DemoPattern.IsMatch(filename);
