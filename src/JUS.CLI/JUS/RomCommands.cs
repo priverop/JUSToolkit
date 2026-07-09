@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Priverop
+﻿// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,8 +54,6 @@ namespace JUS.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
-            // var inputs = inputFiles.Children.ToList();
-
             foreach (IFileImportStrategy strategy in Strategies) {
                 var matchedFiles = inputFiles.Children.Where(f => strategy.Matches(f.Name)).ToList();
                 if (matchedFiles.Count > 0) {
@@ -63,7 +61,12 @@ namespace JUS.CLI.JUS
                 }
             }
 
-            // TODO: cómo le digo al usuario lo que ha ido bien o mal?
+            // Files with no strategies
+            var orphanFiles = inputFiles.Children.Where(file => !Strategies.Any(strategy => strategy.Matches(file.Name)));
+            foreach (Node orphan in orphanFiles) {
+                Console.WriteLine("We couldn't import these files:");
+                Console.WriteLine(orphan.Name);
+            }
 
             var nitroParameters = new NitroRom2BinaryParams { DecompressedProgram = true };
             gameNode.TransformWith(new NitroRom2Binary(nitroParameters));
