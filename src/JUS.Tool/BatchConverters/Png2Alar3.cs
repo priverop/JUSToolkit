@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Priverop
+﻿// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -116,6 +116,7 @@ namespace JUS.Tool.BatchConverters
             return originalAlar;
         }
 
+        // TODO: Igual esto podría ser un conversor nuevo? para reutilizarlo
         private void Transform(Node png, Node dig, Node atm)
         {
             // Original Dig

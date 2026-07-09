@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+﻿// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,6 +77,16 @@ namespace JUS.CLI.JUS.Rom
             }
 
             return name[(name.IndexOf('-') + 1)..];
+        }
+
+        bool IFileImportStrategy.Matches(string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IFileImportStrategy.Import(Node gameNode, List<Node> files)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+﻿// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,23 +79,31 @@ namespace JUS.CLI.JUS.Rom
         /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
-            if (ContainerLocations.TryGetValue(file.Name, out string[]? imageInfo)) {
-                file.Name = StringFunctions.GetOriginalName(file.Name);
-                ProcessContainer(gameNode, file, imageInfo);
-            } else {
-                Console.WriteLine($"File not compatible as menu image: {file.Name}");
+            var filesGroupedByContainer = files.GroupBy(x => ContainerLocations[x.Name][2]);
+
+            foreach (var containerGroup in filesGroupedByContainer) {
+                string alarPath = containerGroup.Key;
+
+                ProcessContainer(gameNode, alarPath, containerGroup);
             }
         }
 
-        private static void ProcessContainer(Node gameNode, Node pngFile, string[] imageInfo)
+        private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
         {
-            Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{imageInfo[2]}") ?? throw new FormatException($"Container not found /root/data{imageInfo[2]}");
+            Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
 
-            originalAlar.TransformWith<Binary2Alar3>()
-                .TransformWith(new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]))
-                .TransformWith(new Alar3ToBinary());
+            // StringFunctions.GetOriginalName(file.Name)
 
-            Console.WriteLine($"File replaced: /root/data{imageInfo[2]}/{pngFile.Name}");
+            // 1 - Hay que revisar si hay que rehacer el Png2Alar3 o modificarlo o qué, para la lista.
+            // 2 - O bien, hacerlo manual o algo asi
+            // 3 - Hoy ya no puedo más
+
+
+            //originalAlar.TransformWith<Binary2Alar3>()
+            //    .TransformWith(new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]))
+            //    .TransformWith(new Alar3ToBinary());
+
+            Console.WriteLine($"Images inserted in: /root/data{alarPath}");
         }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+﻿// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,6 +69,11 @@ namespace JUS.CLI.JUS.Rom
                 toReplace.ChangeFormat(file.Format!);
                 Console.WriteLine($"File replaced: /root/data{value}/{file.Name}");
             }
+        }
+
+        void IFileImportStrategy.Import(Node gameNode, List<Node> files)
+        {
+            throw new NotImplementedException();
         }
     }
 }
