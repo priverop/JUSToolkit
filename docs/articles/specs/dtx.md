@@ -6,13 +6,12 @@ DTX files contains sprites used in animations and UI layers.
 
 We have some types:
 
-- Type 01: Unknown format.
-- Type 02: Unknown format.
-- Type 03: Sprites or Textures. Most of the images are in this format. Images for menus, overlays...
-- Type 04: Komas. The characters of your deck.
-- Type 05: Unknown format.
-- Type 06: Unknown format.
-- Type 83: The DSIG is separated in a single file.
+- Type 00: unsupported in this game.
+- Type 01: unsupported in this game.
+- Type 02: unsupported in this game.
+- Type 03: Sprites or Textures. Most of the images are in this format. Images for menus, overlays..
+  - Type 83: The DSIG is separated in a single file. .
+- Type 04, 05, or 06: Komas. The characters of your deck.
 
 ## Tools and Specifications
 
