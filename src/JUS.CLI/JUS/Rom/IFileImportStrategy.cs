@@ -36,7 +36,7 @@ namespace JUS.CLI.JUS.Rom
         /// Import files into the Rom.
         /// </summary>
         /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
-        void Import(Node gameNode, Node file);
+        /// <param name="files">The list of files to import.</param>
+        void Import(Node gameNode, List<Node> files);
     }
 }

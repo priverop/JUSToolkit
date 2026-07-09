@@ -54,21 +54,16 @@ namespace JUS.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
-            bool match = false;
+            // var inputs = inputFiles.Children.ToList();
 
-            // TODO: find a way to not do 1 by 1.
-            foreach (Node file in inputFiles.Children) {
-                foreach (IFileImportStrategy strategy in Strategies) {
-                    if (strategy.Matches(file.Name)) {
-                        match = true;
-                        strategy.Import(gameNode, file);
-                    }
-                }
-
-                if (!match) {
-                    Console.WriteLine($"File not compatible: {file.Name}");
+            foreach (IFileImportStrategy strategy in Strategies) {
+                var matchedFiles = inputFiles.Children.Where(f => strategy.Matches(f.Name)).ToList();
+                if (matchedFiles.Count > 0) {
+                    strategy.Import(gameNode, matchedFiles);
                 }
             }
+
+            // TODO: cómo le digo al usuario lo que ha ido bien o mal?
 
             var nitroParameters = new NitroRom2BinaryParams { DecompressedProgram = true };
             gameNode.TransformWith(new NitroRom2Binary(nitroParameters));

@@ -76,12 +76,8 @@ namespace JUS.CLI.JUS.Rom
             return ContainerLocations.ContainsKey(filename);
         }
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, Node file)
+        /// <inheritdoc/>
+        public void Import(Node gameNode, List<Node> files)
         {
             if (ContainerLocations.TryGetValue(file.Name, out string[]? imageInfo)) {
                 file.Name = StringFunctions.GetOriginalName(file.Name);
