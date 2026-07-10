@@ -54,6 +54,14 @@ namespace JUS.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
+            // Files with no strategies
+            // In most strategies, we modify Node.Name, so we need to do this first
+            var orphanFiles = inputFiles.Children.Where(file => !Strategies.Any(strategy => strategy.Matches(file.Name)));
+            foreach (Node orphan in orphanFiles) {
+                Console.WriteLine("These files won't be imported, as they don't match with any importer:");
+                Console.WriteLine(orphan.Name);
+            }
+
             foreach (IFileImportStrategy strategy in Strategies) {
                 var matchedFiles = inputFiles.Children.Where(f => strategy.Matches(f.Name)).ToList();
                 if (matchedFiles.Count > 0) {
@@ -61,12 +69,7 @@ namespace JUS.CLI.JUS
                 }
             }
 
-            // Files with no strategies
-            var orphanFiles = inputFiles.Children.Where(file => !Strategies.Any(strategy => strategy.Matches(file.Name)));
-            foreach (Node orphan in orphanFiles) {
-                Console.WriteLine("We couldn't import these files:");
-                Console.WriteLine(orphan.Name);
-            }
+
 
             var nitroParameters = new NitroRom2BinaryParams { DecompressedProgram = true };
             gameNode.TransformWith(new NitroRom2Binary(nitroParameters));

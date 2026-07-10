@@ -92,18 +92,17 @@ namespace JUS.CLI.JUS.Rom
         {
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
 
-            // StringFunctions.GetOriginalName(file.Name)
+            Console.WriteLine($"Inserting images in: /root/data{alarPath}");
 
-            // 1 - Hay que revisar si hay que rehacer el Png2Alar3 o modificarlo o qué, para la lista.
-            // 2 - O bien, hacerlo manual o algo asi
-            // 3 - Hoy ya no puedo más
+            originalAlar.TransformWith<Binary2Alar3>();
 
+            foreach (Node fileToInsert in filesToInsert) {
+                string[] imageInfo = ContainerLocations[fileToInsert.Name];
+                fileToInsert.Name = StringFunctions.GetOriginalName(fileToInsert.Name);
+                originalAlar.TransformWith(new Png2Alar3(fileToInsert, imageInfo[0], imageInfo[1]));
+            }
 
-            //originalAlar.TransformWith<Binary2Alar3>()
-            //    .TransformWith(new Png2Alar3(pngFile, imageInfo[0], imageInfo[1]))
-            //    .TransformWith(new Alar3ToBinary());
-
-            Console.WriteLine($"Images inserted in: /root/data{alarPath}");
+            originalAlar.TransformWith(new Alar3ToBinary());
         }
     }
 }
