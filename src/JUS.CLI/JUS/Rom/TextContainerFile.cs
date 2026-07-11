@@ -20,6 +20,7 @@
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using Yarhl.FileSystem;
+using static System.Net.WebRequestMethods;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -46,25 +47,29 @@ namespace JUS.CLI.JUS.Rom
         /// </summary>
         /// <param name="gameNode">The node of the Rom.</param>
         /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, Node file)
+        public void Import(Node gameNode, List<Node> files)
         {
-            if (ContainerLocations.TryGetValue(file.Name, out string? path)) {
-                file.Name = GetFileName(file.Name);
-                ProcessContainer(gameNode, file, path);
-            } else {
-                Console.WriteLine($"File not compatible as text container: {file.Name}");
+            var filesGroupedByContainer = files.GroupBy(x => ContainerLocations[x.Name]);
+
+            foreach (var containerGroup in filesGroupedByContainer) {
+                string alarPath = containerGroup.Key;
+
+                ProcessContainer(gameNode, alarPath, containerGroup);
             }
         }
 
-        private static void ProcessContainer(Node gameNode, Node file, string containerPath)
+        private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
+            Console.WriteLine($"Inserting text files in: /root/data{alarPath}.");
 
             Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
-            alar.InsertModification(file);
+            foreach (Node fileToInsert in filesToInsert) {
+                fileToInsert.Name = GetFileName(fileToInsert.Name);
+                alar.InsertModification(fileToInsert);
+            }
             _ = containerNode.TransformWith(new Alar3ToBinary());
 
-            Console.WriteLine($"File replaced: /root/data{containerPath}/{file.Name}");
         }
 
         /// <summary>
@@ -77,16 +82,6 @@ namespace JUS.CLI.JUS.Rom
             }
 
             return name[(name.IndexOf('-') + 1)..];
-        }
-
-        bool IFileImportStrategy.Matches(string filename)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IFileImportStrategy.Import(Node gameNode, List<Node> files)
-        {
-            throw new NotImplementedException();
         }
     }
 }

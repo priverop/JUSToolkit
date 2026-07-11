@@ -92,7 +92,7 @@ namespace JUS.CLI.JUS.Rom
         {
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
 
-            Console.WriteLine($"Inserting images in: /root/data{alarPath}");
+            Console.WriteLine($"Inserting images in: /root/data{alarPath}.");
 
             originalAlar.TransformWith<Binary2Alar3>();
 

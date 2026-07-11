@@ -69,8 +69,6 @@ namespace JUS.CLI.JUS
                 }
             }
 
-
-
             var nitroParameters = new NitroRom2BinaryParams { DecompressedProgram = true };
             gameNode.TransformWith(new NitroRom2Binary(nitroParameters));
 

@@ -62,18 +62,15 @@ namespace JUS.CLI.JUS.Rom
         /// </summary>
         /// <param name="gameNode">The node of the Rom.</param>
         /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, Node file)
+        public void Import(Node gameNode, List<Node> filesToInsert)
         {
-            if (TextLocations.TryGetValue(file.Name, out string? value)) {
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}/{file.Name}")!;
-                toReplace.ChangeFormat(file.Format!);
-                Console.WriteLine($"File replaced: /root/data{value}/{file.Name}");
+            foreach (Node file in filesToInsert) {
+                if (TextLocations.TryGetValue(file.Name, out string? value)) {
+                    Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}/{file.Name}")!;
+                    toReplace.ChangeFormat(file.Format!);
+                    Console.WriteLine($"File replaced: /root/data{value}/{file.Name}");
+                }
             }
-        }
-
-        void IFileImportStrategy.Import(Node gameNode, List<Node> files)
-        {
-            throw new NotImplementedException();
         }
     }
 }

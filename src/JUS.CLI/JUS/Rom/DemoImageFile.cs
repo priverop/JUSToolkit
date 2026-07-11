@@ -51,42 +51,42 @@ namespace JUS.CLI.JUS.Rom
         /// </summary>
         /// <param name="gameNode">The node of the Rom.</param>
         /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, Node file)
+        public void Import(Node gameNode, List<Node> files)
         {
             string containerPath = "/demo/demo.aar";
 
-            file.Name = StringFunctions.GetDemoName(file.Name);
-
-            // Ignore the _n_ and _m_, because we obtain them later with the original
-            if (!IsSpecialDemoNM(file.Name)) {
-                ProcessContainer(gameNode, file, containerPath);
-            }
+            ProcessContainer(gameNode, files, containerPath);
         }
 
-        private static void ProcessContainer(Node gameNode, Node pngFile, string containerPath)
+        private static void ProcessContainer(Node gameNode, List<Node> filesToInsert, string containerPath)
         {
             Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
+            _ = originalAlar.TransformWith<Binary2Alar3>();
 
-            IConverter image2Alar3;
+            foreach (Node fileToInsert in filesToInsert) {
+                fileToInsert.Name = StringFunctions.GetDemoName(fileToInsert.Name);
+                // Ignore the _n_ and _m_, because we obtain them later with the original
+                if (!IsSpecialDemoNM(fileToInsert.Name)) {
+                    IConverter image2Alar3;
 
-            string digName = GetDemoDigName(pngFile.Name) + ".dig";
-            string atmName = Path.GetFileNameWithoutExtension(pngFile.Name) + ".atm";
+                    string digName = GetDemoDigName(fileToInsert.Name) + ".dig";
+                    string atmName = Path.GetFileNameWithoutExtension(fileToInsert.Name) + ".atm";
 
-            // Special demo (3, 5, 7, 9) needs 3 atm, 3 pngs and 1 dig
-            // The rest (non special 2, 4, 6, title..., opening or sel) are 1 dig = 1 atm = 1 png
-            if (IsSpecialDemo(pngFile.Name) && !pngFile.Name.Contains("opening") && !pngFile.Name.Contains("sel01")) {
-                string[] atms = GetSpecialAtms(atmName);
-                Node[] pngs = GetSpecialPngs(pngFile);
-                image2Alar3 = new Demo2Alar3(pngs, digName, atms, true);
-            } else {
-                image2Alar3 = new Png2Alar3(pngFile, digName, atmName, true);
+                    // Special demo (3, 5, 7, 9) needs 3 atm, 3 pngs and 1 dig
+                    // The rest (non special 2, 4, 6, title..., opening or sel) are 1 dig = 1 atm = 1 png
+                    if (IsSpecialDemo(fileToInsert.Name) && !fileToInsert.Name.Contains("opening") && !fileToInsert.Name.Contains("sel01")) {
+                        string[] atms = GetSpecialAtms(atmName);
+                        Node[] pngs = GetSpecialPngs(fileToInsert);
+                        image2Alar3 = new Demo2Alar3(pngs, digName, atms, true);
+                    } else {
+                        image2Alar3 = new Png2Alar3(fileToInsert, digName, atmName, true);
+                    }
+
+                    _ = originalAlar.TransformWith(image2Alar3);
+                   Console.WriteLine($"File replaced: /root/data{containerPath}/{fileToInsert.Name}");
+                }
             }
-
-            _ = originalAlar.TransformWith<Binary2Alar3>()
-            .TransformWith(image2Alar3)
-            .TransformWith(new Alar3ToBinary());
-
-            Console.WriteLine($"File replaced: /root/data{containerPath}/{pngFile.Name}");
+            _ = originalAlar.TransformWith(new Alar3ToBinary());
         }
 
         /// <summary>
@@ -197,11 +197,6 @@ namespace JUS.CLI.JUS.Rom
         private static string[] GetSpecialAtms(string atm)
         {
             return GetSpecialFileNames(atm, ".atm");
-        }
-
-        void IFileImportStrategy.Import(Node gameNode, List<Node> files)
-        {
-            throw new NotImplementedException();
         }
     }
 }

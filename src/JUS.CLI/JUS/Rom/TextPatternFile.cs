@@ -22,6 +22,7 @@ using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
+using static System.Net.WebRequestMethods;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -45,31 +46,34 @@ namespace JUS.CLI.JUS.Rom
         /// Import files into the Rom.
         /// </summary>
         /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, Node file)
+        /// <param name="files">The input files to import.</param>
+        public void Import(Node gameNode, List<Node> files)
         {
-            // Si no se encuentra, intenta encontrar la ruta interna usando patrones
-            foreach ((Regex pattern, string containerPath) in PatternList) {
-                if (pattern.IsMatch(file.Name)) {
-                    string parent = GetParentName(file.Name);
-                    file.Name = StringFunctions.GetOriginalName(file.Name);
-                    ProcessContainer(gameNode, file, containerPath, parent);
-                    return;
-                }
-            }
+            var filesGroupedByContainer = files.GroupBy(
+                x => PatternList.FirstOrDefault(p => p.Pattern.IsMatch(x.Name)).Item2
+            );
 
-            Console.WriteLine($"File not compatible as text container: {file.Name}");
+            foreach (var containerGroup in filesGroupedByContainer) {
+                string alarPath = containerGroup.Key;
+
+                ProcessContainer(gameNode, alarPath, containerGroup);
+            }
         }
 
-        private static void ProcessContainer(Node gameNode, Node file, string containerPath, string parent)
+        private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
 
+            Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
             Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
-            alar.InsertModification(file, parent);
+
+            foreach (Node fileToInsert in filesToInsert) {
+                string parent = GetParentName(fileToInsert.Name);
+                fileToInsert.Name = StringFunctions.GetOriginalName(fileToInsert.Name);
+                alar.InsertModification(fileToInsert, parent);
+            }
             _ = containerNode.TransformWith(new Alar3ToBinary());
 
-            Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
         }
 
         /// <summary>
@@ -84,16 +88,6 @@ namespace JUS.CLI.JUS.Rom
             Match match = regex.Match(name);
 
             return match.Groups[1].Value;
-        }
-
-        bool IFileImportStrategy.Matches(string filename)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IFileImportStrategy.Import(Node gameNode, List<Node> files)
-        {
-            throw new NotImplementedException();
         }
     }
 }
