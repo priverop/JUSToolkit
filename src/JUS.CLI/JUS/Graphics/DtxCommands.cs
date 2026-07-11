@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Priverop
+﻿// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -111,56 +111,10 @@ namespace JUS.CLI.JUS.Graphics
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            // Original image
-            Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
-            var palettes = new PaletteCollection();
-            foreach (IPalette p in originalImage.Palettes) {
-                palettes.Palettes.Add(p);
-            }
+            // PNGs to import
+            using Node pngs = NodeFactory.FromDirectory(input, "*.png", FileOpenMode.Read);
 
-            // Configuration for the Converters
-            var newPixels = new List<IndexedPixel>();
-
-            var segmentation = new NitroImageSegmentation() {
-                CanvasWidth = 256,
-                CanvasHeight = 256,
-            };
-            var spriteConverterParameters = new RgbImage2SpriteParams {
-                Palettes = palettes,
-                IsImageTiled = true,
-                MinimumPixelsPerSegment = 64,
-                PixelsPerIndex = 64,
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                PixelSequences = newPixels,
-                Segmentation = segmentation,
-            };
-
-            foreach (string pngPath in Directory.GetFiles(input)) {
-                Node pngNode = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
-
-                // PNG -> RgbImage (array of colors)
-                pngNode.TransformWith<StandardBinaryImage2RgbImage>();
-
-                // RgbImage -> Sprite
-                var converter = new RgbImage2Sprite(spriteConverterParameters);
-                pngNode.TransformWith(converter);
-                Sprite sprite = pngNode.GetFormatAs<Sprite>()!;
-
-                // Check if there is a Children with the correct name:
-                string cleanSpriteName = Path.GetFileNameWithoutExtension(pngPath);
-                Node spriteToReplace = dtx3.Children["sprites"]!.Children[cleanSpriteName]
-                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
-
-                spriteToReplace.ChangeFormat(sprite);
-            }
-
-            var updatedImage = new Dig(originalImage) {
-                Pixels = newPixels.ToArray(),
-                Width = 8,
-                Height = newPixels.Count / 8,
-            };
-
-            dtx3.Children["image"]!.ChangeFormat(updatedImage);
+            _ = dtx3.TransformWith(new Png2Dtx3(pngs.GetFormatAs<NodeContainerFormat>()!));
 
             new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>()!)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
