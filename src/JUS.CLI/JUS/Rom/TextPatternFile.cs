@@ -22,7 +22,6 @@ using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
-using static System.Net.WebRequestMethods;
 
 namespace JUS.CLI.JUS.Rom
 {

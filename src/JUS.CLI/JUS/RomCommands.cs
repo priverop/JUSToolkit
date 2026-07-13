@@ -36,6 +36,7 @@ namespace JUS.CLI.JUS
             new TextPatternFile(),
             new MenuImageFile(),
             new DemoImageFile(),
+            new SpriteDtx3ImageFile(),
         ];
 
         /// <summary>

@@ -108,10 +108,11 @@ namespace JUS.CLI.JUS.Graphics
 
             // Original Sprites (textures) + Image
             using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
+                .TransformWith<LzssDecompression>() // TODO - do we need this??
                 .TransformWith<BinaryToDtx3>();
 
             // PNGs to import
+            // TODO: file naming???
             using Node pngs = NodeFactory.FromDirectory(input, "*.png", FileOpenMode.Read);
 
             _ = dtx3.TransformWith(new Png2Dtx3(pngs.GetFormatAs<NodeContainerFormat>()!));
