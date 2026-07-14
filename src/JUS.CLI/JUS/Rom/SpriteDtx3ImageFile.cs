@@ -26,14 +26,6 @@ using YamlDotNet.RepresentationModel;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-/*
- * TODO:
- * Modificar files para meter las rutas con .aar y todo.
- * SearchNode con child y dtx, ruta relativa.
- * 
- 
-*/
-
 namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
@@ -42,13 +34,6 @@ namespace JUS.CLI.JUS.Rom
     /// </summary>
     public class SpriteDtx3ImageFile : IFileImportStrategy
     {
-        //private static readonly Dictionary<string, string> ParentLocations = new() {
-        //    { "jgalaxy-jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
-        //    { "jgalaxy-mission.bin", "/jgalaxy/jgalaxy.aar" },
-        //    { "jgalaxy-battle.bin", "/jgalaxy/jgalaxy.aar" },
-        //    { "jquiz.bin", "/jquiz/jquiz_pack.aar" },
-        //};
-
         private static readonly Regex FilenamePattern = new(@"^[^-]+\.aar-[^-]+\.aar-[^-]+\.dtx-sp_\d+\.png$", RegexOptions.Compiled);
 
         /// <inheritdoc/>
