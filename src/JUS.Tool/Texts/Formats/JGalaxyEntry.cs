@@ -1,4 +1,4 @@
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Single entry in a JGalaxy file.
@@ -13,11 +13,11 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the Description.
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the Unknown section.
         /// </summary>
-        public byte[] Unknown { get; set; }
+        public byte[] Unknown { get; set; } = [];
     }
 }

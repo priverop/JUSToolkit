@@ -17,19 +17,18 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between Ability format and BinaryFormat.
     /// </summary>
     public class Binary2Ability : IConverter<BinaryFormat, Ability>, IConverter<Ability, BinaryFormat>
     {
-        private DataReader reader;
+        private DataReader reader = null!;
 
         /// <summary>
         /// Converts BinaryFormat to Ability format.

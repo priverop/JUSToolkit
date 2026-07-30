@@ -1,6 +1,6 @@
-﻿using Texim.Compressions.Nitro;
+﻿using Texim.TileMaps;
 
-namespace JUSToolkit.Graphics
+namespace JUS.Tool.Graphics
 {
     /// <summary>
     /// NDS Background Modes.
@@ -26,19 +26,21 @@ namespace JUSToolkit.Graphics
     /// <summary>
     /// Screen map with format Almt.
     /// </summary>
-    public class Almt : IScreenMap
+    public class Almt : ITileMap
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Almt"/> class.
         /// </summary>
-        public Almt() {
+        public Almt()
+        {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Almt"/> class cloning another Almt object.
         /// </summary>
         /// <param name="atm">Almt object to clone.</param>
-        public Almt(Almt atm) {
+        public Almt(Almt atm)
+        {
             Magic = atm.Magic;
             Unknown = atm.Unknown;
             Unknown2 = atm.Unknown2;
@@ -59,7 +61,7 @@ namespace JUSToolkit.Graphics
         /// </summary>
         /// <param name="atm">Almt object to clone.</param>
         /// <param name="screenMap">ScreenMap object to clone.</param>
-        public Almt(Almt atm, IScreenMap screenMap)
+        public Almt(Almt atm, ITileMap screenMap)
             : this(atm)
         {
             Width = screenMap.Width;
@@ -132,10 +134,7 @@ namespace JUSToolkit.Graphics
         }
 
         /// <inheritdoc/>
-        public MapInfo[] Maps {
-            get;
-            set;
-        }
+        public MapInfo[] Maps { get; set; } = [];
 
         /// <inheritdoc/>
         public int Width { get; set; }

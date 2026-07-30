@@ -17,10 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Format for blocks of the complex JGalaxy files.
@@ -34,7 +33,6 @@ namespace JUSToolkit.Texts.Formats
         /// <param name="startingPointer">Pointer of the start of the block.</param>
         public JGalaxyComplexBlock(short numberOfEntries, int startingPointer)
         {
-            Entries = new List<JGalaxyEntry>();
             NumberOfEntries = numberOfEntries;
             StartPointer = startingPointer;
         }
@@ -45,7 +43,6 @@ namespace JUSToolkit.Texts.Formats
         /// <param name="startingPointer">Pointer of the start of the block.</param>
         public JGalaxyComplexBlock(int startingPointer)
         {
-            Entries = new List<JGalaxyEntry>();
             StartPointer = startingPointer;
         }
 
@@ -62,6 +59,6 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the list of text entries.
         /// </summary>
-        public List<JGalaxyEntry> Entries { get; set; }
+        public List<JGalaxyEntry> Entries { get; set; } = [];
     }
 }

@@ -17,18 +17,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using JUSToolkit.Containers;
-using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
+using JUS.Tool.Containers;
+using JUS.Tool.Containers.Converters;
+using JUS.Tool.Graphics.Converters;
+using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.CLI.JUS.Rom
+namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.
@@ -55,13 +53,14 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <param name="file">The input file to import.</param>
         public void Import(Node gameNode, Node file)
         {
-            if (ContainerLocations.TryGetValue(file.Name, out string path)) {
+            if (ContainerLocations.TryGetValue(file.Name, out string? path)) {
+                file.Name = GetFileName(file.Name);
                 ProcessContainer(gameNode, file, path);
             } else {
                 // Si no se encuentra, intenta encontrar la ruta interna usando patrones
                 foreach ((Regex pattern, string containerPath) in PatternList) {
                     if (pattern.IsMatch(file.Name)) {
-                        string parent = GetParentName(file.Name);
+                        string? parent = GetParentName(file.Name);
                         file.Name = StringFunctions.GetOriginalName(file.Name);
                         ProcessContainer(gameNode, file, containerPath, parent);
                         return;
@@ -72,19 +71,33 @@ namespace JUSToolkit.CLI.JUS.Rom
             }
         }
 
-        private static void ProcessContainer(Node gameNode, Node file, string containerPath, string parent = null)
+        private static void ProcessContainer(Node gameNode, Node file, string containerPath, string? parent = null)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")
-                                .TransformWith<LzssDecompression>();
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")!;
 
-            Alar3 alar = containerNode.TransformWith<Binary2Alar3>()
-            .GetFormatAs<Alar3>();
-            alar.InsertModification(file, parent);
+            Alar alar = containerNode.TransformWith<Binary2Alar3>()
+            .GetFormatAs<Alar>()!;
+            alar.InsertModification(file, parent!);
             BinaryFormat newBinary = alar.ConvertWith(new Alar3ToBinary());
 
             _ = containerNode.ChangeFormat(newBinary);
 
-            Console.WriteLine($"File replaced: /root/data{containerPath}/{parent}/{file.Name}");
+            string fullPath = parent != null
+                ? $"/root/data{containerPath}/{parent}/{file.Name}"
+                : $"/root/data{containerPath}/{file.Name}";
+            Console.WriteLine($"File replaced: {fullPath}");
+        }
+
+        /// <summary>
+        /// Gets the file name without the container prefix. "jgalaxy-mission.bin" will return "mission.bin".
+        /// </summary>
+        private static string GetFileName(string name)
+        {
+            if (string.IsNullOrEmpty(name) || !name.Contains('-')) {
+                return name;
+            }
+
+            return name[(name.IndexOf('-') + 1)..];
         }
 
         /// <summary>
@@ -92,7 +105,7 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// </summary>
         /// <param name="name">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
         /// <returns>The directory name. If the input string is null or empty, the original string is returned.</returns>
-        private static string GetParentName(string name)
+        private static string? GetParentName(string name)
         {
             if (string.IsNullOrEmpty(name) || !name.Contains('-')) {
                 return null;

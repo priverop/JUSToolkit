@@ -17,10 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Format for simple JGalaxy files.
@@ -33,14 +32,6 @@ namespace JUSToolkit.Texts.Formats
         public static readonly int EntrySize = 164;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JGalaxySimple"/> class.
-        /// </summary>
-        public JGalaxySimple()
-        {
-            Entries = new List<JGalaxyEntry>();
-        }
-
-        /// <summary>
         /// Gets or sets the number of <see cref="JGalaxySimple"/> entries.
         /// </summary>
         public int NumberOfEntries { get; set; }
@@ -48,6 +39,6 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the list of text entries.
         /// </summary>
-        public List<JGalaxyEntry> Entries { get; set; }
+        public List<JGalaxyEntry> Entries { get; set; } = [];
     }
 }

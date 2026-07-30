@@ -22,7 +22,7 @@ using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Yarhl.FileSystem;
 
-namespace JUSToolkit.Tests.Assertions
+namespace JUS.Tests.Assertions
 {
     public class NodeAssertions
         : ReferenceTypeAssertions<Node, NodeAssertions>
@@ -44,12 +44,12 @@ namespace JUSToolkit.Tests.Assertions
                 // YAML deserializer always gets the value as a string
                 foreach (System.Collections.Generic.KeyValuePair<string, object> entry in info.Tags) {
                     Subject.Tags.Should().ContainKey(entry.Key);
-                    Subject.Tags[entry.Key].ToString().Should().Be(entry.Value);
+                    Subject.Tags[entry.Key].ToString().Should().Be(entry.Value.ToString());
                 }
             }
 
             if (info.Stream != null) {
-                Subject.Stream.Should().MatchInfo(info.Stream);
+                Subject.Stream!.Should().MatchInfo(info.Stream);
             }
 
             int expectedCount = info.Children?.Count ?? 0;
@@ -58,10 +58,10 @@ namespace JUSToolkit.Tests.Assertions
             }
 
             for (int i = 0; i < expectedCount; i++) {
-                NodeContainerInfo expectedNode = info.Children[i];
+                NodeContainerInfo expectedNode = info.Children![i];
                 using (new AssertionScope(expectedNode.Name)) {
                     Subject.Children.Should().Contain(n => n.Name == expectedNode.Name);
-                    Subject.Children[expectedNode.Name].Should().MatchInfo(expectedNode);
+                    Subject.Children[expectedNode.Name]!.Should().MatchInfo(expectedNode);
                 }
             }
 

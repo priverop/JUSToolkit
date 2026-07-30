@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JUSToolkit.Texts
+namespace JUS.Tool.Texts
 {
     /// <summary>
     /// Class with utilities to work with Jus text files with relative pointers.
@@ -12,14 +12,13 @@ namespace JUSToolkit.Texts
         /// </summary>
         public DirectTextWriter()
         {
-            Strings = new List<string>();
             PointerAccumulator = 0;
         }
 
         /// <summary>
         /// Gets or sets the list of sentences / entries.
         /// </summary>
-        public List<string> Strings { get; set; }
+        public List<string> Strings { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the acumulator pointer.

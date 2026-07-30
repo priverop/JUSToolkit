@@ -17,13 +17,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
+using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between InfoDeckDeck (generic bin) format and Po.
@@ -67,8 +66,8 @@ namespace JUSToolkit.Texts.Converters
                 List<string> originalLines = JusText.SplitStringToList(po.Entries[i].Original, '\n', infoDeck.LinesPerPage);
                 List<string> translatedLines = JusText.SplitStringToList(po.Entries[i].Text, '\n', infoDeck.LinesPerPage);
 
-                if (originalLines.Count != translatedLines.Count) {
-                    Console.WriteLine($"Wrong number of lines in {po.Entries[i].Text}");
+                if (originalLines.Count != translatedLines.Count) { // TODO: why is this necessary?
+                    Logger.DisplayError($"Wrong number of lines in {po.Entries[i].Text}");
                     continue;
                 }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,7 +11,7 @@ namespace JUS.Tests.Texts
 {
     public class AbilityFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
@@ -19,7 +19,7 @@ namespace JUS.Tests.Texts
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Ability/");
 
-            Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
+            Assert.That(Directory.Exists(resPath), Is.True, "The resources folder does not exist");
         }
 
         [Test]
@@ -28,9 +28,9 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Ability
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
                     var binary2Ability = new Binary2Ability();
-                    Ability expectedAbility = null;
+                    Ability expectedAbility = null!;
                     try {
                         expectedAbility = binary2Ability.Convert(expectedBin);
                     } catch (Exception ex) {
@@ -39,7 +39,7 @@ namespace JUS.Tests.Texts
 
                     // Ability -> Po
                     var ability2Po = new Ability2Po();
-                    Po expectedPo = null;
+                    Po expectedPo = null!;
                     try {
                         expectedPo = ability2Po.Convert(expectedAbility);
                     } catch (Exception ex) {
@@ -47,7 +47,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Po -> Ability
-                    Ability actualAbility = null;
+                    Ability actualAbility = null!;
                     try {
                         actualAbility = ability2Po.Convert(expectedPo);
                     } catch (Exception ex) {
@@ -55,7 +55,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Ability -> BinaryFormat
-                    BinaryFormat actualBin = null;
+                    BinaryFormat actualBin = null!;
                     try {
                         actualBin = binary2Ability.Convert(actualAbility);
                     } catch (Exception ex) {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Ability is not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Ability is not identical: {node.Path}");
                 }
             }
         }

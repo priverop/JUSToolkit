@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,7 +10,7 @@ namespace JUS.Tests.Texts
 {
     public class DeckFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
@@ -19,7 +18,7 @@ namespace JUS.Tests.Texts
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Deck/");
 
-            Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
+            Assert.That(Directory.Exists(resPath), Is.True, "The resources folder does not exist");
         }
 
         [Test]
@@ -29,9 +28,9 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Deck
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
                     var binary2Deck = new Binary2Deck();
-                    Deck expectedDeck = null;
+                    Deck expectedDeck = null!;
                     try {
                         expectedDeck = binary2Deck.Convert(expectedBin);
                     } catch (Exception ex) {
@@ -44,7 +43,7 @@ namespace JUS.Tests.Texts
 
                     // NCF (Deck) -> Po
                     var deck2Po = new Deck2Po();
-                    Po expectedPo = null;
+                    Po expectedPo = null!;
                     try {
                         expectedPo = deck2Po.Convert(originalContainer);
                     } catch (Exception ex) {
@@ -52,7 +51,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Po -> NCF (Deck)
-                    NodeContainerFormat container = null;
+                    NodeContainerFormat container = null!;
                     try {
                         container = deck2Po.Convert(expectedPo);
                     } catch (Exception ex) {
@@ -60,10 +59,10 @@ namespace JUS.Tests.Texts
                     }
 
                     // NCF -> Deck
-                    Deck actualDeck = container.Root.Children[0].GetFormatAs<Deck>();
+                    Deck actualDeck = container.Root.Children[0].GetFormatAs<Deck>()!;
 
                     // Deck -> BinaryFormat
-                    BinaryFormat actualBin = null;
+                    BinaryFormat actualBin = null!;
                     try {
                         actualBin = binary2Deck.Convert(actualDeck);
                     } catch (Exception ex) {
@@ -71,7 +70,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Deck are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Deck are not identical: {node.Path}");
                 }
             }
         }

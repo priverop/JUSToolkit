@@ -1,11 +1,11 @@
-- name: Home
-  href: index.md
+- name: Tool
+  href: articles/tool/
 
-- name: Guides
-  href: guides/
+- name: Format specs
+  href: articles/specs/
 
-- name: API
-  href: dev/
+- name: Dev guides
+  href: articles/dev/
 
-- name: GitHub
-  href: https://github.com/pleonex/csharp-template
+- name: Source code
+  href: https://github.com/priverop/JUSToolkit

@@ -1,5 +1,5 @@
 name: vscall.aar
-format_type: JUSToolkit.Containers.Alar3
+format_type: JUS.Tool.Containers.Alar
 tags:
 check_children: true
 children:
@@ -9,12 +9,12 @@ children:
     check_children: false
     children:
       - name: obj_a.aar
-        format_type: JUSToolkit.Containers.Alar3File
-      - name: obj_b.aar 
-        format_type: JUSToolkit.Containers.Alar3File
+        format_type: JUS.Tool.Containers.AlarFile
+      - name: obj_b.aar
+        format_type: JUS.Tool.Containers.AlarFile
       - name: vs00_a.atm
-        format_type: JUSToolkit.Containers.Alar3File
+        format_type: JUS.Tool.Containers.AlarFile
       - name: vs00_b.atm
-        format_type: JUSToolkit.Containers.Alar3File
+        format_type: JUS.Tool.Containers.AlarFile
       - name: vs00.dig
-        format_type: JUSToolkit.Containers.Alar3File
+        format_type: JUS.Tool.Containers.AlarFile

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,7 +11,7 @@ namespace JUS.Tests.Texts
 {
     public class BgmFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
@@ -19,7 +19,7 @@ namespace JUS.Tests.Texts
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Bgm/");
 
-            Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
+            Assert.That(Directory.Exists(resPath), Is.True, "The resources folder does not exist");
         }
 
         [Test]
@@ -28,9 +28,9 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Bgm
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
                     var binary2Bgm = new Binary2Bgm();
-                    Bgm expectedBgm = null;
+                    Bgm expectedBgm = null!;
                     try {
                         expectedBgm = binary2Bgm.Convert(expectedBin);
                     } catch (Exception ex) {
@@ -39,7 +39,7 @@ namespace JUS.Tests.Texts
 
                     // Bgm -> Po
                     var bgm2Po = new Bgm2Po();
-                    Po expectedPo = null;
+                    Po expectedPo = null!;
                     try {
                         expectedPo = bgm2Po.Convert(expectedBgm);
                     } catch (Exception ex) {
@@ -47,7 +47,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Po -> Bgm
-                    Bgm actualBgm = null;
+                    Bgm actualBgm = null!;
                     try {
                         actualBgm = bgm2Po.Convert(expectedPo);
                     } catch (Exception ex) {
@@ -55,7 +55,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Bgm -> BinaryFormat
-                    BinaryFormat actualBin = null;
+                    BinaryFormat actualBin = null!;
                     try {
                         actualBin = binary2Bgm.Convert(actualBgm);
                     } catch (Exception ex) {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Bgm are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Bgm are not identical: {node.Path}");
                 }
             }
         }

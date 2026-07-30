@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
+using JUS.Tool.Graphics.Converters;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -28,7 +26,7 @@ namespace JUS.Tool.Graphics.Converters
         /// </summary>
         /// <param name="originalDtx">Original DTX to copy all the info from.</param>
         /// <param name="segmentsMetadata">Metadata of the Segments so we can modify them.</param>
-        public Dtx3TxToBinary(BinaryFormat originalDtx, List<SpriteDummy> segmentsMetadata)
+        public Dtx3TxToBinary(BinaryFormat originalDtx, List<Sprite> segmentsMetadata)
         {
             OriginalDTX = originalDtx;
             SegmentsMetadata = segmentsMetadata;
@@ -36,7 +34,7 @@ namespace JUS.Tool.Graphics.Converters
 
         private BinaryFormat OriginalDTX { get; set; }
 
-        private List<SpriteDummy> SegmentsMetadata { get; set; }
+        private List<Sprite> SegmentsMetadata { get; set; } = [];
 
         /// <summary>
         /// Converts a DTX3 format to a binary format.
@@ -49,7 +47,7 @@ namespace JUS.Tool.Graphics.Converters
             var writer = new DataWriter(newBin.Stream);
             var reader = new DataReader(OriginalDTX.Stream);
 
-            if (SegmentsMetadata == null) {
+            if (SegmentsMetadata.Count == 0) {
                 // Obtenemos el DSIG offset
                 reader.Stream.Position = 0x08;
                 uint dsigOffset = reader.ReadUInt16();
@@ -65,14 +63,14 @@ namespace JUS.Tool.Graphics.Converters
 
                 long segmentInfoOffset = 2 * SegmentsMetadata.Count; // relative to 0x0A
 
-                foreach (SpriteDummy sprite in SegmentsMetadata) {
+                foreach (Sprite sprite in SegmentsMetadata) {
                     writer.WriteOfType<ushort>((ushort)segmentInfoOffset);
                     segmentInfoOffset += 2 + (sprite.Segments.Count * 6);
                 }
 
-                foreach (SpriteDummy sprite in SegmentsMetadata) {
+                foreach (Sprite sprite in SegmentsMetadata) {
                     writer.WriteOfType<short>((short)sprite.Segments.Count);
-                    foreach (ImageSegment segment in sprite.Segments) {
+                    foreach (IImageSegment segment in sprite.Segments) {
                         writer.WriteOfType<ushort>((ushort)segment.TileIndex);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateX);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateY);
@@ -82,8 +80,8 @@ namespace JUS.Tool.Graphics.Converters
                 }
             }
 
-            var imageReader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
-                .GetFormatAs<BinaryFormat>().Stream);
+            var imageReader = new DataReader(dtx.Root.Children["image"]!.TransformWith<Dig2Binary>()
+                .GetFormatAs<BinaryFormat>()!.Stream);
             imageReader.Stream.Position = 0;
             writer.Write(imageReader.ReadBytes((int)imageReader.Stream.Length));
 
@@ -112,24 +110,7 @@ namespace JUS.Tool.Graphics.Converters
                 (8, 32) => 0x09,
                 (16, 32) => 0x0A,
                 (32, 64) => 0x0B,
-                _ => throw new ArgumentOutOfRangeException(nameof(width), $"Invalid size: {width}x{height}")
-            };
-        }
-
-        /// <summary>
-        /// Gets the flip byte based on horizontal and vertical flip.
-        /// </summary>
-        /// <param name="hFlip">Indicates if horizontal flip is applied.</param>
-        /// <param name="vFlip">Indicates if vertical flip is applied.</param>
-        /// <returns>The flip byte.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when the flip combination is invalid.</exception>
-        private static byte GetFlip(bool hFlip, bool vFlip)
-        {
-            return (hFlip, vFlip) switch {
-                (false, false) => 0x00,
-                (true, false) => 0x10,
-                (false, true) => 0x20,
-                (true, true) => 0x30,
+                _ => throw new ArgumentOutOfRangeException(nameof(width), $"Invalid size: {width}x{height}"),
             };
         }
     }

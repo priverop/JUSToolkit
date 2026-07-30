@@ -17,26 +17,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using JUS.Tool.Containers.Converters;
+using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
-using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
-using Texim.Formats;
+using JUS.Tool.Utils;
+using Texim.Games.Nitro.Sprites;
 using Texim.Images;
+using Texim.Images.Quantization;
+using Texim.Images.Standard;
 using Texim.Palettes;
 using Texim.Pixels;
-using Texim.Processing;
 using Texim.Sprites;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.CLI.JUS
+namespace JUS.CLI.JUS.Graphics
 {
     /// <summary>
     /// Commands related to Sprites (dtx) graphics files.
@@ -62,7 +57,7 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<Dtx2Bitmaps>();
 
             foreach (Node nodeSprite in dtx3.Children) {
-                nodeSprite.Stream.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
+                nodeSprite.Stream!.WriteTo(Path.Combine(output, $"{nodeSprite.Name}.png"));
             }
         }
 
@@ -83,17 +78,13 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
-
-            var indexedImageParams = new IndexedImageBitmapParams {
-                Palettes = originalImage,
-            };
+            Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
 
             if (originalImage.Swizzling != DigSwizzling.Linear) {
                 throw new FormatException("Image is not DTX03TX");
             }
 
-            BinaryFormat image = new IndexedImage2Bitmap(indexedImageParams).Convert(originalImage);
+            BinaryFormat image = new IndexedImage2BinaryPng(originalImage).Convert(originalImage);
 
             image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + "_tx.png"));
 
@@ -121,7 +112,7 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<BinaryToDtx3>();
 
             // Original image
-            Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
+            Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
             var palettes = new PaletteCollection();
             foreach (IPalette p in originalImage.Palettes) {
                 palettes.Palettes.Add(p);
@@ -134,7 +125,7 @@ namespace JUSToolkit.CLI.JUS
                 CanvasWidth = 256,
                 CanvasHeight = 256,
             };
-            var spriteConverterParameters = new FullImage2SpriteParams {
+            var spriteConverterParameters = new RgbImage2SpriteParams {
                 Palettes = palettes,
                 IsImageTiled = true,
                 MinimumPixelsPerSegment = 64,
@@ -147,17 +138,17 @@ namespace JUSToolkit.CLI.JUS
             foreach (string pngPath in Directory.GetFiles(input)) {
                 Node pngNode = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
-                // PNG -> FullImage (array of colors)
-                pngNode.TransformWith<Bitmap2FullImage>();
+                // PNG -> RgbImage (array of colors)
+                pngNode.TransformWith<StandardBinaryImage2RgbImage>();
 
-                // FullImage -> Sprite
-                var converter = new FullImage2Sprite(spriteConverterParameters);
+                // RgbImage -> Sprite
+                var converter = new RgbImage2Sprite(spriteConverterParameters);
                 pngNode.TransformWith(converter);
-                Sprite sprite = pngNode.GetFormatAs<Sprite>();
+                Sprite sprite = pngNode.GetFormatAs<Sprite>()!;
 
                 // Check if there is a Children with the correct name:
                 string cleanSpriteName = Path.GetFileNameWithoutExtension(pngPath);
-                Node spriteToReplace = dtx3.Children["sprites"].Children[cleanSpriteName]
+                Node spriteToReplace = dtx3.Children["sprites"]!.Children[cleanSpriteName]
                 ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
 
                 spriteToReplace.ChangeFormat(sprite);
@@ -169,9 +160,9 @@ namespace JUSToolkit.CLI.JUS
                 Height = newPixels.Count / 8,
             };
 
-            dtx3.Children["image"].ChangeFormat(updatedImage);
+            dtx3.Children["image"]!.ChangeFormat(updatedImage);
 
-            new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+            new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>()!)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
@@ -199,11 +190,11 @@ namespace JUSToolkit.CLI.JUS
 
             // Clone DTX:
             // Clone the nodes
-            var dtxClone = (BinaryFormat)new BinaryFormat(dtx3.Stream).DeepClone();
+            var dtxClone = (BinaryFormat)new BinaryFormat(dtx3.Stream!).DeepClone();
 
             dtx3.TransformWith<BinaryToDtx3>();
 
-            Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
+            Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
 
             var palettes = new PaletteCollection();
             foreach (IPalette p in originalImage.Palettes) {
@@ -215,27 +206,27 @@ namespace JUSToolkit.CLI.JUS
 
             // Get the IndexedPixels
             var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
-            pngNode.TransformWith<Bitmap2FullImage>().TransformWith(new FullImage2IndexedPalette(quantization));
-            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
+            pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>()!;
 
             // Update the original base image
             var updatedImage = new Dig(originalImage) {
                 Pixels = newImage.Pixels.ToArray(),
             };
 
-            dtx3.Children["image"].ChangeFormat(updatedImage);
+            dtx3.Children["image"]!.ChangeFormat(updatedImage);
 
             Dtx3TxToBinary converter;
 
             if (!string.IsNullOrEmpty(yaml)) {
                 PathValidator.ValidateFile(yaml);
 
-                converter = new Dtx3TxToBinary(dtxClone, GetYamlInfo(yaml));
+                converter = new Dtx3TxToBinary(dtxClone, BinaryToDtx3.DeserializeYaml(File.ReadAllText(yaml)));
             } else {
                 converter = new Dtx3TxToBinary(dtxClone);
             }
 
-            converter.Convert(dtx3.GetFormatAs<NodeContainerFormat>())
+            converter.Convert(dtx3.GetFormatAs<NodeContainerFormat>()!)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
@@ -265,43 +256,29 @@ namespace JUSToolkit.CLI.JUS
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>();
+                .GetFormatAs<KShapeSprites>()!;
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>();
+                .GetFormatAs<Koma>()!;
             foreach (KomaElement komaElement in komaFormat) {
                 string filename = $"{komaElement.KomaName}.dtx";
 
-                Node dtx = komas.Children[filename];
+                Node? dtx = komas.Children[filename];
                 if (dtx is null) {
                     Console.WriteLine("- Missing: " + filename);
                     continue;
                 }
 
-                _ = dtx.TransformWith<BinaryDtx4ToSpriteImage>();
-                IndexedPaletteImage image = dtx.Children["image"].GetFormatAs<IndexedPaletteImage>();
-
-                // We ignore the sprite info from the DSTX and we take the one
-                // from the kshape
-                Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+                var converter = new Dtx4ToBitmap(shapes, komaFormat, komaElement.KomaName);
+                using BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>()!);
 
                 string outputFilePath = Path.Combine(
                     output,
                     $"{komaElement.KShapeGroupId}",
                     komaElement.KomaName + ".png");
 
-                var spriteParams = new Sprite2IndexedImageParams {
-                    RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
-                    FullImage = image,
-                };
-                var indexedImageParams = new IndexedImageBitmapParams {
-                    Palettes = image,
-                };
-                new Node("sprite", sprite)
-                    .TransformWith(new Sprite2IndexedImage(spriteParams))
-                    .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
-                    .Stream.WriteTo(outputFilePath);
+                png.Stream.WriteTo(outputFilePath);
             }
 
             Console.WriteLine("Done!");
@@ -326,39 +303,21 @@ namespace JUSToolkit.CLI.JUS
             PathValidator.ValidateFile(koma);
             PathValidator.ValidateFile(kshape);
 
-            // Sprites + pixels + palette
-            using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
-            .TransformWith<LzssDecompression>()
-            .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
-
-            IndexedPaletteImage image = dtx4.Children["image"].GetFormatAs<IndexedPaletteImage>();
-
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>();
+                .GetFormatAs<KShapeSprites>()!;
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>();
+                .GetFormatAs<Koma>()!;
 
-            KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtx)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+            string dtxName = Path.GetFileNameWithoutExtension(dtx);
 
-            // We ignore the sprite info from the DSTX and we take the one
-            // from the kshape
-            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+            using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith(new Dtx4ToBitmap(shapes, komaFormat, dtxName));
 
-            var spriteParams = new Sprite2IndexedImageParams {
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
-                FullImage = image,
-            };
-            var indexedImageParams = new IndexedImageBitmapParams {
-                Palettes = image,
-            };
-
-            new Node("sprite", sprite)
-                .TransformWith(new Sprite2IndexedImage(spriteParams))
-                .TransformWith(new IndexedImage2Bitmap(indexedImageParams))
-                .Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + ".png"));
+            dtx4.Stream!.WriteTo(Path.Combine(output, dtxName + ".png"));
 
             Console.WriteLine("Done!");
         }
@@ -390,7 +349,7 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
             // Get the image (dig) of the dtx to get the palette
-            Dig originalImage = dtx4.Children["image"].GetFormatAs<Dig>();
+            Dig originalImage = dtx4.Children["image"]!.GetFormatAs<Dig>()!;
 
             var palettes = new PaletteCollection();
             foreach (IPalette p in originalImage.Palettes) {
@@ -402,17 +361,17 @@ namespace JUSToolkit.CLI.JUS
 
             // Get the IndexedPixels
             var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
-            pngNode.TransformWith<Bitmap2FullImage>().TransformWith(new FullImage2IndexedPalette(quantization));
-            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
+            pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>()!;
 
             // Sprite from KShape
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>();
+                .GetFormatAs<KShapeSprites>()!;
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>();
+                .GetFormatAs<Koma>()!;
 
             KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtx)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
 
@@ -437,10 +396,10 @@ namespace JUSToolkit.CLI.JUS
                 Swizzling = DigSwizzling.Linear,
             }.InsertTransparentTile();
 
-            dtx4.Children["image"].ChangeFormat(updatedImage);
+            dtx4.Children["image"]!.ChangeFormat(updatedImage);
 
             // Export the new .dtx
-            new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())
+            new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>()!)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
 
             Console.WriteLine("Done!");
@@ -464,18 +423,9 @@ namespace JUSToolkit.CLI.JUS
                 .TransformWith<LzssDecompression>()
                 .TransformWith<BinaryToDtx3>();
 
-            BinaryFormat segmentInfo = dtx3.Children["yaml"].GetFormatAs<BinaryFormat>();
+            BinaryFormat segmentInfo = dtx3.Children["yaml"]!.GetFormatAs<BinaryFormat>()!;
 
             segmentInfo.Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)) + ".yaml");
-        }
-
-        private static List<SpriteDummy> GetYamlInfo(string path)
-        {
-            string yaml = File.ReadAllText(path);
-            return new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build()
-                .Deserialize<List<SpriteDummy>>(yaml);
         }
     }
 }

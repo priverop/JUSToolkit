@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,7 +11,7 @@ namespace JUS.Tests.Texts
 {
     public class JGalaxySimpleFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
@@ -19,7 +19,7 @@ namespace JUS.Tests.Texts
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/JGalaxySimple/");
 
-            Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
+            Assert.That(Directory.Exists(resPath), Is.True, "The resources folder does not exist");
         }
 
         [Test]
@@ -28,9 +28,9 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> JGalaxySimple
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
                     var binary2JGalaxySimple = new Binary2JGalaxySimple();
-                    JGalaxySimple expectedJGalaxySimple = null;
+                    JGalaxySimple expectedJGalaxySimple = null!;
                     try {
                         expectedJGalaxySimple = binary2JGalaxySimple.Convert(expectedBin);
                     } catch (Exception ex) {
@@ -39,7 +39,7 @@ namespace JUS.Tests.Texts
 
                     // JGalaxySimple -> Po
                     var galaxy2Po = new JGalaxySimple2Po();
-                    Po expectedPo = null;
+                    Po expectedPo = null!;
                     try {
                         expectedPo = galaxy2Po.Convert(expectedJGalaxySimple);
                     } catch (Exception ex) {
@@ -47,7 +47,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Po -> JGalaxySimple
-                    JGalaxySimple actualJGalaxySimple = null;
+                    JGalaxySimple actualJGalaxySimple = null!;
                     try {
                         actualJGalaxySimple = galaxy2Po.Convert(expectedPo);
                     } catch (Exception ex) {
@@ -55,7 +55,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // JGalaxySimple -> BinaryFormat
-                    BinaryFormat actualBin = null;
+                    BinaryFormat actualBin = null!;
                     try {
                         actualBin = binary2JGalaxySimple.Convert(actualJGalaxySimple);
                     } catch (Exception ex) {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"JGalaxySimple are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"JGalaxySimple are not identical: {node.Path}");
                 }
             }
         }

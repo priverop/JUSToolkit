@@ -6,7 +6,7 @@ using Texim.Pixels;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFile and a <see cref="Dig"/> Node.
@@ -38,12 +38,12 @@ namespace JUSToolkit.Graphics.Converters
             writer.Write((ushort)dig.Height);
 
             foreach (IPalette c in dig.Palettes) {
-                writer.Write<Bgr555>(c.Colors);
+                writer.Write<Bgr555Encoding>(c.Colors);
             }
 
             IIndexedPixelEncoding encoder = dig.Bpp switch {
-                DigBpp.Bpp4 => Indexed4Bpp.Instance,
-                DigBpp.Bpp8 => Indexed8Bpp.Instance,
+                DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
+                DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
                 _ => throw new FormatException("Invalid bpp"),
             };
 

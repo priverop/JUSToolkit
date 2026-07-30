@@ -20,7 +20,7 @@
 using System.Collections.ObjectModel;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Graphics
+namespace JUS.Tool.Graphics
 {
     /// <summary>
     /// Sprite Format - A Koma is a Collection of KomaElements.
@@ -30,7 +30,7 @@ namespace JUSToolkit.Graphics
         /// <summary>
         /// Gets the table with the Game names. From ARM9 pointers at 0x0209E840.
         /// </summary>
-        public static string[] NameTable { get; } = new[] {
+        public static string?[] NameTable { get; } = new string?[] {
             null, "es", "is", "ig",
             "tr", "ct", "gt", "kn",
             "kk", "cb", "oj", "nb",

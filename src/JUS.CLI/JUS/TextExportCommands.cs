@@ -17,25 +17,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
-using JUSToolkit.Utils;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
+using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.CLI.JUS
+namespace JUS.CLI.JUS
 {
     /// <summary>
     /// Commands related to text files.
     /// </summary>
     public static class TextExportCommands
     {
-        private const string TextConvertersNamespace = "JUSToolkit.Texts.Converters.";
-
         /// <summary>
         /// Export a .bin file to a .Po file.
         /// </summary>
@@ -68,7 +64,7 @@ namespace JUSToolkit.CLI.JUS
             // Get the last directory or file name from the path
             string lastDirectory = Path.GetFileName(directory);
 
-            Node inputFiles = NodeFactory.FromDirectory(directory, "*.bin");
+            using Node inputFiles = NodeFactory.FromDirectory(directory, "*.bin");
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
             Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
 
@@ -76,7 +72,7 @@ namespace JUSToolkit.CLI.JUS
             IConverter poConverter = pdeck ? new PDeck2Po() : new Deck2Po();
 
             // NodeContainerFormat with all the (P)Deck files
-            var container = new Node("parent", new NodeContainerFormat());
+            using var container = new Node("parent", new NodeContainerFormat());
 
             foreach (Node file in inputFiles.Children) {
                 Console.WriteLine(file.Name);
@@ -89,7 +85,7 @@ namespace JUSToolkit.CLI.JUS
             Node poFormat = container.TransformWith(poConverter);
 
             // Po -> Binary
-            BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat.GetFormatAs<Po>());
+            using BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat.GetFormatAs<Po>()!);
 
             string outputFile = Path.Combine(output, $"deck-{lastDirectory}.po");
             poBinaryFormat.Stream.WriteTo(outputFile);
@@ -114,7 +110,7 @@ namespace JUSToolkit.CLI.JUS
             binNode.TransformWith<JQuiz2Po>();
 
             foreach (Node quiz in binNode.Children) {
-                quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
+                quiz.Stream!.WriteTo(Path.Combine(output, quiz.Name));
             }
 
             Console.WriteLine("Done!");
@@ -127,7 +123,7 @@ namespace JUSToolkit.CLI.JUS
         /// <param name="output">The output directory.</param>
         public static void BatchExport(string directory, string output)
         {
-            Node inputFiles = NodeFactory.FromDirectory(directory, "*.bin");
+            using Node inputFiles = NodeFactory.FromDirectory(directory, "*.bin");
             Console.WriteLine(inputFiles.Children.Count.ToString() + " files to transform.");
 
             foreach (Node file in inputFiles.Children) {
@@ -158,7 +154,7 @@ namespace JUSToolkit.CLI.JUS
             var poFormat = (Po)ConvertFormat.With(poConverterName, textFormat);
 
             // Po -> Binary
-            BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat);
+            using BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat);
 
             string outputFile = Path.Combine(output, filename + ".po");
             poBinaryFormat.Stream.WriteTo(outputFile);

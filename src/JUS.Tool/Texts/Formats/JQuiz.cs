@@ -17,24 +17,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Format for JQuiz.bin file.
     /// </summary>
     public class JQuiz : IFormat
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JQuiz"/> class.
-        /// </summary>
-        public JQuiz()
-        {
-            Entries = new List<JQuizEntry>();
-        }
-
         /// <summary>
         /// Gets or sets the number of entries.
         /// </summary>
@@ -43,6 +34,6 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the list of <see cref="JQuizEntry" />.
         /// </summary>
-        public List<JQuizEntry> Entries { get; set; }
+        public List<JQuizEntry> Entries { get; set; } = [];
     }
 }

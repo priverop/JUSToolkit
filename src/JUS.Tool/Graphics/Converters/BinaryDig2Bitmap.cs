@@ -17,15 +17,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
+using JUS.Tool.Utils;
 using Texim.Images;
+using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
@@ -54,8 +54,7 @@ namespace JUSToolkit.Graphics.Converters
         /// <returns><see cref="Dig"/>.</returns>
         public BinaryFormat Convert(IBinary source)
         {
-            if (source is null)
-            {
+            if (source is null) {
                 throw new ArgumentNullException(nameof(source));
             }
 
@@ -70,21 +69,17 @@ namespace JUSToolkit.Graphics.Converters
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>();
 
-            var mapsParams = new MapDecompressionParams
-            {
-                Map = mapsNode.GetFormatAs<Almt>(),
-                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
+            var mapsParams = new MapDecompressionParams {
+                Map = mapsNode.GetFormatAs<Almt>()!,
+                TileSize = mapsNode.GetFormatAs<Almt>()!.TileSize,
             };
-            var bitmapParams = new IndexedImageBitmapParams
-            {
-                Palettes = pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>(),
-            };
+
             var mapCompression = new MapDecompression(mapsParams);
-            var image2Bitmap = new IndexedImage2Bitmap(bitmapParams);
+            var image2Bitmap = new IndexedImage2BinaryPng(pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>()!);
             pixelsPaletteNode.TransformWith(mapCompression)
                 .TransformWith(image2Bitmap);
 
-            return new BinaryFormat(pixelsPaletteNode.Stream);
+            return new BinaryFormat(pixelsPaletteNode.Stream!);
         }
     }
 }

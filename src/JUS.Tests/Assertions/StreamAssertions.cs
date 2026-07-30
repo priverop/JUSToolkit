@@ -17,15 +17,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.IO;
 using System.Security.Cryptography;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Yarhl.IO;
 
-namespace JUSToolkit.Tests.Assertions
+namespace JUS.Tests.Assertions
 {
     public class StreamAssertions :
         ReferenceTypeAssertions<Stream, StreamAssertions>
@@ -60,7 +58,7 @@ namespace JUSToolkit.Tests.Assertions
             Subject.Position = 0;
             using var sha256 = SHA256.Create();
             sha256.ComputeHash(Subject);
-            string actualHash = BitConverter.ToString(sha256.Hash)
+            string actualHash = BitConverter.ToString(sha256.Hash!)
                 .Replace("-", string.Empty)
                 .ToLowerInvariant();
 

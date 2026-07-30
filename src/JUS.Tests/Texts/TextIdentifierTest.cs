@@ -1,5 +1,5 @@
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Utils;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Utils;
 using NUnit.Framework;
 
 namespace JUS.Tests.Texts
@@ -9,15 +9,15 @@ namespace JUS.Tests.Texts
         [Test]
         public void BinDictionaryTest()
         {
-            Assert.AreEqual(typeof(Binary2Ability), TextIdentifier.GetTextFormat("ability_t.bin")[0]);
-            Assert.AreEqual(typeof(Tutorial2Po), TextIdentifier.GetTextFormat("tutorial.bin")[1]);
+            Assert.That(TextIdentifier.GetTextFormat("ability_t.bin")[0], Is.EqualTo(typeof(Binary2Ability)));
+            Assert.That(TextIdentifier.GetTextFormat("tutorial.bin")[1], Is.EqualTo(typeof(Tutorial2Po)));
         }
 
         [Test]
         public void BinInfoDeckTest()
         {
-            Assert.AreEqual(typeof(Binary2InfoDeckInfo), TextIdentifier.GetTextFormat("bin-info-jump.bin")[0]);
-            Assert.AreEqual(typeof(InfoDeckDeck2Po), TextIdentifier.GetTextFormat("bin-deck-bb.bin")[1]);
+            Assert.That(TextIdentifier.GetTextFormat("bin-info-jump.bin")[0], Is.EqualTo(typeof(Binary2InfoDeckInfo)));
+            Assert.That(TextIdentifier.GetTextFormat("bin-deck-bb.bin")[1], Is.EqualTo(typeof(InfoDeckDeck2Po)));
         }
     }
 }

@@ -17,19 +17,18 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between JQuiz format and BinaryFormat.
     /// </summary>
-    public class Binary2JQuiz : IConverter<BinaryFormat, JQuiz>, IConverter<JQuiz, BinaryFormat>
+    public class Binary2JQuiz : IConverter<IBinary, JQuiz>, IConverter<JQuiz, BinaryFormat>
     {
-        private DataReader reader;
+        private DataReader reader = null!;
 
         /// <summary>
         /// Converts BinaryFormat to JQuiz format.
@@ -37,7 +36,7 @@ namespace JUSToolkit.Texts.Converters
         /// <param name="source">BinaryFormat to convert.</param>
         /// <returns>Text format.</returns>
         /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
-        public JQuiz Convert(BinaryFormat source)
+        public JQuiz Convert(IBinary source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));

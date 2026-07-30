@@ -1,0 +1,16 @@
+- name: ✨ Getting started
+- name: Introduction
+  href: ../../index.md
+
+- name: 🛠️ JUSToolkit console
+- name: Installation
+  href: install.md
+
+- name: How to use
+  href: usage.md
+
+- name: Scripts
+  href: scripts.md
+
+- name: SceneGate Plugin
+  href: scenegate.md

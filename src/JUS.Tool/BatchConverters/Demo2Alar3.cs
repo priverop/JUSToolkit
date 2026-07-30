@@ -17,29 +17,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.IO;
-using System.Linq;
-using JUSToolkit.Containers;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
+using JUS.Tool.Containers;
+using JUS.Tool.Graphics;
+using JUS.Tool.Graphics.Converters;
+using JUS.Tool.Utils;
 using Texim.Images;
+using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.BatchConverters
+namespace JUS.Tool.BatchConverters
 {
     /// <summary>
     /// Inserts a PNG into an Alar3.
     /// </summary>
     public class Demo2Alar3 :
-        IConverter<Alar3, Alar3>
+        IConverter<Alar, Alar>
     {
-        private NodeContainerFormat transformedFiles; // Dig + Atm to insert in the Alar3
+        private NodeContainerFormat transformedFiles = null!; // Dig + Atm to insert in the Alar3
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Demo2Alar3"/> class.
@@ -77,11 +74,11 @@ namespace JUSToolkit.BatchConverters
         public bool TransparentTile { get; set; }
 
         /// <summary>
-        /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar3"/> container.
+        /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar"/> container.
         /// </summary>
         /// <param name="originalAlar">Original Alar3.</param>
-        /// <returns><see cref="Alar3"/>Alar3 with the PNG inserted.</returns>
-        public Alar3 Convert(Alar3 originalAlar)
+        /// <returns><see cref="Alar"/>Alar3 with the PNG inserted.</returns>
+        public Alar Convert(Alar originalAlar)
         {
             if (Images.Length != AtmNames.Length) {
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
@@ -96,10 +93,10 @@ namespace JUSToolkit.BatchConverters
             Node atmN = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[2]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[2]);
 
             // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atmFull_clone = (BinaryFormat)new BinaryFormat(atmFull.Stream).DeepClone();
-            var atmM_clone = (BinaryFormat)new BinaryFormat(atmM.Stream).DeepClone();
-            var atmN_clone = (BinaryFormat)new BinaryFormat(atmN.Stream).DeepClone();
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
+            var atmFull_clone = (BinaryFormat)new BinaryFormat(atmFull.Stream!).DeepClone();
+            var atmM_clone = (BinaryFormat)new BinaryFormat(atmM.Stream!).DeepClone();
+            var atmN_clone = (BinaryFormat)new BinaryFormat(atmN.Stream!).DeepClone();
 
             Node[] atms = [new Node(atmFull.Name, atmFull_clone), new Node(atmM.Name, atmM_clone), new Node(atmN.Name, atmN_clone)];
 
@@ -122,12 +119,12 @@ namespace JUSToolkit.BatchConverters
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
 
-            // Transform PNG into a FullImage (Pixels + Map) using the Dig Palette
-            var compressionParams = new FullImageMapCompressionParams {
+            // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
+            var compressionParams = new RgbImageMapCompressionParams {
                 Palettes = mergedImage,
             };
 
-            IndexedImage newImage = null;
+            IndexedImage? newImage = null;
 
             // 2 - Iterate the input PNGs
             for (int i = 0; i < pngs.Length; i++) {
@@ -135,25 +132,28 @@ namespace JUSToolkit.BatchConverters
                     throw new FormatException("Invalid png file");
                 }
 
-                // Transform the PNG into FullImage (Pixels + Map) using the palette of the original DIG
-                pngs[i].Stream.Position = 0;
-                _ = pngs[i].TransformWith<Bitmap2FullImage>()
-                    .TransformWith(new FullImageMapCompression(compressionParams));
+                // Transform the PNG into RgbImage (Pixels + Map) using the palette of the original DIG
+                pngs[i].Stream!.Position = 0;
+                MapCompressedIndexedImage compressed = pngs[i].TransformWith<StandardBinaryImage2RgbImage>()
+                    .TransformWith(new RgbImageMapCompression(compressionParams))
+                    .GetFormatAs<MapCompressedIndexedImage>()!;
 
-                // Pixels
-                newImage = pngs[i].Children[0].GetFormatAs<IndexedImage>();
+                newImage = new IndexedImage {
+                    Width = 8,
+                    Height = compressed.Tiles.Length / 8,
+                    Pixels = compressed.Tiles,
+                };
 
-                // Map
-                ScreenMap map = pngs[i].Children[1].GetFormatAs<ScreenMap>();
+                ITileMap map = compressed.Map;
 
                 // 3 - Clone original
                 mergedImage = new Dig(mergedImage, newImage);
 
                 if (TransparentTile && i == 0) {
-                    mergedImage = mergedImage.InsertTransparentTile(map);
+                    mergedImage = mergedImage.InsertTransparentTile(map!);
                 }
 
-                compressionParams = new FullImageMapCompressionParams {
+                compressionParams = new RgbImageMapCompressionParams {
                     MergeImage = mergedImage,
                     Palettes = mergedImage,
                 };
@@ -169,7 +169,7 @@ namespace JUSToolkit.BatchConverters
                         .TransformWith<Binary2Almt>()
                         .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
 
-                var newAtm = new Almt(originalAtm, map);
+                var newAtm = new Almt(originalAtm, map!);
 
                 // Export ATM
                 BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
@@ -182,7 +182,7 @@ namespace JUSToolkit.BatchConverters
             }
 
             // New Dig: original dig changing height, width and pixels
-            var newDig = new Dig(mergedImage, newImage);
+            var newDig = new Dig(mergedImage, newImage!);
 
             BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 

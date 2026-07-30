@@ -1,0 +1,64 @@
+- name: 👊 Jump Ultimate Stars formats
+- name: Overview
+  href: ./summary.md
+
+- name: 🔎 Research documents
+  href: other-research.md
+
+- name: 📁 Containers
+- name: ALAR
+  href: alar.md
+#- name: TODO: DSCP
+#  href: dscp.md
+
+- name: 🖼️ Graphics
+- name: DTX sprites
+  href: dtx.md
+- name: Koma sprites
+  href: koma.md
+
+#- name: 🈂️ Fonts
+#- name: TODO: ALFT
+#  href: alft.md
+
+- name: 📝 Texts
+- name: Battle tutorial
+  href: texts.md
+- name: Abilities
+  href: texts.md
+- name: Music titles
+  href: texts.md
+- name: Characters
+  href: texts.md
+- name: Stage clear messages
+  href: texts.md
+- name: Window messages
+  href: texts.md
+- name: Introduction
+  href: texts.md
+- name: Deck info
+  href: texts.md
+- name: Deck
+  href: texts.md
+- name: Info names
+  href: texts.md
+- name: Koma texts
+  href: texts.md
+- name: Pieces
+  href: texts.md
+- name: Names
+  href: texts.md
+- name: Location
+  href: texts.md
+- name: Rules
+  href: texts.md
+- name: Stage
+  href: texts.md
+- name: Title
+  href: texts.md
+- name: Tutorial
+  href: texts.md
+- name: JGalaxy
+  href: texts.md
+- name: JQuiz
+  href: texts.md

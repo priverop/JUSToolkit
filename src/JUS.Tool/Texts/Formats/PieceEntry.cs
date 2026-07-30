@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Single entry in a <see cref="Piece"/> file.
     /// </summary>
-    public class PieceEntry
+    public class PieceEntry : IEntry
     {
         /// <summary>
         /// Entry size in bytes.
@@ -13,19 +13,24 @@ namespace JUSToolkit.Texts.Formats
         public static readonly int EntrySize = 0x60;
 
         /// <summary>
-        /// Number of authors.
-        /// </summary>
-        public static readonly int NumAuthors = 2;
-
-        /// <summary>
-        /// Number of info.
+        /// Number of authors / info entries.
         /// </summary>
         public static readonly int NumInfo = 2;
 
         /// <summary>
-        /// Lines per page.
+        /// Maximum line length for info/author sections.
+        /// </summary>
+        public static readonly int MaxLineLengthInfo = 19;
+
+        /// <summary>
+        /// Lines per description page.
         /// </summary>
         public static readonly int LinesPerPage = 9;
+
+        /// <summary>
+        /// Lines per info section.
+        /// </summary>
+        public static readonly int LinesPerInfo = 2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PieceEntry"/> class.
@@ -38,10 +43,13 @@ namespace JUSToolkit.Texts.Formats
             Page2 = new List<string>();
         }
 
+        /// <inheritdoc/>
+        public int MaxLineLength => 40;
+
         /// <summary>
         /// Gets or sets the title.
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the authors.

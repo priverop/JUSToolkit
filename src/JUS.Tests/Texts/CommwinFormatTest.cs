@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,26 +11,28 @@ namespace JUS.Tests.Texts
 {
     public class CommwinFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Commwin/");
-
-            Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
         }
 
         [Test]
         public void CommwinTest()
         {
+            if (!Directory.Exists(resPath)) {
+                Assert.Ignore("The resources folder does not exist");
+            }
+
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Commwin
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
                     var binary2Commwin = new Binary2Commwin();
-                    Commwin expectedCommwin = null;
+                    Commwin expectedCommwin = null!;
                     try {
                         expectedCommwin = binary2Commwin.Convert(expectedBin);
                     } catch (Exception ex) {
@@ -39,7 +41,7 @@ namespace JUS.Tests.Texts
 
                     // Commwin -> Po
                     var commwin2Po = new Commwin2Po();
-                    Po expectedPo = null;
+                    Po expectedPo = null!;
                     try {
                         expectedPo = commwin2Po.Convert(expectedCommwin);
                     } catch (Exception ex) {
@@ -47,7 +49,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Po -> Commwin
-                    Commwin actualCommwin = null;
+                    Commwin actualCommwin = null!;
                     try {
                         actualCommwin = commwin2Po.Convert(expectedPo);
                     } catch (Exception ex) {
@@ -55,7 +57,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Commwin -> BinaryFormat
-                    BinaryFormat actualBin = null;
+                    BinaryFormat actualBin = null!;
                     try {
                         actualBin = binary2Commwin.Convert(actualCommwin);
                     } catch (Exception ex) {
@@ -65,7 +67,7 @@ namespace JUS.Tests.Texts
                     actualBin.Stream.WriteTo("test.bin");
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Commwin are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Commwin are not identical: {node.Path}");
                 }
             }
         }

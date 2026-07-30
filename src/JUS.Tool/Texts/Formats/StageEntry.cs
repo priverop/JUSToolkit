@@ -1,4 +1,4 @@
-﻿namespace JUSToolkit.Texts.Formats
+﻿namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Single entry in a Stage file.
@@ -13,7 +13,7 @@
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the ??.

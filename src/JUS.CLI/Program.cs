@@ -19,7 +19,7 @@
 // SOFTWARE.
 using System.CommandLine;
 
-namespace JUSToolkit.CLI
+namespace JUS.CLI
 {
     /// <summary>
     /// Main program class.
@@ -33,9 +33,10 @@ namespace JUSToolkit.CLI
         /// <returns>The return code.</returns>
         public static int Main(string[] args)
         {
-            return new RootCommand("Convert files from Jump Ultimate Stars! game") {
+            var rootCommand = new RootCommand("Convert files from Jump Ultimate Stars! game") {
                 JUS.CommandLine.CreateCommand(),
-            }.Invoke(args);
+            };
+            return rootCommand.Parse(args).Invoke();
         }
     }
 }

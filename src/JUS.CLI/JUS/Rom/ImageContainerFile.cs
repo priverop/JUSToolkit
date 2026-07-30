@@ -17,20 +17,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using JUSToolkit.BatchConverters;
-using JUSToolkit.Containers;
-using JUSToolkit.Containers.Converters;
-using JUSToolkit.Utils;
+using JUS.Tool.BatchConverters;
+using JUS.Tool.Containers;
+using JUS.Tool.Containers.Converters;
+using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.CLI.JUS.Rom
+namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.
@@ -97,7 +93,7 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <param name="file">The input file to import.</param>
         public void Import(Node gameNode, Node file)
         {
-            if (ContainerLocations.TryGetValue(file.Name, out string[] imageInfo)) {
+            if (ContainerLocations.TryGetValue(file.Name, out string[]? imageInfo)) {
                 file.Name = StringFunctions.GetOriginalName(file.Name);
                 ProcessContainer(gameNode, file, imageInfo);
             } else {
@@ -139,9 +135,9 @@ namespace JUSToolkit.CLI.JUS.Rom
                 image2Alar3 = new Png2Alar3(pngFile, imageInfo[0], imageInfo[1], transparentTile);
             }
 
-            Alar3 newAlar = originalAlar
+            Alar newAlar = originalAlar
                 .TransformWith(image2Alar3)
-                .GetFormatAs<Alar3>();
+                .GetFormatAs<Alar>()!;
 
             BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
 
@@ -217,22 +213,20 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <summary>
         /// Constructs the names of the _m_ and _n_ files for the given base node name and extension.
         /// </summary>
-        /// <param name="nodeName">The base name of the node (e.g., "bb_03.png").</param>
-        /// <param name="extension">The file extension (e.g., ".png", ".atm").</param>
+        /// <param name="nodeName">The base name of the node ("bb_03.png").</param>
+        /// <param name="extension">The file extension (".png", ".atm").</param>
         /// <returns>An array of strings containing the names of the base, _m_, and _n_ files.</returns>
         private static string[] GetSpecialFileNames(string nodeName, string extension)
         {
             string manga = nodeName[..2]; // "bb"
             char number = nodeName[4]; // '3'
 
-            // Use the dictionary to find the corresponding index for _m_ and _n_
             if (!SpecialDigNumbers.Any(kv => kv.Value == number)) {
                 throw new InvalidOperationException($"Value {number} is not found in SpecialDigNumbers.");
             }
 
             char specialNumber = SpecialDigNumbers.First(kv => kv.Value == number).Key;
 
-            // Construct the names of the _m_ and _n_ files
             string nameOfMFile = $"{manga}_m_0{specialNumber}{extension}";
             string nameOfNFile = $"{manga}_n_0{specialNumber}{extension}";
 
@@ -252,13 +246,11 @@ namespace JUSToolkit.CLI.JUS.Rom
         {
             string[] fileNames = GetSpecialFileNames(png.Name, ".png");
 
-            // Retrieve the corresponding Nodes with the original name
-            Node mNode = png.Parent.Children["demo-" + fileNames[1]] ??
+            Node mNode = png.Parent!.Children["demo-" + fileNames[1]] ??
                     throw new FormatException("Special m file not found: " + fileNames[1]);
             Node nNode = png.Parent.Children["demo-" + fileNames[2]] ??
                     throw new FormatException("Special nfile not found: " + fileNames[2]);
 
-            // Return the array of Nodes
             return new[] { png, mNode, nNode };
         }
 

@@ -17,21 +17,20 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between InfoDeckDeck format and BinaryFormat.
     /// </summary>
     public class Binary2InfoDeckDeck :
-        IConverter<BinaryFormat, InfoDeckDeck>,
+        IConverter<IBinary, InfoDeckDeck>,
         IConverter<InfoDeckDeck, BinaryFormat>
     {
-        private DataReader reader;
+        private DataReader reader = null!;
 
         /// <summary>
         /// Converts BinaryFormat to InfoDeckDeck format.
@@ -39,7 +38,7 @@ namespace JUSToolkit.Texts.Converters
         /// <param name="source">BinaryFormat to convert.</param>
         /// <returns>Text format.</returns>
         /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
-        public InfoDeckDeck Convert(BinaryFormat source)
+        public InfoDeckDeck Convert(IBinary source)
         {
             ArgumentNullException.ThrowIfNull(source);
 

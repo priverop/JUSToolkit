@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,7 +11,7 @@ namespace JUS.Tests.Texts
 {
     public class RulemessFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
@@ -19,7 +19,7 @@ namespace JUS.Tests.Texts
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Rulemess/");
 
-            Assert.True(Directory.Exists(resPath), "The resources folder does not exist", resPath);
+            Assert.That(Directory.Exists(resPath), Is.True, "The resources folder does not exist");
         }
 
         [Test]
@@ -28,9 +28,9 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Rulemess
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
                     var binary2Rulemess = new Binary2Rulemess();
-                    Rulemess expectedRulemess = null;
+                    Rulemess expectedRulemess = null!;
                     try {
                         expectedRulemess = binary2Rulemess.Convert(expectedBin);
                     } catch (Exception ex) {
@@ -39,7 +39,7 @@ namespace JUS.Tests.Texts
 
                     // Rulemess -> Po
                     var rulemess2Po = new Rulemess2Po();
-                    Po expectedPo = null;
+                    Po expectedPo = null!;
                     try {
                         expectedPo = rulemess2Po.Convert(expectedRulemess);
                     } catch (Exception ex) {
@@ -47,7 +47,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Po -> Rulemess
-                    Rulemess actualRulemess = null;
+                    Rulemess actualRulemess = null!;
                     try {
                         actualRulemess = rulemess2Po.Convert(expectedPo);
                     } catch (Exception ex) {
@@ -55,7 +55,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Rulemess -> BinaryFormat
-                    BinaryFormat actualBin = null;
+                    BinaryFormat actualBin = null!;
                     try {
                         actualBin = binary2Rulemess.Convert(actualRulemess);
                     } catch (Exception ex) {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Rulemess are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Rulemess are not identical: {node.Path}");
                 }
             }
         }

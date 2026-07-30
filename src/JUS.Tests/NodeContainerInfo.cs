@@ -17,30 +17,28 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace JUSToolkit.Tests
+namespace JUS.Tests
 {
     /// <summary>
     /// Containers yaml file information.
     /// </summary>
     public class NodeContainerInfo
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public string FormatType { get; set; }
+        public string FormatType { get; set; } = string.Empty;
 
-        public BinaryInfo Stream { get; set; }
+        public BinaryInfo? Stream { get; set; }
 
-        public Dictionary<string, object> Tags { get; set; }
+        public Dictionary<string, object> Tags { get; set; } = [];
 
         public bool CheckChildren { get; set; }
 
-        public Collection<NodeContainerInfo> Children { get; set; }
+        public Collection<NodeContainerInfo> Children { get; set; } = [];
 
         /// <summary>
         /// Gets the info from the Yaml file into the NodeContainerInfo object.

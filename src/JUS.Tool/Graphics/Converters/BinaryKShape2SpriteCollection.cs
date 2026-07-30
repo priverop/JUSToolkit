@@ -16,12 +16,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
     /// Converts between a <see cref="KShapeSprites"/> and a Binary File.
@@ -84,7 +83,6 @@ namespace JUSToolkit.Graphics.Converters
 
             var reader = new DataReader(source.Stream);
             var kshape = new KShapeSprites();
-
 
             for (int i = 0; i < NumGroups; i++) {
                 source.Stream.Position = i * 4; // First section

@@ -7,9 +7,8 @@ security issues.
 
 ## Reporting a Vulnerability
 
-Vulnerabilities can be reported to my personal email address (you can check it
-from my [GitHub profile](https://github.com/pleonex)).
+Vulnerabilities can be reported to the maintainers email address (see git logs).
 
-All the security issues will be analyzed and a reply will be given in two
+All the security issues will be analyzed, and a reply will be given in two
 working days. Once the issue is accepted it will be fixed in the current
 development branch and for the latest version. A new version would be released.

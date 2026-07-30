@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Format for Demo.bin file.
     /// </summary>
     public class Demo : IFormat
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Demo"/> class.
-        /// </summary>
-        public Demo()
-        {
-            Entries = new List<DemoEntry>();
-        }
-
         /// <summary>
         /// Gets or sets the number of entries in <see cref="Entries"/>.
         /// </summary>
@@ -28,6 +17,6 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the list of <see cref="DemoEntry" />.
         /// </summary>
-        public List<DemoEntry> Entries { get; set; }
+        public List<DemoEntry> Entries { get; set; } = [];
     }
 }

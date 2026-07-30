@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,26 +11,28 @@ namespace JUS.Tests.Texts
 {
     public class PieceFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Piece/piece.bin");
-
-            Assert.True(File.Exists(resPath), "The file does not exist", resPath);
         }
 
         [Test]
         public void PieceTest()
         {
+            if (!Directory.Exists(resPath)) {
+                Assert.Ignore("The resources folder does not exist");
+            }
+
             Node node = NodeFactory.FromFile(resPath);
 
             // BinaryFormat -> Piece
-            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
             var binary2Piece = new Binary2Piece();
-            Piece expectedPiece = null;
+            Piece expectedPiece = null!;
             try {
                 expectedPiece = binary2Piece.Convert(expectedBin);
             } catch (Exception ex) {
@@ -39,7 +41,7 @@ namespace JUS.Tests.Texts
 
             // Piece -> Po
             var piece2Po = new Piece2Po();
-            Po expectedPo = null;
+            Po expectedPo = null!;
             try {
                 expectedPo = piece2Po.Convert(expectedPiece);
             } catch (Exception ex) {
@@ -47,7 +49,7 @@ namespace JUS.Tests.Texts
             }
 
             // Po -> Piece
-            Piece actualPiece = null;
+            Piece actualPiece = null!;
             try {
                 actualPiece = piece2Po.Convert(expectedPo);
             } catch (Exception ex) {
@@ -55,7 +57,7 @@ namespace JUS.Tests.Texts
             }
 
             // Piece -> BinaryFormat
-            BinaryFormat actualBin = null;
+            BinaryFormat actualBin = null!;
             try {
                 actualBin = binary2Piece.Convert(actualPiece);
             } catch (Exception ex) {
@@ -63,7 +65,7 @@ namespace JUS.Tests.Texts
             }
 
             // Comparing Binaries
-            Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Piece is not identical: {node.Path}");
+            Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Piece is not identical: {node.Path}");
         }
     }
 }

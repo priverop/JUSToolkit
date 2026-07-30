@@ -17,22 +17,19 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Text.RegularExpressions;
+using JUS.Tool.BatchConverters;
+using JUS.Tool.Containers;
+using JUS.Tool.Containers.Converters;
+using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
-using JUSToolkit.BatchConverters;
-using JUSToolkit.Containers;
-using JUSToolkit.Containers.Converters;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
-using Texim.Formats;
+using JUS.Tool.Utils;
+using Texim.Images.Standard;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.CLI.JUS
+namespace JUS.CLI.JUS
 {
     /// <summary>
     /// Commands using Containers and Graphics. Batch import, export...
@@ -62,10 +59,10 @@ namespace JUSToolkit.CLI.JUS
                 : originalAlar.TransformWith<Alar2Png>();
 
             NodeContainerFormat result = originalAlar
-                .GetFormatAs<NodeContainerFormat>();
+                .GetFormatAs<NodeContainerFormat>()!;
 
             foreach (Node image in result.Root.Children) {
-                image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
+                image.Stream!.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
             Console.WriteLine("Done!");
@@ -98,16 +95,10 @@ namespace JUSToolkit.CLI.JUS
                                     .TransformWith<LzssDecompression>()
                                     .TransformWith<BinaryToDtx3>();
 
-                                Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
-
-                                var indexedImageParams = new IndexedImageBitmapParams {
-                                    Palettes = originalImage,
-                                };
+                                Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
 
                                 if (originalImage.Swizzling == DigSwizzling.Linear) {
-
-                                    BinaryFormat image = new IndexedImage2Bitmap(indexedImageParams).Convert(originalImage);
-
+                                    BinaryFormat image = new IndexedImage2BinaryPng(originalImage).Convert(originalImage);
                                     image.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-tx.png"));
                                 }
                             } else {
@@ -116,24 +107,15 @@ namespace JUSToolkit.CLI.JUS
                                     .TransformWith<Dtx2Bitmaps>();
 
                                 foreach (Node nodeSprite in dtx3.Children) {
-                                    nodeSprite.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
+                                    nodeSprite.Stream!.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
                                 }
                             }
-
                         } catch (Exception ex) {
                             Console.WriteLine($"Error processing DTX file {originalAlarName}/{child.Name}: {ex.Message}");
                         }
                     } else if (Path.GetExtension(child.Name) == ".aar") {
                         Console.WriteLine($"AAR found, processing recursively: {originalAlarName}/{child.Name}");
-                        using Node nestedAlar = child.TransformWith<LzssDecompression>();
-
-                        Version nestedAlarVersion = Identifier.GetAlarVersion(nestedAlar.Stream);
-
-                        if (nestedAlarVersion.Major == 3) {
-                            nestedAlar.TransformWith<Binary2Alar3>();
-                        } else if (nestedAlarVersion.Major == 2) {
-                            nestedAlar.TransformWith<Binary2Alar2>();
-                        }
+                        using Node nestedAlar = child.TransformWith<Binary2Alar>();
 
                         ProcessNode(nestedAlar, Path.Combine(baseOutputPath, originalAlarName));
                     }
@@ -141,16 +123,7 @@ namespace JUSToolkit.CLI.JUS
             }
 
             Node originalAlar = NodeFactory.FromFile(container)
-                            .TransformWith<LzssDecompression>() ?? throw new FormatException("Invalid container file");
-
-            Version alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
-
-            // ToDo: In the future we need to encapsulate this
-            if (alarVersion.Major == 3) {
-                originalAlar.TransformWith<Binary2Alar3>();
-            } else if (alarVersion.Major == 2) {
-                originalAlar.TransformWith<Binary2Alar2>();
-            }
+                .TransformWith<Binary2Alar>();
 
             ProcessNode(originalAlar, output);
 
@@ -172,13 +145,39 @@ namespace JUSToolkit.CLI.JUS
 
             var png2Alar3 = new Png2Alar3(inputPNG, cleanName + ".dig", cleanName + ".atm");
 
-            Alar3 newAlar = originalAlar
+            Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar3>();
+                .GetFormatAs<Alar>()!;
 
             using BinaryFormat binary = newAlar.ConvertWith(new Alar3ToBinary());
 
             binary.Stream.WriteTo(Path.Combine(output, "imported_" + originalAlar.Name));
+
+            Console.WriteLine("Done!");
+        }
+
+        /// <summary>
+        /// Uncompress every file.
+        /// </summary>
+        /// <param name="input">The path to the PNG we want to insert.</param>
+        public static void UncompressFiles(string input)
+        {
+            if (string.IsNullOrEmpty(input)) {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            Node files = NodeFactory.FromDirectory(input, x => Regex.IsMatch(x, @"\.(dtx|dig|atm)$"), "data", true);
+
+            foreach (Node file in Navigator.IterateNodes(files)) {
+                if (!file.IsContainer) {
+                    Console.WriteLine(file.Path);
+                    if (CompressionUtils.IsCompressed(file)) {
+                        file.TransformWith(new LzssDecompression());
+                        string path = Path.Combine(input.Replace("/data", string.Empty), file.Path[1..]);
+                        file.Stream!.WriteTo(path);
+                    }
+                }
+            }
 
             Console.WriteLine("Done!");
         }

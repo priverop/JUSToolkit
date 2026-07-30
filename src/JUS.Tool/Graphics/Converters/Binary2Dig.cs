@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
 using Texim;
 using Texim.Colors;
 using Texim.Palettes;
@@ -25,7 +24,7 @@ using Texim.Pixels;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFormat (a file) containing a Dsig Format and IndexedPaletteImage (PNG).
@@ -64,12 +63,12 @@ namespace JUSToolkit.Graphics.Converters
 
             switch (bpp) {
                 case DigBpp.Bpp4:
-                    pixelEncoding = Indexed4Bpp.Instance;
+                    pixelEncoding = Indexed4BppEncoding.Instance;
                     colorsPerPalette = 16;
                     numPalettes = numPaletteLines;
                     break;
                 case DigBpp.Bpp8:
-                    pixelEncoding = Indexed8Bpp.Instance;
+                    pixelEncoding = Indexed8BppEncoding.Instance;
                     colorsPerPalette = 256;
                     numPalettes = ((numPaletteLines - 1) / 16) + 1;
                     break;
@@ -90,7 +89,7 @@ namespace JUSToolkit.Graphics.Converters
             var palettes = new PaletteCollection();
 
             for (int i = 0; i < numPalettes; i++) {
-                palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555>(colorsPerPalette)));
+                palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555Encoding>(colorsPerPalette)));
             }
 
             source.Stream.Position = pixelsStart;

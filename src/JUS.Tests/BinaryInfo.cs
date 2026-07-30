@@ -17,11 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace JUSToolkit.Tests
+namespace JUS.Tests
 {
     /// <summary>
     /// Single file yaml information.
@@ -32,7 +31,7 @@ namespace JUSToolkit.Tests
 
         public long Length { get; set; }
 
-        public string Sha256 { get; set; }
+        public string Sha256 { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets the info from the Yaml file into the BinaryInfo object.

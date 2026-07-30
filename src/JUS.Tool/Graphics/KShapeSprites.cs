@@ -17,11 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Graphics
+namespace JUS.Tool.Graphics
 {
     /// <summary>
     /// Image Format - KShape defines the geometric shape of the Koma.

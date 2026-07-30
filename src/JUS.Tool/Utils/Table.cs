@@ -17,21 +17,17 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#nullable enable
-using System;
-using System.IO;
-using Yarhl.IO;
+using System.Reflection;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit
+namespace JUS.Tool.Utils
 {
     /// <summary>
     /// Table class for special characters of the font.
     /// </summary>
     public sealed class Table
     {
-        private static readonly string TablePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "Resources", "table.tbl"));
-        private static readonly object InstanceLock = new object();
+        private static readonly object InstanceLock = new();
         private static Table instance = null!;
         private Replacer replacer = null!;
 
@@ -58,12 +54,13 @@ namespace JUSToolkit
         }
 
         /// <summary>
-        /// Gets the Stream of the Table.
+        /// Gets the Stream of the Table from the embedded resource.
         /// </summary>
         /// <returns>The Stream of the Table.</returns>
-        public Stream GetTableStream() =>
-            DataStreamFactory.FromFile(TablePath, FileOpenMode.Read)
-                ?? throw new FileNotFoundException("Cannot find table resource");
+        public static Stream GetTableStream() =>
+            Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("JUS.Tool.Resources.table.tbl")
+                ?? throw new FileNotFoundException("Missing embedded resource: table.tbl");
 
         /// <summary>
         /// Decode a string converting the special chars of the table (JAP->ESP).

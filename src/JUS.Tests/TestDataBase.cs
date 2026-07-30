@@ -17,13 +17,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using NUnit.Framework;
+using SceneGate.Ekona.Containers.Rom;
+using Yarhl.IO;
 
-namespace JUSToolkit.Tests
+namespace JUS.Tests
 {
     /// <summary>
     /// Managing test resources.
@@ -32,7 +30,7 @@ namespace JUSToolkit.Tests
     {
         public static string RootFromOutputPath {
             get {
-                string envVar = Environment.GetEnvironmentVariable("YARHL_TEST_DIR");
+                string? envVar = Environment.GetEnvironmentVariable("JUS_PATH");
                 if (!string.IsNullOrEmpty(envVar)) {
                     return envVar;
                 }
@@ -40,12 +38,23 @@ namespace JUSToolkit.Tests
                 string programDir = AppDomain.CurrentDomain.BaseDirectory;
                 string path = Path.Combine(
                     programDir,
-                    "..", // framework
-                    "..", // configuration
-                    "..", // bin
+                    "..", // output folder (framework) -> debug/release (configuration)
+                    "..", // -> bin
+                    "..", // -> project
                     "Resources");
                 return Path.GetFullPath(path);
             }
+        }
+
+        public static string SoftwareNitroRomPath => Path.Combine(RootFromOutputPath, "JUS_AJUJ01_00.nds");
+
+        public static NitroRom ReadSoftware()
+        {
+            string path = SoftwareNitroRomPath;
+            IgnoreIfFileDoesNotExist(path);
+
+            using var binary = new BinaryFormat(path, FileOpenMode.Read);
+            return new Binary2NitroRom().Convert(binary);
         }
 
         public static void IgnoreIfFileDoesNotExist(string file)

@@ -17,11 +17,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using Texim.Compressions.Nitro;
+using Texim.Games.Nitro.TileMaps;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Graphics.Converters
+namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
     /// Converts between BinaryFormat and ALMT.

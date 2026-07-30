@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace JUSToolkit.Graphics
+namespace JUS.Tool.Graphics
 {
     /// <summary>
     /// Image Format - Individual Koma OAM (square).
@@ -37,7 +37,7 @@ namespace JUSToolkit.Graphics
         /// <summary>
         /// Gets or sets the name of the koma.
         /// </summary>
-        public string KomaName { get; set; }
+        public string KomaName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the Unknown6.

@@ -17,12 +17,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between Piece format and BinaryFormat.
@@ -31,7 +30,7 @@ namespace JUSToolkit.Texts.Converters
         IConverter<BinaryFormat, Piece>,
         IConverter<Piece, BinaryFormat>
     {
-        private DataReader reader;
+        private DataReader reader = null!;
 
         /// <summary>
         /// Converts BinaryFormat to Piece format.
@@ -106,7 +105,7 @@ namespace JUSToolkit.Texts.Converters
             var entry = new PieceEntry();
 
             entry.Title = JusText.ReadIndirectString(reader);
-            for (int i = 0; i < PieceEntry.NumAuthors; i++) {
+            for (int i = 0; i < PieceEntry.NumInfo; i++) {
                 entry.Authors.Add(JusText.ReadIndirectString(reader));
             }
 

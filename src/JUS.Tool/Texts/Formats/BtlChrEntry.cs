@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Single entry in a BtlChr file.
@@ -28,60 +28,49 @@ namespace JUSToolkit.Texts.Formats
         public static readonly string EmptyAbility = "◇";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BtlChrEntry"/> class.
-        /// </summary>
-        public BtlChrEntry()
-        {
-            AbilityNames = new List<string>();
-            AbilityFuriganas = new List<string>();
-            AbilityDescriptions = new List<string>();
-            Interactions = new List<string>();
-        }
-
-        /// <summary>
         /// Gets or sets the character Name.
         /// </summary>
-        public string ChrName { get; set; }
+        public string ChrName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the list of ability names.
         /// </summary>
-        public List<string> AbilityNames { get; set; }
+        public List<string> AbilityNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the list of ability furiganas.
         /// </summary>
-        public List<string> AbilityFuriganas { get; set; }
+        public List<string> AbilityFuriganas { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the list of ability descriptions.
         /// </summary>
-        public List<string> AbilityDescriptions { get; set; }
+        public List<string> AbilityDescriptions { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the name of a passive ability.
         /// </summary>
-        public string PassiveName { get; set; }
+        public string PassiveName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the furigana of a passive ability.
         /// </summary>
-        public string PassiveFurigana { get; set; }
+        public string PassiveFurigana { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the first description of a passive ability.
         /// </summary>
-        public string PassiveDescription1 { get; set; }
+        public string PassiveDescription1 { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the second description of a passive ability.
         /// </summary>
-        public string PassiveDescription2 { get; set; }
+        public string PassiveDescription2 { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the list of interactions.
         /// </summary>
-        public List<string> Interactions { get; set; }
+        public List<string> Interactions { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the ??.

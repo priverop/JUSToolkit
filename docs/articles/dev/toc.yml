@@ -1,0 +1,7 @@
+# Disabled as there won't be releases in the near future.
+#- name: ✨ Changelog
+#  href: ../changelog.md
+
+- name: 📃 API docs
+- name: Namespaces
+  href: ../../api/toc.yml

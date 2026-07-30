@@ -17,29 +17,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.IO;
-using System.Linq;
-using JUSToolkit.Containers;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
-using JUSToolkit.Utils;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
+using JUS.Tool.Containers;
+using JUS.Tool.Graphics;
+using JUS.Tool.Graphics.Converters;
+using JUS.Tool.Utils;
 using Texim.Images;
+using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.BatchConverters
+namespace JUS.Tool.BatchConverters
 {
     /// <summary>
     /// Inserts a PNG into an Alar3.
     /// </summary>
     public class Png2Alar3 :
-        IConverter<Alar3, Alar3>
+        IConverter<Alar, Alar>
     {
-        private NodeContainerFormat transformedFiles; // Dig + Atm to insert in the Alar3
+        private NodeContainerFormat transformedFiles = null!; // Dig + Atm to insert in the Alar3
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Png2Alar3"/> class.
@@ -91,11 +88,11 @@ namespace JUSToolkit.BatchConverters
         public bool TransparentTile { get; set; }
 
         /// <summary>
-        /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar3"/> container.
+        /// Converts a <see cref="Node"/> (png file) to a <see cref="Alar"/> container.
         /// </summary>
         /// <param name="originalAlar">Original Alar3.</param>
-        /// <returns><see cref="Alar3"/>Alar3 with the PNG inserted.</returns>
-        public Alar3 Convert(Alar3 originalAlar)
+        /// <returns><see cref="Alar"/>Alar3 with the PNG inserted.</returns>
+        public Alar Convert(Alar originalAlar)
         {
             if (Path.GetExtension(Image.Name) != ".png") {
                 throw new FormatException("Invalid png file");
@@ -108,8 +105,8 @@ namespace JUSToolkit.BatchConverters
             Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmName) ?? throw new FormatException("Atm doesn't exist: " + AtmName);
 
             // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
+            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
 
             // Transform the PNG into the new Dig and Almt (we need the original dig + atm)
             Transform(Image, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
@@ -141,17 +138,23 @@ namespace JUSToolkit.BatchConverters
                     .TransformWith<Binary2Almt>()
                     .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
 
-            // Transform PNG into a FullImage (Pixels + Map) using the Dig Palette
-            var compressionParams = new FullImageMapCompressionParams {
+            // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
+            var compressionParams = new RgbImageMapCompressionParams {
                 Palettes = originalDig,
             };
 
-            png.Stream.Position = 0;
-            Node compressed = png
-                .TransformWith<Bitmap2FullImage>()
-                .TransformWith(new FullImageMapCompression(compressionParams));
-            IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-            ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
+            png.Stream!.Position = 0;
+            MapCompressedIndexedImage compressed = png
+                .TransformWith<StandardBinaryImage2RgbImage>()
+                .TransformWith(new RgbImageMapCompression(compressionParams))
+                .GetFormatAs<MapCompressedIndexedImage>()!;
+
+            var newImage = new IndexedImage {
+                Width = 8,
+                Height = compressed.Tiles.Length / 8,
+                Pixels = compressed.Tiles,
+            };
+            ITileMap map = compressed.Map;
 
             // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(originalDig, newImage);

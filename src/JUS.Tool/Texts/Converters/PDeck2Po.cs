@@ -17,12 +17,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
+using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between Container of PDeck files and Po.
@@ -41,7 +42,7 @@ namespace JUSToolkit.Texts.Converters
             Po po = JusText.GenerateJusPo();
 
             foreach (Node file in container.Root.Children) {
-                PDeck pDeck = file.GetFormatAs<PDeck>();
+                PDeck pDeck = file.GetFormatAs<PDeck>()!;
                 string headerBase64 = System.Convert.ToBase64String(pDeck.Header);
 
                 po.Add(new PoEntry(pDeck.Name) {

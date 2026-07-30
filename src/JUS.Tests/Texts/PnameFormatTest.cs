@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -11,26 +11,28 @@ namespace JUS.Tests.Texts
 {
     public class PnameFormatTest
     {
-        private string resPath;
+        private string resPath = string.Empty;
 
         [SetUp]
         public void Setup()
         {
             string programDir = AppDomain.CurrentDomain.BaseDirectory;
             resPath = Path.GetFullPath(programDir + "/../../../Resources/Texts/Pname/pname.bin");
-
-            Assert.True(File.Exists(resPath), "The resource file does not exist", resPath);
         }
 
         [Test]
         public void PnameTest()
         {
+            if (!Directory.Exists(resPath)) {
+                Assert.Ignore("The resources folder does not exist");
+            }
+
             Node node = NodeFactory.FromFile(resPath);
 
             // BinaryFormat -> Pname
-            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
             var binary2Pname = new Binary2Pname();
-            Pname expectedPname = null;
+            Pname expectedPname = null!;
             try {
                 expectedPname = binary2Pname.Convert(expectedBin);
             } catch (Exception ex) {
@@ -39,7 +41,7 @@ namespace JUS.Tests.Texts
 
             // Pname -> Po
             var pname2Po = new Pname2Po();
-            Po expectedPo = null;
+            Po expectedPo = null!;
             try {
                 expectedPo = pname2Po.Convert(expectedPname);
             } catch (Exception ex) {
@@ -47,7 +49,7 @@ namespace JUS.Tests.Texts
             }
 
             // Po -> Pname
-            Pname actualPname = null;
+            Pname actualPname = null!;
             try {
                 actualPname = pname2Po.Convert(expectedPo);
             } catch (Exception ex) {
@@ -55,7 +57,7 @@ namespace JUS.Tests.Texts
             }
 
             // Pname -> BinaryFormat
-            BinaryFormat actualBin = null;
+            BinaryFormat actualBin = null!;
             try {
                 actualBin = binary2Pname.Convert(actualPname);
             } catch (Exception ex) {
@@ -63,7 +65,7 @@ namespace JUS.Tests.Texts
             }
 
             // Comparing Binaries
-            Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"Pname is not identical: {node.Path}");
+            Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Pname is not identical: {node.Path}");
         }
     }
 }

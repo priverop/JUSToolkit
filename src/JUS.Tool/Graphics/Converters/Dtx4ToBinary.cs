@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using JUSToolkit.Graphics.Converters;
+﻿using JUS.Tool.Graphics.Converters;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -31,7 +29,7 @@ namespace JUS.Tool.Graphics.Converters
             writer.Write(Version);
             writer.Write(Type);
 
-            Sprite sprite = dtx.Root.Children["sprite"].GetFormatAs<Sprite>();
+            Sprite sprite = dtx.Root.Children["sprite"]!.GetFormatAs<Sprite>()!;
 
             // NumSegments
             writer.Write((ushort)sprite.Segments.Count);
@@ -55,8 +53,8 @@ namespace JUS.Tool.Graphics.Converters
             }
 
             // WriteDig
-            var reader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
-                .GetFormatAs<BinaryFormat>().Stream);
+            var reader = new DataReader(dtx.Root.Children["image"]!.TransformWith<Dig2Binary>()
+                .GetFormatAs<BinaryFormat>()!.Stream);
             reader.Stream.Position = 0;
             writer.Write(reader.ReadBytes((int)reader.Stream.Length));
 

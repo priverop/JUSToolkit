@@ -19,7 +19,7 @@
 // SOFTWARE.
 using Yarhl.FileSystem;
 
-namespace JUSToolkit.CLI.JUS.Rom
+namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.

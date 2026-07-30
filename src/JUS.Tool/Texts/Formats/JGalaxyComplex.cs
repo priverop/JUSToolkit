@@ -19,7 +19,7 @@
 // SOFTWARE.
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Format for simple JGalaxy files.

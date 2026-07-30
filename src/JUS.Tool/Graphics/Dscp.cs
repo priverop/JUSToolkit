@@ -1,6 +1,6 @@
 ﻿using Yarhl.FileFormat;
 
-namespace JUSToolkit.Graphics
+namespace JUS.Tool.Graphics
 {
     /// <summary>
     /// Dscp image format.

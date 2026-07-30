@@ -4,21 +4,15 @@
 # Build outputs
 obj/
 bin/
-artifacts/
+build/
+/CHANGELOG.md
+/CHANGELOG.NEXT.md
 
-# Build system
-tools/
-
-# Test results
-test_results/
-
-# Documentation output
-docs/_site
-docs/api
-docs/_site_pdf
-
-# Visual studio files
-src/.vs/
+# IDEs
+.vs/
+*.csproj.user
+*.DotSettings.user
+launchSettings.json
 
 # Text test resources
 *.aar

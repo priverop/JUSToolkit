@@ -17,21 +17,20 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Formats;
 using Yarhl.FileFormat;
 using Yarhl.IO;
 
-namespace JUSToolkit.Texts.Converters
+namespace JUS.Tool.Texts.Converters
 {
     /// <summary>
     /// Converts between JGalaxySimple format and BinaryFormat.
     /// </summary>
     public class Binary2JGalaxySimple :
-        IConverter<BinaryFormat, JGalaxySimple>,
+        IConverter<IBinary, JGalaxySimple>,
         IConverter<JGalaxySimple, BinaryFormat>
     {
-        private DataReader reader;
+        private DataReader reader = null!;
 
         /// <summary>
         /// Converts BinaryFormat to JGalaxySimple format.
@@ -39,7 +38,7 @@ namespace JUSToolkit.Texts.Converters
         /// <param name="source">BinaryFormat to convert.</param>
         /// <returns>Text format.</returns>
         /// <exception cref="ArgumentNullException">Source file does not exist.</exception>
-        public JGalaxySimple Convert(BinaryFormat source)
+        public JGalaxySimple Convert(IBinary source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));

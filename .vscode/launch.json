@@ -15,9 +15,9 @@
         "texts",
         "export",
         "--bin",
-        "${workspaceFolder}/src/JUS.CLI/bin/Debug/net6.0/test.bin",
+        "${workspaceFolder}/src/JUS.CLI/bin/Debug/net8.0/01-dtx/test.bin",
         "--output",
-        "${workspaceFolder}/src/JUS.CLI/bin/Debug/net6.0/out/"
+        "${workspaceFolder}/src/JUS.CLI/bin/Debug/net8.0/01-dtx/out/"
       ],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,

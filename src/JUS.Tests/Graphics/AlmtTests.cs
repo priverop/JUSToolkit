@@ -17,20 +17,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FluentAssertions;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
+using JUS.Tool.Graphics;
+using JUS.Tool.Graphics.Converters;
 using NUnit.Framework;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.Tests.Graphics
+namespace JUS.Tests.Graphics
 {
     [TestFixture]
     public class AlmtTests
@@ -53,10 +47,10 @@ namespace JUSToolkit.Tests.Graphics
 
             using Node node = NodeFactory.FromFile(almtPath, FileOpenMode.Read);
 
-            Almt almt = new Binary2Almt().Convert(node.GetFormatAs<BinaryFormat>());
+            Almt almt = new Binary2Almt().Convert(node.GetFormatAs<BinaryFormat>()!);
             BinaryFormat generatedStream = new Almt2Binary().Convert(almt);
 
-            var originalStream = new DataStream(node.Stream!, 0, node.Stream.Length);
+            var originalStream = new DataStream(node.Stream!, 0, node.Stream!.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }

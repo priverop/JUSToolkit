@@ -17,17 +17,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.IO;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
+using JUS.Tool.Graphics;
+using JUS.Tool.Graphics.Converters;
+using JUS.Tool.Utils;
 using Texim.Images;
+using Texim.Images.Standard;
+using Texim.TileMaps;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.CLI.JUS
+namespace JUS.CLI.JUS.Graphics
 {
     /// <summary>
     /// Commands related to DSIG/DIG graphics files.
@@ -49,7 +48,7 @@ namespace JUSToolkit.CLI.JUS
             using Node pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
                 .TransformWith(binaryDig2Bitmap);
 
-            pixelsPaletteNode.Stream.WriteTo(output + ".png");
+            pixelsPaletteNode.Stream!.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(mapsNode.Name) + ".png"));
 
             Console.WriteLine("Done!");
         }
@@ -71,12 +70,12 @@ namespace JUSToolkit.CLI.JUS
             Dig originalDig = NodeFactory.FromFile(dig, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>();
+                .GetFormatAs<Dig>()!;
 
             Almt originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Almt>()
-                .GetFormatAs<Almt>();
+                .GetFormatAs<Almt>()!;
 
             if (originalDig is null) {
                 throw new FormatException("Invalid dig file");
@@ -86,15 +85,21 @@ namespace JUSToolkit.CLI.JUS
                 throw new FormatException("Invalid atm file");
             }
 
-            var compressionParams = new FullImageMapCompressionParams {
+            var compressionParams = new RgbImageMapCompressionParams {
                 Palettes = originalDig,
             };
 
-            Node compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
-                .TransformWith<Bitmap2FullImage>()
-                .TransformWith(new FullImageMapCompression(compressionParams));
-            IndexedImage newImage = compressed.Children[0].GetFormatAs<IndexedImage>();
-            ScreenMap map = compressed.Children[1].GetFormatAs<ScreenMap>();
+            MapCompressedIndexedImage compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
+                .TransformWith<StandardBinaryImage2RgbImage>()
+                .TransformWith(new RgbImageMapCompression(compressionParams))
+                .GetFormatAs<MapCompressedIndexedImage>()!;
+
+            var newImage = new IndexedImage {
+                Width = 8,
+                Height = compressed.Tiles.Length / 8,
+                Pixels = compressed.Tiles,
+            };
+            ITileMap map = compressed.Map;
 
             var newDig = new Dig(originalDig, newImage);
 
@@ -132,26 +137,28 @@ namespace JUSToolkit.CLI.JUS
             Dig mergedImage = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>();
+                .GetFormatAs<Dig>()!;
 
-            var compressionParams = new FullImageMapCompressionParams {
+            var compressionParams = new RgbImageMapCompressionParams {
                 Palettes = mergedImage,
             };
 
-            IndexedImage newImage = null;
+            IndexedImage? newImage = null;
 
             // 2 - Iterate the input PNGs
             for (int i = 0; i < input.Length; i++) {
-                // Transform the PNG into FullImage (Pixels + Map) using the palette of the original DIG
-                Node png = NodeFactory.FromFile(input[i], FileOpenMode.Read)
-                    .TransformWith<Bitmap2FullImage>()
-                    .TransformWith(new FullImageMapCompression(compressionParams));
+                // Transform the PNG into RgbImage (Pixels + Map) using the palette of the original DIG
+                MapCompressedIndexedImage compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
+                    .TransformWith<StandardBinaryImage2RgbImage>()
+                    .TransformWith(new RgbImageMapCompression(compressionParams))
+                    .GetFormatAs<MapCompressedIndexedImage>()!;
 
-                // Pixels
-                newImage = png.Children[0].GetFormatAs<IndexedImage>();
-
-                // Map
-                ScreenMap map = png.Children[1].GetFormatAs<ScreenMap>();
+                newImage = new IndexedImage {
+                    Width = 8,
+                    Height = compressed.Tiles.Length / 8,
+                    Pixels = compressed.Tiles,
+                };
+                ITileMap map = compressed.Map;
 
                 // 3 - Clone original
                 mergedImage = new Dig(mergedImage, newImage);
@@ -160,7 +167,7 @@ namespace JUSToolkit.CLI.JUS
                     mergedImage = mergedImage.InsertTransparentTile(map);
                 }
 
-                compressionParams = new FullImageMapCompressionParams {
+                compressionParams = new RgbImageMapCompressionParams {
                     MergeImage = mergedImage,
                     Palettes = mergedImage,
                 };
@@ -168,7 +175,7 @@ namespace JUSToolkit.CLI.JUS
                 // New Atm: original atm changing height, width and maps
                 Almt originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
                     .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>();
+                    .GetFormatAs<Almt>()!;
                 var newAtm = new Almt(originalAtm, map);
 
                 // Export ATM
@@ -177,7 +184,7 @@ namespace JUSToolkit.CLI.JUS
             }
 
             // New Dig: original dig changing height, width and pixels
-            var newDig = new Dig(mergedImage, newImage);
+            var newDig = new Dig(mergedImage, newImage!);
             new Dig2Binary().Convert(newDig)
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dig)));
 

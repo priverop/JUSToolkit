@@ -17,22 +17,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FluentAssertions;
-using JUSToolkit.Graphics;
-using JUSToolkit.Graphics.Converters;
+using JUS.Tool.Graphics;
+using JUS.Tool.Graphics.Converters;
 using NUnit.Framework;
-using Texim.Compressions.Nitro;
-using Texim.Formats;
 using Texim.Images;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
-namespace JUSToolkit.Tests.Graphics
+namespace JUS.Tests.Graphics
 {
     [TestFixture]
     public class DigTests
@@ -64,7 +58,7 @@ namespace JUSToolkit.Tests.Graphics
             using Node pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
                 .TransformWith(new BinaryDig2Bitmap(mapsNode));
 
-            pixelsPaletteNode.Stream.Should().MatchInfo(info);
+            pixelsPaletteNode.Stream!.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetFiles))]

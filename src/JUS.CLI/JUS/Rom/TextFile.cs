@@ -17,11 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
 using Yarhl.FileSystem;
 
-namespace JUSToolkit.CLI.JUS.Rom
+namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.
@@ -61,8 +59,8 @@ namespace JUSToolkit.CLI.JUS.Rom
         /// <param name="file">The input file to import.</param>
         public void Import(Node gameNode, Node file)
         {
-            if (TextLocations.TryGetValue(file.Name, out string value)) {
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}");
+            if (TextLocations.TryGetValue(file.Name, out string? value)) {
+                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}")!;
                 toReplace.ChangeFormat(file.Format!);
                 Console.WriteLine($"File replaced: /root/data{value}");
             }

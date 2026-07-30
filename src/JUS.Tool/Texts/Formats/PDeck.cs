@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Yarhl.FileFormat;
 
-namespace JUSToolkit.Texts.Formats
+namespace JUS.Tool.Texts.Formats
 {
     /// <summary>
     /// Format for pDeck files.
@@ -26,12 +26,12 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets or sets the Name of the PDeck.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the Header.
         /// </summary>
-        public byte[] Header { get; set; }
+        public byte[] Header { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the Unknown.

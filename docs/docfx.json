@@ -1,83 +1,81 @@
 {
-    "metadata": [
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "JUS.Tool/*.csproj"
+          ],
+          "src": "../src"
+        }
+      ],
+      "dest": "api",
+      "includePrivateMembers": false,
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false,
+      "noRestore": false,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "EnumSortOrder": "alphabetic",
+      "allowCompilationErrors": false
+    }
+  ],
+  "build": {
+    "content": [
       {
-        "src": [
-          {
-            "files": [
-              "JUS.Tool/bin/**/JUS.Tool.dll"
-            ],
-            "src": "../src"
-          }
-        ],
-        "dest": "api",
-        "filter": "filter_config.yml",
-        "disableGitFeatures": false,
-        "disableDefaultFilter": false
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": "**/*.{md,yml}",
+        "src": "articles",
+        "dest": "docs"
+      },
+      {
+        "files": [
+          "toc.yml",
+          "*.md"
+        ]
       }
     ],
-    "build": {
-      "content": [
-        {
-          "files": [ "api/**.yml", "dev/**" ]
-        },
-        {
-          "files": [ "toc.yml", "index.md" ]
-        },
-        {
-          "files": [ "guides/**" ]
-        },
-        {
-          "files": ["README.md", "CONTRIBUTING.md"],
-          "src": "../"
-        }
-      ],
-      "resource": [
-        {
-          "files": ["images/**"]
-        }
-      ],
-      "dest": "_site",
-      "globalMetadataFiles": ["global_metadata.json"],
-      "fileMetadataFiles": [],
-      "template": [
-        "default",
-        "statictoc",
-        "default-widescreen"
-      ],
-      "postProcessors": [],
-      "markdownEngineName": "markdig",
-      "noLangKeyword": false,
-      "keepFileLink": false,
-      "cleanupCacheHistory": false,
-      "disableGitFeatures": false,
-      "xrefService": [ "https://xref.docs.microsoft.com/query?uid={uid}" ]
+    "resource": [
+      {
+        "files": [
+          "**/images/**",
+          "**/resources/**"
+        ],
+        "exclude": [
+          "_site/**",
+          "obj/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "globalMetadata": {
+      "_appTitle": "JUS Toolkit",
+      "_appName": "JUS Toolkit",
+      "_appFooter": "Copyright (c) 2019 Pablo Rivero",
+      "_appLogoPath": "images/icon_50.webp",
+      "_appFaviconPath": "images/favicon.webp",
+      "_enableSearch": true,
+      "_enableNewTab": true,
+      "_lang": "en"
     },
-    "pdf": {
-      "content": [
-        {
-          "files": [ "pdf/**" ]
-        },
-        {
-          "files": [ "api/**.yml" ],
-          "exclude": [ "**/toc.yml" ]
-        },
-        {
-          "files": [ "index.md" ]
-        },
-        {
-          "files": [ "guides/**" ],
-          "exclude": [ "**/toc.yml" ]
-        },
-        {
-          "files": ["README.md", "CONTRIBUTING.md"],
-          "src": "../"
-        }
-      ],
-      "resource": [
-        {
-          "files": ["images/**"]
-        }
-      ],
-      "dest": "_site_pdf"
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "modern",
+      "template"
+    ],
+    "postProcessors": [],
+    "keepFileLink": false,
+    "disableGitFeatures": false,
+    "sitemap": {
+      "baseUrl": "https://priverop.github.io/JUSTollkit",
+      "priority": 0.5,
+      "changefreq": "monthly"
     }
+  }
 }

@@ -1,16 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+
+    <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../docs/images/logo_128.png" Pack="true" PackagePath="$(PackageIcon)" Visible="false" />
-    <None Include="../../README.md" Pack="true" PackagePath="$(PackageReadmeFile)" />
+    <None Include="../../docs/images/icon_128.png" Pack="true" PackagePath="$(PackageIcon)" Visible="false" />
+    <None Include="../../docs/index.md" Pack="true" PackagePath="$(PackageReadmeFile)" />
 
+    <EmbeddedResource Include="Utils/jgalaxy_unknown" />
+    <EmbeddedResource Include="../../Resources/table.tbl" LogicalName="JUS.Tool.Resources.table.tbl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="JUS.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Yarhl" />
     <PackageReference Include="Yarhl.Media.Text" />
     <PackageReference Include="Texim" />
+    <PackageReference Include="Texim.Games" />
     <PackageReference Include="SceneGate.Ekona" />
     <PackageReference Include="YamlDotNet" />
   </ItemGroup>

@@ -17,20 +17,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FluentAssertions;
-using JUSToolkit.Texts.Converters;
-using JUSToolkit.Texts.Formats;
+using JUS.Tool.Texts.Converters;
+using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 
-namespace JUSToolkit.Tests.Containers
+namespace JUS.Tests.Texts
 {
     [TestFixture]
     public class JQuizFormatTest
@@ -56,8 +52,9 @@ namespace JUSToolkit.Tests.Containers
 
             using Node jquiz = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
-            jquiz.Invoking(n => n.TransformWith<Binary2JQuiz>()).Should().NotThrow();
-            jquiz.GetFormatAs<JQuiz>().Entries.Should().NotBeEmpty().And.HaveCount(3006);
+            var act = () => jquiz.TransformWith<Binary2JQuiz>();
+            act.Should().NotThrow();
+            jquiz.GetFormatAs<JQuiz>()!.Entries.Should().NotBeEmpty().And.HaveCount(3006);
         }
 
         [TestCaseSource(nameof(GetJQuizFiles))]
@@ -68,7 +65,7 @@ namespace JUSToolkit.Tests.Containers
 
             using Node node = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
-            JQuiz jquiz = new Binary2JQuiz().Convert(node.GetFormatAs<BinaryFormat>());
+            JQuiz jquiz = new Binary2JQuiz().Convert(node.GetFormatAs<BinaryFormat>()!);
             BinaryFormat generatedStream = new Binary2JQuiz().Convert(jquiz);
 
             generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
@@ -84,9 +81,9 @@ namespace JUSToolkit.Tests.Containers
             using Node node = NodeFactory.FromFile(jquizPath);
 
             // BinaryFormat -> JQuiz
-            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
             var binary2JQuiz = new Binary2JQuiz();
-            JQuiz expectedJQuiz = null;
+            JQuiz expectedJQuiz = null!;
             try {
                 expectedJQuiz = binary2JQuiz.Convert(expectedBin);
             } catch (Exception ex) {
@@ -95,7 +92,7 @@ namespace JUSToolkit.Tests.Containers
 
             // JQuiz -> NCF of Pos
             var jquiz2Po = new JQuiz2Po();
-            NodeContainerFormat expectedPo = null;
+            NodeContainerFormat expectedPo = null!;
             try {
                 expectedPo = jquiz2Po.Convert(expectedJQuiz);
             } catch (Exception ex) {
@@ -103,7 +100,7 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Po -> JQuiz
-            JQuiz actualJQuiz = null;
+            JQuiz actualJQuiz = null!;
             try {
                 actualJQuiz = jquiz2Po.Convert(expectedPo);
             } catch (Exception ex) {
@@ -111,7 +108,7 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // JQuiz -> BinaryFormat
-            BinaryFormat actualBin = null;
+            BinaryFormat actualBin = null!;
             try {
                 actualBin = binary2JQuiz.Convert(actualJQuiz);
             } catch (Exception ex) {
@@ -119,7 +116,7 @@ namespace JUSToolkit.Tests.Containers
             }
 
             // Comparing Binaries
-            Assert.True(expectedBin.Stream.Compare(actualBin.Stream), $"JQuiz is not identical: {node.Path}");
+            Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"JQuiz is not identical: {node.Path}");
         }
     }
 }
