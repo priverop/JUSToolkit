@@ -21,7 +21,7 @@ namespace JUSToolkit.Texts.Formats
         /// <summary>
         /// Gets the Maximum length of the lines.
         /// </summary>
-        public static readonly int LineLength = 26;
+        public static readonly int LineLength = 16;
 
         /// <summary>
         /// Gets or sets the Name of the Deck.
