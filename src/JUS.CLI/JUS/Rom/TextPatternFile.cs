@@ -36,16 +36,13 @@ namespace JUS.CLI.JUS.Rom
             (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
         ];
 
+        /// <inheritdoc/>
         public bool Matches(string filename)
         {
             return PatternList.Any(x => x.Pattern.IsMatch(filename));
         }
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="files">The input files to import.</param>
+        /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
             var filesGroupedByContainer = files.GroupBy(

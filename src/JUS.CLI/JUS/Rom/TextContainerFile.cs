@@ -42,11 +42,7 @@ namespace JUS.CLI.JUS.Rom
             return ContainerLocations.ContainsKey(filename);
         }
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
+        /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
             var filesGroupedByContainer = files.GroupBy(x => ContainerLocations[x.Name]);

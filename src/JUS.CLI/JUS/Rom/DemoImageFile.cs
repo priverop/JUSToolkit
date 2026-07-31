@@ -46,11 +46,7 @@ namespace JUS.CLI.JUS.Rom
             return DemoPattern.IsMatch(filename);
         }
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
+        /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
             string containerPath = "/demo/demo.aar";

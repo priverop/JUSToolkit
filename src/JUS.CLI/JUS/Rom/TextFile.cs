@@ -57,14 +57,10 @@ namespace JUS.CLI.JUS.Rom
             return TextLocations.ContainsKey(filename);
         }
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, List<Node> filesToInsert)
+        /// <inheritdoc/>
+        public void Import(Node gameNode, List<Node> files)
         {
-            foreach (Node file in filesToInsert) {
+            foreach (Node file in files) {
                 if (TextLocations.TryGetValue(file.Name, out string? value)) {
                     Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}/{file.Name}")!;
                     toReplace.ChangeFormat(file.Format!);
