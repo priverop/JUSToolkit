@@ -89,13 +89,12 @@ namespace JUS.Tool.Texts.Converters
         /// Each line needs to have the same length, with no spaces, so we pad it with |.
         /// </summary>
         /// <param name="input">Line to clean.</param>
-        /// <param name="input">Line to clean.</param>
         /// <returns>Transformed string.</returns>
         private static string AdjustLength(string input)
         {
             const char PADDING_CHAR = '|';
 
-            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(new KomatxtEntry().LineLength, PADDING_CHAR);
+            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(new KomatxtEntry().MaxLineLength, PADDING_CHAR);
         }
     }
 }
