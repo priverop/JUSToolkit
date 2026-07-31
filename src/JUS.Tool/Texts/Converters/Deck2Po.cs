@@ -64,9 +64,7 @@ namespace JUS.Tool.Texts.Converters
                 string sentence = Table.Instance.Encode(entry.Text);
 
                 if (sentence.Length > Deck.LineLength) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"❌ Limit of {Deck.LineLength} chars reached: {sentence}.");
-                    Console.ResetColor();
+                    Logger.DisplayErrorMaxLength(Deck.LineLength, sentence);
                     break;
                 }
 
