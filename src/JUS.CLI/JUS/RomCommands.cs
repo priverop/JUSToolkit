@@ -31,12 +31,13 @@ namespace JUS.CLI.JUS
     {
         private static readonly IFileImportStrategy[] Strategies =
         [
+            new DemoImageFile(),
+            new MenuImageFile(),
+            new RawContainerFile(),
+            new SpriteDtx3ImageFile(),
             new TextFile(),
             new TextContainerFile(),
             new TextPatternFile(),
-            new MenuImageFile(),
-            new DemoImageFile(),
-            new SpriteDtx3ImageFile(),
         ];
 
         /// <summary>
