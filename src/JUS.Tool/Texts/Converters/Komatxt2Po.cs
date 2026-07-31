@@ -71,18 +71,10 @@ namespace JUS.Tool.Texts.Converters
                     break;
                 }
 
-                entry.Name = AdjustLength(sentence);
-
                 metadata = JusText.ParseMetadata(po.Entries[i].ExtractedComments);
 
                 entry = new KomatxtEntry {
-                    Name = Table.Instance.Encode(po.Entries[i].Text),
-                    Unk1 = int.Parse(metadata[0]),
-                    Unk2 = int.Parse(metadata[1]),
-                };
-
-                entry = new KomatxtEntry {
-                    Name = Table.Instance.Encode(po.Entries[i].Text),
+                    Name = AdjustLength(sentence),
                     Unk1 = int.Parse(metadata[0]),
                     Unk2 = int.Parse(metadata[1]),
                 };
@@ -94,17 +86,16 @@ namespace JUS.Tool.Texts.Converters
         }
 
         /// <summary>
-        /// Each line needs to be 17 character long, with no spaces.
+        /// Each line needs to have the same length, with no spaces, so we pad it with |.
         /// </summary>
         /// <param name="input">Line to clean.</param>
         /// <param name="input">Line to clean.</param>
         /// <returns>Transformed string.</returns>
         private static string AdjustLength(string input)
-        private static string AdjustLength(string input)
         {
             const char PADDING_CHAR = '|';
 
-            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(KomatxtEntry.LineLength, PADDING_CHAR);
+            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(new KomatxtEntry().LineLength, PADDING_CHAR);
         }
     }
 }
