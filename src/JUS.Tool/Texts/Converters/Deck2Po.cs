@@ -71,25 +71,13 @@ namespace JUS.Tool.Texts.Converters
                 }
 
                 var deck = new Deck() {
-                    Name = AdjustLength(sentence),
+                    Name = sentence,
                     Header = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
                 container.Root.Add(new Node(entry.Context, deck));
             }
 
             return container;
-        }
-
-        /// <summary>
-        /// Each line needs to be 26 character long, with no spaces.
-        /// </summary>
-        /// <param name="input">Line to clean.</param>
-        /// <returns>Transformed string.</returns>
-        private static string AdjustLength(string input)
-        {
-            const char PADDING_CHAR = '|';
-
-            return input.Replace(" ", PADDING_CHAR.ToString()).PadRight(Deck.LineLength, PADDING_CHAR);
         }
     }
 }
