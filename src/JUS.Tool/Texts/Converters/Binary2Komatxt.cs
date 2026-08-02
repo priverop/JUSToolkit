@@ -67,7 +67,7 @@ namespace JUS.Tool.Texts.Converters
         public BinaryFormat Convert(Komatxt komatxt)
         {
             var bin = new BinaryFormat();
-            DataWriter writer = new DataWriter(bin.Stream) {
+            var writer = new DataWriter(bin.Stream) {
                 DefaultEncoding = JusText.JusEncoding,
             };
 
@@ -90,11 +90,11 @@ namespace JUS.Tool.Texts.Converters
         /// <returns>The read <see cref="KomatxtEntry"/>.</returns>
         private KomatxtEntry ReadEntry()
         {
-            var entry = new KomatxtEntry();
-
-            entry.Name = JusText.ReadIndirectString(reader);
-            entry.Unk1 = reader.ReadInt32();
-            entry.Unk2 = reader.ReadInt32();
+            var entry = new KomatxtEntry {
+                Name = JusText.ReadIndirectString(reader),
+                Unk1 = reader.ReadInt32(),
+                Unk2 = reader.ReadInt32(),
+            };
 
             return entry;
         }
