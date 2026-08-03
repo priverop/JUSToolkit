@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Priverop
+﻿// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Text.RegularExpressions;
 using JUS.CLI.JUS.Rom;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
@@ -30,43 +29,16 @@ namespace JUS.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
-        private static readonly Dictionary<string, IFileImportStrategy> ImportStrategies = new()
-        {
-            { "tutorial.bin", new TextFile() },
-            { "tutorial0.bin", new TextFile() },
-            { "tutorial1.bin", new TextFile() },
-            { "tutorial2.bin", new TextFile() },
-            { "tutorial3.bin", new TextFile() },
-            { "tutorial4.bin", new TextFile() },
-            { "tutorial5.bin", new TextFile() },
-            { "ability_t.bin", new TextFile() },
-            { "bgm.bin", new TextFile() },
-            { "chr_b_t.bin", new TextFile() },
-            { "chr_s_t.bin", new TextFile() },
-            { "clearlst.bin", new TextFile() },
-            { "commwin.bin", new TextFile() },
-            { "demo.bin", new TextFile() },
-            { "infoname.bin", new TextFile() },
-            { "komatxt.bin", new TextFile() },
-            { "location.bin", new TextFile() },
-            { "piece.bin", new TextFile() },
-            { "pname.bin", new TextFile() },
-            { "rulemess.bin", new TextFile() },
-            { "stage.bin", new TextFile() },
-            { "title.bin", new TextFile() },
-            { "jgalaxy-jgalaxy.bin", new TextContainerFile() },
-            { "jgalaxy-mission.bin", new TextContainerFile() },
-            { "jgalaxy-battle.bin", new TextContainerFile() },
-            { "jquiz.bin", new TextContainerFile() },
-        };
-
-        private static readonly List<(Regex pattern, IFileImportStrategy strategy)> PatternStrategies = new()
-        {
-            (new Regex(@"^bin-.*-.*\.bin$"), new TextContainerFile()),
-            (new Regex(@"^deck-.*-.*\.bin$"), new TextContainerFile()),
-            (new Regex(@"^menu-.*-.*\.png$"), new ImageContainerFile()),
-            (new Regex(@"^demo-.*\.png$"), new ImageContainerFile()),
-        };
+        private static readonly IFileImportStrategy[] Strategies =
+        [
+            new DemoImageFile(),
+            new MenuImageFile(),
+            new RawContainerFile(),
+            new SpriteDtx3ImageFile(),
+            new TextFile(),
+            new TextContainerFile(),
+            new TextPatternFile(),
+        ];
 
         /// <summary>
         /// Import files into the Rom.
@@ -84,24 +56,18 @@ namespace JUS.CLI.JUS
             Node inputFiles = NodeFactory.FromDirectory(input);
             inputFiles.SortChildren((x, y) => string.Compare(x.Name, y.Name, StringComparison.CurrentCulture));
 
-            foreach (Node file in inputFiles.Children) {
-                // Fixed names
-                if (ImportStrategies.TryGetValue(file.Name, out IFileImportStrategy? strategy)) {
-                    strategy.Import(gameNode, file);
-                } else {
-                    // Pattern names
-                    bool matched = false;
-                    foreach ((Regex pattern, IFileImportStrategy patternStrategy) in PatternStrategies) {
-                        if (pattern.IsMatch(file.Name)) {
-                            patternStrategy.Import(gameNode, file);
-                            matched = true;
-                            break;
-                        }
-                    }
+            // Files with no strategies
+            // In most strategies, we modify Node.Name, so we need to do this first
+            var orphanFiles = inputFiles.Children.Where(file => !Strategies.Any(strategy => strategy.Matches(file.Name)));
+            foreach (Node orphan in orphanFiles) {
+                Console.WriteLine("These files won't be imported, as they don't match with any importer:");
+                Console.WriteLine(orphan.Name);
+            }
 
-                    if (!matched) {
-                        Console.WriteLine($"File not compatible: {file.Name}");
-                    }
+            foreach (IFileImportStrategy strategy in Strategies) {
+                var matchedFiles = inputFiles.Children.Where(f => strategy.Matches(f.Name)).ToList();
+                if (matchedFiles.Count > 0) {
+                    strategy.Import(gameNode, matchedFiles);
                 }
             }
 
