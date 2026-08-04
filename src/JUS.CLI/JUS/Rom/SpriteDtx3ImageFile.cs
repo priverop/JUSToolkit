@@ -55,13 +55,17 @@ namespace JUS.CLI.JUS.Rom
             }
         }
 
+        // Process parent.aar (Alar3)
         private static void ProcessParentContainer(Node gameNode, string parentPath, IEnumerable<Node> files)
         {
             Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentPath}/{parentPath}.aar") ?? throw new FormatException($"Container not found /root/data/{parentPath}/{parentPath}.aar");
 
             Console.WriteLine($"/root/data/{parentPath}/{parentPath}.aar found.");
 
+            bool isCompressed = CompressionUtils.IsCompressed(parentAlar);
+
             _ = parentAlar.TransformWith<Binary2Alar>();
+            parentAlar.Tags[Alar.CompressionTag] = isCompressed;
 
             var filesGroupedByChild = files.GroupBy(f => f.Name.Split('-')[1]);
 
@@ -72,6 +76,7 @@ namespace JUS.CLI.JUS.Rom
             _ = parentAlar.TransformWith(new AlarToBinary());
         }
 
+        // Process child.aar (Alar2, usually compressed)
         private static void ProcessChildContainer(Node parentAlar, string childName, IEnumerable<Node> files)
         {
             Node originalChild = Navigator.SearchNode(parentAlar, $"{parentAlar.Path}/{Path.GetFileNameWithoutExtension(parentAlar.Name)}/{childName}")
@@ -81,7 +86,10 @@ namespace JUS.CLI.JUS.Rom
 
             // Clone the node to avoid changing the original (AlarFile).
             using var workingChild = new Node(childName, (BinaryFormat)new BinaryFormat(originalChild.Stream!).DeepClone());
+            bool isCompressed = CompressionUtils.IsCompressed(workingChild);
+
             _ = workingChild.TransformWith<Binary2Alar>();
+            workingChild.Tags[Alar.CompressionTag] = isCompressed;
 
             var filesGroupedByDtx = files.GroupBy(f => f.Name.Split('-')[2]);
 
