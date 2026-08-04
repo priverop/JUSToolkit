@@ -65,7 +65,7 @@ namespace JUS.Tool.Texts.Converters
 
                 if (sentence.Length > Deck.LineLength) {
                     Logger.DisplayErrorMaxLength(Deck.LineLength, sentence);
-                    break;
+                    sentence = sentence[0..Deck.LineLength];
                 }
 
                 var deck = new Deck() {
