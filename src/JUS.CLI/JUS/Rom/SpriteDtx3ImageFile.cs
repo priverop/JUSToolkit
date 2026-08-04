@@ -36,6 +36,17 @@ namespace JUS.CLI.JUS.Rom
     {
         private static readonly Regex FilenamePattern = new(@"^[^-]+\.aar-[^-]+\.aar-[^-]+\.dtx-sp_\d+\.png$", RegexOptions.Compiled);
 
+        // The importer assumes the /data/parent directory name is the same as the parent.aar file.
+        // This is not the case for some of the .aar
+        private static readonly Dictionary<string, string> ParentLocations = new() {
+            { "button.aar", "Common" },
+            { "commu_pack.aar", "Commu" },
+            { "error_2d.aar", "Commu" },
+            { "jquiz_pack.aar", "jquiz" },
+            { "pause.aar", "battle" },
+            { "title_icon_2d.aar", "Common" },
+        };
+
         /// <inheritdoc/>
         public bool Matches(string filename)
         {
@@ -58,9 +69,11 @@ namespace JUS.CLI.JUS.Rom
         // Process parent.aar (Alar3)
         private static void ProcessParentContainer(Node gameNode, string parentPath, IEnumerable<Node> files)
         {
-            Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentPath}/{parentPath}.aar") ?? throw new FormatException($"Container not found /root/data/{parentPath}/{parentPath}.aar");
+            string parentDirectory = ParentLocations.TryGetValue($"{parentPath}.aar", out string? directory) ? directory : parentPath;
 
-            Console.WriteLine($"/root/data/{parentPath}/{parentPath}.aar found.");
+            Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentDirectory}/{parentPath}.aar") ?? throw new FormatException($"Container not found /root/data/{parentDirectory}/{parentPath}.aar");
+
+            Console.WriteLine($"/root/data/{parentDirectory}/{parentPath}.aar found.");
 
             bool isCompressed = CompressionUtils.IsCompressed(parentAlar);
 
