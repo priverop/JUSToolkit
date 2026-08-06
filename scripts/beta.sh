@@ -7,6 +7,8 @@ set -eu
 
 clear
 
+SECONDS=0
+
 # ----------------------------
 # DEBUG mode
 # ----------------------------
@@ -197,6 +199,7 @@ if [ "$DEBUG" == false ]; then
 fi
 
 echo -e '\n\033[1;32m✅ Finished! File created at \033[0m'$DEMO_PATH/$DEMO_NAME
+printf -- '\033[1;32m⏱  Elapsed: %02dm %02ds\033[0m\n' $((SECONDS / 60)) $((SECONDS % 60))
 printf -- "------------------------------\n\n"
 
 # Opening the new game
