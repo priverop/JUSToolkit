@@ -50,6 +50,10 @@ namespace JUS.CLI.JUS
         {
             Console.WriteLine($"Importing {input}");
 
+            if (!Directory.Exists(input)) {
+                throw new ArgumentException($"The --input parameter must be a directory: {input}");
+            }
+
             Node gameNode = NodeFactory.FromFile(game, "root", FileOpenMode.Read)
                 .TransformWith<Binary2NitroRom>();
 
