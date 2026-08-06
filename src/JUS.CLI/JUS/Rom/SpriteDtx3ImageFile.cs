@@ -30,11 +30,12 @@ namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
     /// Strategy to import DTX3 sprites. These sprites are usually inside a parent .aar and child .aar.
-    /// Filename format: parent.aar-child.aar-name.dtx-sp_NN.png.
+    /// Filename format: parent.aar-child.aar-name.dtx-sp_NN.png, or parent.aar-name.dtx-sp_NN.png
+    /// when the .dtx hangs directly from the parent .aar (jquiz question images or Commu/ .dtx).
     /// </summary>
     public class SpriteDtx3ImageFile : IFileImportStrategy
     {
-        private static readonly Regex FilenamePattern = new(@"^[^-]+\.aar-[^-]+\.aar-[^-]+\.dtx-sp_\d+\.png$", RegexOptions.Compiled);
+        private static readonly Regex FilenamePattern = new(@"^[^-]+\.aar-([^-]+\.aar-)?[^-]+\.dtx-sp_\d+\.png$", RegexOptions.Compiled);
 
         // The importer assumes the /data/parent directory name is the same as the parent.aar file.
         // This is not the case for some of the .aar
@@ -45,6 +46,12 @@ namespace JUS.CLI.JUS.Rom
             { "jquiz_pack.aar", "jquiz" },
             { "pause.aar", "battle" },
             { "title_icon_2d.aar", "Common" },
+        };
+
+        // Some .dtx hang directly from the parent.aar, without an intermediate child.aar.
+        // They are at its root unless listed here, where the value is their inner directory.
+        private static readonly Dictionary<string, string> DirectDtxSubdirectories = new() {
+            { "jquiz_pack.aar", "jquiz/img" },
         };
 
         /// <inheritdoc/>
@@ -80,20 +87,31 @@ namespace JUS.CLI.JUS.Rom
             _ = parentAlar.TransformWith<Binary2Alar>();
             parentAlar.Tags[Alar.CompressionTag] = isCompressed;
 
-            var filesGroupedByChild = files.GroupBy(f => f.Name.Split('-')[1]);
+            // A parent.aar can hold both layouts, so we cannot decide by container.
+            string dtxRoot = DirectDtxSubdirectories.TryGetValue($"{parentPath}.aar", out string? subdirectory) ? $"{subdirectory}/" : string.Empty;
+
+            // filename: [0] parent.aar, [1] name.dtx, [2] sp_NN.png
+            var filesGroupedByDtx = files.Where(f => f.Name.Split('-').Length == 3).GroupBy(f => f.Name.Split('-')[1]);
+
+            foreach (var dtxGroup in filesGroupedByDtx) {
+                ProcessDtx(parentAlar, $"{dtxRoot}{dtxGroup.Key}", dtxGroup);
+            }
+
+            var filesGroupedByChild = files.Where(f => f.Name.Split('-').Length == 4).GroupBy(f => f.Name.Split('-')[1]);
 
             foreach (var childGroup in filesGroupedByChild) {
-                ProcessChildContainer(parentAlar, childGroup.Key, childGroup);
+                ProcessChildContainer(parentAlar, parentDirectory, childGroup.Key, childGroup);
             }
 
             _ = parentAlar.TransformWith(new AlarToBinary());
         }
 
-        // Process child.aar (Alar2, usually compressed)
-        private static void ProcessChildContainer(Node parentAlar, string childName, IEnumerable<Node> files)
+        // Process child.aar (Alar2, usually compressed).
+        // The directory holding it inside the parent.aar is named after the /data one, not after the parent.aar.
+        private static void ProcessChildContainer(Node parentAlar, string childDirectory, string childName, IEnumerable<Node> files)
         {
-            Node originalChild = Navigator.SearchNode(parentAlar, $"{parentAlar.Path}/{Path.GetFileNameWithoutExtension(parentAlar.Name)}/{childName}")
-                ?? throw new FormatException($"Container not found {parentAlar.Path}/{childName}");
+            Node originalChild = Navigator.SearchNode(parentAlar, $"{parentAlar.Path}/{childDirectory}/{childName}")
+                ?? throw new FormatException($"Container not found {parentAlar.Path}/{childDirectory}/{childName}");
 
             Console.WriteLine($"{childName} found.");
 
@@ -116,9 +134,11 @@ namespace JUS.CLI.JUS.Rom
             parentAlar.GetFormatAs<Alar>()!.InsertModification(newChild);
         }
 
-        private static void ProcessDtx(Node childAlar, string dtxName, IEnumerable<Node> files)
+        private static void ProcessDtx(Node childAlar, string dtxPath, IEnumerable<Node> files)
         {
-            Node originalDTX = Navigator.SearchNode(childAlar, dtxName) ?? throw new FormatException($"DTX {dtxName} not found in {childAlar.Path}.");
+            Node originalDTX = Navigator.SearchNode(childAlar, dtxPath) ?? throw new FormatException($"DTX {dtxPath} not found in {childAlar.Path}.");
+
+            string dtxName = Path.GetFileName(dtxPath);
 
             Console.WriteLine($"Importing sprites into: {dtxName}.");
 
@@ -129,7 +149,7 @@ namespace JUS.CLI.JUS.Rom
             // Renamed and cloned (just in case) TODO: quitar?
             using var pngs = new NodeContainerFormat();
             foreach (Node file in files) {
-                pngs.Root.Add(new Node(file.Name.Split('-')[3], new BinaryFormat(file.Stream!)));
+                pngs.Root.Add(new Node(file.Name.Split('-')[^1], new BinaryFormat(file.Stream!)));
             }
 
             _ = workingDtx.TransformWith(new Png2Dtx3(pngs));
