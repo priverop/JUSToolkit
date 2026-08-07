@@ -1,5 +1,4 @@
 #!/bin/bash
-# Translate this into English:
 # Script to generate a demo with the translated data from the Git repo.
 # Usage: ./script.sh [debug]
 #   - debug: Debug mode (avoid compiling the project, git pull and the rom name doesn't change).
@@ -168,6 +167,11 @@ echo '7 - JQuiz'
 #--------------------------
 ## IMAGES
 echo -e '\n\033[1;34m🖼  Importing images\033[0m'
+
+# KOMAS
+echo ''
+echo 'KOMAS OLD'
+./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $IMAGES_DIRECTORY/ --output $DEMO_PATH
 
 # MENUS
 echo ''
