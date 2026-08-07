@@ -31,14 +31,14 @@ namespace JUS.CLI.JUS.Rom
     /// <summary>
     /// Strategy to import DTX3 sprites. These sprites are usually inside a parent .aar and child .aar.
     /// Filename format: parent.aar-child.aar-name.dtx-sp_NN.png, or parent.aar-name.dtx-sp_NN.png
-    /// when the .dtx hangs directly from the parent .aar (jquiz question images or Commu/ .dtx).
+    /// when the .dtx hangs directly from the parent .aar (jquiz question images, pause, error_2d).
     /// </summary>
     public class SpriteDtx3ImageFile : IFileImportStrategy
     {
         private static readonly Regex FilenamePattern = new(@"^[^-]+\.aar-([^-]+\.aar-)?[^-]+\.dtx-sp_\d+\.png$", RegexOptions.Compiled);
 
         // The importer assumes the /data/parent directory name is the same as the parent.aar file.
-        // This is not the case for some of the .aar
+        // This is not the case for some of the .aar.
         private static readonly Dictionary<string, string> ParentLocations = new() {
             { "button.aar", "Common" },
             { "commu_pack.aar", "Commu" },
@@ -46,12 +46,6 @@ namespace JUS.CLI.JUS.Rom
             { "jquiz_pack.aar", "jquiz" },
             { "pause.aar", "battle" },
             { "title_icon_2d.aar", "Common" },
-        };
-
-        // Some .dtx hang directly from the parent.aar, without an intermediate child.aar.
-        // They are at its root unless listed here, where the value is their inner directory.
-        private static readonly Dictionary<string, string> DirectDtxSubdirectories = new() {
-            { "jquiz_pack.aar", "jquiz/img" },
         };
 
         /// <inheritdoc/>
@@ -63,55 +57,44 @@ namespace JUS.CLI.JUS.Rom
         /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
-            // filename: [0] parent.aar, [1] child.aar, [2] name.dtx, [3] sp_NN.png
-            var filesGroupedByParent = files.GroupBy(f => f.Name.Split('-')[0]);
-
-            foreach (var parentGroup in filesGroupedByParent) {
-                string parentName = parentGroup.Key;
-                string parentPath = Path.GetFileNameWithoutExtension(parentName);
-                ProcessParentContainer(gameNode, parentPath, parentGroup);
+            foreach (var parentGroup in files.GroupBy(ParentOf)) {
+                ProcessParentContainer(gameNode, parentGroup.Key, parentGroup);
             }
         }
 
         // Process parent.aar (Alar3)
-        private static void ProcessParentContainer(Node gameNode, string parentPath, IEnumerable<Node> files)
+        private static void ProcessParentContainer(Node gameNode, string parentName, IEnumerable<Node> files)
         {
-            string parentDirectory = ParentLocations.TryGetValue($"{parentPath}.aar", out string? directory) ? directory : parentPath;
+            // By default the directory is named after the .aar (deckselect.aar -> /data/deckselect).
+            string parentDirectory = ParentLocations.TryGetValue(parentName, out string? directory)
+                ? directory
+                : Path.GetFileNameWithoutExtension(parentName);
 
-            Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentDirectory}/{parentPath}.aar") ?? throw new FormatException($"Container not found /root/data/{parentDirectory}/{parentPath}.aar");
+            Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentDirectory}/{parentName}") ?? throw new FormatException($"Container not found /root/data/{parentDirectory}/{parentName}");
 
-            Console.WriteLine($"/root/data/{parentDirectory}/{parentPath}.aar found.");
+            Console.WriteLine($"/root/data/{parentDirectory}/{parentName} found.");
 
             bool isCompressed = CompressionUtils.IsCompressed(parentAlar);
 
             _ = parentAlar.TransformWith<Binary2Alar>();
             parentAlar.Tags[Alar.CompressionTag] = isCompressed;
 
-            // A parent.aar can hold both layouts, so we cannot decide by container.
-            string dtxRoot = DirectDtxSubdirectories.TryGetValue($"{parentPath}.aar", out string? subdirectory) ? $"{subdirectory}/" : string.Empty;
-
-            // filename: [0] parent.aar, [1] name.dtx, [2] sp_NN.png
-            var filesGroupedByDtx = files.Where(f => f.Name.Split('-').Length == 3).GroupBy(f => f.Name.Split('-')[1]);
-
-            foreach (var dtxGroup in filesGroupedByDtx) {
-                ProcessDtx(parentAlar, $"{dtxRoot}{dtxGroup.Key}", dtxGroup);
+            // No child.aar
+            foreach (var dtxGroup in files.Where(f => ChildOf(f) is null).GroupBy(DtxOf)) {
+                ProcessDtx(parentAlar, dtxGroup.Key, dtxGroup);
             }
 
-            var filesGroupedByChild = files.Where(f => f.Name.Split('-').Length == 4).GroupBy(f => f.Name.Split('-')[1]);
-
-            foreach (var childGroup in filesGroupedByChild) {
-                ProcessChildContainer(parentAlar, parentDirectory, childGroup.Key, childGroup);
+            foreach (var childGroup in files.Where(f => ChildOf(f) is not null).GroupBy(f => ChildOf(f)!)) {
+                ProcessChildContainer(parentAlar, childGroup.Key, childGroup);
             }
 
             _ = parentAlar.TransformWith(new AlarToBinary());
         }
 
-        // Process child.aar (Alar2, usually compressed).
-        // The directory holding it inside the parent.aar is named after the /data one, not after the parent.aar.
-        private static void ProcessChildContainer(Node parentAlar, string childDirectory, string childName, IEnumerable<Node> files)
+        // Process child.aar (Alar2, usually compressed)
+        private static void ProcessChildContainer(Node parentAlar, string childName, IEnumerable<Node> files)
         {
-            Node originalChild = Navigator.SearchNode(parentAlar, $"{parentAlar.Path}/{childDirectory}/{childName}")
-                ?? throw new FormatException($"Container not found {parentAlar.Path}/{childDirectory}/{childName}");
+            Node originalChild = FindByName(parentAlar, childName);
 
             Console.WriteLine($"{childName} found.");
 
@@ -122,9 +105,7 @@ namespace JUS.CLI.JUS.Rom
             _ = workingChild.TransformWith<Binary2Alar>();
             workingChild.Tags[Alar.CompressionTag] = isCompressed;
 
-            var filesGroupedByDtx = files.GroupBy(f => f.Name.Split('-')[2]);
-
-            foreach (var dtxGroup in filesGroupedByDtx) {
+            foreach (var dtxGroup in files.GroupBy(DtxOf)) {
                 ProcessDtx(workingChild, dtxGroup.Key, dtxGroup);
             }
 
@@ -134,11 +115,9 @@ namespace JUS.CLI.JUS.Rom
             parentAlar.GetFormatAs<Alar>()!.InsertModification(newChild);
         }
 
-        private static void ProcessDtx(Node childAlar, string dtxPath, IEnumerable<Node> files)
+        private static void ProcessDtx(Node containerAlar, string dtxName, IEnumerable<Node> files)
         {
-            Node originalDTX = Navigator.SearchNode(childAlar, dtxPath) ?? throw new FormatException($"DTX {dtxPath} not found in {childAlar.Path}.");
-
-            string dtxName = Path.GetFileName(dtxPath);
+            Node originalDTX = FindByName(containerAlar, dtxName);
 
             Console.WriteLine($"Importing sprites into: {dtxName}.");
 
@@ -155,7 +134,7 @@ namespace JUS.CLI.JUS.Rom
             // Renamed and cloned (just in case) TODO: quitar?
             using var pngs = new NodeContainerFormat();
             foreach (Node file in files) {
-                pngs.Root.Add(new Node(file.Name.Split('-')[^1], new BinaryFormat(file.Stream!)));
+                pngs.Root.Add(new Node(SpriteOf(file), new BinaryFormat(file.Stream!)));
             }
 
             _ = workingDtx.TransformWith(new Png2Dtx3(pngs));
@@ -168,6 +147,26 @@ namespace JUS.CLI.JUS.Rom
 
             using var newDtx = new Node(dtxName, compressedDtx);
             containerAlar.GetFormatAs<Alar>()!.InsertModification(newDtx);
+        }
+
+        // filename: parent.aar[-child.aar]-name.dtx-sp_NN.png
+        private static string ParentOf(Node file) => file.Name.Split('-')[0];
+
+        // Null when the .dtx has no child.aar.
+        private static string? ChildOf(Node file)
+        {
+            string[] segments = file.Name.Split('-');
+            return segments.Length == 4 ? segments[1] : null;
+        }
+
+        private static string DtxOf(Node file) => file.Name.Split('-')[^2];
+
+        private static string SpriteOf(Node file) => file.Name.Split('-')[^1];
+
+        private static Node FindByName(Node container, string name)
+        {
+            return Navigator.IterateNodes(container).FirstOrDefault(n => n.Name == name)
+                ?? throw new FormatException($"{name} not found in {container.Path}.");
         }
     }
 }
