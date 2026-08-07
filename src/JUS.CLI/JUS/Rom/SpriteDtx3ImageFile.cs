@@ -144,6 +144,12 @@ namespace JUS.CLI.JUS.Rom
 
             // Clone the node to avoid changing the original (AlarFile)
             using var workingDtx = new Node(dtxName, (BinaryFormat)new BinaryFormat(originalDTX.Stream!).DeepClone());
+            bool isCompressed = CompressionUtils.IsCompressed(workingDtx);
+
+            if (isCompressed) {
+                _ = workingDtx.TransformWith<LzssDecompression>();
+            }
+
             _ = workingDtx.TransformWith<BinaryToDtx3>();
 
             // Renamed and cloned (just in case) TODO: quitar?
@@ -156,8 +162,12 @@ namespace JUS.CLI.JUS.Rom
 
             BinaryFormat dtxBinary = new Dtx3ToBinary().Convert(workingDtx.GetFormatAs<NodeContainerFormat>()!);
 
-            using var newDtx = new Node(dtxName, dtxBinary);
-            childAlar.GetFormatAs<Alar>()!.InsertModification(newDtx);
+            BinaryFormat compressedDtx = isCompressed ?
+                new LzssCompression().Convert(dtxBinary) :
+                dtxBinary;
+
+            using var newDtx = new Node(dtxName, compressedDtx);
+            containerAlar.GetFormatAs<Alar>()!.InsertModification(newDtx);
         }
     }
 }
