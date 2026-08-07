@@ -21,7 +21,7 @@ namespace JUS.Tool.Texts.Formats
         /// <summary>
         /// Gets the Maximum length of the lines.
         /// </summary>
-        public static readonly int LineLength = 12;
+        public static readonly int LineLength = 10;
 
         /// <summary>
         /// Gets or sets the Name of the Deck.
