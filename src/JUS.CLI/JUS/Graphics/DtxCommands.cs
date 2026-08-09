@@ -21,6 +21,7 @@ using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
+using Texim.Colors;
 using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
@@ -28,6 +29,7 @@ using Texim.Images.Standard;
 using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Sprites;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -87,6 +89,23 @@ namespace JUS.CLI.JUS.Graphics
             BinaryFormat image = new IndexedImage2BinaryPng(originalImage).Convert(originalImage);
 
             image.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + "_tx.png"));
+
+            RgbImage rgbImage = originalImage.ConvertWith(
+                new IndexedImage2RgbImage(new IndexedImage2RgbImageParams(originalImage)));
+
+            DataStream yamlStream = dtx3.Children["yaml"]!.Stream!;
+            yamlStream.Position = 0;
+            string yaml = new TextDataReader(yamlStream).ReadToEnd();
+            List<Sprite> sprites = BinaryToDtx3.DeserializeYaml(yaml);
+
+            for (int i = 0; i < sprites.Count; i++) {
+                foreach (IImageSegment segment in sprites[i].Segments) {
+                    SegmentDrawer.DrawSegment(rgbImage, segment, SegmentDrawer.GetColor(i));
+                }
+            }
+
+            new RgbImage2BinaryPng().Convert(rgbImage).Stream
+                .WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(dtx) + "_tx_segments.png"));
 
             Console.WriteLine("Done");
         }
