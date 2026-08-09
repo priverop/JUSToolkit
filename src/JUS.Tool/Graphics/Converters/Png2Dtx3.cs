@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Texim.Games.Nitro.Sprites;
+﻿using Texim.Games.Nitro.Sprites;
+using Texim.Images;
 using Texim.Images.Standard;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -62,23 +59,37 @@ namespace JUS.Tool.Graphics.Converters
                 Segmentation = segmentation,
             };
 
-            foreach (Node pngNode in pngs.Root.Children) {
-                pngNode.Stream!.Position = 0;
+            var spriteParams = new Sprite2IndexedImageParams {
+                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
+                FullImage = originalImage,
+            };
 
-                // PNG -> RgbImage (array of colors)
-                pngNode.TransformWith<StandardBinaryImage2RgbImage>();
+            // Iterate all the sprites to compose a new bae image.
+            // If it finds the same sprites in the inserted PNGs, it will use them,
+            // if not, it will use the originals.
+            foreach (Node spriteNode in dtx3.Root.Children["sprites"]!.Children) {
+                Node? pngNode = pngs.Root.Children[$"{spriteNode.Name}.png"];
+
+                RgbImage image;
+
+                if (pngNode is not null) {
+                    pngNode.Stream!.Position = 0;
+                    // PNG -> RgbImage
+                    image = pngNode.TransformWith<StandardBinaryImage2RgbImage>().GetFormatAs<RgbImage>()!;
+                } else {
+                    // Sprite -> RgbImage
+                    // This will re-compress the original sprites and fill up the
+                    // new base image (newPixels).
+                    image = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>()!)
+                        .TransformWith(new Sprite2IndexedImage(spriteParams))
+                        .TransformWith(new IndexedImage2RgbImage(palettes))
+                        .GetFormatAs<RgbImage>()!;
+                }
 
                 // RgbImage -> Sprite
-                var converter = new RgbImage2Sprite(spriteConverterParameters);
-                pngNode.TransformWith(converter);
-                Sprite sprite = pngNode.GetFormatAs<Sprite>()!;
+                ISprite sprite = new RgbImage2Sprite(spriteConverterParameters).Convert(image);
 
-                // Check if there is a Children with the correct name:
-                string cleanSpriteName = Path.GetFileNameWithoutExtension(pngNode.Name);
-                Node spriteToReplace = dtx3.Root.Children["sprites"]!.Children[cleanSpriteName]
-                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}.");
-
-                spriteToReplace.ChangeFormat(sprite);
+                spriteNode.ChangeFormat(sprite);
             }
 
             var updatedImage = new Dig(originalImage) {

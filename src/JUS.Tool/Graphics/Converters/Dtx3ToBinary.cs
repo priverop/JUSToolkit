@@ -52,6 +52,7 @@ namespace JUS.Tool.Graphics.Converters
                 }
             }
 
+            writer.WritePadding(0, 4);
             offset = (ushort)writer.Stream.Position;
             writer.Stream.PushToPosition(0x08);
             writer.Write(offset);
