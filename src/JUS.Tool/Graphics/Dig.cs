@@ -113,8 +113,8 @@ namespace JUS.Tool.Graphics
                     size = width * height / 2;
                     nWidth = width / 2;
                     totalWidth = dig.Width / 2;
-                    yTileIndex = tileIndex / (totalWidth / 4) * 8;
-                    xTileIndex = (tileIndex % (totalWidth / 4)) * 4;
+                    (int xPixel, yTileIndex) = GetTilePosition(tileIndex, dig.Width);
+                    xTileIndex = xPixel / 2; // 2 pixels each
                     break;
                 case DigBpp.Bpp8:
                     encoding = Indexed8BppEncoding.Instance;
@@ -176,6 +176,19 @@ namespace JUS.Tool.Graphics
         /// Gets or sets the Swizzling mode.
         /// </summary>
         public DigSwizzling Swizzling { get; set; }
+
+        /// <summary>
+        /// Gets the pixel position of a tile inside an image.
+        /// </summary>
+        /// <param name="tileIndex">Tile index.</param>
+        /// <param name="imageWidth">Width (pixels) of the image.</param>
+        /// <returns>Position of the tile.</returns>
+        public static (int X, int Y) GetTilePosition(int tileIndex, int imageWidth)
+        {
+            int tilesPerRow = imageWidth / 8;
+
+            return ((tileIndex % tilesPerRow) * 8, tileIndex / tilesPerRow * 8);
+        }
 
         /// <summary>
         /// Paste a <see cref="Dig"/> subimage into this <see cref="Dig"/>.
