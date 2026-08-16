@@ -79,6 +79,7 @@ public class AlarTests
 
         Alar container = new Binary2Alar().Convert(original);
         BinaryFormat actual = new AlarToBinary().Convert(container);
+        Assert.That(actual, Is.Not.Null);
 
         byte[] originalData = new byte[(int)original.Stream.Length];
         original.Stream.Position = 0;
