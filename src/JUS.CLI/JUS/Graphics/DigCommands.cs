@@ -67,54 +67,17 @@ namespace JUS.CLI.JUS.Graphics
             Console.WriteLine(dig);
             Console.WriteLine(atm);
 
-            Dig originalDig = NodeFactory.FromFile(dig, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>()!;
+            Node originalDig = NodeFactory.FromFile(dig, FileOpenMode.Read);
+            Node originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read);
+            Node png = NodeFactory.FromFile(input, FileOpenMode.Read);
 
-            Almt originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Almt>()
-                .GetFormatAs<Almt>()!;
+            var converter = new Png2DigAtm(originalDig, originalAtm, insertTransparent);
+            NodeContainerFormat transformedFiles = converter.Convert(png);
 
-            if (originalDig is null) {
-                throw new FormatException("Invalid dig file");
-            }
-
-            if (originalAtm is null) {
-                throw new FormatException("Invalid atm file");
-            }
-
-            var compressionParams = new RgbImageMapCompressionParams {
-                Palettes = originalDig,
-            };
-
-            MapCompressedIndexedImage compressed = NodeFactory.FromFile(input, FileOpenMode.Read)
-                .TransformWith<StandardBinaryImage2RgbImage>()
-                .TransformWith(new RgbImageMapCompression(compressionParams))
-                .GetFormatAs<MapCompressedIndexedImage>()!;
-
-            var newImage = new IndexedImage {
-                Width = 8,
-                Height = compressed.Tiles.Length / 8,
-                Pixels = compressed.Tiles,
-            };
-            ITileMap map = compressed.Map;
-
-            var newDig = new Dig(originalDig, newImage);
-
-            if (insertTransparent) {
-                newDig = newDig.InsertTransparentTile(map);
-            }
-
-            using BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
-
-            binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
-
-            var newAtm = new Almt(originalAtm, map);
-            using BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
-
-            binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
+            transformedFiles.Root.Children[originalDig.Name]!.Stream!.WriteTo(
+                Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
+            transformedFiles.Root.Children[originalAtm.Name]!.Stream!.WriteTo(
+                Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 
             Console.WriteLine("Done!");
         }
