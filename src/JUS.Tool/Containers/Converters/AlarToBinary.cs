@@ -1,5 +1,6 @@
 ﻿using JUS.Tool.Utils;
 using Yarhl.FileFormat;
+using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUS.Tool.Containers.Converters;
@@ -8,14 +9,17 @@ namespace JUS.Tool.Containers.Converters;
 /// Converter between an ALAR container and binary format. It supports versions
 /// 2, and 3. It does also support re-compression (DCMP format) via file tag.
 /// </summary>
-public class AlarToBinary : IConverter<Alar, BinaryFormat>
+public class AlarToBinary : IConverter<NodeContainerFormat, BinaryFormat>
 {
     /// <inheritdoc />
-    public BinaryFormat Convert(Alar source)
+    public BinaryFormat Convert(NodeContainerFormat source)
     {
         ArgumentNullException.ThrowIfNull(source);
 
-        BinaryFormat actual = source switch {
+        AlarInfo info = source.Root.Children[Alar.InfoNodeName]?.GetFormatAs<AlarInfo>()
+            ?? throw new FormatException("Missing info node");
+
+        BinaryFormat actual = info switch {
             { Version: 2 } => new Alar2ToBinary().Convert(source),
             { Version: 3 } => new Alar3ToBinary().Convert(source),
             _ => throw new NotSupportedException("Unsupported format"),

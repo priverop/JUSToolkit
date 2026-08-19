@@ -44,7 +44,8 @@ namespace JUS.Tool.Containers.Converters
             reader = new DataReader(input.Stream);
             reader.Stream.Position = 0;
 
-            int numFiles = ReadHeader();
+            alar = new Alar();
+            (AlarInfo info, int numFiles) = ReadHeader();
 
             for (int i = 0; i < numFiles; i++) {
                 uint fileId = reader.ReadUInt32();
@@ -53,18 +54,19 @@ namespace JUS.Tool.Containers.Converters
                 uint flags = reader.ReadUInt32();
 
                 var fileStream = new DataStream(input.Stream, offset, size);
-                var alarFile = new AlarFile(fileStream) {
+                var alarFile = new AlarFileInfo {
                     FileId = fileId,
                     Flags = flags,
                 };
 
-                AppendChild(alarFile, offset);
+                info.FilesMetadata.Add(alarFile);
+                AppendChild(alarFile, new BinaryFormat(fileStream), offset);
             }
 
             return alar;
         }
 
-        private int ReadHeader()
+        private (AlarInfo, int) ReadHeader()
         {
             string stamp = reader.ReadString(4);
             if (stamp != Alar.FormatId) {
@@ -80,17 +82,18 @@ namespace JUS.Tool.Containers.Converters
             uint firstFileId = reader.ReadUInt32();
             uint lastFileId = reader.ReadUInt32();
 
-            alar = new Alar {
+            var alarInfo = new AlarInfo {
                 Version = 2,
                 Features = featureFlags,
                 FirstFileId = firstFileId,
                 LastFileId = lastFileId,
             };
+            alar.Root.Add(new Node(Alar.InfoNodeName, alarInfo));
 
-            return fileCount;
+            return (alarInfo, fileCount);
         }
 
-        private void AppendChild(AlarFile alarFile, uint dataOffset)
+        private void AppendChild(AlarFileInfo alarFile, BinaryFormat dataStream, uint dataOffset)
         {
             string filename = "file";
 
@@ -101,7 +104,9 @@ namespace JUS.Tool.Containers.Converters
                 reader.Stream.PopPosition();
             }
 
-            var child = new Node(filename, alarFile);
+            alarFile.Path = filename;
+
+            var child = new Node(filename, dataStream);
             alar.Root.Add(child);
         }
     }
