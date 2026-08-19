@@ -48,6 +48,10 @@ namespace JUS.Tests
 
         public static string SoftwareNitroRomPath => Path.Combine(RootFromOutputPath, "JUS_AJUJ01_00.nds");
 
+        public static string RootTestFailedPath =>
+            Path.Combine(Path.GetDirectoryName(SoftwareNitroRomPath)!, "failed");
+
+
         public static NitroRom ReadSoftware()
         {
             string path = SoftwareNitroRomPath;
@@ -74,5 +78,12 @@ namespace JUS.Tests
                 .Select(line => line.Trim())
                 .Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'));
         }
+
+        public static void WriteFailedData(DataStream? stream, string name)
+        {
+            string path = Path.Combine(RootTestFailedPath, name);
+            stream?.WriteTo(path);
+        }
+
     }
 }
