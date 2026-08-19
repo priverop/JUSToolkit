@@ -115,7 +115,7 @@ namespace JUS.CLI.JUS.Graphics
             // TODO: file naming???
             using Node pngs = NodeFactory.FromDirectory(input, "*.png", FileOpenMode.Read);
 
-            _ = dtx3.TransformWith(new Png2Dtx3(pngs.GetFormatAs<NodeContainerFormat>()!));
+            _ = dtx3.TransformWith(new Png2Dtx3(pngs.GetFormatAs<NodeContainerFormat>()));
 
             new Dtx3ToBinary().Convert(dtx3.GetFormatAs<NodeContainerFormat>())
                 .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));

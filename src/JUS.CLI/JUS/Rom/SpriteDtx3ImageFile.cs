@@ -99,7 +99,7 @@ namespace JUS.CLI.JUS.Rom
             Console.WriteLine($"{childName} found.");
 
             // Clone the node to avoid changing the original (AlarFile).
-            using var workingChild = new Node(childName, (BinaryFormat)new BinaryFormat(originalChild.Stream!).DeepClone());
+            using var workingChild = new Node(childName, (BinaryFormat)new BinaryFormat(originalChild.Stream).DeepClone());
             bool isCompressed = CompressionUtils.IsCompressed(workingChild);
 
             _ = workingChild.TransformWith<Binary2Alar>();
@@ -109,10 +109,10 @@ namespace JUS.CLI.JUS.Rom
                 ProcessDtx(workingChild, dtxGroup.Key, dtxGroup);
             }
 
-            BinaryFormat childBinary = new AlarToBinary().Convert(workingChild.GetFormatAs<Alar>()!);
+            BinaryFormat childBinary = new AlarToBinary().Convert(workingChild.GetFormatAs<Alar>());
 
             using var newChild = new Node(childName, childBinary);
-            parentAlar.GetFormatAs<Alar>()!.InsertModification(newChild);
+            parentAlar.GetFormatAs<Alar>().InsertModification(newChild);
         }
 
         private static void ProcessDtx(Node containerAlar, string dtxName, IEnumerable<Node> files)
@@ -122,7 +122,7 @@ namespace JUS.CLI.JUS.Rom
             Console.WriteLine($"Importing sprites into: {dtxName}.");
 
             // Clone the node to avoid changing the original (AlarFile)
-            using var workingDtx = new Node(dtxName, (BinaryFormat)new BinaryFormat(originalDTX.Stream!).DeepClone());
+            using var workingDtx = new Node(dtxName, (BinaryFormat)new BinaryFormat(originalDTX.Stream).DeepClone());
             bool isCompressed = CompressionUtils.IsCompressed(workingDtx);
 
             if (isCompressed) {
@@ -134,19 +134,19 @@ namespace JUS.CLI.JUS.Rom
             // Renamed and cloned (just in case) TODO: quitar?
             using var pngs = new NodeContainerFormat();
             foreach (Node file in files) {
-                pngs.Root.Add(new Node(SpriteOf(file), new BinaryFormat(file.Stream!)));
+                pngs.Root.Add(new Node(SpriteOf(file), new BinaryFormat(file.Stream)));
             }
 
             _ = workingDtx.TransformWith(new Png2Dtx3(pngs));
 
-            BinaryFormat dtxBinary = new Dtx3ToBinary().Convert(workingDtx.GetFormatAs<NodeContainerFormat>()!);
+            BinaryFormat dtxBinary = new Dtx3ToBinary().Convert(workingDtx.GetFormatAs<NodeContainerFormat>());
 
             BinaryFormat compressedDtx = isCompressed ?
                 new LzssCompression().Convert(dtxBinary) :
                 dtxBinary;
 
             using var newDtx = new Node(dtxName, compressedDtx);
-            containerAlar.GetFormatAs<Alar>()!.InsertModification(newDtx);
+            containerAlar.GetFormatAs<Alar>().InsertModification(newDtx);
         }
 
         // filename: parent.aar[-child.aar]-name.dtx-sp_NN.png

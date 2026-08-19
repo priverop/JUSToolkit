@@ -67,7 +67,7 @@ namespace JUS.Tool.Graphics.Converters
             var dtx4Converter = new BinaryDtx4ToSpriteImage();
             using NodeContainerFormat dtx4 = dtx4Converter.Convert(source);
 
-            IndexedPaletteImage image = dtx4.Root.Children["image"]!.GetFormatAs<IndexedPaletteImage>()!;
+            IndexedPaletteImage image = dtx4.Root.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
             // We ignore the sprite info from the DSTX and we take the one from the kshape
             KomaElement komaElement = koma.First(n => n.KomaName == dtxName)
@@ -82,8 +82,8 @@ namespace JUS.Tool.Graphics.Converters
 
             return new Node("sprite", sprite)
                 .TransformWith(new Sprite2IndexedImage(spriteParams))
-                .TransformWith(new IndexedImage2BinaryPng(image!))
-                .GetFormatAs<BinaryFormat>()!;
+                .TransformWith(new IndexedImage2BinaryPng(image))
+                .GetFormatAs<BinaryFormat>();
         }
     }
 }

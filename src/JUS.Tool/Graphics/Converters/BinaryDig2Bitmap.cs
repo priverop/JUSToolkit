@@ -70,16 +70,16 @@ namespace JUS.Tool.Graphics.Converters
                 .TransformWith<Binary2Almt>();
 
             var mapsParams = new MapDecompressionParams {
-                Map = mapsNode.GetFormatAs<Almt>()!,
-                TileSize = mapsNode.GetFormatAs<Almt>()!.TileSize,
+                Map = mapsNode.GetFormatAs<Almt>(),
+                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
             };
 
             var mapCompression = new MapDecompression(mapsParams);
-            var image2Bitmap = new IndexedImage2BinaryPng(pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>()!);
+            var image2Bitmap = new IndexedImage2BinaryPng(pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>());
             pixelsPaletteNode.TransformWith(mapCompression)
                 .TransformWith(image2Bitmap);
 
-            return new BinaryFormat(pixelsPaletteNode.Stream!);
+            return new BinaryFormat(pixelsPaletteNode.Stream);
         }
     }
 }

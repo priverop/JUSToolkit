@@ -49,7 +49,7 @@ namespace JUS.Tool.Graphics.Converters
             // Sprites + pixels + palette
             using NodeContainerFormat dtx3 = converter.Convert(source);
 
-            Dig image = dtx3.Root.Children["image"]!.GetFormatAs<Dig>()!;
+            Dig image = dtx3.Root.Children["image"].GetFormatAs<Dig>();
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 FullImage = image,
@@ -59,18 +59,18 @@ namespace JUS.Tool.Graphics.Converters
 
             switch (image.Swizzling) {
                 case DigSwizzling.Tiled:
-                    foreach (Node nodeSprite in dtx3.Root.Children["sprites"]!.Children) {
+                    foreach (Node nodeSprite in dtx3.Root.Children["sprites"].Children) {
                         // Cloning the node so we can transform it
-                        bitmaps.Root.Add(new Node(nodeSprite.Name, nodeSprite.GetFormatAs<Sprite>()!)
+                        bitmaps.Root.Add(new Node(nodeSprite.Name, nodeSprite.GetFormatAs<Sprite>())
                             .TransformWith(new Sprite2IndexedImage(spriteParams))
                             .TransformWith(new IndexedImage2BinaryPng(image)));
                     }
 
                     break;
                 case DigSwizzling.Linear:
-                    foreach (Node nodeTexture in dtx3.Root.Children["sprites"]!.Children) {
+                    foreach (Node nodeTexture in dtx3.Root.Children["sprites"].Children) {
                         // Cloning the node so we can transform it
-                        bitmaps.Root.Add(new Node(nodeTexture.Name, nodeTexture.GetFormatAs<Dig>()!)
+                        bitmaps.Root.Add(new Node(nodeTexture.Name, nodeTexture.GetFormatAs<Dig>())
                             .TransformWith(new IndexedImage2BinaryPng(image)));
                     }
 
