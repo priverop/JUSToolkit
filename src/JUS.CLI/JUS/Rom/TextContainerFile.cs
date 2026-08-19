@@ -20,7 +20,6 @@
 using System.Text.RegularExpressions;
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
-using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -73,10 +72,10 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, Node file, string containerPath, string? parent = null)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}")!;
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{containerPath}");
 
             Alar alar = containerNode.TransformWith<Binary2Alar3>()
-            .GetFormatAs<Alar>()!;
+            .GetFormatAs<Alar>();
             alar.InsertModification(file, parent!);
             BinaryFormat newBinary = alar.ConvertWith(new Alar3ToBinary());
 

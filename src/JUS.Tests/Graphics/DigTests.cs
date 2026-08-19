@@ -58,7 +58,7 @@ namespace JUS.Tests.Graphics
             using Node pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
                 .TransformWith(new BinaryDig2Bitmap(mapsNode));
 
-            pixelsPaletteNode.Stream!.Should().MatchInfo(info);
+            pixelsPaletteNode.Stream.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetFiles))]
@@ -72,7 +72,7 @@ namespace JUS.Tests.Graphics
             Dig dig = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Dig());
             BinaryFormat generatedStream = dig.ConvertWith(new Dig2Binary());
 
-            var originalStream = new DataStream(node.Stream!, 0, node.Stream.Length);
+            var originalStream = new DataStream(node.Stream, 0, node.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }

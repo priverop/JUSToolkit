@@ -60,8 +60,8 @@ namespace JUS.CLI.JUS.Rom
         public void Import(Node gameNode, Node file)
         {
             if (TextLocations.TryGetValue(file.Name, out string? value)) {
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}")!;
-                toReplace.ChangeFormat(file.Format!);
+                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}");
+                toReplace.ChangeFormat(file.Format);
                 Console.WriteLine($"File replaced: /root/data{value}");
             }
         }

@@ -93,10 +93,10 @@ namespace JUS.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            Alar alar = node.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
+            Alar alar = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
-            generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
+            generatedStream.Stream.Length.Should().Be(node.Stream.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
         }
 
@@ -108,11 +108,11 @@ namespace JUS.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            Alar alar = alarOriginal.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
-            alar.InsertModification(fileOriginal.GetFormatAs<NodeContainerFormat>()!);
+            Alar alar = alarOriginal.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
+            alar.InsertModification(fileOriginal.GetFormatAs<NodeContainerFormat>());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar3ToBinary());
 
-            generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
+            generatedStream.Stream.Length.Should().Be(alarOriginal.Stream.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();
         }
 
@@ -162,13 +162,13 @@ namespace JUS.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromFile(fileToInsert, FileOpenMode.Read);
 
-            Alar alar = alarOriginal.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar3());
+            Alar alar = alarOriginal.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar3());
             alar.InsertModification(fileOriginal, parent);
 
             // Tenemos que comprobar si se ha introducido correctamente
             // Obtenemos el fichero del alar3 y comprobamos el size
-            Node newFile = Navigator.SearchNode(alar.Root, internalPath) ?? throw new FormatException("Node not found: " + internalPath);
-            Assert.That(newFile.Stream!.Length, Is.EqualTo(fileOriginal.Stream!.Length));
+            Node newFile = Navigator.SearchNode(alar.Root, internalPath);
+            Assert.That(newFile.Stream.Length, Is.EqualTo(fileOriginal.Stream.Length));
         }
 
         [Test]

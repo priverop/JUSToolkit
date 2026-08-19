@@ -137,7 +137,7 @@ namespace JUS.CLI.JUS.Rom
 
             Alar newAlar = originalAlar
                 .TransformWith(image2Alar3)
-                .GetFormatAs<Alar>()!;
+                .GetFormatAs<Alar>();
 
             BinaryFormat newBinary = newAlar.ConvertWith(new Alar3ToBinary());
 

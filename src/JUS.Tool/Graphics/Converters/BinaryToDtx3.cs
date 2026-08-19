@@ -1,7 +1,4 @@
-﻿using System;
-using JUS.Tool.Graphics;
-using JUS.Tool.Graphics.Converters;
-using Texim.Pixels;
+﻿using Texim.Pixels;
 using Texim.Sprites;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -124,7 +121,7 @@ namespace JUS.Tool.Graphics.Converters
 
         private static (int Width, int Height) GetSize(int shape)
         {
-            int[] sizes = new int[4] { 8, 16, 32, 64 };
+            int[] sizes = [8, 16, 32, 64];
 
             return shape switch {
                 0x00 => (sizes[0], sizes[0]),   // 1x1
@@ -157,7 +154,7 @@ namespace JUS.Tool.Graphics.Converters
         private Sprite ReadSprite(DataReader reader)
         {
             int spriteOffset = reader.ReadUInt16() + PointerOffset;
-            reader.Stream.PushToPosition(spriteOffset);
+            using var _ = reader.Stream.EnterWithPosition(spriteOffset);
 
             var sprite = new Sprite();
             ushort numSegments = reader.ReadUInt16();
@@ -186,7 +183,6 @@ namespace JUS.Tool.Graphics.Converters
 
             sprite.Width = 256;
             sprite.Height = 256;
-            reader.Stream.PopPosition();
 
             return sprite;
         }

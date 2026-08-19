@@ -49,7 +49,7 @@ namespace JUS.Tool.Utils
         /// </summary>
         /// <param name="source">The DataStream to compress.</param>
         /// <returns>The compressed DataStream.</returns>
-        public static DataStream Convert(DataStream source)
+        public static DataStream Convert(Stream source)
         {
             ArgumentNullException.ThrowIfNull(source);
 

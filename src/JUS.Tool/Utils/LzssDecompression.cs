@@ -48,7 +48,7 @@ namespace JUS.Tool.Utils
         /// </summary>
         /// <param name="source">The compressed DataStream with LZSS.</param>
         /// <returns>The decompressed DataStream.</returns>
-        public static DataStream Convert(DataStream source)
+        public static DataStream Convert(Stream source)
         {
             if (source == null) {
                 throw new ArgumentNullException(nameof(source));

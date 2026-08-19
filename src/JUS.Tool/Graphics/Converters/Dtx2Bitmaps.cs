@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Priverop
+﻿// Copyright (c) 2025 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
 // SOFTWARE.
 using JUS.Tool.Graphics.Converters;
 using Texim.Images;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;

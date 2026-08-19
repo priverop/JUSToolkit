@@ -38,14 +38,10 @@ namespace JUS.Tool.Utils
         /// </summary>
         /// <param name="stream">The stream we want to check.</param>
         /// <returns>The version.</returns>
-        public static byte GetAlarVersion(DataStream stream)
+        public static byte GetAlarVersion(Stream stream)
         {
-            var reader = new DataReader(stream);
-            stream.PushToPosition(4);
-            byte version = reader.ReadByte();
-            stream.PopPosition();
-
-            return version;
+            using var _ = stream.EnterWithPosition(4);
+            return stream.ReadByteExactly();
         }
     }
 }

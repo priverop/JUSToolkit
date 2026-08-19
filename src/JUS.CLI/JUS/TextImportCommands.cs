@@ -75,7 +75,7 @@ namespace JUS.CLI.JUS
                 file.TransformWith(binConverter);
 
                 string outputFile = Path.Combine(output, $"deck-{parentDirectory}-{file.Name}");
-                file.Stream!.WriteTo(outputFile);
+                file.Stream.WriteTo(outputFile);
             }
 
             Console.WriteLine("Done");
@@ -116,7 +116,7 @@ namespace JUS.CLI.JUS
 
             JQuiz jquiz = inputFiles
                 .TransformWith<JQuiz2Po>()
-                .GetFormatAs<JQuiz>()!;
+                .GetFormatAs<JQuiz>();
 
             using BinaryFormat binary = new Binary2JQuiz().Convert(jquiz);
 
@@ -140,10 +140,10 @@ namespace JUS.CLI.JUS
             Console.WriteLine("File Name: " + cleanFileName + " - Bin Converter: " + binConverterName + " - Po Converter: " + poConverterName);
 
             // Po -> Text Format
-            object textFormat = ConvertFormat.With(poConverterName, poNode.Format!);
+            object textFormat = ConvertFormat.With(poConverterName, poNode.Format);
 
             // // Text Format -> Binary
-            var binaryFormat = (BinaryFormat)ConvertFormat.With(binConverterName, textFormat)!;
+            var binaryFormat = (BinaryFormat)ConvertFormat.With(binConverterName, textFormat);
 
             string outputFile = Path.Combine(output, cleanFileName);
             binaryFormat.Stream.WriteTo(outputFile);

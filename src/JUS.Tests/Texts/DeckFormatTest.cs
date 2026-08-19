@@ -27,7 +27,7 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Deck
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2Deck = new Binary2Deck();
                     Deck expectedDeck = null!;
                     try {
@@ -58,7 +58,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // NCF -> Deck
-                    Deck actualDeck = container.Root.Children[0].GetFormatAs<Deck>()!;
+                    Deck actualDeck = container.Root.Children[0].GetFormatAs<Deck>();
 
                     // Deck -> BinaryFormat
                     BinaryFormat actualBin = null!;
@@ -69,7 +69,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Deck are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"Deck are not identical: {node.Path}");
                 }
             }
         }
