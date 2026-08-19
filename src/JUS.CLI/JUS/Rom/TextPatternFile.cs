@@ -17,37 +17,37 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System.Text.RegularExpressions;
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using static System.Net.WebRequestMethods;
 
 namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
     /// Strategy Pattern: Interface for rom importing logic.
     /// </summary>
-    public class TextContainerFile : IFileImportStrategy
+    public class TextPatternFile : IFileImportStrategy
     {
-        private static readonly Dictionary<string, string> ContainerLocations = new() {
-            { "jgalaxy-jgalaxy.bin", "/jgalaxy/jgalaxy.aar" },
-            { "jgalaxy-mission.bin", "/jgalaxy/jgalaxy.aar" },
-            { "jgalaxy-battle.bin", "/jgalaxy/jgalaxy.aar" },
-            { "jquiz.bin", "/jquiz/jquiz_pack.aar" },
-        };
+        private static readonly List<(Regex Pattern, string)> PatternList =
+        [
+            (new Regex(@"^bin-.*-.*\.bin$"), "/bin/InfoDeck.aar"), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
+        ];
 
         /// <inheritdoc/>
         public bool Matches(string filename)
         {
-            return ContainerLocations.ContainsKey(filename);
+            return PatternList.Any(x => x.Pattern.IsMatch(filename));
         }
 
         /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
-            var filesGroupedByContainer = files.GroupBy(x => ContainerLocations[x.Name]);
+            var filesGroupedByContainer = files.GroupBy(
+                x => PatternList.FirstOrDefault(p => p.Pattern.IsMatch(x.Name)).Item2
+            );
 
             foreach (var containerGroup in filesGroupedByContainer) {
                 string alarPath = containerGroup.Key;
@@ -58,28 +58,32 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}");
-            Console.WriteLine($"Inserting text files in: /root/data{alarPath}.");
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
 
-            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>();
+            Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
+            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
+
             foreach (Node fileToInsert in filesToInsert) {
-                fileToInsert.Name = GetFileName(fileToInsert.Name);
-                alar.InsertModification(fileToInsert);
+                string parent = GetParentName(fileToInsert.Name);
+                fileToInsert.Name = StringFunctions.GetOriginalName(fileToInsert.Name);
+                alar.InsertModification(fileToInsert, parent);
             }
             _ = containerNode.TransformWith(new Alar3ToBinary());
 
         }
 
         /// <summary>
-        /// Gets the file name without the container prefix. "jgalaxy-mission.bin" returns "mission.bin".
+        /// Gets the directory name of the file (parent). "bin-deck-bb.bin" will return "deck".
         /// </summary>
-        private static string GetFileName(string name)
+        /// <param name="name">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
+        /// <returns>The directory name. If the input string is null or empty, the original string is returned.</returns>
+        private static string GetParentName(string name)
         {
-            if (string.IsNullOrEmpty(name) || !name.Contains('-')) {
-                return name;
-            }
+            // Regular expression to capture the second word
+            var regex = new Regex(@"^[^-]+-([^-]+)-");
+            Match match = regex.Match(name);
 
-            return name[(name.IndexOf('-') + 1)..];
+            return match.Groups[1].Value;
         }
     }
 }

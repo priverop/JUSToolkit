@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+// Copyright (c) 2026 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +22,24 @@ using Yarhl.FileSystem;
 namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
-    /// Strategy Pattern: Interface for rom importing logic.
+    /// Imports .aar directly to the game.
     /// </summary>
-    public interface IFileImportStrategy
+    public class RawContainerFile : IFileImportStrategy
     {
-        /// <summary>
-        /// Checks if the strategy supports a filename.
-        /// </summary>
-        /// <param name="filename">The name of the file to check.</param>
-        bool Matches(string filename);
+        /// <inheritdoc/>
+        public bool Matches(string filename)
+        {
+            return Path.GetExtension(filename) == ".aar";
+        }
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="files">The list of files to import.</param>
-        void Import(Node gameNode, List<Node> files);
+        /// <inheritdoc/>
+        public void Import(Node gameNode, List<Node> files)
+        {
+            foreach (Node container in files) {
+                Node toReplace = Navigator.IterateNodes(gameNode).FirstOrDefault(x => x.Name == container.Name) ?? throw new FormatException($"Container not found {container}");
+                toReplace.ChangeFormat(container.Format!);
+                Console.WriteLine($"Container replaced: {container.Name}");
+            }
+        }
     }
 }

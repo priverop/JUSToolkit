@@ -61,8 +61,15 @@ namespace JUS.Tool.Texts.Converters
         {
             var container = new NodeContainerFormat();
             foreach (PoEntry entry in po.Entries) {
+                string sentence = Table.Instance.Encode(entry.Text);
+
+                if (sentence.Length > Deck.LineLength) {
+                    Logger.DisplayErrorMaxLength(Deck.LineLength, sentence);
+                    sentence = sentence[0..Deck.LineLength];
+                }
+
                 var deck = new Deck() {
-                    Name = Table.Instance.Encode(entry.Text),
+                    Name = sentence,
                     Header = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
                 container.Root.Add(new Node(entry.Context, deck));

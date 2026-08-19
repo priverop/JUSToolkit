@@ -116,6 +116,7 @@ namespace JUS.Tool.BatchConverters
             return originalAlar;
         }
 
+        // TODO: Igual esto podría ser un conversor nuevo? para reutilizarlo
         private void Transform(Node png, Node dig, Node atm)
         {
             // Original Dig

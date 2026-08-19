@@ -274,31 +274,11 @@ namespace JUS.Tests.Graphics
 
             // Original image
             Dig originalImage = dtx.Children["image"].GetFormatAs<Dig>();
-            var palettes = new PaletteCollection();
-            foreach (IPalette p in originalImage.Palettes) {
-                palettes.Palettes.Add(p);
-            }
 
             // Configuration for the Converters
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
                 FullImage = originalImage,
-            };
-
-            var newPixels = new List<IndexedPixel>();
-
-            var segmentation = new NitroImageSegmentation() {
-                CanvasWidth = 256,
-                CanvasHeight = 256,
-            };
-            var spriteConverterParameters = new RgbImage2SpriteParams {
-                Palettes = palettes,
-                IsImageTiled = true,
-                MinimumPixelsPerSegment = 64,
-                PixelsPerIndex = 64,
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                PixelSequences = newPixels,
-                Segmentation = segmentation,
             };
 
             var originalBitmaps = new NodeContainerFormat();
@@ -315,30 +295,9 @@ namespace JUS.Tests.Graphics
             using var cloneBitmaps = (NodeContainerFormat)originalBitmaps.DeepClone();
 
             // 2 - Import the PNGs into the DTX
-            foreach (Node pngNode in cloneBitmaps.Root.Children) {
-                pngNode.Stream.Position = 0;
-                pngNode.TransformWith<StandardBinaryImage2RgbImage>();
+            dtx.TransformWith(new Png2Dtx3(cloneBitmaps));
 
-                // RgbImage -> Sprite
-                var converter = new RgbImage2Sprite(spriteConverterParameters);
-                pngNode.TransformWith(converter);
-                Sprite sprite = pngNode.GetFormatAs<Sprite>();
-
-                // Check if there is a Children with the correct name:
-                string cleanSpriteName = Path.GetFileNameWithoutExtension(pngNode.Name);
-                Node spriteToReplace = dtx.Children["sprites"].Children[cleanSpriteName]
-                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
-
-                spriteToReplace.ChangeFormat(sprite);
-            }
-
-            var updatedImage = new Dig(originalImage) {
-                Pixels = newPixels.ToArray(),
-                Width = 8,
-                Height = newPixels.Count / 8,
-            };
-
-            dtx.Children["image"].ChangeFormat(updatedImage);
+            Dig updatedImage = dtx.Children["image"].GetFormatAs<Dig>();
 
             BinaryFormat generatedBinary = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>());
 
