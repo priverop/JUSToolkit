@@ -65,7 +65,7 @@ namespace JUS.Tool.Graphics.Converters
 
             // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
             var compressionParams = new RgbImageMapCompressionParams {
-                Palettes = dig,
+                Palettes = new Texim.Palettes.PaletteCollection(dig.Palettes.Skip(12)),
             };
 
             png.Stream!.Position = 0;
@@ -80,6 +80,12 @@ namespace JUS.Tool.Graphics.Converters
                 Pixels = compressed.Tiles,
             };
             ITileMap map = compressed.Map;
+
+            for (int i = 0; i < map.Maps.Length; i++) {
+                if (map.Maps[i].PaletteIndex == 0) {
+                    map.Maps[i] = map.Maps[i] with { PaletteIndex = 12 };
+                }
+            }
 
             // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(dig, newImage);
