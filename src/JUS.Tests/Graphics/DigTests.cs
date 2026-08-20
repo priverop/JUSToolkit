@@ -155,9 +155,9 @@ namespace JUS.Tests.Graphics
                 .TransformWith<Binary2Almt>()
                 .GetFormatAs<Almt>()!;
 
-            // The dig files have a lot of empty palettes (all colors are 0,0,0: black).
-            // In order to import PNGs, Texim looks for the black color, and finds
-            // the first palette (which is empty, and all black).
+            // The DIG files have a lot of empty palettes (all colors are 0,0,0: black).
+            // In order to import PNGs with black pixels, Texim looks for that black color, and finds
+            // the first palette (which is empty, all black).
             // We fixed this, so we shouldn't have empty palettes linked in the map.
 
             // First we find the palettes the map is using:
