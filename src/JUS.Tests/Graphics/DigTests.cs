@@ -22,6 +22,7 @@ using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
+using JUS.Tool.Utils;
 using NUnit.Framework;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileFormat;
@@ -43,7 +44,7 @@ namespace JUS.Tests.Graphics
             }
 
             Node topmenuAlar = Navigator.SearchNode(Root.Value.Data, "topmenu/topmenu.aar") ?? throw new ArgumentException("topmenu.aar not found");
-            TopMenuAlar = topmenuAlar.TransformWith<Binary2Alar>().GetFormatAs<Alar>()!;
+            TopMenuAlar = topmenuAlar.GetFormatAs<Alar>() ?? topmenuAlar.TransformWith<Binary2Alar>().GetFormatAs<Alar>()!;
 
             return Navigator.IterateNodes(TopMenuAlar.Root, NavigationMode.DepthFirst)
                 .Where(n => n.Name == "top_bg01.dig")
@@ -80,7 +81,11 @@ namespace JUS.Tests.Graphics
             var originalPngClone = (BinaryFormat)new BinaryFormat(originalPng.Stream!).DeepClone();
 
             // Import png
-            var converter = new Png2DigAtm(dig, atm, true);
+            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
+            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            using var digImport = new Node(dig.Name, digImportBinary);
+            using var atmImport = new Node(atm.Name, atmImportBinary);
+            var converter = new Png2DigAtm(digImport, atmImport, true);
             NodeContainerFormat transformedFiles = converter.Convert(new Node("png", originalPng));
 
             // Export new Dig + ATM
@@ -100,8 +105,70 @@ namespace JUS.Tests.Graphics
 
             finalPng.Stream.Length.Should().Be(originalPngClone.Stream.Length);
             finalPng.Stream.Compare(originalPngClone.Stream).Should().BeTrue();
+        }
 
-            // Palette check?
+        [TestCaseSource(nameof(GetDigPaths))]
+        public void ImportEmptyPalettes(string digPath)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
+
+            Node originalDig = Navigator.SearchNode(TopMenuAlar!.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
+            Assert.That(originalDig, Is.Not.Null);
+
+            string atmPath = Path.ChangeExtension(digPath, ".atm");
+
+            Node originalAtm = Navigator.SearchNode(TopMenuAlar!.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
+            Assert.That(originalAtm, Is.Not.Null);
+
+            AssertImportEmptyPalettes(originalDig, originalAtm);
+        }
+
+        private static void AssertImportEmptyPalettes(Node dig, Node atm)
+        {
+            // Clone original nodes
+            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
+            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            using var digClone = new Node(dig.Name, digCloneBinary);
+            using var atmClone = new Node(atm.Name, atmCloneBinary);
+
+            // Export Dig + ATM into a PNG
+            var binaryDig2Bitmap = new BinaryDig2Bitmap(atmClone);
+            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>()!);
+
+            // Import PNG
+            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
+            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            using var digImport = new Node(dig.Name, digImportBinary);
+            using var atmImport = new Node(atm.Name, atmImportBinary);
+            var converter = new Png2DigAtm(digImport, atmImport, true);
+            NodeContainerFormat transformedFiles = converter.Convert(new Node("png", originalPng));
+
+            Node newDigNode = transformedFiles.Root.Children[dig.Name]!;
+            Node newAtmNode = transformedFiles.Root.Children[atm.Name]!;
+
+            Dig newDig = newDigNode
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Dig>()
+                .GetFormatAs<Dig>()!;
+            Almt newAtm = newAtmNode
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Almt>()
+                .GetFormatAs<Almt>()!;
+
+            // The dig files have a lot of empty palettes (all colors are 0,0,0: black).
+            // In order to import PNGs, Texim looks for the black color, and finds
+            // the first palette (which is empty, and all black).
+            // We fixed this, so we shouldn't have empty palettes linked in the map.
+
+            // First we find the palettes the map is using:
+            IEnumerable<byte> usedPalettes = newAtm.Maps.Select(m => m.PaletteIndex).Distinct();
+            // Let's now iterate these palettes, and check for empty-palettes (all black):
+            IEnumerable<byte> blackPalettes = usedPalettes.Where(index =>
+                newDig.Palettes[index].Colors.All(color => color.Red == 0 && color.Green == 0 && color.Blue == 0
+                )
+            );
+
+            blackPalettes.Should().BeEmpty();
         }
 
         public static IEnumerable<TestCaseData> GetFiles()
