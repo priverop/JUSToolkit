@@ -15,7 +15,7 @@ struct Segment {
 
 struct SpriteData3 {
     u16 offset;
-    u16 segmentsCount @ offset + 0xA; 
+    u16 segmentsCount @ offset + 0xA;
     Segment segments[segmentsCount] @ offset + 0xC;
 };
 
@@ -25,10 +25,15 @@ struct SpriteData4 {
     u16 tileIndex;
 };
 
+bitfield DtxFeatures {
+    bool type: 7;
+    bool separateDsig: 1;
+};
+
 struct DTX {
     u32 magic;
-    u8 version; 
-    u8 dtx_type;
+    u8 version;
+    DtxFeatures features;
     u16 number_elements;
     type::Hex<u16> dsig_offset;
     if (dtx_type == 03) {
@@ -40,4 +45,4 @@ struct DTX {
     }
 };
 
-DTX dtx_file @ 0x00;
+DTX dtx @ 0x00;

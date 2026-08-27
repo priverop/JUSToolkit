@@ -1,45 +1,28 @@
-# DTX Sprites
+# DSTX textures
 
-DTX files contains sprites used in animations and UI layers.
+The _DSTX_ binary format (_nintendo DS TeXture_) stores a texture image. It
+supports different pixel encodings and they are used in animations and UI layers.
 
-## Sprite Types
+- [ImHex pattern](./resources/dtx.hexpat)
 
-We have some types:
+## Formats
 
-- Type 01: Unknown format.
-- Type 02: Unknown format.
-- Type 03: Sprites or Textures. Most of the images are in this format. Images for menus, overlays...
-- Type 04: Komas. The characters of your deck.
-- Type 05: Unknown format.
-- Type 06: Unknown format.
-- Type 83: The DSIG is separated in a single file.
+The game uses the following format variants:
 
-## Tools and Specifications
-
-Use the [ImHex pattern file](./resources/dtx.hexpat) to automatically parse and visualize DTX files in the [ImHex](https://imhex.werwolv.net/) hex editor. I fully recommend using this to explore the format.
-
-In Ubuntu, copy it to `/usr/share/imhex/pattern` for automatic file recognition.
-
-### Tinke Workflow
-
-You can use my [Tinke branch](https://github.com/priverop/tinke/tree/feat/jus_dtx) to automatically watch DTX files. If you don't have it, follow these instructions:
-
-1. Open the DTX file and decompress/unpack if necessary (pressing "D").
-2. View as Palette: DSIG offset + 0xC (16). This can vary, look for the "E0" byte.
-3. View as Tile: Pixels Offset => After the palette and the padding zeros.
-4. Settings: Image Pattern is Horizontal (Tiled) or Lineal depending on the DTX. BPP is always 4bpp.
-
-Example: `Commu/commu_pack.aar -> leader00.dtx`
-
-- Palette offset: 0x264
-- Tile offset: 0x304
+- Version 1:
+  - Type 0, 1, 2: unsupported in this game.
+  - Type 3: Sprites or Textures.
+  - Type 83: The DSIG is in another file.
+  - Type 4, 5, or 6: Komas.
+- Version 2:
+  - Type 3 or 83
 
 ### DTX 03
 
 | Offset | Type                        | Description        |
-| ------ | --------------------------- | ------------------ |
+| ------ | --------------------------- |--------------------|
 | 0x00   | char[4]                     | DSTX               |
-| 0x04   | byte                        | Unknown            |
+| 0x04   | byte                        | Version            |
 | 0x05   | byte                        | Type, must be 0x03 |
 | 0x06   | short                       | Number of elements |
 | 0x08   | short                       | DSIG offset        |
@@ -130,7 +113,10 @@ The sprite data is 4 bytes:
 2. byte: Height in tiles (48 pixels)
 3. short: Tile index (starting offset of the image). Only if it's 0, use 1. Tile 0 is transparent tile.
 
-However, this format uses the Sprite info from the KSHape file, we don't know why they store the sprite info in the .dtx file.
+> [!NOTE]    
+> The sprite IDs from `KShape` do not correspond to the order defined in the
+> DSTX. `KShape` points to blocks of 48x48 in the order defined in the image
+> DSIG, which may be different as the sprites defined here.
 
 ## Shape Property
 

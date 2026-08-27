@@ -7,7 +7,7 @@ information about the specification in each sub-page.
 > **AL**  
 > There are several formats and debug text in the game with the prefix `AL`.
 > This could have been the internal code name of the game, or the game engine
-> name.
+> name (e.g., A Library).
 
 ## Containers
 
@@ -63,7 +63,7 @@ The main formats for images are:
 
 - [`DSTX`](./dtx.md): textures
 - `ALMT`: tile map.
-- `DSIG`: indexed image.
+- [`DSIG`](./dsig.md): indexed image.
 - `ALTM`: tile map.
 - `ALOD`: unknown.
 - `NCCL`: palette.
@@ -114,3 +114,17 @@ These files have different data structures to support different game features.
 - `stage/stage.aar/stage/SuddenDeath.bin`.
 - `title/title.aar/title/*.bin`.
 - `topmenu/topmenu.aar/topmenu/*.bin`.
+
+## Tools and specifications
+
+Use the [ImHex pattern files](./resources/) to automatically parse and visualize
+the files in the [ImHex](https://imhex.werwolv.net/) hex editor. I fully recommend using this to
+explore the formats.
+
+In Ubuntu, copy them to `/usr/share/imhex/pattern` for automatic file
+recognition.
+
+### Tinke
+
+The following fork of [Tinke](https://github.com/priverop/tinke/tree/feat/jus_dtx)
+has improved support for the game.
