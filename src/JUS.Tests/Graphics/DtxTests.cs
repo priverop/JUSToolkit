@@ -23,11 +23,9 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using NUnit.Framework;
-using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
 using Texim.Images.Standard;
-using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Sprites;
 using Yarhl.FileSystem;
@@ -176,8 +174,10 @@ namespace JUS.Tests.Graphics
 
             // Sprites + pixels + palette
             using Node dtx4 = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
-            .TransformWith<LzssDecompression>();
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx4.Stream!).DeepClone();
+                .TransformWith<LzssDecompression>();
+
+            // Soft-clone to keep our original stream alive (needed later)
+            using var originalDtx = new DataStream(dtx4.Stream!);
 
             dtx4.TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
@@ -191,9 +191,9 @@ namespace JUS.Tests.Graphics
                 .TransformWith<Binary2Koma>()
                 .GetFormatAs<Koma>()!;
 
-            KomaElement komaElement = komaFormat!.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
 
-            Sprite sprite = shapes!.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
@@ -235,11 +235,10 @@ namespace JUS.Tests.Graphics
                 .Stream;
 
             // Compare
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
-            generatedStream.Length.Should().Be(originalStream.Length);
-            originalStream.WriteTo("original.dtx");
+            generatedStream.Length.Should().Be(originalDtx.Length);
+            originalDtx.WriteTo("original.dtx");
             generatedStream.WriteTo("generated.dtx");
-            generatedStream.Compare(originalStream).Should().BeTrue();
+            generatedStream.Compare(originalDtx).Should().BeTrue();
         }
 
         [TestCaseSource(nameof(GetDtx3Files))]
@@ -267,7 +266,8 @@ namespace JUS.Tests.Graphics
             // 1 - Dtx -> Pngs
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>();
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream!).DeepClone();
+
+            var originalDtx = new DataStream(dtx.Stream!);
 
             dtx.TransformWith(new BinaryToDtx3());
 
@@ -300,8 +300,7 @@ namespace JUS.Tests.Graphics
 
             BinaryFormat generatedBinary = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>()!);
 
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
-            originalStream.Length.Should().BeGreaterThan(generatedBinary.Stream.Length);
+            originalDtx.Length.Should().BeGreaterThan(generatedBinary.Stream.Length);
 
             NodeContainerFormat newDtx = new BinaryToDtx3().Convert(generatedBinary);
 
@@ -348,7 +347,7 @@ namespace JUS.Tests.Graphics
             TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
 
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read);
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream!).DeepClone();
+            var originalDtx = new DataStream(dtx.Stream!);
 
             dtx.TransformWith(new BinaryToDtx3());
 
@@ -362,9 +361,8 @@ namespace JUS.Tests.Graphics
 
             BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>()!);
 
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
-            generatedStream.Stream.Length.Should().Be(originalStream.Length);
-            generatedStream.Stream.Compare(originalStream).Should().BeTrue();
+            generatedStream.Stream.Length.Should().Be(originalDtx.Length);
+            generatedStream.Stream.Compare(originalDtx).Should().BeTrue();
         }
 
         [TestCaseSource(nameof(GetDtx3TxFiles))]
@@ -374,7 +372,7 @@ namespace JUS.Tests.Graphics
             TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
 
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read);
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream!).DeepClone();
+            var originalDtx = new DataStream(dtx.Stream!);
 
             dtx.TransformWith(new BinaryToDtx3());
 
@@ -382,7 +380,7 @@ namespace JUS.Tests.Graphics
 
             BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>()!);
 
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            var originalStream = new DataStream(originalDtx, 0, originalDtx.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }

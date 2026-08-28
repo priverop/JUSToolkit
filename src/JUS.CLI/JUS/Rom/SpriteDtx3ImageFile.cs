@@ -23,7 +23,6 @@ using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -93,57 +92,41 @@ namespace JUS.CLI.JUS.Rom
         // Process child.aar (Alar2, usually compressed)
         private static void ProcessChildContainer(Node parentAlar, string childName, IEnumerable<Node> files)
         {
-            Node originalChild = FindByName(parentAlar, childName);
-
+            Node container = FindByName(parentAlar, childName);
             Console.WriteLine($"{childName} found.");
 
-            // Clone the node to avoid changing the original (AlarFile).
-            using var workingChild = new Node(childName, (BinaryFormat)new BinaryFormat(originalChild.Stream!).DeepClone());
-            bool isCompressed = CompressionUtils.IsCompressed(workingChild);
-
-            _ = workingChild.TransformWith<Binary2Alar>();
-            workingChild.Tags[Alar.CompressionTag] = isCompressed;
-
+            container.TransformWith<Binary2Alar>();
             foreach (var dtxGroup in files.GroupBy(DtxOf)) {
-                ProcessDtx(workingChild, dtxGroup.Key, dtxGroup);
+                ProcessDtx(container, dtxGroup.Key, dtxGroup);
             }
 
-            BinaryFormat childBinary = new AlarToBinary().Convert(workingChild.GetFormatAs<Alar>()!);
-            parentAlar.Children[childName]!.ChangeFormat(childBinary);
+            container.TransformWith<AlarToBinary>();
         }
 
         private static void ProcessDtx(Node containerAlar, string dtxName, IEnumerable<Node> files)
         {
-            Node originalDTX = FindByName(containerAlar, dtxName);
+            Node dtxNode = FindByName(containerAlar, dtxName);
 
             Console.WriteLine($"Importing sprites into: {dtxName}.");
 
-            // Clone the node to avoid changing the original (AlarFile)
-            using var workingDtx = new Node(dtxName, (BinaryFormat)new BinaryFormat(originalDTX.Stream!).DeepClone());
-            bool isCompressed = CompressionUtils.IsCompressed(workingDtx);
-
+            bool isCompressed = CompressionUtils.IsCompressed(dtxNode);
             if (isCompressed) {
-                _ = workingDtx.TransformWith<LzssDecompression>();
+                _ = dtxNode.TransformWith<LzssDecompression>();
             }
 
-            _ = workingDtx.TransformWith<BinaryToDtx3>();
+            _ = dtxNode.TransformWith<BinaryToDtx3>();
 
-            // Renamed and cloned (just in case) TODO: quitar?
+            // Rename to match game names
             using var pngs = new NodeContainerFormat();
             foreach (Node file in files) {
-                pngs.Root.Add(new Node(SpriteOf(file), new BinaryFormat(file.Stream!)));
+                file.Name = SpriteOf(file);
             }
 
-            _ = workingDtx.TransformWith(new Png2Dtx3(pngs));
-
-            BinaryFormat dtxBinary = new Dtx3ToBinary().Convert(workingDtx.GetFormatAs<NodeContainerFormat>()!);
-
-            BinaryFormat compressedDtx = isCompressed ?
-                new LzssCompression().Convert(dtxBinary) :
-                dtxBinary;
-
-            using var newDtx = new Node(dtxName, compressedDtx);
-            containerAlar.Children[dtxName]!.ChangeFormat(compressedDtx);
+            _ = dtxNode.TransformWith(new Png2Dtx3(pngs))
+                .TransformWith<Dtx3ToBinary>();
+            if (isCompressed) {
+                _ = dtxNode.TransformWith<LzssCompression>();
+            }
         }
 
         // filename: parent.aar[-child.aar]-name.dtx-sp_NN.png

@@ -25,6 +25,7 @@ using JUS.Tool.Graphics.Converters;
 using NUnit.Framework;
 using Texim.Images;
 using Texim.Images.Standard;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -57,15 +58,14 @@ namespace JUS.Tests.Batch
 
             using Node originalAlar = NodeFactory.FromFile(alarPath, FileOpenMode.Read)
                 .TransformWith<Binary2Alar3>();
-            using Node inputPNG = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
-            // Decode original PNG to pixels (deep clone so inputPNG stream stays alive for Png2Alar3)
-            using var originalPngCopy = new Node("original", (BinaryFormat)new BinaryFormat(inputPNG.Stream!).DeepClone());
-            originalPngCopy.TransformWith<StandardBinaryImage2RgbImage>();
-            IRgbImage originalPixels = originalPngCopy.GetFormatAs<IRgbImage>()!;
+            // Decode original PNG to pixels for comparing later
+            RgbImage originalPixels = new BinaryFormat(pngPath, FileOpenMode.Read)
+                .ConvertWith(new StandardBinaryImage2RgbImage(), disposeInput: true);
 
             string originalName = Path.GetFileNameWithoutExtension(pngPath);
 
+            using Node inputPNG = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
             var png2Alar3 = new Png2Alar3(inputPNG, originalName + ".dig", originalName + ".atm", true);
 
             Alar newAlar = originalAlar

@@ -1,6 +1,4 @@
-﻿using System;
-using JUS.Tool.Graphics.Converters;
-using Texim.Sprites;
+﻿using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -16,7 +14,7 @@ namespace JUS.Tool.Graphics.Converters
         /// Initializes a new instance of the <see cref="Dtx3TxToBinary"/> class.
         /// </summary>
         /// <param name="originalDtx">Original DTX to copy all the info from.</param>
-        public Dtx3TxToBinary(BinaryFormat originalDtx)
+        public Dtx3TxToBinary(Stream originalDtx)
         {
             OriginalDTX = originalDtx;
         }
@@ -26,13 +24,13 @@ namespace JUS.Tool.Graphics.Converters
         /// </summary>
         /// <param name="originalDtx">Original DTX to copy all the info from.</param>
         /// <param name="segmentsMetadata">Metadata of the Segments so we can modify them.</param>
-        public Dtx3TxToBinary(BinaryFormat originalDtx, List<Sprite> segmentsMetadata)
+        public Dtx3TxToBinary(Stream originalDtx, List<Sprite> segmentsMetadata)
         {
             OriginalDTX = originalDtx;
             SegmentsMetadata = segmentsMetadata;
         }
 
-        private BinaryFormat OriginalDTX { get; set; }
+        private Stream OriginalDTX { get; set; }
 
         private List<Sprite> SegmentsMetadata { get; set; } = [];
 
@@ -45,7 +43,7 @@ namespace JUS.Tool.Graphics.Converters
         {
             var newBin = new BinaryFormat();
             var writer = new DataWriter(newBin.Stream);
-            var reader = new DataReader(OriginalDTX.Stream);
+            var reader = new DataReader(OriginalDTX);
 
             if (SegmentsMetadata.Count == 0) {
                 // Obtenemos el DSIG offset

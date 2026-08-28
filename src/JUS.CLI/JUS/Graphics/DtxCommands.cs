@@ -21,7 +21,6 @@ using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
 using Texim.Images.Standard;
@@ -127,29 +126,27 @@ namespace JUS.CLI.JUS.Graphics
         /// Import multiple PNGs into a sprite .dtx file.
         /// </summary>
         /// <param name="input">The input folder containing PNGs.</param>
-        /// <param name="dtx">The original .dtx file.</param>
+        /// <param name="dtxPath">The original .dtx file.</param>
         /// <param name="yaml">Segments metadata of the sprites.</param>
         /// <param name="output">The output folder.</param>
-        public static void ImportDtx3Tx(string input, string dtx, string yaml, string output)
+        public static void ImportDtx3Tx(string input, string dtxPath, string yaml, string output)
         {
             Console.WriteLine("Importing DTX3 Texture");
-            Console.WriteLine("DTX: " + dtx);
+            Console.WriteLine("DTX: " + dtxPath);
             Console.WriteLine("Input files from: " + input);
 
-            PathValidator.ValidateFile(dtx);
+            PathValidator.ValidateFile(dtxPath);
             PathValidator.ValidateFile(input);
 
             // Sprites + pixels + palette
-            using Node dtx3 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+            using Node dtxNode = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>();
 
-            // Clone DTX:
-            // Clone the nodes
-            var dtxClone = (BinaryFormat)new BinaryFormat(dtx3.Stream!).DeepClone();
+            // Keep the original binary as we need it to write it back (for now).
+            IBinary originalDtx = dtxNode.GetFormatAs<IBinary>()!;
 
-            dtx3.TransformWith<BinaryToDtx3>();
-
-            Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
+            using NodeContainerFormat dtx3 = new BinaryToDtx3().Convert(originalDtx);
+            Dig originalImage = dtx3.Root.Children["image"]!.GetFormatAs<Dig>()!;
 
             var palettes = new PaletteCollection();
             foreach (IPalette p in originalImage.Palettes) {
@@ -169,20 +166,20 @@ namespace JUS.CLI.JUS.Graphics
                 Pixels = newImage.Pixels.ToArray(),
             };
 
-            dtx3.Children["image"]!.ChangeFormat(updatedImage);
+            dtx3.Root.Children["image"]!.ChangeFormat(updatedImage);
 
             Dtx3TxToBinary converter;
 
             if (!string.IsNullOrEmpty(yaml)) {
                 PathValidator.ValidateFile(yaml);
 
-                converter = new Dtx3TxToBinary(dtxClone, BinaryToDtx3.DeserializeYaml(File.ReadAllText(yaml)));
+                converter = new Dtx3TxToBinary(originalDtx.Stream, BinaryToDtx3.DeserializeYaml(File.ReadAllText(yaml)));
             } else {
-                converter = new Dtx3TxToBinary(dtxClone);
+                converter = new Dtx3TxToBinary(originalDtx.Stream);
             }
 
-            converter.Convert(dtx3.GetFormatAs<NodeContainerFormat>()!)
-                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtx)));
+            converter.Convert(dtx3)
+                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dtxPath)));
 
             Console.WriteLine("Done!");
         }
