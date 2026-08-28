@@ -22,7 +22,6 @@ using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using YamlDotNet.RepresentationModel;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -110,9 +109,7 @@ namespace JUS.CLI.JUS.Rom
             }
 
             BinaryFormat childBinary = new AlarToBinary().Convert(workingChild.GetFormatAs<Alar>()!);
-
-            using var newChild = new Node(childName, childBinary);
-            parentAlar.GetFormatAs<Alar>()!.InsertModification(newChild);
+            parentAlar.Children[childName]!.ChangeFormat(childBinary);
         }
 
         private static void ProcessDtx(Node containerAlar, string dtxName, IEnumerable<Node> files)
@@ -146,7 +143,7 @@ namespace JUS.CLI.JUS.Rom
                 dtxBinary;
 
             using var newDtx = new Node(dtxName, compressedDtx);
-            containerAlar.GetFormatAs<Alar>()!.InsertModification(newDtx);
+            containerAlar.Children[dtxName]!.ChangeFormat(compressedDtx);
         }
 
         // filename: parent.aar[-child.aar]-name.dtx-sp_NN.png

@@ -17,12 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using JUS.Tool.Containers;
+
+using JUS.Tool;
 using JUS.Tool.Containers.Converters;
-using JUS.Tool.Utils;
-using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.CLI.JUS
 {
@@ -61,55 +59,27 @@ namespace JUS.CLI.JUS
         /// <summary>
         /// Import files into an Alar container.
         /// </summary>
-        /// <param name="container">The path to the original alar file.</param>
-        /// <param name="input">The path to the directory of the files we want to add.</param>
+        /// <param name="containerPath">The path to the original alar file.</param>
+        /// <param name="inputPath">The path to the directory of the files we want to add.</param>
         /// <param name="output">The output directory.</param>
-        public static void Import(string container, string input, string output)
+        public static void Import(string containerPath, string inputPath, string output)
         {
             Console.WriteLine("Importing Alar");
-            Console.WriteLine("Container: " + container);
-            Console.WriteLine("Input files from: " + input);
+            Console.WriteLine("Container: " + containerPath);
+            Console.WriteLine("Input files from: " + inputPath);
 
-            PathValidator.ValidateFile(container);
-            PathValidator.ValidateDirectory(input);
+            PathValidator.ValidateFile(containerPath);
+            PathValidator.ValidateDirectory(inputPath);
 
-            using Node originalAlar = NodeFactory.FromFile(container) ?? throw new FormatException("Invalid container file");
+            using Node container = NodeFactory.FromFile(containerPath)
+                .TransformWith(new Binary2Alar());
 
-            bool originalIsCompressed = CompressionUtils.IsCompressed(originalAlar);
+            using Node inputRoot = NodeFactory.FromDirectory(inputPath);
+            container.ReplaceBinaryChildren(inputRoot);
 
-            if (originalIsCompressed) {
-                _ = originalAlar.TransformWith<LzssDecompression>();
-            }
-
-            byte alarVersion = Identifier.GetAlarVersion(originalAlar.Stream!);
-
-            using var filesToInsert = new NodeContainerFormat();
-            using Node inputDir = NodeFactory.FromDirectory(input);
-            filesToInsert.Root.Add(inputDir.Children);
-
-            BinaryFormat binary;
-            if (alarVersion == 3) {
-                Alar alar = originalAlar.TransformWith<Binary2Alar3>()
-                    .GetFormatAs<Alar>()!;
-                alar.InsertModification(filesToInsert);
-                binary = alar.ConvertWith(new Alar3ToBinary());
-            } else if (alarVersion == 2) {
-                Alar alar = originalAlar.TransformWith<Binary2Alar2>()
-                    .GetFormatAs<Alar>()!;
-                alar.InsertModification(filesToInsert);
-                binary = alar.ConvertWith(new Alar2ToBinary());
-            } else {
-                throw new FormatException($"Unsupported ALAR version: {alarVersion}");
-            }
-
-            using (binary) {
-                if (originalIsCompressed) {
-                    using BinaryFormat compressed = new LzssCompression().Convert(binary);
-                    compressed.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
-                } else {
-                    binary.Stream.WriteTo(Path.Combine(output, Path.GetFileName(container)));
-                }
-            }
+            string outputFilePath = Path.Combine(output, Path.GetFileName(containerPath));
+            container.TransformWith(new AlarToBinary())
+                .Stream!.WriteTo(outputFilePath);
 
             Console.WriteLine("Done!");
         }

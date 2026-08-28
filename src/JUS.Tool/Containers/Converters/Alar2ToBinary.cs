@@ -44,11 +44,15 @@ namespace JUS.Tool.Containers.Converters
             WriteHeader(alar, info);
 
             // Pre-fill the file info table so we can write the file data (and know the offset)
-            int fileInfoTableLength = alar.Root.Children.Count * 0x10;
+            int fileInfoTableLength = (alar.Root.Children.Count - 1) * 0x10;
             writer.WriteTimes(0x00, fileInfoTableLength);
 
             writer.Stream.Position = 0x10;
             foreach (Node child in alar.Root.Children) {
+                if (child.Name == Alar.InfoNodeName) {
+                    continue;
+                }
+
                 WriteFile(child, info);
             }
 
@@ -60,7 +64,7 @@ namespace JUS.Tool.Containers.Converters
             writer.Write(Alar.FormatId, false);
             writer.Write(info.Version);
             writer.Write((byte)info.Features);
-            writer.Write((ushort)alar.Root.Children.Count);
+            writer.Write((ushort)(alar.Root.Children.Count - 1)); // without the _info node
             writer.Write(info.FirstFileId);
             writer.Write(info.LastFileId);
         }

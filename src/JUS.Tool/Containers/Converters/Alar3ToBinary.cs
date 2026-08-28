@@ -108,7 +108,7 @@ namespace JUS.Tool.Containers.Converters
         {
             List<FileEntry> entries = [];
             foreach (Node node in Navigator.IterateNodes(root, NavigationMode.DepthFirst)) {
-                if (node.IsContainer) {
+                if (node.IsContainer || node.Name == Alar.InfoNodeName) {
                     continue;
                 }
 

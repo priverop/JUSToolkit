@@ -18,10 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Text.RegularExpressions;
-using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -52,24 +52,27 @@ namespace JUS.CLI.JUS.Rom
             foreach (var containerGroup in filesGroupedByContainer) {
                 string alarPath = containerGroup.Key;
 
-                ProcessContainer(gameNode, alarPath, containerGroup);
+                ProcessContainer(gameNode, alarPath, containerGroup.ToArray());
             }
         }
 
-        private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
+        private static void ProcessContainer(Node gameNode, string alarPath, Node[] filesToInsert)
         {
             Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
-
             Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
-            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
 
+            containerNode.TransformWith<Binary2Alar3>();
             foreach (Node fileToInsert in filesToInsert) {
                 string parent = GetParentName(fileToInsert.Name);
-                fileToInsert.Name = StringFunctions.GetOriginalName(fileToInsert.Name);
-                alar.InsertModification(fileToInsert, parent);
-            }
-            _ = containerNode.TransformWith(new Alar3ToBinary());
+                string filename = StringFunctions.GetOriginalName(fileToInsert.Name);
 
+                // Soft-clone so if we dispose the input, the stream still exists.
+                containerNode.Children[parent]!
+                    .Children[filename]!
+                    .ChangeFormat(new BinaryFormat(new DataStream(fileToInsert.Stream!)));
+            }
+
+            _ = containerNode.TransformWith(new Alar3ToBinary());
         }
 
         /// <summary>

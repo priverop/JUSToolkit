@@ -26,7 +26,6 @@ using Texim.Images.Standard;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using Yarhl.IO;
 
 namespace JUS.Tool.BatchConverters
 {
@@ -36,8 +35,6 @@ namespace JUS.Tool.BatchConverters
     public class Png2Alar3 :
         IConverter<Alar, Alar>
     {
-        private NodeContainerFormat transformedFiles = null!; // Dig + Atm to insert in the Alar3
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Png2Alar3"/> class.
         /// </summary>
@@ -98,20 +95,12 @@ namespace JUS.Tool.BatchConverters
                 throw new FormatException("Invalid png file");
             }
 
-            transformedFiles = new NodeContainerFormat();
-
             // Obtaining the original Dig and Almt
             Node dig = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
             Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmName) ?? throw new FormatException("Atm doesn't exist: " + AtmName);
 
-            // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
-
             // Transform the PNG into the new Dig and Almt (we need the original dig + atm)
-            Transform(Image, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
-
-            originalAlar.InsertModification(transformedFiles);
+            Transform(Image, dig, atm);
 
             return originalAlar;
         }
@@ -121,23 +110,21 @@ namespace JUS.Tool.BatchConverters
         {
             // Original Dig
             bool digIsCompressed = CompressionUtils.IsCompressed(dig);
-            Node uncompressedDig = digIsCompressed ?
-                dig.TransformWith<LzssDecompression>() :
-                dig;
+            if (digIsCompressed) {
+                dig.TransformWith<LzssDecompression>();
+            }
 
-            Dig originalDig = uncompressedDig
-                .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
+            dig.TransformWith<Binary2Dig>();
+            Dig originalDig = dig.GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
 
             // Original Atm
             bool atmIsCompressed = CompressionUtils.IsCompressed(atm);
-            Node uncompressedAtm = atmIsCompressed ?
-                atm.TransformWith<LzssDecompression>() :
-                atm;
+            if (atmIsCompressed) {
+                atm.TransformWith<LzssDecompression>();
+            }
 
-            Almt originalAtm = uncompressedAtm
-                    .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
+            atm.TransformWith<Binary2Almt>();
+            Almt originalAtm = atm.GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
 
             // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
             var compressionParams = new RgbImageMapCompressionParams {
@@ -164,23 +151,19 @@ namespace JUS.Tool.BatchConverters
                 newDig = newDig.InsertTransparentTile(map);
             }
 
-            BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
-
-            BinaryFormat compressedDig = digIsCompressed ?
-                new LzssCompression().Convert(binaryDig) :
-                binaryDig;
-
-            transformedFiles.Root.Add(new Node(dig.Name, compressedDig));
+            dig.ChangeFormat(newDig)
+                .TransformWith<Dig2Binary>();
+            if (digIsCompressed) {
+                dig.TransformWith<LzssCompression>();
+            }
 
             // New Atm: original atm changing height, width and maps
             var newAtm = new Almt(originalAtm, map);
-            BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
-
-            BinaryFormat compressedAtm = atmIsCompressed ?
-                new LzssCompression().Convert(binaryAtm) :
-                binaryAtm;
-
-            transformedFiles.Root.Add(new Node(atm.Name, compressedAtm));
+            atm.ChangeFormat(newAtm)
+                .TransformWith<Almt2Binary>();
+            if (atmIsCompressed) {
+                atm.TransformWith<LzssCompression>();
+            }
         }
     }
 }
