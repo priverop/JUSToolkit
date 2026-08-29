@@ -129,9 +129,10 @@ The **Shape** byte encodes both segment size and flip transformations:
 See [the Koma specification](./koma.md) for more details.
 
 | Offset | Type   | Description                                             |
-| ------ | ------ | ------------------------------------------------------- |
+| ------ |--------| ------------------------------------------------------- |
 | 0x0A   | short  | Unknown                                                 |
 | 0x0C   | uint[] | Sprite data                                             |
+| ...    | byte[] | Uknown area
 | ...    | DSIG   | Image with palette (weight 8, swizzled 48x48 tile size) |
 
 The sprite data is 4 bytes:
@@ -140,6 +141,10 @@ The sprite data is 4 bytes:
 2. byte: Height in tiles (48 pixels)
 3. short: Tile index (starting offset of the image). Only if it's 0, use 1. Tile
    0 is transparent tile.
+
+The unknown area is a data pointer the game reads by calculating the offset
+after the sprite data info (12 + count * 4). Then it calculates the size by
+substracting the offset to the DSIG data.
 
 > [!NOTE]  
 > The sprite IDs from `KShape` do not correspond to the order defined in the
