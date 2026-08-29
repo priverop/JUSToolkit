@@ -11,18 +11,18 @@ pixels).
 There are two known versions of the formats, each with different variants. This
 games only handles version 2 when the flags value is `0x40`.
 
-| Offset | Type       | Description                                    |
-| ------ | ---------- | ---------------------------------------------- |
-| 0x00   | char[4]    | Format ID: `DSIG`                              |
-| 0x04   | byte       | Version: 1 or 2                                |
-| 0x05   | byte       | Flags                                          |
-| 0x06   | byte       | Number of palettes                             |
-| 0x07   | byte       | Metadata length? (v2 is 4, otherwise 0)        |
-| 0x08   | ushort     | Image width                                    |
-| 0x0A   | ushort     | Image height                                   |
-| 0x0C   | bgr555[][] | Palettes                                       |
-| ...    | uint       | (only v2) Metadata? Decompressed total length? |
-| ...    | byte[]     | Indexed pixels                                 |
+| Offset | Type       | Description                                       |
+| ------ | ---------- | ------------------------------------------------- |
+| 0x00   | char[4]    | Format ID: `DSIG`                                 |
+| 0x04   | byte       | Version: 1 or 2                                   |
+| 0x05   | byte       | Flags                                             |
+| 0x06   | byte       | Number of palettes                                |
+| 0x07   | byte       | Metadata length? (v2 is 4, otherwise 0)           |
+| 0x08   | ushort     | Image width or block info length / 4 in format 4  |
+| 0x0A   | ushort     | Image height or block data length / 4 in format 4 |
+| 0x0C   | bgr555[][] | Palettes                                          |
+| ...    | uint       | (only v2 with format 4) Metadata?                 |
+| ...    | byte[]     | Indexed pixels                                    |
 
 ### Flags
 

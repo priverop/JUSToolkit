@@ -6,11 +6,16 @@ struct DsigPalette {
     type::RGBA5551 colors[16];
 };
 
+struct DsigBlock {
+    u16 blockOffset;
+    u16 blockLength;
+
+    u8 compressedData[blockLength] @ parent.blockBasePos + (blockOffset * 4);
+};
+
 bitfield DsigFlags {
     bpp: 4; // 0: 4bpp, 1: 8bpp
-    swizzling: 2; // 0: tbd, 1: tiled, 2: lineal, 3: tbd
-    compression: 1;
-    reserved7: 1;
+    format: 4; // 0: reserved, 1: tiled, 2: lineal, 3: unk, 4: compressed, 5: unk.
 };
 
 struct Dsig {
@@ -18,16 +23,28 @@ struct Dsig {
     u8 version;
     DsigFlags flags;
     u8 paletteCount;
-    u8 unknown1; // only v2
-    u16 width;
-    u16 height;
-    DsigPalette palettes[paletteCount];
 
-    if (version != 1) {
-        u32 unknown2;
+    if (flags.format == 4) {
+        u8 metadataLength; // tbc
+        u16 blockInfoLength; // divided by 4
+        u16 blockDataLength; // divided by 4
+    } else {
+        u8 reserved;
+        u16 width;
+        u16 height;
     }
 
-    if (flags.bpp == 0) {
+    DsigPalette palettes[paletteCount];
+
+    if (flags.format == 4) {
+        if (version != 1) {
+            u32 unknown;
+        }
+
+        u32 blockBasePos = $;
+        u32 blockCount;
+        DsigBlock blocks[blockCount];
+    } else if (flags.bpp == 0) {
         u8 pixels[width * height / 2];
     } else {
         u8 pixels[width * height];

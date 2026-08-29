@@ -50,8 +50,8 @@ for each type of file. The [text specification](./texts.md) have more details.
 
 ## Fonts
 
-The fonts are in the `font` folder with `ALFT` format.
-.
+The fonts are in the `font` folder with `ALFT` format. .
+
 - `font/DSFont.aft`.
 - `font/js8font.aft`.
 - `font/jskfont_q.aft`.
@@ -117,8 +117,9 @@ These files have different data structures to support different game features.
 
 ## Tools and specifications
 
-Use the [ImHex pattern files](./resources/) to automatically parse and visualize
-the files in the [ImHex](https://imhex.werwolv.net/) hex editor. I fully recommend using this to
+Use the ImHex pattern files available in each documentation page to
+automatically parse and visualize the files in the
+[ImHex](https://imhex.werwolv.net/) hex editor. I fully recommend using this to
 explore the formats.
 
 In Ubuntu, copy them to `/usr/share/imhex/pattern` for automatic file
@@ -126,5 +127,6 @@ recognition.
 
 ### Tinke
 
-The following fork of [Tinke](https://github.com/priverop/tinke/tree/feat/jus_dtx)
-has improved support for the game.
+The following fork of
+[Tinke](https://github.com/priverop/tinke/tree/feat/jus_dtx) has improved
+support for the game.
