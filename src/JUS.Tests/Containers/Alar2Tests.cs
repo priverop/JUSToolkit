@@ -77,10 +77,10 @@ namespace JUS.Tests.Containers
 
             using Node node = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
 
-            Alar alar = node.GetFormatAs<IBinary>()!.ConvertWith(new Binary2Alar2());
+            Alar alar = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Alar2());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
-            generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
+            generatedStream.Stream.Length.Should().Be(node.Stream.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
         }
 
@@ -92,11 +92,11 @@ namespace JUS.Tests.Containers
             using Node alarOriginal = NodeFactory.FromFile(alarPath, FileOpenMode.Read);
             using Node fileOriginal = NodeFactory.FromDirectory(dirPath);
 
-            Alar alar = new Binary2Alar2().Convert(alarOriginal.GetFormatAs<IBinary>()!);
-            alar.InsertModification(fileOriginal.GetFormatAs<NodeContainerFormat>()!);
+            Alar alar = new Binary2Alar2().Convert(alarOriginal.GetFormatAs<IBinary>());
+            alar.InsertModification(fileOriginal.GetFormatAs<NodeContainerFormat>());
             BinaryFormat generatedStream = alar.ConvertWith(new Alar2ToBinary());
 
-            generatedStream.Stream.Length.Should().Be(alarOriginal.Stream!.Length);
+            generatedStream.Stream.Length.Should().Be(alarOriginal.Stream.Length);
             generatedStream.Stream.Compare(alarOriginal.Stream).Should().BeTrue();
         }
 

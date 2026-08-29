@@ -1,6 +1,6 @@
-﻿using Texim.Games.Nitro.Sprites;
+﻿using Texim.Formats.ImageSharp.Images;
+using Texim.Games.Nitro.Sprites;
 using Texim.Images;
-using Texim.Images.Standard;
 using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Sprites;
@@ -36,7 +36,7 @@ namespace JUS.Tool.Graphics.Converters
             ArgumentNullException.ThrowIfNull(dtx3);
 
             // Original image
-            Dig originalImage = dtx3.Root.Children["image"]!.GetFormatAs<Dig>()!;
+            Dig originalImage = dtx3.Root.Children["image"].GetFormatAs<Dig>();
             var palettes = new PaletteCollection();
             foreach (IPalette p in originalImage.Palettes) {
                 palettes.Palettes.Add(p);
@@ -67,23 +67,23 @@ namespace JUS.Tool.Graphics.Converters
             // Iterate all the sprites to compose a new bae image.
             // If it finds the same sprites in the inserted PNGs, it will use them,
             // if not, it will use the originals.
-            foreach (Node spriteNode in dtx3.Root.Children["sprites"]!.Children) {
-                Node? pngNode = pngs.Root.Children[$"{spriteNode.Name}.png"];
+            foreach (Node spriteNode in dtx3.Root.Children["sprites"].Children) {
+                Node? pngNode = pngs.Root.Children.GetOrDefault($"{spriteNode.Name}.png");
 
                 RgbImage image;
 
                 if (pngNode is not null) {
-                    pngNode.Stream!.Position = 0;
+                    pngNode.Stream.Position = 0;
                     // PNG -> RgbImage
-                    image = pngNode.TransformWith<StandardBinaryImage2RgbImage>().GetFormatAs<RgbImage>()!;
+                    image = pngNode.TransformWith<StandardBinaryImage2RgbImage>().GetFormatAs<RgbImage>();
                 } else {
                     // Sprite -> RgbImage
                     // This will re-compress the original sprites and fill up the
                     // new base image (newPixels).
-                    image = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>()!)
+                    image = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
                         .TransformWith(new Sprite2IndexedImage(spriteParams))
                         .TransformWith(new IndexedImage2RgbImage(palettes))
-                        .GetFormatAs<RgbImage>()!;
+                        .GetFormatAs<RgbImage>();
                 }
 
                 // RgbImage -> Sprite
@@ -98,7 +98,7 @@ namespace JUS.Tool.Graphics.Converters
                 Height = newPixels.Count / 8,
             };
 
-            dtx3.Root.Children["image"]!.ChangeFormat(updatedImage);
+            dtx3.Root.Children["image"].ChangeFormat(updatedImage);
 
             return dtx3;
         }

@@ -231,6 +231,7 @@ dotnet_diagnostic.SA1633.severity = none # No XML-format header in source files
 dotnet_diagnostic.S1133.severity = suggestion # Remove deprecated code -.-' I know, some day
 dotnet_diagnostic.S1135.severity = suggestion # It's almost inevitable to have TODO but add bug ID
 dotnet_diagnostic.S3267.severity = suggestion # Simplify loops nope for readability
+dotnet_diagnostic.S6444.severity = suggestion # Mandatory timeout for regex... It's ok
 
 # Special rules for test projects
 [src/*Tests/**]

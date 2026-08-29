@@ -49,7 +49,7 @@ namespace JUS.Tests.Assertions
             }
 
             if (info.Stream != null) {
-                Subject.Stream!.Should().MatchInfo(info.Stream);
+                Subject.Stream.Should().MatchInfo(info.Stream);
             }
 
             int expectedCount = info.Children?.Count ?? 0;
@@ -61,7 +61,7 @@ namespace JUS.Tests.Assertions
                 NodeContainerInfo expectedNode = info.Children![i];
                 using (new AssertionScope(expectedNode.Name)) {
                     Subject.Children.Should().Contain(n => n.Name == expectedNode.Name);
-                    Subject.Children[expectedNode.Name]!.Should().MatchInfo(expectedNode);
+                    Subject.Children[expectedNode.Name].Should().MatchInfo(expectedNode);
                 }
             }
 

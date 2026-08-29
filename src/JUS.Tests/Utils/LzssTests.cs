@@ -63,7 +63,7 @@ namespace JUS.Tests.Utils
             using var compressedFile = NodeFactory.FromFile(compressedPath, FileOpenMode.Read);
 
             compressedFile.TransformWith<LzssDecompression>()
-                .Stream!.Should().MatchInfo(info);
+                .Stream.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetCompressionFiles))]
@@ -77,7 +77,7 @@ namespace JUS.Tests.Utils
             using var decompressedFile = NodeFactory.FromFile(decompressedPath, FileOpenMode.Read);
 
             decompressedFile.TransformWith<LzssCompression>()
-                .Stream!.Should().MatchInfo(info);
+                .Stream.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetDecompressionFiles))]
@@ -87,14 +87,14 @@ namespace JUS.Tests.Utils
             TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
 
             using var compressedFile = NodeFactory.FromFile(compressedPath, FileOpenMode.Read);
-            var originalStream = new DataStream(compressedFile.Stream!, 0, compressedFile.Stream!.Length);
+            var originalStream = new DataStream(compressedFile.Stream, 0, compressedFile.Stream.Length);
 
             var decompressed = compressedFile.TransformWith<LzssDecompression>();
 
             var recompressed = decompressed.TransformWith<LzssCompression>();
 
-            recompressed.Stream!.Length.Should().Be(originalStream.Length);
-            recompressed.Stream!.Compare(originalStream).Should().BeTrue();
+            recompressed.Stream.Length.Should().Be(originalStream.Length);
+            recompressed.Stream.Compare(originalStream).Should().BeTrue();
         }
     }
 }

@@ -28,7 +28,7 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> JGalaxyComplex
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2JGalaxyComplex = new Binary2JGalaxyComplex();
                     JGalaxyComplex expectedJGalaxyComplex = null!;
                     try {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"JGalaxyComplex are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"JGalaxyComplex are not identical: {node.Path}");
                 }
             }
         }

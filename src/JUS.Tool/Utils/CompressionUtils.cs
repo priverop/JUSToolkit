@@ -32,14 +32,14 @@ namespace JUS.Tool.Utils
         /// </summary>
         /// <param name="node">The Node we want to check.</param>
         /// <returns>The result.</returns>
-        public static bool IsCompressed(Node node) => IsCompressed(node.Stream!);
+        public static bool IsCompressed(Node node) => IsCompressed(node.Stream);
 
         /// <summary>
         /// Returns true if the DataStream is compressed.
         /// </summary>
         /// <param name="stream">The Stream we want to check.</param>
         /// <returns>The result.</returns>
-        public static bool IsCompressed(DataStream stream)
+        public static bool IsCompressed(Stream stream)
         {
             var reader = new DataReader(stream);
             stream.Position = 0;
