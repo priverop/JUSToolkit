@@ -12,8 +12,10 @@
 #  href: dscp.md
 
 - name: 🖼️ Graphics
-- name: DTX sprites
-  href: dtx.md
+- name: Indexed images
+  href: dsig.md
+- name: Textures
+  href: dstx.md
 - name: Koma sprites
   href: koma.md
 

@@ -1,7 +1,7 @@
 # DSIG images
 
 The _DSIG_ binary format (_nintendo DS Indexed Graphic_) stores a color palette
-and encoded pixel information that points to the palette colores (indexed
+and encoded pixel information that points to the palette colors (indexed
 pixels).
 
 - [ImHex pattern](./resources/dig.hexpat).

@@ -5,44 +5,56 @@
 
 import type.base;
 
-struct Segment {
+bitfield DstxSegmentShape {
+    size: 4; // see spec for conversion
+    horizontal_flip: 1;
+    vertical_flip: 1;
+};
+
+struct DstxSpriteSegment {
     u16 tileIndex;
     s8 xPos;
     s8 yPos;
-    u8 shape;
+    DstxSegmentShape shape;
     u8 paletteIndex;
 };
 
-struct SpriteData3 {
+struct DstxSpriteData3 {
     u16 offset;
     u16 segmentsCount @ offset + 0xA;
-    Segment segments[segmentsCount] @ offset + 0xC;
+    DstxSpriteSegment segments[segmentsCount] @ offset + 0xC;
 };
 
-struct SpriteData4 {
-    u8 width;
-    u8 height;
-    u16 tileIndex;
+struct DstxSpriteData4 {
+    u8 width; // in tiles of 48 pixels
+    u8 height; // in tiles of 48 pixels
+    u16 firstTileIndex; // if 0, use 1, as tile 0 is the transparent tile.
 };
 
-bitfield DtxFeatures {
-    bool type: 7;
+bitfield DstxFeatures {
+    type: 7;
     bool separateDsig: 1;
 };
 
-struct DTX {
+struct Dstx {
     u32 magic;
     u8 version;
-    DtxFeatures features;
+    DstxFeatures features;
     u16 number_elements;
-    type::Hex<u16> dsig_offset;
-    if (dtx_type == 03) {
-        SpriteData3 spriteData[number_elements];
-    }
-    if (dtx_type == 04) {
+    u16 dsig_offset;
+
+    if (features.type == 3) {
+        DstxSpriteData3 spriteData[number_elements];
+    } else if (features.type == 4) {
         u16 unknown;
-        SpriteData4 spriteData[number_elements];
+        DstxSpriteData4 spriteData[number_elements];
+    }
+
+    if (features.separateDsig) {
+        u32 dsigFileId @ dsig_offset;
+    } else {
+        u8 dsig[] @ dsig_offset;
     }
 };
 
-DTX dtx @ 0x00;
+Dstx dtx @ 0x00;
