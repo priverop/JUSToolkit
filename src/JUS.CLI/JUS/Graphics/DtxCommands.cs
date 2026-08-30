@@ -228,9 +228,11 @@ namespace JUS.CLI.JUS.Graphics
                 var converter = new Dtx4ToBitmap(shapes, komaFormat, komaElement.KomaName);
                 using BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>()!);
 
+                string manga = komaElement.KomaName.Split('_')[0];
+
                 string outputFilePath = Path.Combine(
                     output,
-                    $"{komaElement.KShapeGroupId}",
+                    manga,
                     komaElement.KomaName + ".png");
 
                 png.Stream.WriteTo(outputFilePath);
