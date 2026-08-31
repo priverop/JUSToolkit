@@ -79,7 +79,7 @@ namespace JUS.Tests
                 .Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'));
         }
 
-        public static void WriteFailedData(DataStream? stream, string name)
+        public static void WriteFailedData(Stream? stream, string name)
         {
             string path = Path.Combine(RootTestFailedPath, name);
             stream?.WriteTo(path);

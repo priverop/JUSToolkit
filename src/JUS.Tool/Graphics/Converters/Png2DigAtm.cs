@@ -1,6 +1,6 @@
 using JUS.Tool.Utils;
+using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
-using Texim.Images.Standard;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -68,11 +68,11 @@ namespace JUS.Tool.Graphics.Converters
                 Palettes = new Texim.Palettes.PaletteCollection(dig.Palettes.Skip(12)),
             };
 
-            png.Stream!.Position = 0;
+            png.Stream.Position = 0;
             MapCompressedIndexedImage compressed = png
                 .TransformWith<StandardBinaryImage2RgbImage>()
                 .TransformWith(new RgbImageMapCompression(compressionParams))
-                .GetFormatAs<MapCompressedIndexedImage>()!;
+                .GetFormatAs<MapCompressedIndexedImage>();
 
             var newImage = new IndexedImage {
                 Width = 8,

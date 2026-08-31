@@ -87,8 +87,7 @@ namespace JUS.Tool.BatchConverters
         /// <returns><see cref="Alar"/>Alar3 with the PNG inserted.</returns>
         public Alar Convert(Alar originalAlar)
         {
-            if (Path.GetExtension(Image.Name) != ".png")
-            {
+            if (Path.GetExtension(Image.Name) != ".png") {
                 throw new FormatException("Invalid png file");
             }
 
