@@ -30,7 +30,7 @@ namespace JUS.Tests.Texts
             Node node = NodeFactory.FromFile(resPath);
 
             // BinaryFormat -> Pname
-            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
             var binary2Pname = new Binary2Pname();
             Pname expectedPname = null!;
             try {
@@ -65,7 +65,7 @@ namespace JUS.Tests.Texts
             }
 
             // Comparing Binaries
-            Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Pname is not identical: {node.Path}");
+            Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"Pname is not identical: {node.Path}");
         }
     }
 }

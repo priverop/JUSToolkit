@@ -87,7 +87,8 @@ namespace JUS.Tool.BatchConverters
         /// <returns><see cref="Alar"/>Alar3 with the PNG inserted.</returns>
         public Alar Convert(Alar originalAlar)
         {
-            if (Path.GetExtension(Image.Name) != ".png") {
+            if (Path.GetExtension(Image.Name) != ".png")
+            {
                 throw new FormatException("Invalid png file");
             }
 
@@ -96,8 +97,8 @@ namespace JUS.Tool.BatchConverters
             Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmName) ?? throw new FormatException("Atm doesn't exist: " + AtmName);
 
             // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
 
             // Transform the PNG into the new Dig and Almt (we need the original dig + atm)
             var converter = new Png2DigAtm(new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone), true);

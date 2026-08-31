@@ -37,7 +37,7 @@ namespace JUS.CLI.JUS.Rom
         {
             foreach (Node container in files) {
                 Node toReplace = Navigator.IterateNodes(gameNode).FirstOrDefault(x => x.Name == container.Name) ?? throw new FormatException($"Container not found {container}");
-                toReplace.ChangeFormat(container.Format!);
+                toReplace.ChangeFormat(container.Format);
                 Console.WriteLine($"Container replaced: {container.Name}");
             }
         }

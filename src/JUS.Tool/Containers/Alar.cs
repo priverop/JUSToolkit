@@ -64,18 +64,18 @@ namespace JUS.Tool.Containers
             bool replaced = false;
             foreach (Node nOld in Navigator.IterateNodes(Root)) {
                 if (!nOld.IsContainer) {
-                    AlarFile alarFileOld = nOld.GetFormatAs<AlarFile>()!;
+                    AlarFile alarFileOld = nOld.GetFormatAs<AlarFile>();
 
                     if (parent == null && nOld.Name == nNew.Name) {
                         Console.WriteLine("Replacing: " + nNew.Name);
-                        alarFileOld.Stream = new DataStream(nNew.Stream!);
+                        alarFileOld.Stream = new DataStream(nNew.Stream);
                         replaced = true;
                     }
 
                     // Search for the specific file in case there are more than one in different directories
                     // That's why specify the parent (directory name)
                     else if (parent != null && parent == nOld.Parent!.Name && nOld.Name == nNew.Name) {
-                        alarFileOld.Stream = new DataStream(nNew.Stream!);
+                        alarFileOld.Stream = new DataStream(nNew.Stream);
                         replaced = true;
                     }
                 }

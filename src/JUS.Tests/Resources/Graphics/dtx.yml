@@ -1,4 +1,4 @@
-name: NodeContainerRoot
+name: root
 format_type: Yarhl.FileSystem.NodeContainerFormat
 tags: null
 check_children: true

@@ -54,7 +54,7 @@ namespace JUS.Tests.Texts
 
             var act = () => jquiz.TransformWith<Binary2JQuiz>();
             act.Should().NotThrow();
-            jquiz.GetFormatAs<JQuiz>()!.Entries.Should().NotBeEmpty().And.HaveCount(3006);
+            jquiz.GetFormatAs<JQuiz>().Entries.Should().NotBeEmpty().And.HaveCount(3006);
         }
 
         [TestCaseSource(nameof(GetJQuizFiles))]
@@ -65,10 +65,10 @@ namespace JUS.Tests.Texts
 
             using Node node = NodeFactory.FromFile(jquizPath, FileOpenMode.Read);
 
-            JQuiz jquiz = new Binary2JQuiz().Convert(node.GetFormatAs<BinaryFormat>()!);
+            JQuiz jquiz = new Binary2JQuiz().Convert(node.GetFormatAs<BinaryFormat>());
             BinaryFormat generatedStream = new Binary2JQuiz().Convert(jquiz);
 
-            generatedStream.Stream.Length.Should().Be(node.Stream!.Length);
+            generatedStream.Stream.Length.Should().Be(node.Stream.Length);
             generatedStream.Stream.Compare(node.Stream).Should().BeTrue();
         }
 
@@ -81,7 +81,7 @@ namespace JUS.Tests.Texts
             using Node node = NodeFactory.FromFile(jquizPath);
 
             // BinaryFormat -> JQuiz
-            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+            BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
             var binary2JQuiz = new Binary2JQuiz();
             JQuiz expectedJQuiz = null!;
             try {
@@ -116,7 +116,7 @@ namespace JUS.Tests.Texts
             }
 
             // Comparing Binaries
-            Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"JQuiz is not identical: {node.Path}");
+            Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"JQuiz is not identical: {node.Path}");
         }
     }
 }

@@ -11,7 +11,7 @@ on:
     tags: [ "v*" ]
 
 env:
-  DOTNET_VERSIONS: 10.0.300
+  DOTNET_VERSIONS: 10.0.400
   DOTNET_INSTALL_DIR: '/tmp/dotnet/'
 
 jobs:

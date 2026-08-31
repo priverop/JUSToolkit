@@ -33,7 +33,7 @@ public class AlarTests
         return Navigator.IterateNodes(Root.Value.Data, NavigationMode.DepthFirst)
             .Where(n => !n.IsContainer && n.Name.EndsWith(".aar"))
             .SelectMany(n => {
-                NodeContainerFormat alar = new Binary2Alar().Convert(n.GetFormatAs<IBinary>()!);
+                NodeContainerFormat alar = new Binary2Alar().Convert(n.GetFormatAs<IBinary>());
                 return Navigator.IterateNodes(alar.Root, NavigationMode.DepthFirst)
                     .Where(c => !c.IsContainer && c.Name.EndsWith(".aar"))
                     .Select(c => new TestCaseData(n.Path, c.Path));

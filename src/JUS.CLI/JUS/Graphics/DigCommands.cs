@@ -20,8 +20,8 @@
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
+using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
-using Texim.Images.Standard;
 using Texim.TileMaps;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -48,7 +48,7 @@ namespace JUS.CLI.JUS.Graphics
             using Node pixelsPaletteNode = NodeFactory.FromFile(dig, FileOpenMode.Read)
                 .TransformWith(binaryDig2Bitmap);
 
-            pixelsPaletteNode.Stream!.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(mapsNode.Name) + ".png"));
+            pixelsPaletteNode.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(mapsNode.Name) + ".png"));
 
             Console.WriteLine("Done!");
         }
@@ -92,7 +92,8 @@ namespace JUS.CLI.JUS.Graphics
         /// <param name="output">The output folder.</param>
         public static void MergeDig(string[] input, bool insertTransparent, string dig, string[] atm, string output)
         {
-            if (input.Length != atm.Length) {
+            if (input.Length != atm.Length)
+            {
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
             }
 
@@ -100,23 +101,26 @@ namespace JUS.CLI.JUS.Graphics
             Dig mergedImage = NodeFactory.FromFile(dig)
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>()!;
+                .GetFormatAs<Dig>();
 
-            var compressionParams = new RgbImageMapCompressionParams {
+            var compressionParams = new RgbImageMapCompressionParams
+            {
                 Palettes = mergedImage,
             };
 
             IndexedImage? newImage = null;
 
             // 2 - Iterate the input PNGs
-            for (int i = 0; i < input.Length; i++) {
+            for (int i = 0; i < input.Length; i++)
+            {
                 // Transform the PNG into RgbImage (Pixels + Map) using the palette of the original DIG
                 MapCompressedIndexedImage compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
                     .TransformWith<StandardBinaryImage2RgbImage>()
                     .TransformWith(new RgbImageMapCompression(compressionParams))
-                    .GetFormatAs<MapCompressedIndexedImage>()!;
+                    .GetFormatAs<MapCompressedIndexedImage>();
 
-                newImage = new IndexedImage {
+                newImage = new IndexedImage
+                {
                     Width = 8,
                     Height = compressed.Tiles.Length / 8,
                     Pixels = compressed.Tiles,
@@ -126,11 +130,13 @@ namespace JUS.CLI.JUS.Graphics
                 // 3 - Clone original
                 mergedImage = new Dig(mergedImage, newImage);
 
-                if (insertTransparent && i == 0) {
+                if (insertTransparent && i == 0)
+                {
                     mergedImage = mergedImage.InsertTransparentTile(map);
                 }
 
-                compressionParams = new RgbImageMapCompressionParams {
+                compressionParams = new RgbImageMapCompressionParams
+                {
                     MergeImage = mergedImage,
                     Palettes = mergedImage,
                 };
@@ -138,7 +144,7 @@ namespace JUS.CLI.JUS.Graphics
                 // New Atm: original atm changing height, width and maps
                 Almt originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
                     .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>()!;
+                    .GetFormatAs<Almt>();
                 var newAtm = new Almt(originalAtm, map);
 
                 // Export ATM

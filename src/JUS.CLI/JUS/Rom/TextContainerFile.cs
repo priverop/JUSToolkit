@@ -19,6 +19,8 @@
 // SOFTWARE.
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
+using JUS.Tool.Utils;
+using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using static System.Net.WebRequestMethods;
 
@@ -56,10 +58,10 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}");
             Console.WriteLine($"Inserting text files in: /root/data{alarPath}.");
 
-            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>()!;
+            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>();
             foreach (Node fileToInsert in filesToInsert) {
                 fileToInsert.Name = GetFileName(fileToInsert.Name);
                 alar.InsertModification(fileToInsert);
