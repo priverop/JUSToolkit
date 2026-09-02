@@ -14,7 +14,9 @@
 - name: 🖼️ Graphics
 - name: Indexed images
   href: dsig.md
-- name: Textures
+- name: Tile maps
+  href: altm.md
+- name: Sprites and textures
   href: dstx.md
 - name: Koma sprites
   href: koma.md

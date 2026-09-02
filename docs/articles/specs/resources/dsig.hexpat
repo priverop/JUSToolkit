@@ -1,3 +1,8 @@
+#pragma author pleonex
+#pragma description Nintendo DS - Jump Ultimate Stars! indexed image
+
+#pragma magic [44 53 49 47] @ 0x00
+
 import type.color;
 
 struct DsigPalette {

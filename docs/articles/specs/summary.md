@@ -7,7 +7,8 @@ information about the specification in each sub-page.
 > **AL**  
 > There are several formats and debug text in the game with the prefix `AL`.
 > This could have been the internal code name of the game, or the game engine
-> name (e.g., A Library).
+> name (e.g., Anime Library). The game studio refers to their game engines as
+> _libraries_.
 
 ## Containers
 
@@ -62,7 +63,7 @@ The fonts are in the `font` folder with `ALFT` format. .
 The main formats for images are:
 
 - [`DSIG`](./dsig.md): indexed image.
-- `ALTM`: tile map.
+- [`ALTM`](./altm.md): tile map.
 - [`DSTX`](./dstx.md): sprites.
 - [`ALMT`](./almt.md): sprite animations.
 - [`ALOD`](./alod.md): sprite object definition.

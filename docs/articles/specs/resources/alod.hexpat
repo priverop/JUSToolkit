@@ -1,5 +1,5 @@
 #pragma author pleonex
-#pragma description Nintendo DS - Jump Ultimate Stars! animation format
+#pragma description Nintendo DS - Jump Ultimate Stars! object definition format
 
 #pragma magic [41 4C 4F 44] @ 0x00
 
