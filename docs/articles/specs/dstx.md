@@ -4,7 +4,7 @@ The _DSTX_ binary format (_nintendo DS TeXture_) stores a texture image. It
 supports different pixel encodings, and they are used in animations and UI
 layers.
 
-- [ImHex pattern](./resources/dtx.hexpat)
+- [ImHex pattern](./resources/dstx.hexpat)
 
 ## Formats
 
@@ -129,10 +129,10 @@ The **Shape** byte encodes both segment size and flip transformations:
 See [the Koma specification](./koma.md) for more details.
 
 | Offset | Type   | Description                                             |
-| ------ |--------| ------------------------------------------------------- |
+| ------ | ------ | ------------------------------------------------------- |
 | 0x0A   | short  | Unknown                                                 |
 | 0x0C   | uint[] | Sprite data                                             |
-| ...    | byte[] | Uknown area
+| ...    | byte[] | Uknown area                                             |
 | ...    | DSIG   | Image with palette (weight 8, swizzled 48x48 tile size) |
 
 The sprite data is 4 bytes:
@@ -143,7 +143,7 @@ The sprite data is 4 bytes:
    0 is transparent tile.
 
 The unknown area is a data pointer the game reads by calculating the offset
-after the sprite data info (12 + count * 4). Then it calculates the size by
+after the sprite data info (12 + count \* 4). Then it calculates the size by
 substracting the offset to the DSIG data.
 
 > [!NOTE]  

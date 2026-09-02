@@ -61,10 +61,10 @@ The fonts are in the `font` folder with `ALFT` format. .
 
 The main formats for images are:
 
-- [`DSTX`](./dstx.md): textures
-- `ALMT`: tile map.
 - [`DSIG`](./dsig.md): indexed image.
 - `ALTM`: tile map.
+- [`DSTX`](./dstx.md): sprites.
+- [`ALMT`](./almt.md): sprite animations.
 - `ALOD`: unknown.
 - `NCCL`: palette.
 
