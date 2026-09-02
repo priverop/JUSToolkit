@@ -74,7 +74,7 @@ namespace JUS.Tool.Graphics.Converters
                         writer.WriteOfType<ushort>((ushort)segment.TileIndex);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateX);
                         writer.WriteOfType<sbyte>((sbyte)segment.CoordinateY);
-                        writer.WriteOfType<byte>(GetSize(segment.Width, segment.Height));
+                        writer.WriteOfType<byte>((byte)(GetSize(segment.Width, segment.Height) + GetFlip(segment.HorizontalFlip, segment.VerticalFlip)));
                         writer.WriteOfType<sbyte>((sbyte)segment.PaletteIndex);
                     }
                 }
@@ -111,6 +111,23 @@ namespace JUS.Tool.Graphics.Converters
                 (16, 32) => 0x0A,
                 (32, 64) => 0x0B,
                 _ => throw new ArgumentOutOfRangeException(nameof(width), $"Invalid size: {width}x{height}"),
+            };
+        }
+
+        /// <summary>
+        /// Gets the flip bits of the size byte.
+        /// </summary>
+        /// <param name="hFlip">The segment is flipped horizontally.</param>
+        /// <param name="vFlip">The segment is flipped vertically.</param>
+        /// <returns>The flip bits.</returns>
+        private static byte GetFlip(bool hFlip, bool vFlip)
+        {
+            return (hFlip, vFlip) switch
+            {
+                (false, false) => 0x00,
+                (true, false) => 0x10,
+                (false, true) => 0x20,
+                (true, true) => 0x30,
             };
         }
     }
