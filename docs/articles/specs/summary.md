@@ -65,7 +65,7 @@ The main formats for images are:
 - `ALTM`: tile map.
 - [`DSTX`](./dstx.md): sprites.
 - [`ALMT`](./almt.md): sprite animations.
-- `ALOD`: unknown.
+- [`ALOD`](./alod.md): sprite object definition.
 - `NCCL`: palette.
 
 Additionally, _komas_ have their own format documented in the
