@@ -78,6 +78,14 @@ namespace JUS.Tool.Graphics.Converters
                         writer.WriteOfType<sbyte>((sbyte)segment.PaletteIndex);
                     }
                 }
+
+                // If segments are different from original, the dsigOffset will be different
+                writer.WritePadding(0, 4);
+                var dsigOffset = (ushort)writer.Stream.Position;
+                using (writer.Stream.EnterWithPosition(0x08))
+                {
+                    writer.Write(dsigOffset);
+                }
             }
 
             var imageReader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
