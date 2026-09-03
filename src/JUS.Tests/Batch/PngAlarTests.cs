@@ -23,8 +23,8 @@ using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics.Converters;
 using NUnit.Framework;
+using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
-using Texim.Images.Standard;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -70,7 +70,7 @@ namespace JUS.Tests.Batch
 
             Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar>()!;
+                .GetFormatAs<Alar>();
 
             // Extracting the png from the newAlar
             Node newDig = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");
@@ -82,7 +82,7 @@ namespace JUS.Tests.Batch
 
             // Decode result PNG to pixels
             resultPngNode.TransformWith<StandardBinaryImage2RgbImage>();
-            IRgbImage resultPixels = resultPngNode.GetFormatAs<IRgbImage>()!;
+            IRgbImage resultPixels = resultPngNode.GetFormatAs<IRgbImage>();
 
             // Compare decoded pixel data
             _ = resultPixels.Width.Should().Be(originalPixels.Width);

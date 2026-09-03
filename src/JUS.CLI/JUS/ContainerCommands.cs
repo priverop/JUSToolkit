@@ -21,6 +21,7 @@
 using JUS.Tool;
 using JUS.Tool.Containers.Converters;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.CLI.JUS
 {
@@ -49,7 +50,7 @@ namespace JUS.CLI.JUS
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
                     string outputFile = Path.Combine(output, node.Path[1..]);
-                    node.Stream!.WriteTo(outputFile);
+                    node.Stream.WriteTo(outputFile);
                 }
             }
 
@@ -79,7 +80,7 @@ namespace JUS.CLI.JUS
 
             string outputFilePath = Path.Combine(output, Path.GetFileName(containerPath));
             container.TransformWith(new AlarToBinary())
-                .Stream!.WriteTo(outputFilePath);
+                .Stream.WriteTo(outputFilePath);
 
             Console.WriteLine("Done!");
         }

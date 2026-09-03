@@ -81,22 +81,22 @@ namespace JUS.Tool.Containers.Converters
 
             writer.Write(fileInfo.FileId);
             writer.Write(fileOffset);
-            writer.Write((uint)child.Stream!.Length);
+            writer.Write((uint)child.Stream.Length);
             writer.Write(fileInfo.Flags);
 
-            writer.Stream.PushToPosition(0, SeekOrigin.End);
-            writer.WritePadding(0x00, 4);
+            using (writer.Stream.EnterWithPosition(0, SeekOrigin.End)) {
+                writer.WritePadding(0x00, 4);
 
-            if (hasFilename) {
-                ushort nameHash = AlarPathHash.ComputeV1(child.Name);
+                if (hasFilename) {
+                    ushort nameHash = AlarPathHash.ComputeV1(child.Name);
 
-                writer.Write((ushort)0x00); // padding
-                writer.Write(child.Name, 0x20);
-                writer.Write(nameHash);
+                    writer.Write((ushort)0x00); // padding
+                    writer.Write(child.Name, 0x20);
+                    writer.Write(nameHash);
+                }
+
+                child.Stream.WriteTo(writer.Stream);
             }
-
-            child.Stream.WriteTo(writer.Stream);
-            writer.Stream.PopPosition();
         }
     }
 }

@@ -24,7 +24,7 @@ using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -59,10 +59,10 @@ namespace JUS.CLI.JUS
                 : originalAlar.TransformWith<Alar2Png>();
 
             NodeContainerFormat result = originalAlar
-                .GetFormatAs<NodeContainerFormat>()!;
+                .GetFormatAs<NodeContainerFormat>();
 
             foreach (Node image in result.Root.Children) {
-                image.Stream!.WriteTo(Path.Combine(output, image.Name + ".png"));
+                image.Stream.WriteTo(Path.Combine(output, image.Name + ".png"));
             }
 
             Console.WriteLine("Done!");
@@ -95,7 +95,7 @@ namespace JUS.CLI.JUS
                                     .TransformWith<LzssDecompression>()
                                     .TransformWith<BinaryToDtx3>();
 
-                                Dig originalImage = dtx3.Children["image"]!.GetFormatAs<Dig>()!;
+                                Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
 
                                 if (originalImage.Swizzling == DigSwizzling.Linear) {
                                     BinaryFormat image = new IndexedImage2BinaryPng(originalImage).Convert(originalImage);
@@ -107,7 +107,7 @@ namespace JUS.CLI.JUS
                                     .TransformWith<Dtx2Bitmaps>();
 
                                 foreach (Node nodeSprite in dtx3.Children) {
-                                    nodeSprite.Stream!.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
+                                    nodeSprite.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-{nodeSprite.Name}.png"));
                                 }
                             }
                         } catch (Exception ex) {
@@ -147,7 +147,7 @@ namespace JUS.CLI.JUS
 
             Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar>()!;
+                .GetFormatAs<Alar>();
 
             using BinaryFormat binary = newAlar.ConvertWith(new Alar3ToBinary());
 
@@ -174,7 +174,7 @@ namespace JUS.CLI.JUS
                     if (CompressionUtils.IsCompressed(file)) {
                         file.TransformWith(new LzssDecompression());
                         string path = Path.Combine(input.Replace("/data", string.Empty), file.Path[1..]);
-                        file.Stream!.WriteTo(path);
+                        file.Stream.WriteTo(path);
                     }
                 }
             }

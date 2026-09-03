@@ -58,7 +58,7 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, string alarPath, Node[] filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}") ?? throw new FormatException($"Container not found /root/data{alarPath}");
+            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}");
             Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
 
             containerNode.TransformWith<Binary2Alar3>();
@@ -67,9 +67,9 @@ namespace JUS.CLI.JUS.Rom
                 string filename = StringFunctions.GetOriginalName(fileToInsert.Name);
 
                 // Soft-clone so if we dispose the input, the stream still exists.
-                containerNode.Children[parent]!
-                    .Children[filename]!
-                    .ChangeFormat(new BinaryFormat(new DataStream(fileToInsert.Stream!)));
+                containerNode.Children[parent]
+                    .Children[filename]
+                    .ChangeFormat(new BinaryFormat(new DataStream(fileToInsert.Stream)));
             }
 
             _ = containerNode.TransformWith(new Alar3ToBinary());

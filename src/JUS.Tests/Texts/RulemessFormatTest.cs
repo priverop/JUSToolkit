@@ -28,7 +28,7 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Rulemess
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2Rulemess = new Binary2Rulemess();
                     Rulemess expectedRulemess = null!;
                     try {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Rulemess are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"Rulemess are not identical: {node.Path}");
                 }
             }
         }

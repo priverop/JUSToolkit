@@ -99,9 +99,9 @@ namespace JUS.Tool.Containers.Converters
 
             bool hasFilename = (alarFile.Flags >> 31) == 1;
             if (hasFilename) {
-                reader.Stream.PushToPosition(dataOffset - 0x22);
-                filename = reader.ReadString();
-                reader.Stream.PopPosition();
+                using (reader.Stream.EnterWithPosition(dataOffset - 0x22)) {
+                    filename = reader.ReadString();
+                }
             }
 
             alarFile.Path = filename;

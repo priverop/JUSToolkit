@@ -28,7 +28,7 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> Bgm
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2Bgm = new Binary2Bgm();
                     Bgm expectedBgm = null!;
                     try {
@@ -63,7 +63,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"Bgm are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"Bgm are not identical: {node.Path}");
                 }
             }
         }

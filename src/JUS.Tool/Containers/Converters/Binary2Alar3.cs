@@ -48,7 +48,9 @@ namespace JUS.Tool.Containers.Converters
 
             for (int i = 0; i < numFiles; i++) {
                 ushort offset = reader.ReadUInt16();
-                source.Stream.RunInPosition(() => ReadFileInfo(source, info), offset);
+                using (source.Stream.EnterWithPosition(offset)) {
+                    ReadFileInfo(source, info);
+                }
             }
 
             return alar;

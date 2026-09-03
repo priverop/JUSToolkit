@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+﻿// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Images;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -117,10 +117,10 @@ namespace JUS.Tool.BatchConverters
                 }
 
                 // Transform the PNG into RgbImage (Pixels + Map) using the palette of the original DIG
-                pngs[i].Stream!.Position = 0;
+                pngs[i].Stream.Position = 0;
                 MapCompressedIndexedImage compressed = pngs[i].TransformWith<StandardBinaryImage2RgbImage>()
                     .TransformWith(new RgbImageMapCompression(compressionParams))
-                    .GetFormatAs<MapCompressedIndexedImage>()!;
+                    .GetFormatAs<MapCompressedIndexedImage>();
 
                 newImage = new IndexedImage {
                     Width = 8,

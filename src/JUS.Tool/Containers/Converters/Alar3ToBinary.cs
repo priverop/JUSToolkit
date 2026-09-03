@@ -75,9 +75,9 @@ namespace JUS.Tool.Containers.Converters
                 uint fileDataOffset = (uint)writer.Stream.Length.Pad(4); // padding written later, except last file
 
                 // Write file info offset
-                writer.Stream.PushToPosition(fileInfoTableOffset + (fileIdx * 2));
-                writer.Write(fileInfoOffset);
-                writer.Stream.PopPosition();
+                using (writer.Stream.EnterWithPosition(fileInfoTableOffset + (fileIdx * 2))) {
+                    writer.Write(fileInfoOffset);
+                }
 
                 // Write file info
                 ushort nameHash = useHashV1 ? AlarPathHash.ComputeV1(entry.ContainerPath) : AlarPathHash.ComputeV2(entry.ContainerPath);
@@ -90,10 +90,10 @@ namespace JUS.Tool.Containers.Converters
                 writer.WritePadding(0, 4);
 
                 // Write file data
-                writer.Stream.PushToPosition(0, SeekOrigin.End);
-                writer.WritePadding(0, 4);
-                entry.Data.WriteTo(writer.Stream);
-                writer.Stream.PopPosition();
+                using (writer.Stream.EnterWithPosition(0, SeekOrigin.End)) {
+                    writer.WritePadding(0, 4);
+                    entry.Data.WriteTo(writer.Stream);
+                }
             }
 
             return binary;
@@ -115,14 +115,14 @@ namespace JUS.Tool.Containers.Converters
                 string containerPath = GetRelativeChildPath(root.Path, node.Path);
                 AlarFileInfo fileInfo = info.FilesMetadata.FirstOrDefault(m => m.Path == containerPath)
                     ?? throw new FormatException($"Cannot find metadata for {node.Path}");
-                entries.Add(new FileEntry(node.Stream!, fileInfo, containerPath));
+                entries.Add(new FileEntry(node.Stream, fileInfo, containerPath));
             }
 
             return entries.ToArray();
         }
 
 
-        private sealed record FileEntry(DataStream Data, AlarFileInfo FileInfo, string ContainerPath)
+        private sealed record FileEntry(Stream Data, AlarFileInfo FileInfo, string ContainerPath)
         {
             /// <summary>
             /// Gets the binary encoded length of the path, assuming ASCII characters and a null-terminator.

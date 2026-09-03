@@ -22,7 +22,7 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Images;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -131,11 +131,11 @@ namespace JUS.Tool.BatchConverters
                 Palettes = originalDig,
             };
 
-            png.Stream!.Position = 0;
+            png.Stream.Position = 0;
             MapCompressedIndexedImage compressed = png
                 .TransformWith<StandardBinaryImage2RgbImage>()
                 .TransformWith(new RgbImageMapCompression(compressionParams))
-                .GetFormatAs<MapCompressedIndexedImage>()!;
+                .GetFormatAs<MapCompressedIndexedImage>();
 
             var newImage = new IndexedImage {
                 Width = 8,

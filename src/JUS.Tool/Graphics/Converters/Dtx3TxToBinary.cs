@@ -78,8 +78,8 @@ namespace JUS.Tool.Graphics.Converters
                 }
             }
 
-            var imageReader = new DataReader(dtx.Root.Children["image"]!.TransformWith<Dig2Binary>()
-                .GetFormatAs<BinaryFormat>()!.Stream);
+            var imageReader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
+                .GetFormatAs<BinaryFormat>().Stream);
             imageReader.Stream.Position = 0;
             writer.Write(imageReader.ReadBytes((int)imageReader.Stream.Length));
 
