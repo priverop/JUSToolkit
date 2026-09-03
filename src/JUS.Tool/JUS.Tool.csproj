@@ -22,6 +22,7 @@
     <PackageReference Include="Yarhl" />
     <PackageReference Include="Yarhl.Media.Text" />
     <PackageReference Include="Texim" />
+    <PackageReference Include="Texim.Formats.ImageSharp" />
     <PackageReference Include="Texim.Games" />
     <PackageReference Include="SceneGate.Ekona" />
     <PackageReference Include="YamlDotNet" />

@@ -23,8 +23,8 @@ using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics.Converters;
 using NUnit.Framework;
+using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
-using Texim.Images.Standard;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -60,9 +60,9 @@ namespace JUS.Tests.Batch
             using Node inputPNG = NodeFactory.FromFile(pngPath, FileOpenMode.Read);
 
             // Decode original PNG to pixels (deep clone so inputPNG stream stays alive for Png2Alar3)
-            using var originalPngCopy = new Node("original", (BinaryFormat)new BinaryFormat(inputPNG.Stream!).DeepClone());
+            using var originalPngCopy = new Node("original", (BinaryFormat)new BinaryFormat(inputPNG.Stream).DeepClone());
             originalPngCopy.TransformWith<StandardBinaryImage2RgbImage>();
-            IRgbImage originalPixels = originalPngCopy.GetFormatAs<IRgbImage>()!;
+            IRgbImage originalPixels = originalPngCopy.GetFormatAs<IRgbImage>();
 
             string originalName = Path.GetFileNameWithoutExtension(pngPath);
 
@@ -70,7 +70,7 @@ namespace JUS.Tests.Batch
 
             Alar newAlar = originalAlar
                 .TransformWith(png2Alar3)
-                .GetFormatAs<Alar>()!;
+                .GetFormatAs<Alar>();
 
             // Extracting the png from the newAlar
             Node newDig = Navigator.IterateNodes(newAlar.Root).First(n => n.Name == originalName + ".dig") ?? throw new FormatException("Dig doesn't exist: " + originalName + ".dig");
@@ -82,7 +82,7 @@ namespace JUS.Tests.Batch
 
             // Decode result PNG to pixels
             resultPngNode.TransformWith<StandardBinaryImage2RgbImage>();
-            IRgbImage resultPixels = resultPngNode.GetFormatAs<IRgbImage>()!;
+            IRgbImage resultPixels = resultPngNode.GetFormatAs<IRgbImage>();
 
             // Compare decoded pixel data
             _ = resultPixels.Width.Should().Be(originalPixels.Width);

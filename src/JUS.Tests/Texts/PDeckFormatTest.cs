@@ -27,7 +27,7 @@ namespace JUS.Tests.Texts
             foreach (string filePath in Directory.GetFiles(resPath, "*.bin", SearchOption.AllDirectories)) {
                 using (Node node = NodeFactory.FromFile(filePath)) {
                     // BinaryFormat -> PDeck
-                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>()!;
+                    BinaryFormat expectedBin = node.GetFormatAs<BinaryFormat>();
                     var binary2PDeck = new Binary2PDeck();
                     PDeck expectedPDeck = null!;
                     try {
@@ -58,7 +58,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // NCF -> PDeck
-                    PDeck actualDeck = container.Root.Children[0].GetFormatAs<PDeck>()!;
+                    PDeck actualDeck = container.Root.Children[0].GetFormatAs<PDeck>();
 
                     // PDeck -> BinaryFormat
                     BinaryFormat actualBin = null!;
@@ -69,7 +69,7 @@ namespace JUS.Tests.Texts
                     }
 
                     // Comparing Binaries
-                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream!), Is.True, $"PDeck are not identical: {node.Path}");
+                    Assert.That(expectedBin.Stream.Compare(actualBin.Stream), Is.True, $"PDeck are not identical: {node.Path}");
                 }
             }
         }

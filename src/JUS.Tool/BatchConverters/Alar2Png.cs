@@ -67,7 +67,7 @@ namespace JUS.Tool.BatchConverters
             foreach (Node child in Navigator.IterateNodes(alarNode.Root)) {
                 if (Path.GetExtension(child.Name) == ".dig") {
                     string cleanName = Path.GetFileNameWithoutExtension(child.Name);
-                    var childClone = new Node(cleanName, new BinaryFormat(child.Stream!));
+                    var childClone = new Node(cleanName, new BinaryFormat(child.Stream));
                     string mangaName = child.Name.Substring(0, 2);
                     string fileNumber = child.Name.Substring(2);
 
@@ -84,7 +84,7 @@ namespace JUS.Tool.BatchConverters
                             Console.WriteLine("Missing special n map file for: " + child.Name);
                         }
 
-                        var stream_n = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>()!.DeepClone();
+                        var stream_n = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
                         Node? image_n = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_n!.Name), stream_n), atm_n, cleanName + "_n_");
                         if (image_n is not null) {
                             transformedFiles.Root.Add(image_n);
@@ -99,7 +99,7 @@ namespace JUS.Tool.BatchConverters
                             Console.WriteLine("Missing special m map file for: " + child.Name);
                         }
 
-                        var stream_m = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>()!.DeepClone();
+                        var stream_m = (BinaryFormat)childClone.GetFormatAs<BinaryFormat>().DeepClone();
                         Node? image_m = GetPNG(new Node(Path.GetFileNameWithoutExtension(atm_m!.Name), stream_m), atm_m, cleanName);
                         if (image_m is not null) {
                             transformedFiles.Root.Add(image_m);

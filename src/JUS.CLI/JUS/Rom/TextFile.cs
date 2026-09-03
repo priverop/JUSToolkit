@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+﻿// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,43 +26,46 @@ namespace JUS.CLI.JUS.Rom
     /// </summary>
     public class TextFile : IFileImportStrategy
     {
-        // ToDo: Remove filename of the second string, we only need the directory
         private static readonly Dictionary<string, string> TextLocations = new() {
-            { "tutorial.bin", "/deckmake/tutorial.bin" },
-            { "tutorial0.bin", "/battle/tutorial0.bin" },
-            { "tutorial1.bin", "/battle/tutorial1.bin" },
-            { "tutorial2.bin", "/battle/tutorial2.bin" },
-            { "tutorial3.bin", "/battle/tutorial3.bin" },
-            { "tutorial4.bin", "/battle/tutorial4.bin" },
-            { "tutorial5.bin", "/battle/tutorial5.bin" },
-            { "ability_t.bin", "/bin/ability_t.bin" },
-            { "bgm.bin", "/bin/bgm.bin" },
-            { "chr_b_t.bin", "/bin/chr_b_t.bin" },
-            { "chr_s_t.bin", "/bin/chr_s_t.bin" },
-            { "clearlst.bin", "/bin/clearlst.bin" },
-            { "commwin.bin", "/bin/commwin.bin" },
-            { "demo.bin", "/bin/demo.bin" },
-            { "infoname.bin", "/bin/infoname.bin" },
-            { "komatxt.bin", "/bin/komatxt.bin" },
-            { "location.bin", "/bin/location.bin" },
-            { "piece.bin", "/bin/piece.bin" },
-            { "pname.bin", "/bin/pname.bin" },
-            { "rulemess.bin", "/bin/rulemess.bin" },
-            { "stage.bin", "/bin/stage.bin" },
-            { "title.bin", "/bin/title.bin" },
+            { "tutorial.bin", "/deckmake" },
+            { "tutorial0.bin", "/battle" },
+            { "tutorial1.bin", "/battle" },
+            { "tutorial2.bin", "/battle" },
+            { "tutorial3.bin", "/battle" },
+            { "tutorial4.bin", "/battle" },
+            { "tutorial5.bin", "/battle" },
+            { "ability_t.bin", "/bin" },
+            { "bgm.bin", "/bin" },
+            { "chr_b_t.bin", "/bin" },
+            { "chr_s_t.bin", "/bin" },
+            { "clearlst.bin", "/bin" },
+            { "commwin.bin", "/bin" },
+            { "demo.bin", "/bin" },
+            { "infoname.bin", "/bin" },
+            { "komatxt.bin", "/bin" },
+            { "location.bin", "/bin" },
+            { "piece.bin", "/bin" },
+            { "pname.bin", "/bin" },
+            { "rulemess.bin", "/bin" },
+            { "stage.bin", "/bin" },
+            { "title.bin", "/bin" },
         };
 
-        /// <summary>
-        /// Import files into the Rom.
-        /// </summary>
-        /// <param name="gameNode">The node of the Rom.</param>
-        /// <param name="file">The input file to import.</param>
-        public void Import(Node gameNode, Node file)
+        /// <inheritdoc/>
+        public bool Matches(string filename)
         {
-            if (TextLocations.TryGetValue(file.Name, out string? value)) {
-                Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}")!;
-                toReplace.ChangeFormat(file.Format!);
-                Console.WriteLine($"File replaced: /root/data{value}");
+            return TextLocations.ContainsKey(filename);
+        }
+
+        /// <inheritdoc/>
+        public void Import(Node gameNode, List<Node> files)
+        {
+            foreach (Node file in files) {
+                if (TextLocations.TryGetValue(file.Name, out string? value)) {
+                    Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}/{file.Name}");
+                    toReplace.ChangeFormat(file.Format);
+                    Console.WriteLine($"File replaced: /root/data{value}/{file.Name}");
+                }
             }
         }
     }

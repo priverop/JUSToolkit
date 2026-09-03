@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Priverop
+﻿// Copyright (c) 2022 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
 // SOFTWARE.
 using JUS.Tool.Utils;
 using Texim.Images;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -70,16 +70,16 @@ namespace JUS.Tool.Graphics.Converters
                 .TransformWith<Binary2Almt>();
 
             var mapsParams = new MapDecompressionParams {
-                Map = mapsNode.GetFormatAs<Almt>()!,
-                TileSize = mapsNode.GetFormatAs<Almt>()!.TileSize,
+                Map = mapsNode.GetFormatAs<Almt>(),
+                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
             };
 
             var mapCompression = new MapDecompression(mapsParams);
-            var image2Bitmap = new IndexedImage2BinaryPng(pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>()!);
+            var image2Bitmap = new IndexedImage2BinaryPng(pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>());
             pixelsPaletteNode.TransformWith(mapCompression)
                 .TransformWith(image2Bitmap);
 
-            return new BinaryFormat(pixelsPaletteNode.Stream!);
+            return new BinaryFormat(pixelsPaletteNode.Stream);
         }
     }
 }

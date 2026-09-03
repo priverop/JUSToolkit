@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 
@@ -89,11 +88,9 @@ namespace JUS.Tool.Texts
         /// <returns><see cref="string"/> at indirect position.</returns>
         public static string ReadIndirectString(DataReader reader)
         {
-            reader.Stream.PushToPosition(reader.Stream.Position + reader.ReadInt32());
-            string text = reader.ReadString();
-            reader.Stream.PopPosition();
-
-            return text;
+            using (reader.Stream.EnterWithPosition(reader.Stream.Position + reader.ReadInt32())) {
+                return reader.ReadString();
+            }
         }
 
         /// <summary>
@@ -104,11 +101,9 @@ namespace JUS.Tool.Texts
         /// <returns><see cref="string"/> at position.</returns>
         public static string ReadIndirectString(DataReader reader, int offset)
         {
-            reader.Stream.PushToPosition(offset);
-            string text = reader.ReadString();
-            reader.Stream.PopPosition();
-
-            return text;
+            using (reader.Stream.EnterWithPosition(offset)) {
+                return reader.ReadString();
+            }
         }
 
         /// <summary>

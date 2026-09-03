@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Priverop
+// Copyright (c) 2026 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,31 +17,29 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using Yarhl.IO;
+using Yarhl.FileSystem;
 
-namespace JUS.Tool.Utils
+namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
-    /// Identification of formats.
+    /// Imports .aar directly to the game.
     /// </summary>
-    public static class Identifier
+    public class RawContainerFile : IFileImportStrategy
     {
-        /// <summary>
-        /// Returns the version of the Alar file.
-        /// </summary>
-        /// <param name="file">The File we want to check.</param>
-        /// <returns>The version.</returns>
-        public static byte GetAlarVersion(IBinary file) => GetAlarVersion(file.Stream);
-
-        /// <summary>
-        /// Returns the version of the Alar stream.
-        /// </summary>
-        /// <param name="stream">The stream we want to check.</param>
-        /// <returns>The version.</returns>
-        public static byte GetAlarVersion(Stream stream)
+        /// <inheritdoc/>
+        public bool Matches(string filename)
         {
-            using var _ = stream.EnterWithPosition(4);
-            return stream.ReadByteExactly();
+            return Path.GetExtension(filename) == ".aar";
+        }
+
+        /// <inheritdoc/>
+        public void Import(Node gameNode, List<Node> files)
+        {
+            foreach (Node container in files) {
+                Node toReplace = Navigator.IterateNodes(gameNode).FirstOrDefault(x => x.Name == container.Name) ?? throw new FormatException($"Container not found {container}");
+                toReplace.ChangeFormat(container.Format);
+                Console.WriteLine($"Container replaced: {container.Name}");
+            }
         }
     }
 }

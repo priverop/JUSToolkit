@@ -17,7 +17,7 @@ namespace JUS.Tool.Containers
         }
 
         /// <inheritdoc/>
-        public DataStream Stream { get; set; }
+        public Stream Stream { get; set; }
 
         /// <summary>
         /// Gets or sets the internal game identifier of the file.

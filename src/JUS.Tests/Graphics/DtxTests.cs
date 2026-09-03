@@ -1,4 +1,4 @@
-// Copyright(c) 2022 Priverop
+﻿// Copyright(c) 2022 Priverop
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,10 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using NUnit.Framework;
+using Texim.Formats.ImageSharp.Images;
 using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
-using Texim.Images.Standard;
 using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Sprites;
@@ -104,33 +104,33 @@ namespace JUS.Tests.Graphics
 
             Node images = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .Children["koma"] ?? throw new FormatException("Invalid container file");
+                .Children["koma"];
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>()!;
+                .GetFormatAs<KShapeSprites>();
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>()!;
+                .GetFormatAs<Koma>();
 
             foreach (KomaElement komaElement in komaFormat) {
                 string filename = $"{komaElement.KomaName}.dtx";
 
-                Node? dtx = images.Children[filename];
+                Node? dtx = images.Children.GetOrDefault(filename);
                 if (dtx is null) {
                     continue;
                 }
 
                 var converter = new Dtx4ToBitmap(shapes, komaFormat, komaElement.KomaName);
-                BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>()!);
+                BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>());
 
                 // If the child Node komaElement.KShapeGroupId does not exist, then we create it
-                if (resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"] == null) {
+                if (!resultContainer.Root.Children.Exists($"{komaElement.KShapeGroupId}")) {
                     resultContainer.Root.Add(new Node($"{komaElement.KShapeGroupId}"));
                 }
 
-                resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"]!
+                resultContainer.Root.Children[$"{komaElement.KShapeGroupId}"]
                     .Add(new Node(komaElement.KomaName, png));
             }
 
@@ -150,11 +150,11 @@ namespace JUS.Tests.Graphics
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>()!;
+                .GetFormatAs<KShapeSprites>();
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>()!;
+                .GetFormatAs<Koma>();
 
             string dtxName = Path.GetFileNameWithoutExtension(dtxPath);
 
@@ -162,7 +162,7 @@ namespace JUS.Tests.Graphics
                 .TransformWith<LzssDecompression>()
                 .TransformWith(new Dtx4ToBitmap(shapes, komaFormat, dtxName));
 
-            dtx4.Stream!.Should().MatchInfo(info);
+            dtx4.Stream.Should().MatchInfo(info);
         }
 
         [TestCaseSource(nameof(GetDtx4Files))]
@@ -177,23 +177,24 @@ namespace JUS.Tests.Graphics
             // Sprites + pixels + palette
             using Node dtx4 = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
             .TransformWith<LzssDecompression>();
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx4.Stream!).DeepClone();
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx4.Stream).DeepClone();
 
             dtx4.TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
 
-            Dig originalImage = dtx4.Children["image"]!.GetFormatAs<Dig>()!;
+            Dig originalImage = dtx4.Children["image"].GetFormatAs<Dig>();
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
-                .GetFormatAs<KShapeSprites>()!;
+                .GetFormatAs<KShapeSprites>();
 
             Koma komaFormat = NodeFactory.FromFile(koma)
                 .TransformWith<Binary2Koma>()
-                .GetFormatAs<Koma>()!;
+                .GetFormatAs<Koma>();
 
-            KomaElement komaElement = komaFormat!.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
+            KomaElement komaElement = komaFormat.FirstOrDefault(n => n.KomaName == Path.GetFileNameWithoutExtension(dtxPath))
+                ?? throw new FormatException("Can't find the dtx in the koma.bin");
 
-            Sprite sprite = shapes!.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
 
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,
@@ -204,17 +205,17 @@ namespace JUS.Tests.Graphics
                 .TransformWith(new Sprite2IndexedImage(spriteParams))
                 .TransformWith(new IndexedImage2BinaryPng(originalImage));
 
-            pngNode.Stream!.Position = 0;
+            pngNode.Stream.Position = 0;
 
             // Import
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
             pngNode.TransformWith<StandardBinaryImage2RgbImage>()
                 .TransformWith(new RgbImage2IndexedPaletteImage(quantization));
-            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>()!;
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
             var segmentedImage = new List<IndexedPixel>();
             foreach (IImageSegment segment in sprite.Segments) {
-                IndexedImage segmentImage = newImage.SubImage(segment.CoordinateX, segment.CoordinateY, segment.Width, segment.Height);
+                IndexedImage segmentImage = newImage.SubImage(segment.ToRectangle());
                 segmentedImage.AddRange(segmentImage.Pixels);
             }
 
@@ -229,13 +230,13 @@ namespace JUS.Tests.Graphics
                 Swizzling = DigSwizzling.Linear,
             }.InsertTransparentTile();
 
-            dtx4.Children["image"]!.ChangeFormat(updatedImage);
+            dtx4.Children["image"].ChangeFormat(updatedImage);
 
-            DataStream generatedStream = new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>()!)
+            Stream generatedStream = new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())
                 .Stream;
 
             // Compare
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            var originalStream = new DataStream(originalDtx.Stream, 0, originalDtx.Stream.Length);
             generatedStream.Length.Should().Be(originalStream.Length);
             originalStream.WriteTo("original.dtx");
             generatedStream.WriteTo("generated.dtx");
@@ -267,16 +268,12 @@ namespace JUS.Tests.Graphics
             // 1 - Dtx -> Pngs
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>();
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream!).DeepClone();
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
 
             dtx.TransformWith(new BinaryToDtx3());
 
             // Original image
-            Dig originalImage = dtx.Children["image"]!.GetFormatAs<Dig>()!;
-            var palettes = new PaletteCollection();
-            foreach (IPalette p in originalImage.Palettes) {
-                palettes.Palettes.Add(p);
-            }
+            Dig originalImage = dtx.Children["image"].GetFormatAs<Dig>();
 
             // Configuration for the Converters
             var spriteParams = new Sprite2IndexedImageParams {
@@ -284,27 +281,11 @@ namespace JUS.Tests.Graphics
                 FullImage = originalImage,
             };
 
-            var newPixels = new List<IndexedPixel>();
-
-            var segmentation = new NitroImageSegmentation() {
-                CanvasWidth = 256,
-                CanvasHeight = 256,
-            };
-            var spriteConverterParameters = new RgbImage2SpriteParams {
-                Palettes = palettes,
-                IsImageTiled = true,
-                MinimumPixelsPerSegment = 64,
-                PixelsPerIndex = 64,
-                RelativeCoordinates = SpriteRelativeCoordinatesKind.Center,
-                PixelSequences = newPixels,
-                Segmentation = segmentation,
-            };
-
             var originalBitmaps = new NodeContainerFormat();
 
             // Cloning the PNG to compare them later, as our compression algorithm is better
             // than the game's, and the new .dtx is smaller than the original
-            foreach (Node spriteNode in dtx.Children["sprites"]!.Children) {
+            foreach (Node spriteNode in dtx.Children["sprites"].Children) {
                 // Cloning the node so we can transform it
                 originalBitmaps.Root.Add(new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
                             .TransformWith(new Sprite2IndexedImage(spriteParams))
@@ -314,34 +295,13 @@ namespace JUS.Tests.Graphics
             using var cloneBitmaps = (NodeContainerFormat)originalBitmaps.DeepClone();
 
             // 2 - Import the PNGs into the DTX
-            foreach (Node pngNode in cloneBitmaps.Root.Children) {
-                pngNode.Stream!.Position = 0;
-                pngNode.TransformWith<StandardBinaryImage2RgbImage>();
+            dtx.TransformWith(new Png2Dtx3(cloneBitmaps));
 
-                // RgbImage -> Sprite
-                var converter = new RgbImage2Sprite(spriteConverterParameters);
-                pngNode.TransformWith(converter);
-                Sprite sprite = pngNode.GetFormatAs<Sprite>()!;
+            Dig updatedImage = dtx.Children["image"].GetFormatAs<Dig>();
 
-                // Check if there is a Children with the correct name:
-                string cleanSpriteName = Path.GetFileNameWithoutExtension(pngNode.Name);
-                Node spriteToReplace = dtx.Children["sprites"]!.Children[cleanSpriteName]
-                ?? throw new ArgumentException($"Wrong sprite name: {cleanSpriteName}");
+            BinaryFormat generatedBinary = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>());
 
-                spriteToReplace.ChangeFormat(sprite);
-            }
-
-            var updatedImage = new Dig(originalImage) {
-                Pixels = newPixels.ToArray(),
-                Width = 8,
-                Height = newPixels.Count / 8,
-            };
-
-            dtx.Children["image"]!.ChangeFormat(updatedImage);
-
-            BinaryFormat generatedBinary = new Dtx3ToBinary().Convert(dtx.GetFormatAs<NodeContainerFormat>()!);
-
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            var originalStream = new DataStream(originalDtx.Stream, 0, originalDtx.Stream.Length);
             originalStream.Length.Should().BeGreaterThan(generatedBinary.Stream.Length);
 
             NodeContainerFormat newDtx = new BinaryToDtx3().Convert(generatedBinary);
@@ -352,15 +312,15 @@ namespace JUS.Tests.Graphics
                 FullImage = updatedImage,
             };
 
-            for (int i = 0; i < newDtx.Root.Children["sprites"]!.Children.Count; i++) {
-                var spriteNode = newDtx.Root.Children["sprites"]!.Children[i];
+            for (int i = 0; i < newDtx.Root.Children["sprites"].Children.Count; i++) {
+                var spriteNode = newDtx.Root.Children["sprites"].Children[i];
 
                 // Cloning the node so we can transform it
-                var pngNode = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>()!)
+                var pngNode = new Node(spriteNode.Name, spriteNode.GetFormatAs<Sprite>())
                             .TransformWith(new Sprite2IndexedImage(spriteParams2))
                             .TransformWith(new IndexedImage2BinaryPng(updatedImage));
 
-                pngNode.Stream!.Compare(originalBitmaps.Root.Children[i].Stream!).Should().BeTrue();
+                pngNode.Stream.Compare(originalBitmaps.Root.Children[i].Stream).Should().BeTrue();
             }
         }
 
@@ -375,7 +335,7 @@ namespace JUS.Tests.Graphics
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
                 .TransformWith(new BinaryToDtx3());
 
-            Dig image = dtx.Children["image"]!.GetFormatAs<Dig>()!;
+            Dig image = dtx.Children["image"].GetFormatAs<Dig>();
 
             BinaryFormat generatedStream = new IndexedImage2BinaryPng(image).Convert(image);
 
@@ -389,11 +349,11 @@ namespace JUS.Tests.Graphics
             TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
 
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read);
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream!).DeepClone();
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
 
             dtx.TransformWith(new BinaryToDtx3());
 
-            BinaryFormat yaml = dtx.Children["yaml"]!.GetFormatAs<BinaryFormat>()!;
+            BinaryFormat yaml = dtx.Children["yaml"].GetFormatAs<BinaryFormat>();
 
             var reader = new TextDataReader(yaml.Stream);
             reader.Stream.Position = 0;
@@ -401,9 +361,9 @@ namespace JUS.Tests.Graphics
             // Import with Yaml
             var yamlConverter = new Dtx3TxToBinary(originalDtx, BinaryToDtx3.DeserializeYaml(reader.ReadToEnd()));
 
-            BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>()!);
+            BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>());
 
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            var originalStream = new DataStream(originalDtx.Stream, 0, originalDtx.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }
@@ -415,15 +375,15 @@ namespace JUS.Tests.Graphics
             TestDataBase.IgnoreIfFileDoesNotExist(dtxPath);
 
             using Node dtx = NodeFactory.FromFile(dtxPath, FileOpenMode.Read);
-            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream!).DeepClone();
+            var originalDtx = (BinaryFormat)new BinaryFormat(dtx.Stream).DeepClone();
 
             dtx.TransformWith(new BinaryToDtx3());
 
             var yamlConverter = new Dtx3TxToBinary(originalDtx);
 
-            BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>()!);
+            BinaryFormat generatedStream = yamlConverter.Convert(dtx.GetFormatAs<NodeContainerFormat>());
 
-            var originalStream = new DataStream(originalDtx.Stream!, 0, originalDtx.Stream.Length);
+            var originalStream = new DataStream(originalDtx.Stream, 0, originalDtx.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }

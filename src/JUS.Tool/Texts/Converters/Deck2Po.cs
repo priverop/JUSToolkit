@@ -42,7 +42,7 @@ namespace JUS.Tool.Texts.Converters
             Po po = JusText.GenerateJusPo();
 
             foreach (Node file in container.Root.Children) {
-                Deck deck = file.GetFormatAs<Deck>()!;
+                Deck deck = file.GetFormatAs<Deck>();
                 po.Add(new PoEntry(deck.Name) {
                     Context = file.Name,
                     ExtractedComments = System.Convert.ToBase64String(deck.Header),
@@ -61,8 +61,15 @@ namespace JUS.Tool.Texts.Converters
         {
             var container = new NodeContainerFormat();
             foreach (PoEntry entry in po.Entries) {
+                string sentence = Table.Instance.Encode(entry.Text);
+
+                if (sentence.Length > Deck.LineLength) {
+                    Logger.DisplayErrorMaxLength(Deck.LineLength, sentence);
+                    sentence = sentence[0..Deck.LineLength];
+                }
+
                 var deck = new Deck() {
-                    Name = Table.Instance.Encode(entry.Text),
+                    Name = sentence,
                     Header = System.Convert.FromBase64String(entry.ExtractedComments),
                 };
                 container.Root.Add(new Node(entry.Context, deck));
