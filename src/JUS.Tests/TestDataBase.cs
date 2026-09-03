@@ -56,7 +56,7 @@ namespace JUS.Tests
 
             return NodeFactory.FromFile(path, FileOpenMode.Read)
                 .TransformWith(new Binary2NitroRom())
-                .GetFormatAs<NitroRom>()!;
+                .GetFormatAs<NitroRom>();
         }
 
         public static void IgnoreIfFileDoesNotExist(string file)

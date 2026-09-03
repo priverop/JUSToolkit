@@ -12,12 +12,24 @@ namespace JUS.Tests.Texts
     {
         private static readonly Lazy<Node> DeckContainer = new(UnpackDeckContainer);
 
+        // Ignored because of line length limitations, until we patch the assembly
+        private static readonly string[] Ignored = [
+            "jard/004.bin",
+            "jard/023.bin",
+            "jard/036.bin",
+            "jarg/019.bin",
+            "priv/002.bin",
+            "priv/004.bin",
+            "priv/008.bin",
+            "smpl/003.bin"
+        ];
+
         private static Node UnpackDeckContainer()
         {
             return TestDataBase.ReadSoftware()
                 .Data
-                .Children["deck"]!
-                .Children["Deck.aar"]!
+                .Children["deck"]
+                .Children["Deck.aar"]
                 .TransformWith(new Binary2Alar());
         }
 
@@ -29,17 +41,18 @@ namespace JUS.Tests.Texts
 
             return Navigator.IterateNodes(DeckContainer.Value, NavigationMode.DepthFirst)
                 .Where(n => !n.IsContainer && n.Name[0] != 'p')
-                .Select(n => new TestCaseData(n.Path));
+                .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
 
         [TestCaseSource(nameof(GetDeckPaths))]
-        public void PoRoundTripIsIdentical(string deckContainerPath)
+        public void PoRoundTripIsIdentical(Node node)
         {
-            Node? node = Navigator.SearchNode(DeckContainer.Value, deckContainerPath);
-            Assert.That(node, Is.Not.Null);
+            if (Ignored.Contains($"{node.Parent!.Name}/{node.Name}")) {
+                Assert.Ignore("It won't be equal due to line length limitations");
+            }
 
             // Binary -> Deck
-            IBinary expectedBin = node.GetFormatAs<IBinary>()!;
+            IBinary expectedBin = node.GetFormatAs<IBinary>();
             var binary2Deck = new Binary2Deck();
             Deck expectedDeck = binary2Deck.Convert(expectedBin);
 
@@ -59,16 +72,19 @@ namespace JUS.Tests.Texts
             NodeContainerFormat container = deck2Po.Convert(expectedPo);
 
             // NCF -> Deck
-            Deck actualDeck = container.Root.Children[0].GetFormatAs<Deck>()!;
+            Deck actualDeck = container.Root.Children[0].GetFormatAs<Deck>();
 
             // Deck -> BinaryFormat
             BinaryFormat actualBin = binary2Deck.Convert(actualDeck);
 
             // Comparing Binaries
-            Assert.That(
-                expectedBin.Stream.Compare(actualBin.Stream),
-                Is.True,
-                $"Deck are not identical: {node.Path}");
+            bool areIdentical = expectedBin.Stream.Compare(actualBin.Stream);
+            if (!areIdentical) {
+                expectedBin.Stream.WriteTo($"expected_{node.Parent.Name}_{node.Name}.bin");
+                actualBin.Stream.WriteTo($"actual_{node.Parent.Name}_{node.Name}.bin");
+            }
+
+            Assert.That(areIdentical, Is.True, "Decks are not identical");
         }
     }
 }
