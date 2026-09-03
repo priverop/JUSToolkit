@@ -8,7 +8,7 @@ public class AlarFileInfo
     /// <summary>
     /// Gets or sets the path of the file in the container with this metadata.
     /// </summary>
-    public string Path { get; set; }
+    public string? Path { get; set; }
 
     /// <summary>
     /// Gets or sets the internal game identifier of the file.

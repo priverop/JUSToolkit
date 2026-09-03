@@ -71,7 +71,7 @@ namespace JUS.Tool.Containers.Converters
 
         private void WriteFile(Node child, AlarInfo info)
         {
-            AlarFileInfo fileInfo = info.FilesMetadata.FirstOrDefault(m => child.Path.EndsWith(m.Path))
+            AlarFileInfo fileInfo = info.FilesMetadata.FirstOrDefault(m => m.Path != null && child.Path.EndsWith(m.Path))
                 ?? throw new FormatException("Cannot find node metadata");
 
             bool hasFilename = (fileInfo.Flags >> 31) == 1;
