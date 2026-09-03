@@ -25,17 +25,17 @@ using Yarhl.IO;
 namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
-    /// Converts between BinaryFormat and ALMT.
+    /// Converts between BinaryFormat and ALTM.
     /// </summary>
-    public class Almt2Binary :
-        IConverter<Almt, BinaryFormat>
+    public class Altm2Binary :
+        IConverter<Altm, BinaryFormat>
     {
         /// <summary>
-        /// Converts an Almt Node to a BinaryFormat Node.
+        /// Converts an Altm Node to a BinaryFormat Node.
         /// </summary>
-        /// <param name="source">Almt Node.</param>
+        /// <param name="source">Altm Node.</param>
         /// <returns>BinaryFormat Node.</returns>
-        public BinaryFormat Convert(Almt source)
+        public BinaryFormat Convert(Altm source)
         {
             var b = new BinaryFormat();
 

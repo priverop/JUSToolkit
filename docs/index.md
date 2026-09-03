@@ -14,7 +14,7 @@
 
 - **Containers** - Unpack and pack **ALAR** files (.aar).
 - **Texts** - Export and import _.bin_ files, including the **JQuiz**.
-- **Textures** - Export and import **DIG** (_.dig_) + **ALMT** (_.atm_).
+- **Textures** - Export and import **DIG** (_.dig_) + **ALTM** (_.atm_).
 - **Sprites** - Export and import **DTX**, including **Komas**.
 - **Automatizations** - Utilities to batch export and import multiple files.
 

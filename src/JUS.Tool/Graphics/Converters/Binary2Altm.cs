@@ -26,21 +26,21 @@ using Yarhl.IO;
 namespace JUS.Tool.Graphics.Converters
 {
     /// <summary>
-    /// Converts between BinaryFormat and ALMT.
+    /// Converts between BinaryFormat and ALTM.
     /// </summary>
-    public class Binary2Almt :
-        IConverter<IBinary, Almt>
+    public class Binary2Altm :
+        IConverter<IBinary, Altm>
     {
         /// <summary>
-        /// Converts a IBinary Node to an Almt Node.
+        /// Converts a IBinary Node to an Altm Node.
         /// </summary>
         /// <param name="source">IBinary Node.</param>
-        /// <returns>Almt Node.</returns>
-        public Almt Convert(IBinary source)
+        /// <returns>Altm Node.</returns>
+        public Altm Convert(IBinary source)
         {
             var reader = new DataReader(source.Stream);
 
-            var almt = new Almt {
+            var altm = new Altm {
                 Magic = reader.ReadUInt32(),
                 Unknown = reader.ReadUInt32(),
                 Unknown2 = reader.ReadUInt32(),
@@ -51,22 +51,22 @@ namespace JUS.Tool.Graphics.Converters
                 Unknown3 = reader.ReadUInt32(),
             };
 
-            almt.TileSize = new System.Drawing.Size(almt.TileSizeW, almt.TileSizeH);
+            altm.TileSize = new System.Drawing.Size(altm.TileSizeW, altm.TileSizeH);
 
-            almt.Width = almt.TileSizeW * almt.NumTileW;
-            almt.Height = (almt.TileSizeH * almt.NumTileH) + 8;
+            altm.Width = altm.TileSizeW * altm.NumTileW;
+            altm.Height = (altm.TileSizeH * altm.NumTileH) + 8;
 
-            almt.BgMode = NitroBackgroundMode.Text;
+            altm.BgMode = NitroBackgroundMode.Text;
 
             long mapInfoSize = reader.Stream.Length - reader.Stream.Position;
-            uint numInfos = (uint)((almt.BgMode == NitroBackgroundMode.Affine) ? mapInfoSize : mapInfoSize / 2);
+            uint numInfos = (uint)((altm.BgMode == NitroBackgroundMode.Affine) ? mapInfoSize : mapInfoSize / 2);
 
-            almt.Maps = new MapInfo[numInfos];
-            for (int i = 0; i < almt.Maps.Length; i++) {
-                almt.Maps[i] = almt.BgMode == NitroBackgroundMode.Affine ? new MapInfo(reader.ReadByte()) : MapInfo.FromUInt16(reader.ReadUInt16());
+            altm.Maps = new MapInfo[numInfos];
+            for (int i = 0; i < altm.Maps.Length; i++) {
+                altm.Maps[i] = altm.BgMode == NitroBackgroundMode.Affine ? new MapInfo(reader.ReadByte()) : MapInfo.FromUInt16(reader.ReadUInt16());
             }
 
-            return almt;
+            return altm;
         }
     }
 }

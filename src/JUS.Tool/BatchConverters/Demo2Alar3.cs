@@ -86,7 +86,7 @@ namespace JUS.Tool.BatchConverters
 
             transformedFiles = new NodeContainerFormat();
 
-            // Obtaining the original Dig and Almts
+            // Obtaining the original Dig and Altms
             Node dig = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
             Node atmFull = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[0]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[0]);
             Node atmM = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[1]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[1]);
@@ -165,14 +165,14 @@ namespace JUS.Tool.BatchConverters
                     atms[i];
 
                 // New Atm: original atm changing height, width and maps
-                Almt originalAtm = uncompressedAtm
-                        .TransformWith<Binary2Almt>()
-                        .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
+                Altm originalAtm = uncompressedAtm
+                        .TransformWith<Binary2Altm>()
+                        .GetFormatAs<Altm>() ?? throw new FormatException("Invalid atm file");
 
-                var newAtm = new Almt(originalAtm, map!);
+                var newAtm = new Altm(originalAtm, map!);
 
                 // Export ATM
-                BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
+                BinaryFormat binaryAtm = new Altm2Binary().Convert(newAtm);
 
                 BinaryFormat compressedAtm = atmIsCompressed ?
                     new LzssCompression().Convert(binaryAtm) :
