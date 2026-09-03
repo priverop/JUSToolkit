@@ -51,7 +51,7 @@ namespace JUS.CLI.JUS
                     // Path.Combine ignores the relative path if there is an absolute path
                     // so we remove the first slash of the node.Path
                     string outputFile = Path.Combine(output, node.Path[1..]);
-                    node.Stream!.WriteTo(outputFile);
+                    node.Stream.WriteTo(outputFile);
                 }
             }
 
@@ -81,7 +81,7 @@ namespace JUS.CLI.JUS
                 _ = originalAlar.TransformWith<LzssDecompression>();
             }
 
-            byte alarVersion = Identifier.GetAlarVersion(originalAlar.Stream!);
+            byte alarVersion = Identifier.GetAlarVersion(originalAlar.Stream);
 
             using var filesToInsert = new NodeContainerFormat();
             using Node inputDir = NodeFactory.FromDirectory(input);
@@ -90,12 +90,12 @@ namespace JUS.CLI.JUS
             BinaryFormat binary;
             if (alarVersion == 3) {
                 Alar alar = originalAlar.TransformWith<Binary2Alar3>()
-                    .GetFormatAs<Alar>()!;
+                    .GetFormatAs<Alar>();
                 alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar3ToBinary());
             } else if (alarVersion == 2) {
                 Alar alar = originalAlar.TransformWith<Binary2Alar2>()
-                    .GetFormatAs<Alar>()!;
+                    .GetFormatAs<Alar>();
                 alar.InsertModification(filesToInsert);
                 binary = alar.ConvertWith(new Alar2ToBinary());
             } else {

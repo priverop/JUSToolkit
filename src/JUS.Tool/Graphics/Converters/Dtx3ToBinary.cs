@@ -1,6 +1,4 @@
-﻿using System;
-using JUS.Tool.Graphics.Converters;
-using Texim.Sprites;
+﻿using Texim.Sprites;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -30,18 +28,18 @@ namespace JUS.Tool.Graphics.Converters
             writer.Write(Version);
             writer.Write(Type);
 
-            NavigableNodeCollection<Node> sprites = dtx.Root.Children["sprites"]!.Children;
+            NavigableNodeCollection<Node> sprites = dtx.Root.Children["sprites"].Children;
             writer.Write((ushort)sprites.Count);
             writer.WriteOfType<ushort>(0x00);
 
             ushort offset = (ushort)(sprites.Count * 2);
             foreach (Node n in sprites) {
                 writer.Write(offset);
-                offset += (ushort)(2 + (n.GetFormatAs<Sprite>()!.Segments.Count * 6));
+                offset += (ushort)(2 + (n.GetFormatAs<Sprite>().Segments.Count * 6));
             }
 
             foreach (Node n in sprites) {
-                Sprite sprite = n.GetFormatAs<Sprite>()!;
+                Sprite sprite = n.GetFormatAs<Sprite>();
                 writer.Write((ushort)sprite.Segments.Count);
                 foreach (IImageSegment s in sprite.Segments) {
                     writer.Write((ushort)s.TileIndex);
@@ -54,12 +52,12 @@ namespace JUS.Tool.Graphics.Converters
 
             writer.WritePadding(0, 4);
             offset = (ushort)writer.Stream.Position;
-            writer.Stream.PushToPosition(0x08);
-            writer.Write(offset);
-            writer.Stream.PopPosition();
+            using (writer.Stream.EnterWithPosition(0x08)) {
+                writer.Write(offset);
+            }
 
-            var reader = new DataReader(dtx.Root.Children["image"]!.TransformWith<Dig2Binary>()
-                .GetFormatAs<BinaryFormat>()!.Stream);
+            var reader = new DataReader(dtx.Root.Children["image"].TransformWith<Dig2Binary>()
+                .GetFormatAs<BinaryFormat>().Stream);
             reader.Stream.Position = 0;
             writer.Write(reader.ReadBytes((int)reader.Stream.Length));
 

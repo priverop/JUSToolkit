@@ -47,10 +47,10 @@ namespace JUS.Tests.Graphics
 
             using Node node = NodeFactory.FromFile(altmPath, FileOpenMode.Read);
 
-            Altm altm = new Binary2Altm().Convert(node.GetFormatAs<BinaryFormat>()!);
+            Altm altm = new Binary2Altm().Convert(node.GetFormatAs<BinaryFormat>());
             BinaryFormat generatedStream = new Altm2Binary().Convert(altm);
 
-            var originalStream = new DataStream(node.Stream!, 0, node.Stream!.Length);
+            var originalStream = new DataStream(node.Stream, 0, node.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);
             generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }

@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.Tool.Texts.Converters;
-using JUS.Tool.Texts.Formats;
 using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -85,7 +84,7 @@ namespace JUS.CLI.JUS
             Node poFormat = container.TransformWith(poConverter);
 
             // Po -> Binary
-            using BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat.GetFormatAs<Po>()!);
+            using BinaryFormat poBinaryFormat = new Po2Binary().Convert(poFormat.GetFormatAs<Po>());
 
             string outputFile = Path.Combine(output, $"deck-{lastDirectory}.po");
             poBinaryFormat.Stream.WriteTo(outputFile);
@@ -110,7 +109,7 @@ namespace JUS.CLI.JUS
             binNode.TransformWith<JQuiz2Po>();
 
             foreach (Node quiz in binNode.Children) {
-                quiz.Stream!.WriteTo(Path.Combine(output, quiz.Name));
+                quiz.Stream.WriteTo(Path.Combine(output, quiz.Name));
             }
 
             Console.WriteLine("Done!");
@@ -148,7 +147,7 @@ namespace JUS.CLI.JUS
             Console.WriteLine("File Name: " + filename + " - Bin Converter: " + binConverterName + " - Po Converter: " + poConverterName);
 
             // BinaryFormat -> TextFormat
-            object textFormat = ConvertFormat.With(binConverterName, binNode.Format!);
+            object textFormat = ConvertFormat.With(binConverterName, binNode.Format);
 
             // TextFormat -> Po
             var poFormat = (Po)ConvertFormat.With(poConverterName, textFormat);

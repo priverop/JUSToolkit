@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using Texim;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -95,9 +94,11 @@ namespace JUS.Tool.Graphics.Converters
             source.Stream.Position = pixelsStart;
 
             IndexedPixel[] pixels = swizzling switch {
-                DigSwizzling.Tiled => pixelEncoding.Decode(source.Stream, width * height)
-                        .UnswizzleWith(new TileSwizzling<IndexedPixel>(width)),
-                DigSwizzling.Linear => pixelEncoding.Decode(source.Stream, width * height),
+                DigSwizzling.Tiled => new TileSwizzling<IndexedPixel>(width)
+                    .Unswizzle(pixelEncoding.DecodeExactly(source.Stream, width * height)),
+
+                DigSwizzling.Linear => pixelEncoding.DecodeExactly(source.Stream, width * height),
+
                 _ => throw new FormatException("Invalid swizzling"),
             };
 

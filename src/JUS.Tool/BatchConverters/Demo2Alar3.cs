@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Priverop
+﻿// Copyright (c) 2024 Priverop
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Images;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -93,10 +93,10 @@ namespace JUS.Tool.BatchConverters
             Node atmN = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[2]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[2]);
 
             // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atmFull_clone = (BinaryFormat)new BinaryFormat(atmFull.Stream!).DeepClone();
-            var atmM_clone = (BinaryFormat)new BinaryFormat(atmM.Stream!).DeepClone();
-            var atmN_clone = (BinaryFormat)new BinaryFormat(atmN.Stream!).DeepClone();
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atmFull_clone = (BinaryFormat)new BinaryFormat(atmFull.Stream).DeepClone();
+            var atmM_clone = (BinaryFormat)new BinaryFormat(atmM.Stream).DeepClone();
+            var atmN_clone = (BinaryFormat)new BinaryFormat(atmN.Stream).DeepClone();
 
             Node[] atms = [new Node(atmFull.Name, atmFull_clone), new Node(atmM.Name, atmM_clone), new Node(atmN.Name, atmN_clone)];
 
@@ -133,10 +133,10 @@ namespace JUS.Tool.BatchConverters
                 }
 
                 // Transform the PNG into RgbImage (Pixels + Map) using the palette of the original DIG
-                pngs[i].Stream!.Position = 0;
+                pngs[i].Stream.Position = 0;
                 MapCompressedIndexedImage compressed = pngs[i].TransformWith<StandardBinaryImage2RgbImage>()
                     .TransformWith(new RgbImageMapCompression(compressionParams))
-                    .GetFormatAs<MapCompressedIndexedImage>()!;
+                    .GetFormatAs<MapCompressedIndexedImage>();
 
                 newImage = new IndexedImage {
                     Width = 8,
@@ -150,7 +150,7 @@ namespace JUS.Tool.BatchConverters
                 mergedImage = new Dig(mergedImage, newImage);
 
                 if (TransparentTile && i == 0) {
-                    mergedImage = mergedImage.InsertTransparentTile(map!);
+                    mergedImage = mergedImage.InsertTransparentTile(map);
                 }
 
                 compressionParams = new RgbImageMapCompressionParams {
@@ -169,7 +169,7 @@ namespace JUS.Tool.BatchConverters
                         .TransformWith<Binary2Altm>()
                         .GetFormatAs<Altm>() ?? throw new FormatException("Invalid atm file");
 
-                var newAtm = new Altm(originalAtm, map!);
+                var newAtm = new Altm(originalAtm, map);
 
                 // Export ATM
                 BinaryFormat binaryAtm = new Altm2Binary().Convert(newAtm);

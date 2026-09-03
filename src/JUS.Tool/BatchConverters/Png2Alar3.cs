@@ -22,7 +22,7 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Images;
-using Texim.Images.Standard;
+using Texim.Formats.ImageSharp.Images;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -105,8 +105,8 @@ namespace JUS.Tool.BatchConverters
             Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmName) ?? throw new FormatException("Atm doesn't exist: " + AtmName);
 
             // Clone the nodes
-            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
 
             // Transform the PNG into the new Dig and Altm (we need the original dig + atm)
             Transform(Image, new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone));
@@ -144,11 +144,11 @@ namespace JUS.Tool.BatchConverters
                 Palettes = originalDig,
             };
 
-            png.Stream!.Position = 0;
+            png.Stream.Position = 0;
             MapCompressedIndexedImage compressed = png
                 .TransformWith<StandardBinaryImage2RgbImage>()
                 .TransformWith(new RgbImageMapCompression(compressionParams))
-                .GetFormatAs<MapCompressedIndexedImage>()!;
+                .GetFormatAs<MapCompressedIndexedImage>();
 
             var newImage = new IndexedImage {
                 Width = 8,

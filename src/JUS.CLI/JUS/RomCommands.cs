@@ -78,7 +78,7 @@ namespace JUS.CLI.JUS
             var nitroParameters = new NitroRom2BinaryParams { DecompressedProgram = true };
             gameNode.TransformWith(new NitroRom2Binary(nitroParameters));
 
-            gameNode.Stream!.WriteTo(Path.Combine(output, "new_game.nds"));
+            gameNode.Stream.WriteTo(Path.Combine(output, "new_game.nds"));
 
             Console.WriteLine("Done!");
         }
@@ -99,19 +99,19 @@ namespace JUS.CLI.JUS
             Node fontNode = NodeFactory.FromFile(font, FileOpenMode.Read);
 
             // Regular Font
-            Node toReplace = Navigator.SearchNode(gameNode, "/root/data/font/jskfont.aft")!;
-            toReplace.ChangeFormat(fontNode.Format!);
+            Node toReplace = Navigator.SearchNode(gameNode, "/root/data/font/jskfont.aft");
+            toReplace.ChangeFormat(fontNode.Format);
             Console.WriteLine("File replaced: /root/data/font/jskfont.aft");
 
             // JQuiz Font
-            Node toReplace_q = Navigator.SearchNode(gameNode, "/root/data/font/jskfont_q.aft")!;
-            toReplace_q.ChangeFormat(fontNode.Format!);
+            Node toReplace_q = Navigator.SearchNode(gameNode, "/root/data/font/jskfont_q.aft");
+            toReplace_q.ChangeFormat(fontNode.Format);
             Console.WriteLine("File replaced: /root/data/font/jskfont_q.aft");
 
             var nitroParameters = new NitroRom2BinaryParams { DecompressedProgram = true };
             gameNode.TransformWith(new NitroRom2Binary(nitroParameters));
 
-            gameNode.Stream!.WriteTo(Path.Combine(output, "new_game_font.nds"));
+            gameNode.Stream.WriteTo(Path.Combine(output, "new_game_font.nds"));
 
             Console.WriteLine("Done!");
         }
