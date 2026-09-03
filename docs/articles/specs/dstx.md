@@ -130,8 +130,8 @@ The **Shape** byte encodes both segment size and flip transformations:
 See [the Koma specification](./koma.md) for more details.
 
 | Offset | Type   | Description                                             |
-| ------ | ------ | ------------------------------------------------------- |
-| 0x0A   | short  | Unknown                                                 |
+| ------ | ------ |---------------------------------------------------------|
+| 0x0A   | short  | Unknown, always 1.                                      |
 | 0x0C   | uint[] | Sprite data                                             |
 | ...    | byte[] | Uknown area                                             |
 | ...    | DSIG   | Image with palette (weight 8, swizzled 48x48 tile size) |
