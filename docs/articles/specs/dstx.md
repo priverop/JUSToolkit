@@ -25,7 +25,8 @@ The flag byte defines the texture actual format:
   - 0, 1, 2: unsupported in this game.
   - 3: sprites or textures.
   - 83: image data is in a separate file inside the same ALAR container.
-  - 4, 5, or 6: tiles of 48x48 pixels (koma).
+  - 4: tiles of 48x48 pixels (koma).
+  - 5, 6: to be investigated.
 - Version 2:
   - 3 or 83.
 
