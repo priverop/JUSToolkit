@@ -39,6 +39,7 @@ namespace JUS.CLI.JUS
                 CreateTextCommand(),
                 CreateBatchCommand(),
                 CreateRomCommand(),
+                FontCommands.CreateCommands(),
             };
         }
 
