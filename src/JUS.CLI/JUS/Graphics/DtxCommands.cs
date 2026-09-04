@@ -161,7 +161,7 @@ namespace JUS.CLI.JUS.Graphics
 
             // Get the IndexedPixels
             var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
-            pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
+            pngNode.TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
             // Update the original base image

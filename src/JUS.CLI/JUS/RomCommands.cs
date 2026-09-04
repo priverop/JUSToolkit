@@ -35,6 +35,7 @@ namespace JUS.CLI.JUS
             new MenuImageFile(),
             new RawContainerFile(),
             new SpriteDtx3ImageFile(),
+            new SpriteDtx3TxImageFile(),
             new TextFile(),
             new TextContainerFile(),
             new TextPatternFile(),
@@ -50,7 +51,8 @@ namespace JUS.CLI.JUS
         {
             Console.WriteLine($"Importing {input}");
 
-            if (!Directory.Exists(input)) {
+            if (!Directory.Exists(input))
+            {
                 throw new ArgumentException($"The --input parameter must be a directory: {input}");
             }
 
@@ -63,14 +65,17 @@ namespace JUS.CLI.JUS
             // Files with no strategies
             // In most strategies, we modify Node.Name, so we need to do this first
             var orphanFiles = inputFiles.Children.Where(file => !Strategies.Any(strategy => strategy.Matches(file.Name)));
-            foreach (Node orphan in orphanFiles) {
+            foreach (Node orphan in orphanFiles)
+            {
                 Console.WriteLine("These files won't be imported, as they don't match with any importer:");
                 Console.WriteLine(orphan.Name);
             }
 
-            foreach (IFileImportStrategy strategy in Strategies) {
+            foreach (IFileImportStrategy strategy in Strategies)
+            {
                 var matchedFiles = inputFiles.Children.Where(f => strategy.Matches(f.Name)).ToList();
-                if (matchedFiles.Count > 0) {
+                if (matchedFiles.Count > 0)
+                {
                     strategy.Import(gameNode, matchedFiles);
                 }
             }
