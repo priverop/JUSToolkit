@@ -1,4 +1,5 @@
-﻿using Yarhl.FileSystem;
+﻿using JUS.Tool.Utils;
+using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUS.Tool;
@@ -24,7 +25,7 @@ public static class NodeExtensions
                 string relativePath = Path.GetRelativePath(inputRoot.Path, inputChild.Path);
                 Node? containerChild = Navigator.SearchNodeOrDefault(node, relativePath);
                 if (containerChild is null) {
-                    Console.WriteLine($"❌ {relativePath} node not found in the container");
+                    Logger.DisplayError($"{relativePath} node not found in the container");
                     continue;
                 }
 
