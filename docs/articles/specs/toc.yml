@@ -17,9 +17,9 @@
 - name: Koma sprites
   href: koma.md
 
-#- name: 🈂️ Fonts
-#- name: TODO: ALFT
-#  href: alft.md
+- name: 🈂️ Fonts
+- name: ALFT
+  href: alft.md
 
 - name: 📝 Texts
 - name: Battle tutorial

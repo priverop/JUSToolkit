@@ -19,6 +19,7 @@
 // SOFTWARE.
 using NUnit.Framework;
 using SceneGate.Ekona.Containers.Rom;
+using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUS.Tests
@@ -53,8 +54,9 @@ namespace JUS.Tests
             string path = SoftwareNitroRomPath;
             IgnoreIfFileDoesNotExist(path);
 
-            using var binary = new BinaryFormat(path, FileOpenMode.Read);
-            return new Binary2NitroRom().Convert(binary);
+            return NodeFactory.FromFile(path, FileOpenMode.Read)
+                .TransformWith(new Binary2NitroRom())
+                .GetFormatAs<NitroRom>();
         }
 
         public static void IgnoreIfFileDoesNotExist(string file)
