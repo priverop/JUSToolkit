@@ -45,11 +45,18 @@ namespace JUS.CLI.JUS.Rom
         // This is not the case for some of the .aar.
         private static readonly Dictionary<string, string> ParentLocations = new() {
             { "button.aar", "Common" },
+            { "challenge_3d.aar", "Commu" },
             { "commu_pack.aar", "Commu" },
             { "error_2d.aar", "Commu" },
+            { "get.aar", "battle" },
             { "jquiz_pack.aar", "jquiz" },
+            { "ko.aar", "battle" },
+            { "marker_b.aar", "battle" },
+            { "marker_t.aar", "battle" },
             { "pause.aar", "battle" },
+            { "set.aar", "battle" },
             { "title_icon_2d.aar", "Common" },
+            { "tutorial_a.aar", "battle" },
         };
 
         /// <inheritdoc/>
