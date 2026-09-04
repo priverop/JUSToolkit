@@ -51,7 +51,7 @@ for each type of file. The [text specification](./texts.md) have more details.
 
 ## Fonts
 
-The fonts are in the `font` folder with `ALFT` format. .
+The fonts are in the `font` folder with [`ALFT`](./alft.md) format.
 
 - `font/DSFont.aft`.
 - `font/js8font.aft`.

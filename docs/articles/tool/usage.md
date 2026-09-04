@@ -26,6 +26,8 @@ single `.dig` file can have multiple `.atm`.
 can export/import a single file, or folder with files/.po. Deck, and jQuiz are 
 big .bin split into multiple .po, that's why they have their specific commands.
 
+**Fonts:**: _ALFT_. Export and import font files into a PNG and YAML files.
+
 **Batch:** These commands mix commands and graphics exports. We can export/import 
 graphics from .aar directly. Here we also have generic util commands.
 
