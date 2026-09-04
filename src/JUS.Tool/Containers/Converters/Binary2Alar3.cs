@@ -44,19 +44,19 @@ namespace JUS.Tool.Containers.Converters
             reader = new DataReader(source.Stream);
             reader.Stream.Position = 0;
 
-            int numFiles = ReadHeader();
+            (AlarInfo info, int numFiles) = ReadHeader();
 
             for (int i = 0; i < numFiles; i++) {
                 ushort offset = reader.ReadUInt16();
                 using (source.Stream.EnterWithPosition(offset)) {
-                    ReadFileInfo(source);
+                    ReadFileInfo(source, info);
                 }
             }
 
             return alar;
         }
 
-        private int ReadHeader()
+        private (AlarInfo, int) ReadHeader()
         {
             string stamp = reader.ReadString(4);
             if (stamp != Alar.FormatId) {
@@ -73,25 +73,27 @@ namespace JUS.Tool.Containers.Converters
             uint lastFileId = reader.ReadUInt32();
             _ = reader.ReadUInt16(); // offset to file data
 
-            alar = new Alar {
+            alar = new Alar();
+            var alarInfo = new AlarInfo {
                 Version = 3,
                 Features = featureFlags,
                 FirstFileId = firstFileId,
                 LastFileId = lastFileId,
             };
+            alar.Root.Add(new Node(Alar.InfoNodeName, alarInfo));
 
-            return numFiles;
+            return (alarInfo, numFiles);
         }
 
-        private void ReadFileInfo(IBinary source)
+        private void ReadFileInfo(IBinary source, AlarInfo info)
         {
             uint id = reader.ReadUInt32();
             uint offset = reader.ReadUInt32();
             uint size = reader.ReadUInt32();
             uint flags = reader.ReadUInt32();
 
-            var fileStream = new DataStream(source.Stream, offset, size);
-            var alarFile = new AlarFile(fileStream) {
+            var binaryFile = new BinaryFormat(source.Stream, offset, size);
+            var alarFileInfo = new AlarFileInfo {
                 FileId = id,
                 Flags = flags,
             };
@@ -101,14 +103,16 @@ namespace JUS.Tool.Containers.Converters
             if ((flags >> 31) == 1) {
                 _ = reader.ReadUInt16(); // name hash
                 string path = reader.ReadString();
+                alarFileInfo.Path = path;
 
                 string name = Path.GetFileName(path);
                 dir = Path.GetDirectoryName(path)!;
-                child = new Node(name, alarFile);
+                child = new Node(name, binaryFile);
             } else {
-                child = new Node("file", alarFile);
+                child = new Node("file", binaryFile);
             }
 
+            info.FilesMetadata.Add(alarFileInfo);
             NodeFactory.CreateContainersForChild(alar.Root, dir, child);
         }
     }

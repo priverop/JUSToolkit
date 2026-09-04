@@ -17,12 +17,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using JUS.Tool.Containers;
+
+using JUS.Tool;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
-using static System.Net.WebRequestMethods;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -52,20 +52,24 @@ namespace JUS.CLI.JUS.Rom
             foreach (var containerGroup in filesGroupedByContainer) {
                 string alarPath = containerGroup.Key;
 
-                ProcessContainer(gameNode, alarPath, containerGroup);
+                ProcessContainer(gameNode, alarPath, containerGroup.ToArray());
             }
         }
 
-        private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
+        private static void ProcessContainer(Node gameNode, string alarPath, Node[] filesToInsert)
         {
             Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}");
             Console.WriteLine($"Inserting text files in: /root/data{alarPath}.");
 
-            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>();
+            containerNode.TransformWith<Binary2Alar3>();
             foreach (Node fileToInsert in filesToInsert) {
                 fileToInsert.Name = GetFileName(fileToInsert.Name);
-                alar.InsertModification(fileToInsert);
             }
+
+            var inputRoot = new Node("root", new NodeContainerFormat());
+            inputRoot.Add(filesToInsert);
+
+            containerNode.ReplaceBinaryChildren(inputRoot);
             _ = containerNode.TransformWith(new Alar3ToBinary());
 
         }
