@@ -27,12 +27,12 @@ using Yarhl.IO;
 namespace JUS.Tests.Graphics
 {
     [TestFixture]
-    public class AlmtTests
+    public class AltmTests
     {
         public static IEnumerable<TestCaseData> GetFiles()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
-            string listPath = Path.Combine(basePath, "almt.txt");
+            string listPath = Path.Combine(basePath, "altm.txt");
             return TestDataBase.ReadTestListFile(listPath)
                 .Select(line => line.Split(','))
                 .Select(data => new TestCaseData(
@@ -41,14 +41,14 @@ namespace JUS.Tests.Graphics
         }
 
         [TestCaseSource(nameof(GetFiles))]
-        public void TwoWaysIdenticalAlmtStream(string almtPath)
+        public void TwoWaysIdenticalAltmStream(string altmPath)
         {
-            TestDataBase.IgnoreIfFileDoesNotExist(almtPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(altmPath);
 
-            using Node node = NodeFactory.FromFile(almtPath, FileOpenMode.Read);
+            using Node node = NodeFactory.FromFile(altmPath, FileOpenMode.Read);
 
-            Almt almt = new Binary2Almt().Convert(node.GetFormatAs<BinaryFormat>());
-            BinaryFormat generatedStream = new Almt2Binary().Convert(almt);
+            Altm altm = new Binary2Altm().Convert(node.GetFormatAs<BinaryFormat>());
+            BinaryFormat generatedStream = new Altm2Binary().Convert(altm);
 
             var originalStream = new DataStream(node.Stream, 0, node.Stream.Length);
             generatedStream.Stream.Length.Should().Be(originalStream.Length);

@@ -67,11 +67,11 @@ namespace JUS.Tool.Graphics.Converters
             // Map
             using Node mapsNode = OriginalAtm
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Almt>();
+                .TransformWith<Binary2Altm>();
 
             var mapsParams = new MapDecompressionParams {
-                Map = mapsNode.GetFormatAs<Almt>(),
-                TileSize = mapsNode.GetFormatAs<Almt>().TileSize,
+                Map = mapsNode.GetFormatAs<Altm>(),
+                TileSize = mapsNode.GetFormatAs<Altm>().TileSize,
             };
 
             var mapCompression = new MapDecompression(mapsParams);

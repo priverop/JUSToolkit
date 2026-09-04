@@ -24,22 +24,22 @@ namespace JUS.Tool.Graphics
     }
 
     /// <summary>
-    /// Screen map with format Almt.
+    /// Screen map with format ALTM.
     /// </summary>
-    public class Almt : ITileMap
+    public class Altm : ITileMap
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Almt"/> class.
+        /// Initializes a new instance of the <see cref="Altm"/> class.
         /// </summary>
-        public Almt()
+        public Altm()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Almt"/> class cloning another Almt object.
+        /// Initializes a new instance of the <see cref="Altm"/> class cloning another Almt object.
         /// </summary>
         /// <param name="atm">Almt object to clone.</param>
-        public Almt(Almt atm)
+        public Altm(Altm atm)
         {
             Magic = atm.Magic;
             Unknown = atm.Unknown;
@@ -57,11 +57,11 @@ namespace JUS.Tool.Graphics
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Almt"/> class cloning another Almt and the ScreenMap properties.
+        /// Initializes a new instance of the <see cref="Altm"/> class cloning another Almt and the ScreenMap properties.
         /// </summary>
         /// <param name="atm">Almt object to clone.</param>
         /// <param name="screenMap">ScreenMap object to clone.</param>
-        public Almt(Almt atm, ITileMap screenMap)
+        public Altm(Altm atm, ITileMap screenMap)
             : this(atm)
         {
             Width = screenMap.Width;

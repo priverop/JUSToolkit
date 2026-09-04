@@ -34,7 +34,7 @@ namespace JUS.CLI.JUS.Graphics
     public static class DigCommands
     {
         /// <summary>
-        /// Export a DSIG + ALMT into a PNG.
+        /// Export a DSIG + ALTM into a PNG.
         /// </summary>
         /// <param name="dig">The file.dig.</param>
         /// <param name="atm">The map.atm file.</param>
@@ -54,7 +54,7 @@ namespace JUS.CLI.JUS.Graphics
         }
 
         /// <summary>
-        /// Import a PNG into a DSIG + ALMT.
+        /// Import a PNG into a DSIG + ALTM.
         /// </summary>
         /// <param name="input">The png to import.</param>
         /// <param name="insertTransparent">Insert a transparent tile at the start of the image.</param>
@@ -72,10 +72,10 @@ namespace JUS.CLI.JUS.Graphics
                 .TransformWith<Binary2Dig>()
                 .GetFormatAs<Dig>();
 
-            Almt originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
+            Altm originalAtm = NodeFactory.FromFile(atm, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Almt>()
-                .GetFormatAs<Almt>();
+                .TransformWith<Binary2Altm>()
+                .GetFormatAs<Altm>();
 
             if (originalDig is null) {
                 throw new FormatException("Invalid dig file");
@@ -111,8 +111,8 @@ namespace JUS.CLI.JUS.Graphics
 
             binaryDig.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
 
-            var newAtm = new Almt(originalAtm, map);
-            using BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
+            var newAtm = new Altm(originalAtm, map);
+            using BinaryFormat binaryAtm = new Altm2Binary().Convert(newAtm);
 
             binaryAtm.Stream.WriteTo(Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 
@@ -173,13 +173,13 @@ namespace JUS.CLI.JUS.Graphics
                 };
 
                 // New Atm: original atm changing height, width and maps
-                Almt originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
-                    .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>();
-                var newAtm = new Almt(originalAtm, map);
+                Altm originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
+                    .TransformWith<Binary2Altm>()
+                    .GetFormatAs<Altm>();
+                var newAtm = new Altm(originalAtm, map);
 
                 // Export ATM
-                new Almt2Binary().Convert(newAtm)
+                new Altm2Binary().Convert(newAtm)
                     .Stream.WriteTo(Path.Combine(output, Path.GetFileName(atm[i])));
             }
 

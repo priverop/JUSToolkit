@@ -162,12 +162,12 @@ namespace JUS.CLI.JUS
             var exportDigDig = new Option<string>("--dig") { Description = "the input file.dig" };
             var exportDigAtm = new Option<string>("--atm") { Description = "the input map.atm file" };
             var exportDigOutput = new Option<string>("--output") { Description = "the output folder" };
-            var exportDsigAlmt = new Command("export-dig", "Export dsig+almt") {
+            var exportDsigAltm = new Command("export-dig", "Export dsig+altm") {
                 exportDigDig,
                 exportDigAtm,
                 exportDigOutput,
             };
-            exportDsigAlmt.SetAction(parseResult => {
+            exportDsigAltm.SetAction(parseResult => {
                 DigCommands.ExportDig(
                     parseResult.GetValue(exportDigDig)!,
                     parseResult.GetValue(exportDigAtm)!,
@@ -179,7 +179,7 @@ namespace JUS.CLI.JUS
             var importDigDig = new Option<string>("--dig") { Description = "the original file.dig" };
             var importDigAtm = new Option<string>("--atm") { Description = "the original file.atm" };
             var importDigOutput = new Option<string>("--output") { Description = "the output folder" };
-            var importDig = new Command("import-dig", "Import dsig+almt") {
+            var importDig = new Command("import-dig", "Import dsig+altm") {
                 importDigInput,
                 importDigInsertTransparent,
                 importDigDig,
@@ -200,7 +200,7 @@ namespace JUS.CLI.JUS
             var mergeDigDig = new Option<string>("--dig") { Description = "the original file.dig" };
             var mergeDigAtm = new Option<string[]>("--atm") { Description = "the original file.atm", Arity = ArgumentArity.OneOrMore };
             var mergeDigOutput = new Option<string>("--output") { Description = "the output folder" };
-            var mergeDig = new Command("merge-dig", "Import Import dsig with multiple almt") {
+            var mergeDig = new Command("merge-dig", "Import Import dsig with multiple altm") {
                 mergeDigInput,
                 mergeDigInsertTransparent,
                 mergeDigDig,
@@ -237,7 +237,7 @@ namespace JUS.CLI.JUS
                 importDtx3,
                 importDtx3Tx,
                 importDtx4,
-                exportDsigAlmt,
+                exportDsigAltm,
                 importDig,
                 mergeDig,
             };

@@ -12,10 +12,18 @@
 #  href: dscp.md
 
 - name: 🖼️ Graphics
-- name: DTX sprites
-  href: dtx.md
+- name: Indexed images
+  href: dsig.md
+- name: Tile maps
+  href: altm.md
+- name: Sprites and textures
+  href: dstx.md
 - name: Koma sprites
   href: koma.md
+- name: Sprite animations
+  href: almt.md
+- name: Sprite object definition
+  href: alod.md
 
 - name: 🈂️ Fonts
 - name: ALFT
