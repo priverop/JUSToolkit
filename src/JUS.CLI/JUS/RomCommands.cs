@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.CLI.JUS.Rom;
+using JUS.Tool;
+using JUS.Tool.Discovery;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -40,6 +42,27 @@ namespace JUS.CLI.JUS
             new TextContainerFile(),
             new TextPatternFile(),
         ];
+
+        /// <summary>
+        /// Export the game assets into editable formats.
+        /// </summary>
+        /// <param name="gamePath">Path to the game backup file.</param>
+        /// <param name="languageCode">Translation language or null for template files.</param>
+        /// <param name="outputDirectory">Output directory to write the files.</param>
+        public static void Export(string gamePath, string? languageCode, string outputDirectory)
+        {
+            using Node root = NodeFactory.FromFile(gamePath, FileOpenMode.Read)
+                .TransformWith(new Binary2NitroRom());
+
+            ProgramInfo info = root.GetFormatAs<NitroRom>().Information;
+            if (info.GameCode != SupportedSoftware.GameCode) {
+                throw new NotSupportedException($"Unsupported game code: {info.GameCode}");
+            }
+
+            root.TransformWith(new JusAssetsExporter(languageCode));
+
+            ExportNode(root, outputDirectory);
+        }
 
         /// <summary>
         /// Import files into the Rom.
@@ -119,6 +142,19 @@ namespace JUS.CLI.JUS
             gameNode.Stream.WriteTo(Path.Combine(output, "new_game_font.nds"));
 
             Console.WriteLine("Done!");
+        }
+
+        private static void ExportNode(Node container, string outputPath)
+        {
+            foreach (Node child in Navigator.IterateNodes(container)) {
+                if (child.IsContainer) {
+                    continue;
+                }
+
+                string relative = Path.GetRelativePath(container.Path, child.Path);
+                string childOutput = Path.Combine(outputPath, relative);
+                child.Stream.WriteTo(childOutput);
+            }
         }
     }
 }

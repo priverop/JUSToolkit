@@ -341,6 +341,17 @@ namespace JUS.CLI.JUS
 
         private static Command CreateRomCommand()
         {
+            var exportGame = new Option<string>("--game") { Description = "the path of the rom", Required = true };
+            var exportLang = new Option<string>("--lang") { Description = "the target translation language or none to generate templates" };
+            var exportOutput = new Option<string>("--output") { Description = "the output folder" };
+            var export = new Command("export", "Export the game assets in editable formats") { exportGame, exportLang, exportOutput };
+            export.SetAction(r => {
+                RomCommands.Export(
+                    r.GetRequiredValue(exportGame),
+                    r.GetValue(exportLang),
+                    r.GetRequiredValue(exportOutput));
+            });
+
             var importGame = new Option<string>("--game") { Description = "the path of the rom" };
             var importInput = new Option<string>("--input") { Description = "the input directory to insert" };
             var importOutput = new Option<string>("--output") { Description = "the output folder" };
@@ -372,6 +383,7 @@ namespace JUS.CLI.JUS
             });
 
             return new Command("game", "Import files to the Game") {
+                export,
                 import,
                 importFont,
             };
