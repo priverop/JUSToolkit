@@ -74,9 +74,9 @@ namespace JUS.CLI.JUS.Graphics
             var converter = new Png2DigAtm(originalDig, originalAtm, insertTransparent);
             NodeContainerFormat transformedFiles = converter.Convert(png);
 
-            transformedFiles.Root.Children[originalDig.Name]!.Stream!.WriteTo(
+            transformedFiles.Root.Children[originalDig.Name].Stream.WriteTo(
                 Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".dig"));
-            transformedFiles.Root.Children[originalAtm.Name]!.Stream!.WriteTo(
+            transformedFiles.Root.Children[originalAtm.Name].Stream.WriteTo(
                 Path.Combine(output, Path.GetFileNameWithoutExtension(input) + ".atm"));
 
             Console.WriteLine("Done!");
