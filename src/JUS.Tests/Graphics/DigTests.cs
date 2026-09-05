@@ -60,7 +60,7 @@ namespace JUS.Tests.Graphics
             TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
             string atmName = Path.ChangeExtension(dig.Name, ".atm");
-            Node atm = dig.Parent!.Children[atmName] ?? throw new ArgumentException($"{atmName} not found");
+            Node atm = dig.Parent!.Children[atmName];
 
             AssertTwoWaysIdenticalDigImage(dig, atm);
         }
@@ -111,7 +111,7 @@ namespace JUS.Tests.Graphics
             TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
             string atmName = Path.ChangeExtension(dig.Name, ".atm");
-            Node atm = dig.Parent!.Children[atmName] ?? throw new ArgumentException($"{atmName} not found");
+            Node atm = dig.Parent!.Children[atmName];
 
             AssertImportEmptyPalettes(dig, atm);
         }
