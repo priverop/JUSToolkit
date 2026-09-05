@@ -1,8 +1,8 @@
 <Project>
   <!-- Centralize dependency management -->
   <ItemGroup>
-    <PackageVersion Include="Yarhl" Version="5.0.0-preview.43" />
-    <PackageVersion Include="Yarhl.Media.Text" Version="5.0.0-preview.43" />
+    <PackageVersion Include="Yarhl" Version="5.0.0-preview.52" />
+    <PackageVersion Include="Yarhl.Media.Text" Version="5.0.0-preview.52" />
     <PackageVersion Include="Texim" Version="0.1.0-preview.390" />
     <PackageVersion Include="Texim.Formats.ImageSharp" Version="0.1.0-preview.390" />
     <PackageVersion Include="Texim.Games" Version="0.1.0-preview.390" />
