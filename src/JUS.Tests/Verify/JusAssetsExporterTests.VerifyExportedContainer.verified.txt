@@ -1,0 +1,61 @@
+﻿{
+  Root: {
+    Name: root,
+    Format: Yarhl.FileSystem.NodeContainerFormat,
+    Children: [
+      {
+        Name: es,
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: deck,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: deck-jadv.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jard.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jard_p.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jarg.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jarg_p.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-play.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-priv.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-smpl.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-smpl_p.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-test.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  Disposed: false
+}

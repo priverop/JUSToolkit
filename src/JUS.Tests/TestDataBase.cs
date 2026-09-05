@@ -29,6 +29,21 @@ namespace JUS.Tests
     /// </summary>
     public static class TestDataBase
     {
+        public static string VerifyTextsPath => Path.Combine(VerifyResourcesPath, "Texts");
+
+        public static string VerifyResourcesPath {
+            get {
+                string programDir = AppDomain.CurrentDomain.BaseDirectory;
+                string path = Path.Combine(
+                    programDir,
+                    "..", // framework -> configuration
+                    "..", // -> bin
+                    "..", // -> project
+                    "Verify");
+                return Path.GetFullPath(path);
+            }
+        }
+
         public static string RootFromOutputPath {
             get {
                 string? envVar = Environment.GetEnvironmentVariable("JUS_PATH");

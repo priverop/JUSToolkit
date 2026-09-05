@@ -4,8 +4,10 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
     <PackageVersion Include="NLog" Version="6.2.0" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.2.0" />
+    <PackageVersion Include="Verify.NUnit" Version="32.0.0" />
     <PackageVersion Include="Yarhl" Version="5.0.0-preview.43" />
     <PackageVersion Include="Yarhl.Media.Text" Version="5.0.0-preview.43" />
+    <PackageVersion Include="Yarhl.TestFramework.Verify" Version="5.0.0-preview.43" />
     <PackageVersion Include="Texim" Version="0.1.0-preview.379" />
     <PackageVersion Include="Texim.Formats.ImageSharp" Version="0.1.0-preview.379" />
     <PackageVersion Include="Texim.Games" Version="0.1.0-preview.379" />

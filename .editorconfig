@@ -252,3 +252,13 @@ dotnet_diagnostic.S2094.severity = none # Remove empty class
 dotnet_diagnostic.S2699.severity = none # Assert may be in helper methods
 dotnet_diagnostic.S3966.severity = none # Dispose twice to test implementation
 dotnet_code_quality_unused_parameters = all:none # Some test methods may not use all the source args
+
+# Verify settings
+[*.{received,verified}.{json,txt,xml}]
+charset = "utf-8-bom"
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = false
+tab_width = 8
+trim_trailing_whitespace = false

@@ -1,0 +1,115 @@
+﻿{
+  Root: {
+    Name: root,
+    Format: Yarhl.FileSystem.NodeContainerFormat,
+    Children: [
+      {
+        Name: deck,
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: deck-jadv.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x68E5,
+              Length: 0x68E5,
+              SHA256: E178F6D3DAB0427D0879E430CF8CD8B927D2A3D557549F0F6FC9D2619A12561E
+            }
+          },
+          {
+            Name: deck-jard.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x1F19,
+              Length: 0x1F19,
+              SHA256: 29571141614586E3BEAD3779F83B2CB8B776308DE4916F71764CF69E2849A90E
+            }
+          },
+          {
+            Name: deck-jard_p.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x180E,
+              Length: 0x180E,
+              SHA256: 887A765F75DAF44B8BF6565C62C000BF96DD78AE5849D63A2B0A48A0FD27FEAE
+            }
+          },
+          {
+            Name: deck-jarg.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0xD41,
+              Length: 0xD41,
+              SHA256: 188EB7D2EE88047DB65EF3B38B0AA3771CF4D8A74608B602F04983D39C2833D7
+            }
+          },
+          {
+            Name: deck-jarg_p.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0xA8B,
+              Length: 0xA8B,
+              SHA256: BCF02E7151C740558A050407AD282B05E394ABADFBF57E457A0C725F59ADAB7C
+            }
+          },
+          {
+            Name: deck-play.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x377,
+              Length: 0x377,
+              SHA256: 38ED13C3659217830604C2B3AAAB57E2388AA890B556CA89DC907C1BD6B6530B
+            }
+          },
+          {
+            Name: deck-priv.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x1055,
+              Length: 0x1055,
+              SHA256: FB49CE07F119F67DE182FB537D498396675C5AECB7CAA204C7CBA410654D9886
+            }
+          },
+          {
+            Name: deck-smpl.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x3BF,
+              Length: 0x3BF,
+              SHA256: 9F30E8B852827E7AE5846ED4F5D8E663BFD3E459E96B6D5D7103293AD066FC5A
+            }
+          },
+          {
+            Name: deck-smpl_p.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x37D,
+              Length: 0x37D,
+              SHA256: 970747D50F05D89916588FFF94FED83929956EA1E5447CEBFD08145057A44A99
+            }
+          },
+          {
+            Name: deck-test.po,
+            Format: {
+              Stream: Yarhl.IO.DataStream,
+              Offset: 0x0,
+              Position: 0x2E9,
+              Length: 0x2E9,
+              SHA256: 863FA983CC29E112D2A1AC706DDE19A641A12196FDE1BC6A770A6F8418D42FCC
+            }
+          }
+        ]
+      }
+    ]
+  },
+  Disposed: false
+}
