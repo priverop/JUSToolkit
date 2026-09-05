@@ -1,42 +1,10 @@
 # Koma sprites
 
-To export all the info from the images, we need to follow some steps detailed [here](./koma-research.md)
+To export all the info from the images, we need to follow some steps detailed
+[here](./koma-research.md)
 
-## DSTX04
-
-| Offset | Type    | Description        |
-| ------ | ------- | ------------------ |
-| 0x00   | char[4] | DSTX               |
-| 0x04   | byte    | Unknown            |
-| 0x05   | byte    | Type, must be 0x04 |
-| 0x06   | short   | Number of elements |
-| 0x08   | short   | DSIG offset        |
-| 0x0C   | uint[]  | Sprite data        |
-| ...    | DSIG    | Image with palette |
-
-The sprite data is 4 bytes:
-
-1. byte: Width in tiles (48 pixels)
-2. byte: Height in tiles (48 pixels)
-3. short: Tile index. Only if it's 0, use 1. Tile 0 is transparent tile.
-
-> **NOTE**:  
-> The sprite IDs from `KShape` do not correspond to the order defined in the
-> DSTX. `KShape` points to blocks of 48x48 in the order defined in the image
-> DSIG, which may be different as the sprites defined here.
-
-## DSIG
-
-| Offset | Type     | Description                                        |
-| ------ | -------- | -------------------------------------------------- |
-| 0x00   | char[4]  | DSIG                                               |
-| 0x04   | byte     | Version                                            |
-| 0x05   | byte     | nds image format. Different than 0x10, then 8 bpp. |
-| 0x06   | short    | number of palettes                                 |
-| 0x08   | short    | width                                              |
-| 0x0A   | short    | height                                             |
-| 0x0C   | bgr555[] | palette                                            |
-| ...    | pixels[] | image                                              |
+- [koma.bin ImHex pattern](./resources/komabin.hexpat)
+- [kshape ImHex pattern](./resources/kshape.hexpat)
 
 ## KShape
 
