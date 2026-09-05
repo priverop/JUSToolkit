@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using System.Security.Cryptography;
 using FluentAssertions;
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
@@ -44,7 +45,7 @@ namespace JUS.Tests.Graphics
             }
 
             Node topmenuAlar = Navigator.GetNode(Root.Value.Data, "topmenu/topmenu.aar") ?? throw new ArgumentException("topmenu.aar not found");
-            TopMenuAlar = topmenuAlar.GetFormatAs<Alar>() ?? topmenuAlar.TransformWith<Binary2Alar>().GetFormatAs<Alar>()!;
+            TopMenuAlar = topmenuAlar.GetFormatAs<Alar>() ?? topmenuAlar.TransformWith<Binary2Alar>().GetFormatAs<Alar>();
 
             return Navigator.IterateNodes(TopMenuAlar.Root, NavigationMode.DepthFirst)
                 .Where(n => n.Name == "top_bg01.dig")
@@ -70,34 +71,34 @@ namespace JUS.Tests.Graphics
         private static void AssertTwoWaysIdenticalDigImage(Node dig, Node atm)
         {
             // Clone original nodes
-            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
             using var digClone = new Node(dig.Name, digCloneBinary);
             using var atmClone = new Node(atm.Name, atmCloneBinary);
 
             // Export Dig + ATM
             var binaryDig2Bitmap = new BinaryDig2Bitmap(atmClone);
             BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>()!);
-            var originalPngClone = (BinaryFormat)new BinaryFormat(originalPng.Stream!).DeepClone();
+            var originalPngClone = (BinaryFormat)new BinaryFormat(originalPng.Stream).DeepClone();
 
             // Import png
-            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
             using var digImport = new Node(dig.Name, digImportBinary);
             using var atmImport = new Node(atm.Name, atmImportBinary);
             var converter = new Png2DigAtm(digImport, atmImport, true);
             NodeContainerFormat transformedFiles = converter.Convert(new Node("png", originalPng));
 
             // Export new Dig + ATM
-            Node newDig = transformedFiles.Root.Children[dig.Name]!;
-            Node newAtm = transformedFiles.Root.Children[atm.Name]!;
+            Node newDig = transformedFiles.Root.Children[dig.Name];
+            Node newAtm = transformedFiles.Root.Children[atm.Name];
 
             var converter2 = new BinaryDig2Bitmap(newAtm);
-            BinaryFormat finalPng = converter2.Convert(newDig.GetFormatAs<IBinary>()!);
+            BinaryFormat finalPng = converter2.Convert(newDig.GetFormatAs<IBinary>());
 
             // Are the PNGs equal?
             bool hasSameLength = originalPng.Stream.Length == finalPng.Stream.Length;
-            if (!hasSameLength) {
+            if (hasSameLength) {
                 string testCaseName = Path.GetFileNameWithoutExtension(digClone.Name);
                 TestDataBase.WriteFailedData(originalPngClone.Stream, $"expected_{testCaseName}.png");
                 TestDataBase.WriteFailedData(finalPng.Stream, $"actual_{testCaseName}.png");
@@ -112,12 +113,12 @@ namespace JUS.Tests.Graphics
         {
             TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-            Node originalDig = Navigator.GetNode(TopMenuAlar!.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
+            Node originalDig = Navigator.GetNode(TopMenuAlar.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
             Assert.That(originalDig, Is.Not.Null);
 
             string atmPath = Path.ChangeExtension(digPath, ".atm");
 
-            Node originalAtm = Navigator.GetNode(TopMenuAlar!.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
+            Node originalAtm = Navigator.GetNode(TopMenuAlar.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
             Assert.That(originalAtm, Is.Not.Null);
 
             AssertImportEmptyPalettes(originalDig, originalAtm);
@@ -126,34 +127,34 @@ namespace JUS.Tests.Graphics
         private static void AssertImportEmptyPalettes(Node dig, Node atm)
         {
             // Clone original nodes
-            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
             using var digClone = new Node(dig.Name, digCloneBinary);
             using var atmClone = new Node(atm.Name, atmCloneBinary);
 
             // Export Dig + ATM into a PNG
             var binaryDig2Bitmap = new BinaryDig2Bitmap(atmClone);
-            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>()!);
+            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>());
 
             // Import PNG
-            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream!).DeepClone();
-            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream!).DeepClone();
+            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
+            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
             using var digImport = new Node(dig.Name, digImportBinary);
             using var atmImport = new Node(atm.Name, atmImportBinary);
             var converter = new Png2DigAtm(digImport, atmImport, true);
             NodeContainerFormat transformedFiles = converter.Convert(new Node("png", originalPng));
 
-            Node newDigNode = transformedFiles.Root.Children[dig.Name]!;
-            Node newAtmNode = transformedFiles.Root.Children[atm.Name]!;
+            Node newDigNode = transformedFiles.Root.Children[dig.Name];
+            Node newAtmNode = transformedFiles.Root.Children[atm.Name];
 
             Dig newDig = newDigNode
                 .TransformWith<LzssDecompression>()
                 .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>()!;
-            Almt newAtm = newAtmNode
+                .GetFormatAs<Dig>();
+            Altm newAtm = newAtmNode
                 .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Almt>()
-                .GetFormatAs<Almt>()!;
+                .TransformWith<Binary2Altm>()
+                .GetFormatAs<Altm>();
 
             // The DIG files have a lot of empty palettes (all colors are 0,0,0: black).
             // In order to import PNGs with black pixels, Texim looks for that black color, and finds
@@ -168,7 +169,7 @@ namespace JUS.Tests.Graphics
                 )
             );
 
-            blackPalettes.Should().BeEmpty();
+            _ = blackPalettes.Should().BeEmpty();
         }
 
         public static IEnumerable<TestCaseData> GetFiles()
