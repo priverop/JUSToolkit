@@ -75,7 +75,7 @@ namespace JUS.Tests.Graphics
 
             // Export Dig + ATM
             var binaryDig2Bitmap = new BinaryDig2Bitmap(atmClone);
-            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>()!);
+            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>());
             var originalPngClone = (BinaryFormat)new BinaryFormat(originalPng.Stream).DeepClone();
 
             // Import png
@@ -95,7 +95,7 @@ namespace JUS.Tests.Graphics
 
             // Are the PNGs equal?
             bool hasSameLength = originalPng.Stream.Length == finalPng.Stream.Length;
-            if (hasSameLength) {
+            if (!hasSameLength) {
                 string testCaseName = Path.GetFileNameWithoutExtension(digClone.Name);
                 TestDataBase.WriteFailedData(originalPngClone.Stream, $"expected_{testCaseName}.png");
                 TestDataBase.WriteFailedData(finalPng.Stream, $"actual_{testCaseName}.png");
@@ -197,7 +197,6 @@ namespace JUS.Tests.Graphics
         [TestCaseSource(nameof(GetFiles))]
         public void TwoWaysIdenticalDigStream(string infoPath, string digPath, string atmPath)
         {
-            // TODO: refactor first the Dig import logic into a converter
             Assert.Ignore("Imported Dig are smaller, we neet to test with PNGs instead");
             TestDataBase.IgnoreIfFileDoesNotExist(digPath);
 
