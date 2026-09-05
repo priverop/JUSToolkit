@@ -1,12 +1,14 @@
 ﻿using JUS.Tool.Containers.Converters;
 using JUS.Tool.Texts.Converters;
 using JUS.Tool.Texts.Formats;
+using JUS.Tool.Utils;
+using Microsoft.Extensions.Logging;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 using Yarhl.Media.Text;
 
-namespace JUS.Tool.Texts;
+namespace JUS.Tool.BatchConverters;
 
 /// <summary>
 /// Converter that creates a new container with the game text assets ready to export for editing.
@@ -15,6 +17,7 @@ namespace JUS.Tool.Texts;
 /// <param name="createTemplate">Value indicating whether to create a PO template or a target language specific PO.</param>
 public class JusTextAssetsExporter(bool createTemplate): IConverter<NodeContainerFormat, NodeContainerFormat>
 {
+    private readonly ILogger<JusTextAssetsExporter> logger = JusLoggerFactory.Instance.CreateLogger<JusTextAssetsExporter>();
     private readonly string extension = createTemplate ? ".pot" : ".po";
 
     /// <inheritdoc />
@@ -28,6 +31,7 @@ public class JusTextAssetsExporter(bool createTemplate): IConverter<NodeContaine
 
     private IEnumerable<Node> ExportDecks(Node root)
     {
+        logger.LogDebug("Reading decks");
         using NodeContainerFormat container = root
             .Children["data"]
             .Children["deck"]
@@ -38,20 +42,26 @@ public class JusTextAssetsExporter(bool createTemplate): IConverter<NodeContaine
 
         // Pack the read decks into a container, so we export one .po per parent and type
         foreach (Node parent in containerRoot.Children) {
+            logger.LogDebug("Exporting deck container {Name}", parent.Name);
             NodeContainerFormat deckContainer = new();
             NodeContainerFormat pDeckContainer = new();
 
             foreach (Node deck in parent.Children.ToArray()) {
+
                 // Use PDeck or Deck converters and ignore empty files.
                 if (deck.Name[0] == 'p') {
                     deck.TransformWith(new Binary2PDeck());
                     if (deck.GetFormatAs<PDeck>().Name.Length > 0) {
                         pDeckContainer.Root.Add(deck);
+                    } else {
+                        logger.LogDebug("Ignoring empty PDeck: {Path}", deck.Path);
                     }
                 } else {
                     deck.TransformWith(new Binary2Deck());
                     if (deck.GetFormatAs<Deck>().Name.Length > 0) {
                         deckContainer.Root.Add(deck);
+                    } else {
+                        logger.LogDebug("Ignoring empty Deck: {Path}", deck.Path);
                     }
                 }
             }

@@ -19,6 +19,7 @@
 // SOFTWARE.
 using JUS.CLI.JUS.Graphics;
 using System.CommandLine;
+using Microsoft.Extensions.Logging;
 
 namespace JUS.CLI.JUS
 {
@@ -341,15 +342,23 @@ namespace JUS.CLI.JUS
 
         private static Command CreateRomCommand()
         {
+            var verbosity = new Option<LogLevel>("--verbosity") { Description = "logging verbosity", DefaultValueFactory = _ => LogLevel.Information };
+
             var exportGame = new Option<string>("--game") { Description = "the path of the rom", Required = true };
             var exportLang = new Option<string>("--lang") { Description = "the target translation language or none to generate templates" };
             var exportOutput = new Option<string>("--output") { Description = "the output folder" };
-            var export = new Command("export", "Export the game assets in editable formats") { exportGame, exportLang, exportOutput };
+            var export = new Command("export", "Export the game assets in editable formats") {
+                exportGame,
+                exportLang,
+                exportOutput,
+                verbosity,
+            };
             export.SetAction(r => {
                 RomCommands.Export(
                     r.GetRequiredValue(exportGame),
                     r.GetValue(exportLang),
-                    r.GetRequiredValue(exportOutput));
+                    r.GetRequiredValue(exportOutput),
+                    r.GetValue(verbosity));
             });
 
             var importGame = new Option<string>("--game") { Description = "the path of the rom" };

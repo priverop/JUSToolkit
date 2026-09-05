@@ -1,8 +1,7 @@
-﻿using JUS.Tool.Texts;
-using Yarhl.FileFormat;
+﻿using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 
-namespace JUS.Tool;
+namespace JUS.Tool.BatchConverters;
 
 /// <summary>
 /// Converter that creates a new container with the all the game assets ready to export for editing.

@@ -18,8 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.CLI.JUS.Rom;
-using JUS.Tool;
+using JUS.Tool.BatchConverters;
 using JUS.Tool.Discovery;
+using JUS.Tool.Utils;
+using Microsoft.Extensions.Logging;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -49,8 +51,14 @@ namespace JUS.CLI.JUS
         /// <param name="gamePath">Path to the game backup file.</param>
         /// <param name="languageCode">Translation language or null for template files.</param>
         /// <param name="outputDirectory">Output directory to write the files.</param>
-        public static void Export(string gamePath, string? languageCode, string outputDirectory)
+        /// <param name="verbosity">Logging verbosity</param>
+        public static void Export(string gamePath, string? languageCode, string outputDirectory, LogLevel verbosity)
         {
+            AppLoggerFactory.MinimumLevel = verbosity;
+            JusLoggerFactory.Instance = AppLoggerFactory.GetFactory();
+            ILogger logger = AppLoggerFactory.CreateLogger(nameof(RomCommands));
+
+            logger.LogInformation("Reading input: {@Path}", gamePath);
             using Node root = NodeFactory.FromFile(gamePath, FileOpenMode.Read)
                 .TransformWith(new Binary2NitroRom());
 
@@ -59,9 +67,13 @@ namespace JUS.CLI.JUS
                 throw new NotSupportedException($"Unsupported game code: {info.GameCode}");
             }
 
+            logger.LogInformation("Converting to exportable format");
             root.TransformWith(new JusAssetsExporter(languageCode));
 
-            ExportNode(root, outputDirectory);
+            logger.LogInformation("Exporting to file system");
+            ExportNode(root, outputDirectory, logger);
+
+            logger.LogInformation("Done!");
         }
 
         /// <summary>
@@ -144,7 +156,7 @@ namespace JUS.CLI.JUS
             Console.WriteLine("Done!");
         }
 
-        private static void ExportNode(Node container, string outputPath)
+        private static void ExportNode(Node container, string outputPath, ILogger logger)
         {
             foreach (Node child in Navigator.IterateNodes(container)) {
                 if (child.IsContainer) {
@@ -153,6 +165,8 @@ namespace JUS.CLI.JUS
 
                 string relative = Path.GetRelativePath(container.Path, child.Path);
                 string childOutput = Path.Combine(outputPath, relative);
+
+                logger.LogDebug("Writing {NodePath} into {LocalPath}", child.Path, childOutput);
                 child.Stream.WriteTo(childOutput);
             }
         }
