@@ -151,7 +151,7 @@ namespace JUS.CLI.JUS.Rom
                 throw new FormatException($"{dtxName} is not a Dtx3Tx.");
             }
 
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
 
             using var pngNode = new Node(dtxName, new BinaryFormat(PngOf(files, dtxName).Stream));
             _ = pngNode.TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));

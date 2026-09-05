@@ -160,7 +160,7 @@ namespace JUS.CLI.JUS.Graphics
             Node pngNode = NodeFactory.FromFile(input, FileOpenMode.Read);
 
             // Get the IndexedPixels
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
             pngNode.TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
@@ -317,7 +317,7 @@ namespace JUS.CLI.JUS.Graphics
             Node pngNode = NodeFactory.FromFile(png, FileOpenMode.Read);
 
             // Get the IndexedPixels
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
             pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
