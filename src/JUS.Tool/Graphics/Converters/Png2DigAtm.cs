@@ -1,6 +1,7 @@
 using JUS.Tool.Utils;
 using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
+using Texim.Palettes;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
@@ -65,7 +66,8 @@ namespace JUS.Tool.Graphics.Converters
 
             // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
             var compressionParams = new RgbImageMapCompressionParams {
-                Palettes = new Texim.Palettes.PaletteCollection(dig.Palettes.Skip(12)),
+                Palettes = dig,
+                PaletteIndexStart = FirstNonBlackPaletteIndex(dig),
             };
 
             png.Stream.Position = 0;
@@ -80,12 +82,6 @@ namespace JUS.Tool.Graphics.Converters
                 Pixels = compressed.Tiles,
             };
             ITileMap map = compressed.Map;
-
-            for (int i = 0; i < map.Maps.Length; i++) {
-                if (map.Maps[i].PaletteIndex == 0) {
-                    map.Maps[i] = map.Maps[i] with { PaletteIndex = 12 };
-                }
-            }
 
             // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(dig, newImage);
@@ -115,6 +111,25 @@ namespace JUS.Tool.Graphics.Converters
             transformedFiles.Root.Add(new Node(originalAtm.Name, compressedAtm));
 
             return transformedFiles;
+        }
+
+        /// <summary>
+        /// Gets the index of the first palette that is not entirely black.
+        /// </summary>
+        /// <param name="palettes">The palettes of the image.</param>
+        /// <returns>The index of the first non-black palette, 0 if every palette is black.</returns>
+        private static int FirstNonBlackPaletteIndex(IPaletteCollection palettes)
+        {
+            for (int i = 0; i < palettes.Palettes.Count; i++) {
+                bool isBlack = palettes.Palettes[i].Colors
+                    .All(color => color.Red == 0 && color.Green == 0 && color.Blue == 0);
+
+                if (!isBlack) {
+                    return i;
+                }
+            }
+
+            return 0;
         }
     }
 }
