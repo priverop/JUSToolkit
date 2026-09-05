@@ -51,8 +51,7 @@ namespace JUS.CLI.JUS
         {
             Console.WriteLine($"Importing {input}");
 
-            if (!Directory.Exists(input))
-            {
+            if (!Directory.Exists(input)) {
                 throw new ArgumentException($"The --input parameter must be a directory: {input}");
             }
 
@@ -65,17 +64,14 @@ namespace JUS.CLI.JUS
             // Files with no strategies
             // In most strategies, we modify Node.Name, so we need to do this first
             var orphanFiles = inputFiles.Children.Where(file => !Strategies.Any(strategy => strategy.Matches(file.Name)));
-            foreach (Node orphan in orphanFiles)
-            {
+            foreach (Node orphan in orphanFiles) {
                 Console.WriteLine("These files won't be imported, as they don't match with any importer:");
                 Console.WriteLine(orphan.Name);
             }
 
-            foreach (IFileImportStrategy strategy in Strategies)
-            {
+            foreach (IFileImportStrategy strategy in Strategies) {
                 var matchedFiles = inputFiles.Children.Where(f => strategy.Matches(f.Name)).ToList();
-                if (matchedFiles.Count > 0)
-                {
+                if (matchedFiles.Count > 0) {
                     strategy.Import(gameNode, matchedFiles);
                 }
             }
@@ -104,12 +100,12 @@ namespace JUS.CLI.JUS
             Node fontNode = NodeFactory.FromFile(font, FileOpenMode.Read);
 
             // Regular Font
-            Node toReplace = Navigator.SearchNode(gameNode, "/root/data/font/jskfont.aft");
+            Node toReplace = Navigator.GetNode(gameNode, "/root/data/font/jskfont.aft");
             toReplace.ChangeFormat(fontNode.Format);
             Console.WriteLine("File replaced: /root/data/font/jskfont.aft");
 
             // JQuiz Font
-            Node toReplace_q = Navigator.SearchNode(gameNode, "/root/data/font/jskfont_q.aft");
+            Node toReplace_q = Navigator.GetNode(gameNode, "/root/data/font/jskfont_q.aft");
             toReplace_q.ChangeFormat(fontNode.Format);
             Console.WriteLine("File replaced: /root/data/font/jskfont_q.aft");
 

@@ -68,8 +68,7 @@ namespace JUS.CLI.JUS.Rom
         /// <inheritdoc/>
         public void Import(Node gameNode, List<Node> files)
         {
-            foreach (var parentGroup in files.GroupBy(ParentOf))
-            {
+            foreach (var parentGroup in files.GroupBy(ParentOf)) {
                 ProcessParentContainer(gameNode, parentGroup.Key, parentGroup);
             }
         }
@@ -82,7 +81,7 @@ namespace JUS.CLI.JUS.Rom
                 ? directory
                 : Path.GetFileNameWithoutExtension(parentName);
 
-            Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentDirectory}/{parentName}");
+            Node parentAlar = Navigator.GetNode(gameNode, $"/root/data/{parentDirectory}/{parentName}");
 
             Console.WriteLine($"/root/data/{parentDirectory}/{parentName} found.");
 
@@ -92,13 +91,11 @@ namespace JUS.CLI.JUS.Rom
             parentAlar.Tags[Alar.CompressionTag] = isCompressed;
 
             // No child.aar
-            foreach (var dtxGroup in files.Where(f => ChildOf(f) is null).GroupBy(DtxOf))
-            {
+            foreach (var dtxGroup in files.Where(f => ChildOf(f) is null).GroupBy(DtxOf)) {
                 ProcessDtx(parentAlar, dtxGroup.Key, dtxGroup);
             }
 
-            foreach (var childGroup in files.Where(f => ChildOf(f) is not null).GroupBy(f => ChildOf(f)!))
-            {
+            foreach (var childGroup in files.Where(f => ChildOf(f) is not null).GroupBy(f => ChildOf(f)!)) {
                 ProcessChildContainer(parentAlar, childGroup.Key, childGroup);
             }
 
@@ -119,8 +116,7 @@ namespace JUS.CLI.JUS.Rom
             _ = workingChild.TransformWith<Binary2Alar>();
             workingChild.Tags[Alar.CompressionTag] = isCompressed;
 
-            foreach (var dtxGroup in files.GroupBy(DtxOf))
-            {
+            foreach (var dtxGroup in files.GroupBy(DtxOf)) {
                 ProcessDtx(workingChild, dtxGroup.Key, dtxGroup);
             }
 
@@ -140,8 +136,7 @@ namespace JUS.CLI.JUS.Rom
             using var workingDtx = new Node(dtxName, (BinaryFormat)new BinaryFormat(originalDtx.Stream).DeepClone());
             bool isCompressed = CompressionUtils.IsCompressed(workingDtx);
 
-            if (isCompressed)
-            {
+            if (isCompressed) {
                 _ = workingDtx.TransformWith<LzssDecompression>();
             }
 
@@ -152,8 +147,7 @@ namespace JUS.CLI.JUS.Rom
 
             Dig originalImage = workingDtx.Children["image"].GetFormatAs<Dig>();
 
-            if (originalImage.Swizzling != DigSwizzling.Linear)
-            {
+            if (originalImage.Swizzling != DigSwizzling.Linear) {
                 throw new FormatException($"{dtxName} is not a Dtx3Tx.");
             }
 
@@ -164,8 +158,7 @@ namespace JUS.CLI.JUS.Rom
 
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
-            var updatedImage = new Dig(originalImage)
-            {
+            var updatedImage = new Dig(originalImage) {
                 Pixels = newImage.Pixels.ToArray(),
             };
 
@@ -176,12 +169,9 @@ namespace JUS.CLI.JUS.Rom
 
             Dtx3TxToBinary converter;
 
-            if (yaml is null)
-            {
+            if (yaml is null) {
                 converter = new Dtx3TxToBinary(decompressedDtx);
-            }
-            else
-            {
+            } else {
                 var reader = new TextDataReader(yaml.Stream);
                 reader.Stream.Position = 0;
 

@@ -43,7 +43,7 @@ namespace JUS.Tests.Graphics
                 return [];
             }
 
-            Node topmenuAlar = Navigator.SearchNode(Root.Value.Data, "topmenu/topmenu.aar") ?? throw new ArgumentException("topmenu.aar not found");
+            Node topmenuAlar = Navigator.GetNode(Root.Value.Data, "topmenu/topmenu.aar") ?? throw new ArgumentException("topmenu.aar not found");
             TopMenuAlar = topmenuAlar.GetFormatAs<Alar>() ?? topmenuAlar.TransformWith<Binary2Alar>().GetFormatAs<Alar>()!;
 
             return Navigator.IterateNodes(TopMenuAlar.Root, NavigationMode.DepthFirst)
@@ -56,12 +56,12 @@ namespace JUS.Tests.Graphics
         {
             TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-            Node originalDig = Navigator.SearchNode(TopMenuAlar!.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
+            Node originalDig = Navigator.GetNode(TopMenuAlar!.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
             Assert.That(originalDig, Is.Not.Null);
 
             string atmPath = Path.ChangeExtension(digPath, ".atm");
 
-            Node originalAtm = Navigator.SearchNode(TopMenuAlar!.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
+            Node originalAtm = Navigator.GetNode(TopMenuAlar!.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
             Assert.That(originalAtm, Is.Not.Null);
 
             AssertTwoWaysIdenticalDigImage(originalDig, originalAtm);
@@ -112,12 +112,12 @@ namespace JUS.Tests.Graphics
         {
             TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-            Node originalDig = Navigator.SearchNode(TopMenuAlar!.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
+            Node originalDig = Navigator.GetNode(TopMenuAlar!.Root, digPath) ?? throw new ArgumentException($"{digPath} not found");
             Assert.That(originalDig, Is.Not.Null);
 
             string atmPath = Path.ChangeExtension(digPath, ".atm");
 
-            Node originalAtm = Navigator.SearchNode(TopMenuAlar!.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
+            Node originalAtm = Navigator.GetNode(TopMenuAlar!.Root, atmPath) ?? throw new ArgumentException($"{atmPath} not found");
             Assert.That(originalAtm, Is.Not.Null);
 
             AssertImportEmptyPalettes(originalDig, originalAtm);
