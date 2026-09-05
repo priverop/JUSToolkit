@@ -90,6 +90,8 @@ namespace JUS.Tool.Graphics.Converters
                 newDig = newDig.InsertTransparentTile(map);
             }
 
+            newDig.CheckMaxTiles(originalDig.Name);
+
             BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
             BinaryFormat compressedDig = digIsCompressed ?
