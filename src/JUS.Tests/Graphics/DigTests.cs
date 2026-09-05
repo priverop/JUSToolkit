@@ -67,42 +67,29 @@ namespace JUS.Tests.Graphics
 
         private static void AssertTwoWaysIdenticalDigImage(Node dig, Node atm)
         {
-            // Clone original nodes
-            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-            using var digClone = new Node(dig.Name, digCloneBinary);
-            using var atmClone = new Node(atm.Name, atmCloneBinary);
-
             // Export Dig + ATM
-            var binaryDig2Bitmap = new BinaryDig2Bitmap(atmClone);
-            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>());
-            var originalPngClone = (BinaryFormat)new BinaryFormat(originalPng.Stream).DeepClone();
+            using BinaryFormat originalPng = new BinaryDig2Bitmap(atm).Convert(dig.GetFormatAs<IBinary>());
 
             // Import png
-            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-            using var digImport = new Node(dig.Name, digImportBinary);
-            using var atmImport = new Node(atm.Name, atmImportBinary);
-            var converter = new Png2DigAtm(digImport, atmImport, true);
-            NodeContainerFormat transformedFiles = converter.Convert(new Node("png", originalPng));
+            using var pngNode = new Node("png", originalPng);
+            NodeContainerFormat transformedFiles = new Png2DigAtm(dig, atm, true).Convert(pngNode);
 
             // Export new Dig + ATM
             Node newDig = transformedFiles.Root.Children[dig.Name];
             Node newAtm = transformedFiles.Root.Children[atm.Name];
 
-            var converter2 = new BinaryDig2Bitmap(newAtm);
-            BinaryFormat finalPng = converter2.Convert(newDig.GetFormatAs<IBinary>());
+            using BinaryFormat finalPng = new BinaryDig2Bitmap(newAtm).Convert(newDig.GetFormatAs<IBinary>());
 
             // Are the PNGs equal?
             bool hasSameLength = originalPng.Stream.Length == finalPng.Stream.Length;
             if (!hasSameLength) {
-                string testCaseName = Path.GetFileNameWithoutExtension(digClone.Name);
-                TestDataBase.WriteFailedData(originalPngClone.Stream, $"expected_{testCaseName}.png");
+                string testCaseName = Path.GetFileNameWithoutExtension(dig.Name);
+                TestDataBase.WriteFailedData(originalPng.Stream, $"expected_{testCaseName}.png");
                 TestDataBase.WriteFailedData(finalPng.Stream, $"actual_{testCaseName}.png");
             }
 
-            finalPng.Stream.Length.Should().Be(originalPngClone.Stream.Length);
-            finalPng.Stream.Compare(originalPngClone.Stream).Should().BeTrue();
+            finalPng.Stream.Length.Should().Be(originalPng.Stream.Length);
+            finalPng.Stream.Compare(originalPng.Stream).Should().BeTrue();
         }
 
         [TestCaseSource(nameof(GetDigNodes))]
@@ -118,23 +105,12 @@ namespace JUS.Tests.Graphics
 
         private static void AssertImportEmptyPalettes(Node dig, Node atm)
         {
-            // Clone original nodes
-            var digCloneBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atmCloneBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-            using var digClone = new Node(dig.Name, digCloneBinary);
-            using var atmClone = new Node(atm.Name, atmCloneBinary);
-
             // Export Dig + ATM into a PNG
-            var binaryDig2Bitmap = new BinaryDig2Bitmap(atmClone);
-            BinaryFormat originalPng = binaryDig2Bitmap.Convert(digClone.GetFormatAs<IBinary>());
+            using var originalPng = new BinaryDig2Bitmap(atm).Convert(dig.GetFormatAs<IBinary>());
 
             // Import PNG
-            var digImportBinary = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
-            var atmImportBinary = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-            using var digImport = new Node(dig.Name, digImportBinary);
-            using var atmImport = new Node(atm.Name, atmImportBinary);
-            var converter = new Png2DigAtm(digImport, atmImport, true);
-            NodeContainerFormat transformedFiles = converter.Convert(new Node("png", originalPng));
+            using var pngNode = new Node("png", originalPng);
+            NodeContainerFormat transformedFiles = new Png2DigAtm(dig, atm, true).Convert(pngNode);
 
             Node newDigNode = transformedFiles.Root.Children[dig.Name];
             Node newAtmNode = transformedFiles.Root.Children[atm.Name];

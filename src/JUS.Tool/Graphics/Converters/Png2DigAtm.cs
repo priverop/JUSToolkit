@@ -45,36 +45,27 @@ namespace JUS.Tool.Graphics.Converters
         {
             ArgumentNullException.ThrowIfNull(png);
 
+            var decompression = new LzssDecompression();
+
+            // Dig
             bool digIsCompressed = CompressionUtils.IsCompressed(originalDig);
-            Node uncompressedDig = digIsCompressed ?
-                originalDig.TransformWith<LzssDecompression>() :
-                originalDig;
+            BinaryFormat uncompressedDig = decompression.Convert(originalDig.GetFormatAs<IBinary>());
+            Dig dig = new Binary2Dig().Convert(uncompressedDig) ?? throw new FormatException("Invalid dig file");
 
-            Dig dig = uncompressedDig
-                .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
-
-            // Original Atm
+            // Atm
             bool atmIsCompressed = CompressionUtils.IsCompressed(originalAtm);
-            Node uncompressedAtm = atmIsCompressed ?
-                originalAtm.TransformWith<LzssDecompression>() :
-                originalAtm;
+            BinaryFormat uncompressedAtm = decompression.Convert(originalAtm.GetFormatAs<IBinary>());
+            Altm atm = new Binary2Altm().Convert(uncompressedAtm) ?? throw new FormatException("Invalid atm file");
 
-            Altm atm = uncompressedAtm
-                    .TransformWith<Binary2Altm>()
-                    .GetFormatAs<Altm>() ?? throw new FormatException("Invalid atm file");
-
-            // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
+            // Convert PNG into a RgbImage (Pixels + Map) using the Dig Palette
             var compressionParams = new RgbImageMapCompressionParams {
                 Palettes = dig,
                 PaletteIndexStart = FirstNonBlackPaletteIndex(dig),
             };
 
             png.Stream.Position = 0;
-            MapCompressedIndexedImage compressed = png
-                .TransformWith<StandardBinaryImage2RgbImage>()
-                .TransformWith(new RgbImageMapCompression(compressionParams))
-                .GetFormatAs<MapCompressedIndexedImage>();
+            RgbImage rgbImage = new StandardBinaryImage2RgbImage().Convert(png.GetFormatAs<IBinary>());
+            MapCompressedIndexedImage compressed = new RgbImageMapCompression(compressionParams).Convert(rgbImage);
 
             var newImage = new IndexedImage {
                 Width = 8,
