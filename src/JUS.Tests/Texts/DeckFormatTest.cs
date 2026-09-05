@@ -1,10 +1,7 @@
-using System;
-using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Texts.Converters;
 using JUS.Tool.Texts.Formats;
 using NUnit.Framework;
-using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 using Yarhl.Media.Text;
@@ -37,7 +34,7 @@ namespace JUS.Tests.Texts
                 .TransformWith(new Binary2Alar());
         }
 
-        private static IEnumerable<TestCaseData> GetDeckPaths()
+        private static IEnumerable<TestCaseData> GetDeckNodes()
         {
             if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
                 return [];
@@ -48,7 +45,7 @@ namespace JUS.Tests.Texts
                 .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
 
-        [TestCaseSource(nameof(GetDeckPaths))]
+        [TestCaseSource(nameof(GetDeckNodes))]
         public void PoRoundTripIsIdentical(Node node)
         {
             if (Ignored.Contains($"{node.Parent!.Name}/{node.Name}")) {
