@@ -91,7 +91,7 @@ namespace JUS.Tool.BatchConverters
                 throw new FormatException("Invalid png file");
             }
 
-            // Obtaining the original Dig and Almt
+            // Obtaining the original Dig and Altm
             Node dig = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
             Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmName) ?? throw new FormatException("Atm doesn't exist: " + AtmName);
 
@@ -99,7 +99,7 @@ namespace JUS.Tool.BatchConverters
             var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
             var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
 
-            // Transform the PNG into the new Dig and Almt (we need the original dig + atm)
+            // Transform the PNG into the new Dig and Altm (we need the original dig + atm)
             var converter = new Png2DigAtm(new Node(dig.Name, dig_clone), new Node(atm.Name, atm_clone), true);
 
             NodeContainerFormat transformedFiles = converter.Convert(Image);

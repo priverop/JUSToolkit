@@ -60,9 +60,9 @@ namespace JUS.Tool.Graphics.Converters
                 originalAtm.TransformWith<LzssDecompression>() :
                 originalAtm;
 
-            Almt atm = uncompressedAtm
-                    .TransformWith<Binary2Almt>()
-                    .GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
+            Altm atm = uncompressedAtm
+                    .TransformWith<Binary2Altm>()
+                    .GetFormatAs<Altm>() ?? throw new FormatException("Invalid atm file");
 
             // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
             var compressionParams = new RgbImageMapCompressionParams {
@@ -101,8 +101,8 @@ namespace JUS.Tool.Graphics.Converters
             transformedFiles.Root.Add(new Node(originalDig.Name, compressedDig));
 
             // New Atm: original atm changing height, width and maps
-            var newAtm = new Almt(atm, map);
-            BinaryFormat binaryAtm = new Almt2Binary().Convert(newAtm);
+            var newAtm = new Altm(atm, map);
+            BinaryFormat binaryAtm = new Altm2Binary().Convert(newAtm);
 
             BinaryFormat compressedAtm = atmIsCompressed ?
                 new LzssCompression().Convert(binaryAtm) :
