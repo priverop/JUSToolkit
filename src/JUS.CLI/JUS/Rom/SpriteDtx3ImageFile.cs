@@ -120,6 +120,7 @@ namespace JUS.CLI.JUS.Rom
             using var pngs = new NodeContainerFormat();
             foreach (Node file in files) {
                 file.Name = SpriteOf(file);
+                pngs.Root.Add(new Node(file.Name, new BinaryFormat(new DataStream(file.Stream))));
             }
 
             _ = dtxNode.TransformWith(new Png2Dtx3(pngs))
