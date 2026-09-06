@@ -56,7 +56,7 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, List<Node> filesToInsert, string containerPath)
         {
-            Node originalAlar = Navigator.SearchNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
+            Node originalAlar = Navigator.GetNode(gameNode, $"/root/data{containerPath}") ?? throw new FormatException($"Container not found /root/data{containerPath}");
             _ = originalAlar.TransformWith<Binary2Alar3>();
 
             foreach (Node fileToInsert in filesToInsert) {
@@ -79,7 +79,7 @@ namespace JUS.CLI.JUS.Rom
                     }
 
                     _ = originalAlar.TransformWith(image2Alar3);
-                   Console.WriteLine($"File replaced: /root/data{containerPath}/{fileToInsert.Name}");
+                    Console.WriteLine($"File replaced: /root/data{containerPath}/{fileToInsert.Name}");
                 }
             }
             _ = originalAlar.TransformWith(new Alar3ToBinary());

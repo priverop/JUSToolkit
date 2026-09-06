@@ -17,6 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using JUS.Tool.Containers.Converters;
 using NUnit.Framework;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
@@ -29,6 +30,8 @@ namespace JUS.Tests
     /// </summary>
     public static class TestDataBase
     {
+        public static Lazy<NitroRom?> UnpackedRoot { get; } = new(ReadAndUnpackRoot);
+
         public static string RootFromOutputPath {
             get {
                 string? envVar = Environment.GetEnvironmentVariable("JUS_PATH");
@@ -49,6 +52,10 @@ namespace JUS.Tests
 
         public static string SoftwareNitroRomPath => Path.Combine(RootFromOutputPath, "JUS_AJUJ01_00.nds");
 
+        public static string RootTestFailedPath =>
+            Path.Combine(Path.GetDirectoryName(SoftwareNitroRomPath)!, "failed");
+
+
         public static NitroRom ReadSoftware()
         {
             string path = SoftwareNitroRomPath;
@@ -57,6 +64,23 @@ namespace JUS.Tests
             return NodeFactory.FromFile(path, FileOpenMode.Read)
                 .TransformWith(new Binary2NitroRom())
                 .GetFormatAs<NitroRom>();
+        }
+
+        private static NitroRom? ReadAndUnpackRoot()
+        {
+            if (!File.Exists(SoftwareNitroRomPath)) {
+                return null;
+            }
+
+            // Unpack all ALAR so we can easily iterate over all the software assets.
+            NitroRom root = ReadSoftware();
+            foreach (Node node in Navigator.IterateNodes(root.Root)) {
+                if (node.Name.EndsWith(".aar") && node.Format is IBinary) {
+                    node.TransformWith(new Binary2Alar());
+                }
+            }
+
+            return root;
         }
 
         public static void IgnoreIfFileDoesNotExist(string file)
@@ -76,5 +100,12 @@ namespace JUS.Tests
                 .Select(line => line.Trim())
                 .Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'));
         }
+
+        public static void WriteFailedData(Stream? stream, string name)
+        {
+            string path = Path.Combine(RootTestFailedPath, name);
+            stream?.WriteTo(path);
+        }
+
     }
 }

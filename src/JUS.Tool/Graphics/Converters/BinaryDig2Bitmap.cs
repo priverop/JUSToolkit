@@ -58,28 +58,23 @@ namespace JUS.Tool.Graphics.Converters
                 throw new ArgumentNullException(nameof(source));
             }
 
-            source.Stream.Position = 0;
+            var decompression = new LzssDecompression();
 
-            Node pixelsPaletteNode = new Node("dig", source)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Dig>();
+            BinaryFormat uncompressedDig = decompression.Convert(source);
+            Dig pixelsPalette = new Binary2Dig().Convert(uncompressedDig);
 
             // Map
-            using Node mapsNode = OriginalAtm
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Altm>();
+            BinaryFormat uncompressedAtm = decompression.Convert(OriginalAtm.GetFormatAs<IBinary>());
+            Altm maps = new Binary2Altm().Convert(uncompressedAtm);
 
             var mapsParams = new MapDecompressionParams {
-                Map = mapsNode.GetFormatAs<Altm>(),
-                TileSize = mapsNode.GetFormatAs<Altm>().TileSize,
+                Map = maps,
+                TileSize = maps.TileSize,
             };
 
-            var mapCompression = new MapDecompression(mapsParams);
-            var image2Bitmap = new IndexedImage2BinaryPng(pixelsPaletteNode.GetFormatAs<IndexedPaletteImage>());
-            pixelsPaletteNode.TransformWith(mapCompression)
-                .TransformWith(image2Bitmap);
+            IIndexedImage image = new MapDecompression(mapsParams).Convert(pixelsPalette);
 
-            return new BinaryFormat(pixelsPaletteNode.Stream);
+            return new IndexedImage2BinaryPng(pixelsPalette).Convert(image);
         }
     }
 }
