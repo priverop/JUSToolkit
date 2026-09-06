@@ -75,7 +75,7 @@ namespace JUS.CLI.JUS
             using Node container = NodeFactory.FromFile(containerPath)
                 .TransformWith(new Binary2Alar());
 
-            using Node inputRoot = NodeFactory.FromDirectory(inputPath);
+            using Node inputRoot = NodeFactory.FromDirectory(inputPath, "*", "root", true, FileOpenMode.Read);
             container.ReplaceBinaryChildren(inputRoot);
 
             string outputFilePath = Path.Combine(output, Path.GetFileName(containerPath));
