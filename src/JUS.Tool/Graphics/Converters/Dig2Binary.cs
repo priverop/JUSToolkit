@@ -46,8 +46,9 @@ namespace JUS.Tool.Graphics.Converters
                 writer.Write((ushort)dig.OriginalSize.Height);
             }
 
+            IColorEncoding colorEncoding = dig.DataFormat is DigDataFormat.CompressedBlocks ? Abgr555Encoding.Instance : Bgr555Encoding.Instance;
             foreach (IPalette c in dig.Palettes) {
-                writer.Write<Abgr555Encoding>(c.Colors);
+                writer.Write(colorEncoding.Encode(c.Colors));
             }
 
             if (dig.DataFormat is DigDataFormat.CompressedBlocks) {

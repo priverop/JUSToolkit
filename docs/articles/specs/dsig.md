@@ -90,3 +90,5 @@ with the number of segments plus one (the 32-bits of the count).
 
 In the version 2 of DSIG files, there is a 32-bits integer before the pixel data
 which is unknown.
+
+This format uses the color encoding ABGR555 for the palette.
