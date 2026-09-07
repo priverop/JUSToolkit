@@ -17,8 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using JUS.Tool.Graphics.Converters;
-using Texim.Images;
 using Texim.Formats.ImageSharp.Images;
 using Texim.Sprites;
 using Yarhl.FileFormat;
@@ -57,8 +55,8 @@ namespace JUS.Tool.Graphics.Converters
 
             var bitmaps = new NodeContainerFormat();
 
-            switch (image.Swizzling) {
-                case DigSwizzling.Tiled:
+            switch (image.DataFormat) {
+                case DigDataFormat.Tiled:
                     foreach (Node nodeSprite in dtx3.Root.Children["sprites"].Children) {
                         // Cloning the node so we can transform it
                         bitmaps.Root.Add(new Node(nodeSprite.Name, nodeSprite.GetFormatAs<Sprite>())
@@ -67,7 +65,7 @@ namespace JUS.Tool.Graphics.Converters
                     }
 
                     break;
-                case DigSwizzling.Linear:
+                case DigDataFormat.Linear:
                     foreach (Node nodeTexture in dtx3.Root.Children["sprites"].Children) {
                         // Cloning the node so we can transform it
                         bitmaps.Root.Add(new Node(nodeTexture.Name, nodeTexture.GetFormatAs<Dig>())
@@ -76,7 +74,7 @@ namespace JUS.Tool.Graphics.Converters
 
                     break;
                 default:
-                    throw new FormatException("Invalid swizzling");
+                    throw new FormatException("Invalid data format");
             }
 
             return bitmaps;

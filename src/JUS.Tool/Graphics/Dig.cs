@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using JUS.Tool.Utils;
 using Texim.Images;
 using Texim.Palettes;
@@ -24,10 +26,15 @@ namespace JUS.Tool.Graphics
     }
 
     /// <summary>
-    /// Swizzling of a <see cref="Dig"/> image.
+    /// Format of the data of an <see cref="Dig"/> image.
     /// </summary>
-    public enum DigSwizzling
+    public enum DigDataFormat
     {
+        /// <summary>
+        /// Invalid image format.
+        /// </summary>
+        None = 0,
+
         /// <summary>
         /// Tiled swizzling.
         /// </summary>
@@ -37,6 +44,21 @@ namespace JUS.Tool.Graphics
         /// Linear swizzling.
         /// </summary>
         Linear = 2,
+
+        /// <summary>
+        /// Unknown format, not used on this game.
+        /// </summary>
+        Unknown3 = 3,
+
+        /// <summary>
+        /// Blocks of compressed data.
+        /// </summary>
+        CompressedBlocks = 4,
+
+        /// <summary>
+        /// Unknown format.
+        /// </summary>
+        Unknown5 = 5,
     }
 
     /// <summary>
@@ -64,6 +86,8 @@ namespace JUS.Tool.Graphics
         /// </summary>
         public Dig()
         {
+            Metadata = [];
+            CompressedSegments = [];
         }
 
         /// <summary>
@@ -73,26 +97,22 @@ namespace JUS.Tool.Graphics
         [SetsRequiredMembers]
         public Dig(Dig dig)
         {
-            Unknown = dig.Unknown;
-            ImageFormat = dig.ImageFormat;
-            NumPaletteLines = dig.NumPaletteLines;
+            Version = dig.Version;
+            Bpp = dig.Bpp;
+            DataFormat = dig.DataFormat;
             Width = dig.Width;
             Height = dig.Height;
-            Pixels = dig.Pixels;
-            PaletteStart = dig.PaletteStart;
-            PixelsStart = dig.PixelsStart;
-            Bpp = dig.Bpp;
-            Swizzling = dig.Swizzling;
-            foreach (IPalette p in dig.Palettes) {
-                Palettes.Add(p);
-            }
+            Metadata = dig.Metadata.ToArray();
+            CompressedSegments = dig.CompressedSegments.ToArray();
+            Pixels = dig.Pixels.ToArray();
+            Palettes = new Collection<IPalette>(dig.Palettes);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dig"/> class cloning the indexed image.
         /// </summary>
         /// <param name="dig">Dig object to clone.</param>
-        /// <param name="image">IndexedImage object to clone.</param>
+        /// <param name="image">Indexed image object to clone.</param>
         [SetsRequiredMembers]
         public Dig(Dig dig, IIndexedImage image)
             : this(dig)
@@ -154,39 +174,35 @@ namespace JUS.Tool.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the first byte of the format. Maybe the Type?.
+        /// Gets or sets the format version.
         /// </summary>
-        public byte Unknown { get; set; }
+        public byte Version { get; set; }
 
         /// <summary>
-        /// Gets or sets the ImageFormat.
-        /// </summary>
-        public byte ImageFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the NumPaletteLines.
-        /// </summary>
-        public ushort NumPaletteLines { get; set; }
-
-        /// <summary>
-        /// Gets or sets the PaletteStart value.
-        /// </summary>
-        public uint PaletteStart { get; set; }
-
-        /// <summary>
-        /// Gets or sets the PixelsStart value.
-        /// </summary>
-        public uint PixelsStart { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Bpp mode.
+        /// Gets or sets the bits per pixel (pixel encoding).
         /// </summary>
         public DigBpp Bpp { get; set; }
 
         /// <summary>
-        /// Gets or sets the Swizzling mode.
+        /// Gets or sets the format of the pixel data.
         /// </summary>
-        public DigSwizzling Swizzling { get; set; }
+        public DigDataFormat DataFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unknown metadata from version 2, format compressed blocks.
+        /// </summary>
+        public byte[] Metadata { get; set; }
+
+        /// <summary>
+        /// Gets or sets the compressed image segments from compressed block format.
+        /// </summary>
+        public byte[][] CompressedSegments { get; set; }
+
+        /// <summary>
+        /// Gets or sets the original size in the binary format that doesn't match the pixel count.
+        /// </summary>
+        /// <remarks>Probably the size before DSTX compression.</remarks>
+        public Size OriginalSize { get; set; }
 
         /// <summary>
         /// Paste a <see cref="Dig"/> subimage into this <see cref="Dig"/>.

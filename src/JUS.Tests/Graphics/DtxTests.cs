@@ -227,7 +227,7 @@ namespace JUS.Tests.Graphics
                 Pixels = tiledPixels.ToArray(),
                 Width = 8,
                 Height = tiledPixels.Length / 8,
-                Swizzling = DigSwizzling.Linear,
+                DataFormat = DigDataFormat.Linear,
             }.InsertTransparentTile();
 
             dtx4.Children["image"].ChangeFormat(updatedImage);

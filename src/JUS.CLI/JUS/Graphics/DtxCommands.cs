@@ -22,7 +22,6 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Formats.ImageSharp.Images;
-using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
 using Texim.Palettes;
@@ -80,7 +79,7 @@ namespace JUS.CLI.JUS.Graphics
 
             Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
 
-            if (originalImage.Swizzling != DigSwizzling.Linear) {
+            if (originalImage.DataFormat != DigDataFormat.Linear) {
                 throw new FormatException("Image is not DTX03TX");
             }
 
@@ -350,7 +349,7 @@ namespace JUS.CLI.JUS.Graphics
                 Pixels = tiledPixels.ToArray(),
                 Width = 8,
                 Height = tiledPixels.Length / 8,
-                Swizzling = DigSwizzling.Linear,
+                DataFormat = DigDataFormat.Linear,
             }.InsertTransparentTile();
 
             dtx4.Children["image"].ChangeFormat(updatedImage);

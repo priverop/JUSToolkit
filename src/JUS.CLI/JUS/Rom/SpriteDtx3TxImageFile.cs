@@ -147,7 +147,7 @@ namespace JUS.CLI.JUS.Rom
 
             Dig originalImage = workingDtx.Children["image"].GetFormatAs<Dig>();
 
-            if (originalImage.Swizzling != DigSwizzling.Linear) {
+            if (originalImage.DataFormat != DigDataFormat.Linear) {
                 throw new FormatException($"{dtxName} is not a Dtx3Tx.");
             }
 
