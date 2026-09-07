@@ -69,7 +69,7 @@ namespace JUS.Tool.Graphics
         /// <summary>
         /// The Magic ID of the file.
         /// </summary>
-        public const string STAMP = "DSIG";
+        public const string Stamp = "DSIG";
 
         /// <summary>
         /// 10 bits for the tile index.
@@ -86,7 +86,6 @@ namespace JUS.Tool.Graphics
         /// </summary>
         public Dig()
         {
-            Metadata = [];
             CompressedSegments = [];
         }
 
@@ -102,7 +101,8 @@ namespace JUS.Tool.Graphics
             DataFormat = dig.DataFormat;
             Width = dig.Width;
             Height = dig.Height;
-            Metadata = dig.Metadata.ToArray();
+            UnknownValue7 = dig.UnknownValue7;
+            UnknownBlockValue = dig.UnknownBlockValue;
             CompressedSegments = dig.CompressedSegments.ToArray();
             Pixels = dig.Pixels.ToArray();
             Palettes = new Collection<IPalette>(dig.Palettes);
@@ -189,9 +189,14 @@ namespace JUS.Tool.Graphics
         public DigDataFormat DataFormat { get; set; }
 
         /// <summary>
-        /// Gets or sets the unknown metadata from version 2, format compressed blocks.
+        /// Gets or sets the unknown value at position 7.
         /// </summary>
-        public byte[] Metadata { get; set; }
+        public byte UnknownValue7 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unknown value from compressed blocks in version 2.
+        /// </summary>
+        public uint UnknownBlockValue { get; set; }
 
         /// <summary>
         /// Gets or sets the compressed image segments from compressed block format.

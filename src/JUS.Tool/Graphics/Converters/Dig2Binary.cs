@@ -26,7 +26,7 @@ namespace JUS.Tool.Graphics.Converters
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
 
-            writer.Write(Dig.STAMP, false);
+            writer.Write(Dig.Stamp, false);
             writer.Write(dig.Version);
 
             int flags = ((int)dig.DataFormat << 4) | (int)dig.Bpp;
@@ -37,7 +37,7 @@ namespace JUS.Tool.Graphics.Converters
                 : (int)Math.Ceiling(dig.Palettes[0].Colors.Count / 16.0);
             writer.Write((byte)formatPaletteCount);
 
-            writer.Write((byte)dig.Metadata.Length);
+            writer.Write(dig.UnknownValue7);
 
             if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
                 writer.WriteTimes(0x00, 4); // placeholder
@@ -50,9 +50,11 @@ namespace JUS.Tool.Graphics.Converters
                 writer.Write<Abgr555Encoding>(c.Colors);
             }
 
-            writer.Write(dig.Metadata);
-
             if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
+                if (dig.Version != 1) {
+                    writer.Write(dig.UnknownBlockValue);
+                }
+
                 WriteCompressedBlocks(writer, dig);
             } else {
                 WriteIndexedPixels(writer, dig);
@@ -100,7 +102,7 @@ namespace JUS.Tool.Graphics.Converters
             }
 
             int infoLength = 4 + (4 * dig.CompressedSegments.Length);
-            int dataLength = (int)(writer.Stream.Length - basePosition + dig.Metadata.Length);
+            int dataLength = (int)(writer.Stream.Length - basePosition + 4);
 
             writer.Stream.Position = 0x08;
             writer.Write((ushort)(infoLength / 4));

@@ -47,7 +47,7 @@ namespace JUS.Tool.Graphics.Converters
             source.Stream.Position = 0;
 
             // Header
-            if (reader.ReadString(4) != Dig.STAMP) {
+            if (reader.ReadString(4) != Dig.Stamp) {
                 throw new FormatException("Invalid stamp");
             }
 
@@ -56,7 +56,7 @@ namespace JUS.Tool.Graphics.Converters
             var bpp = (DigBpp)(flags & 0x0F);
             var dataFormat = (DigDataFormat)(flags >> 4);
             byte paletteCount = reader.ReadByte();
-            byte metadataLength = reader.ReadByte();
+            byte unk07 = reader.ReadByte();
             ushort field08 = reader.ReadUInt16();
             ushort field0A = reader.ReadUInt16();
 
@@ -109,9 +109,9 @@ namespace JUS.Tool.Graphics.Converters
                 palettes.Add(new Palette(reader.ReadColors<Abgr555Encoding>(colorsPerPalette)));
             }
 
-            byte[] metadata = [];
+            uint unkBlockValue = 0;
             if (version != 1 && dataFormat is DigDataFormat.CompressedBlocks) {
-                metadata = reader.ReadBytes(metadataLength);
+                unkBlockValue = reader.ReadUInt32();
             }
 
             byte[][] compressedSegments = [];
@@ -143,9 +143,10 @@ namespace JUS.Tool.Graphics.Converters
                 Width = width,
                 Height = height,
                 OriginalSize = originalSize,
+                UnknownValue7 = unk07,
                 Pixels = pixels,
                 Palettes = palettes,
-                Metadata = metadata,
+                UnknownBlockValue = unkBlockValue,
                 CompressedSegments = compressedSegments,
             };
             return dig;
