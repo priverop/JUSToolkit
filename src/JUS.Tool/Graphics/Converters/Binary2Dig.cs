@@ -21,6 +21,7 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
 using JUS.Tool.Framework;
+using SceneGate.Ekona.Compression;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -61,52 +62,15 @@ namespace JUS.Tool.Graphics.Converters
             ushort field0A = reader.ReadUInt16();
 
             // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
-            uint pixelsStart = (uint)((paletteCount * 0x20) + 0xC);
-            int pixelLength = (int)(source.Stream.Length - pixelsStart);
-            int pixelCount = bpp == DigBpp.Bpp4 ? pixelLength * 2 : pixelLength;
-
-            IIndexedPixelEncoding pixelEncoding;
-            int colorsPerPalette;
-            int actualPaletteCount;
-            switch (bpp) {
-                case DigBpp.Bpp4:
-                    pixelEncoding = Indexed4BppEncoding.Instance;
-                    colorsPerPalette = 16;
-                    actualPaletteCount = paletteCount;
-                    break;
-                case DigBpp.Bpp8:
-                    pixelEncoding = Indexed8BppEncoding.Instance;
-                    colorsPerPalette = paletteCount * 16;
-                    actualPaletteCount = 1;
-                    break;
-                default:
-                    throw new FormatException($"Invalid bpp: {bpp}");
-            }
-
-            // In the case of compressed blocks, there isn't the concept of width.
-            // We generate an always valid one.
-            int width, height;
-            if (dataFormat == DigDataFormat.CompressedBlocks) {
-                // FUTURE: recalculate by pixel count after decompressing the blocks.
-                width = 8;
-                height = pixelCount / width;
-            } else {
-                width = field08;
-                height = field0A;
-            }
-
-            // DSIG inside DTX may have a size larger than the amount of pixels present.
-            // Probably this was the size before DSTX segmentation and compression (or the grid size?).
-            var originalSize = new Size(width, height);
-            if (dataFormat != DigDataFormat.CompressedBlocks && (width * height) > pixelCount) {
-                width = 8;
-                height = pixelCount / width;
-            }
+            int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
+            int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
 
             // The format 4 (compressed block) seems to use the alpha bit
+            IColorEncoding colorEncoding = dataFormat is DigDataFormat.CompressedBlocks ? Abgr555Encoding.Instance : Bgr555Encoding.Instance;
             var palettes = new Collection<IPalette>();
             for (int i = 0; i < actualPaletteCount; i++) {
-                palettes.Add(new Palette(reader.ReadColors<Abgr555Encoding>(colorsPerPalette)));
+                Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, colorsPerPalette);
+                palettes.Add(new Palette(colors));
             }
 
             uint unkBlockValue = 0;
@@ -114,26 +78,41 @@ namespace JUS.Tool.Graphics.Converters
                 unkBlockValue = reader.ReadUInt32();
             }
 
+            Stream pixelData = reader.Stream.Slice(reader.Stream.Position);
+            if (dataFormat is DigDataFormat.CompressedImage) {
+                pixelData = new LzssDecoder().Convert(pixelData);
+            }
+
+            long pixelCount = bpp == DigBpp.Bpp4 ? pixelData.Length * 2 : pixelData.Length;
+
+            // In the case of compressed blocks, there isn't the concept of width.
+            // We generate an always valid one.
+            int width, height;
+            if (dataFormat == DigDataFormat.CompressedBlocks) {
+                // FUTURE: recalculate by pixel count after decompressing the blocks.
+                width = 8;
+                height = (int)(pixelCount / width);
+            } else {
+                width = field08;
+                height = field0A;
+            }
+
+            // DSIG inside DTX may have width and height values that doesn't represent the amount of pixels.
+            // These images do not really have a size, as they have segments to reconstruct a different image.
+            // We calculate a valid size for them based on a minimal width (tile width).
+            var originalSize = new Size(width, height);
+            if (dataFormat != DigDataFormat.CompressedBlocks && (width * height) != pixelCount) {
+                width = 8;
+                height = (int)(pixelCount / width);
+            }
+
             byte[][] compressedSegments = [];
             IndexedPixel[] pixels = [];
-            switch (dataFormat) {
-                case DigDataFormat.Linear:
-                case DigDataFormat.Unknown5:
-                    pixels = pixelEncoding.DecodeExactly(source.Stream, width * height);
-                    break;
-
-                case DigDataFormat.Tiled:
-                    pixels = pixelEncoding.DecodeExactly(source.Stream, width * height);
-                    pixels = new TileSwizzling<IndexedPixel>(width).Unswizzle(pixels);
-                    break;
-
-                case DigDataFormat.CompressedBlocks:
-                    compressedSegments = ReadCompressedBlocks(reader);
-                    break;
-
-                case DigDataFormat.Unknown3:
-                default:
-                    throw new FormatException($"Invalid data format: {dataFormat}");
+            if (dataFormat is DigDataFormat.CompressedBlocks) {
+                compressedSegments = ReadCompressedBlocks(reader);
+            } else {
+                pixelData.Position = 0;
+                pixels = ReadPixels(pixelData, width, height, bpp, dataFormat);
             }
 
             var dig = new Dig {
@@ -150,6 +129,27 @@ namespace JUS.Tool.Graphics.Converters
                 CompressedSegments = compressedSegments,
             };
             return dig;
+        }
+
+        private static IndexedPixel[] ReadPixels(Stream stream, int width, int height, DigBpp bpp, DigDataFormat format)
+        {
+            if (width == 0 || height == 0) {
+                return [];
+            }
+
+            IIndexedPixelEncoding pixelEncoding = bpp switch {
+                DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
+                DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
+                _ => throw new FormatException($"Unsupported BPP {bpp}"),
+            };
+
+            IndexedPixel[] pixels = pixelEncoding.DecodeExactly(stream, width * height);
+
+            if (format is DigDataFormat.Tiled) {
+                return new TileSwizzling<IndexedPixel>(width).Unswizzle(pixels);
+            }
+
+            return pixels;
         }
 
         private static byte[][] ReadCompressedBlocks(DataReader reader)

@@ -71,9 +71,9 @@ namespace JUS.Tool.Graphics.Converters
                 _ => throw new FormatException("Invalid bpp"),
             };
 
+            // TODO: compress for format compressed image
             IndexedPixel[] pixels = dig.DataFormat switch {
-                DigDataFormat.Linear => dig.Pixels,
-                DigDataFormat.Unknown5 => dig.Pixels,
+                DigDataFormat.Linear or DigDataFormat.CompressedBlocks => dig.Pixels,
                 DigDataFormat.Tiled => new TileSwizzling<IndexedPixel>(dig.Width).Swizzle(dig.Pixels),
                 _ => throw new FormatException("Invalid format"),
             };

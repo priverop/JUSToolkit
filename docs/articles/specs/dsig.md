@@ -12,17 +12,23 @@ There are two known versions of the formats, each with different variants. This
 games only handles version 2 when the flags value is `0x40`.
 
 | Offset | Type       | Description                                       |
-| ------ | ---------- | ------------------------------------------------- |
+| ------ | ---------- |---------------------------------------------------|
 | 0x00   | char[4]    | Format ID: `DSIG`                                 |
 | 0x04   | byte       | Version: 1 or 2                                   |
 | 0x05   | byte       | Flags                                             |
 | 0x06   | byte       | Number of palettes                                |
-| 0x07   | byte       | Metadata length? (v2 is 4, otherwise 0)           |
+| 0x07   | byte       | Unknown (0 or 4)                                  |
 | 0x08   | ushort     | Image width or block info length / 4 in format 4  |
 | 0x0A   | ushort     | Image height or block data length / 4 in format 4 |
 | 0x0C   | bgr555[][] | Palettes                                          |
-| ...    | uint       | (only v2 with format 4) Metadata?                 |
+| ...    | uint       | Unknown (only v2 with format 4)                   |
 | ...    | byte[]     | Indexed pixels                                    |
+
+> [!NOTE]  
+> If the DSIG contains segments for a DSTX sprite, the _width_ and _height_
+> may contain invalid values. This is because the DSIG won't actually contain
+> any full image, but the DSTX will contain the segment instructions to 
+> reconstruct.
 
 ### Flags
 
@@ -31,11 +37,11 @@ games only handles version 2 when the flags value is `0x40`.
   - 1 -> 8bpp.
 - Bit 4-7: image format.
   - 0 -> not supported.
-  - 1 -> tiled.
+  - 1 -> tiled (tiles of 8x8).
   - 2 -> texture atlas (lineal).
   - 3 -> unknown.
   - 4 -> compressed sprite.
-  - 5 -> unknown.
+  - 5 -> compressed texture atlas (Nitro LZSS with header).
 
 The game provides an implementation for the following combination of flags, and
 gives it a name:

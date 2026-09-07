@@ -56,9 +56,9 @@ namespace JUS.Tool.Graphics
         CompressedBlocks = 4,
 
         /// <summary>
-        /// Unknown format.
+        /// One block of compressed data.
         /// </summary>
-        Unknown5 = 5,
+        CompressedImage = 5,
     }
 
     /// <summary>
