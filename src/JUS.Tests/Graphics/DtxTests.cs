@@ -24,10 +24,8 @@ using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using NUnit.Framework;
 using Texim.Formats.ImageSharp.Images;
-using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
-using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Sprites;
 using Yarhl.FileSystem;
@@ -227,7 +225,6 @@ namespace JUS.Tests.Graphics
                 Pixels = tiledPixels.ToArray(),
                 Width = 8,
                 Height = tiledPixels.Length / 8,
-                DataFormat = DigDataFormat.Linear,
             }.InsertTransparentTile();
 
             dtx4.Children["image"].ChangeFormat(updatedImage);
@@ -237,10 +234,13 @@ namespace JUS.Tests.Graphics
 
             // Compare
             var originalStream = new DataStream(originalDtx.Stream, 0, originalDtx.Stream.Length);
-            generatedStream.Length.Should().Be(originalStream.Length);
-            originalStream.WriteTo("original.dtx");
-            generatedStream.WriteTo("generated.dtx");
-            generatedStream.Compare(originalStream).Should().BeTrue();
+            bool areIdentical = generatedStream.Compare(originalStream);
+            if (!areIdentical) {
+                TestDataBase.WriteFailedData(originalStream, "original.dtx");
+                TestDataBase.WriteFailedData(generatedStream, "generated.dtx");
+            }
+
+            Assert.That(areIdentical, Is.True);
         }
 
         [TestCaseSource(nameof(GetDtx3Files))]

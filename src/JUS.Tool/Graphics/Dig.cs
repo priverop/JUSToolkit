@@ -101,6 +101,7 @@ namespace JUS.Tool.Graphics
             DataFormat = dig.DataFormat;
             Width = dig.Width;
             Height = dig.Height;
+            OriginalSize = dig.OriginalSize;
             UnknownValue7 = dig.UnknownValue7;
             UnknownBlockValue = dig.UnknownBlockValue;
             CompressedSegments = dig.CompressedSegments.ToArray();
