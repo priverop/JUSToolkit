@@ -129,11 +129,11 @@ The **Shape** byte encodes both segment size and flip transformations:
 
 See [the Koma specification](./koma.md) for more details.
 
-| Offset | Type   | Description                                             |
-| ------ | ------ |---------------------------------------------------------|
-| 0x0A   | short  | Unknown, always 1.                                      |
-| 0x0C   | uint[] | Sprite data                                             |
-| ...    | byte[] | Uknown area                                             |
+| Offset | Type   | Description                                            |
+| ------ |--------|--------------------------------------------------------|
+| 0x0A   | ushort | Flags? Always 1 for alpha channel in DSIG?             |
+| 0x0C   | uint[] | Sprite data                                            |
+| ...    | byte[] | Uknown area                                            |
 | ...    | DSIG   | Image with palette (weight 8, swizzled 48x48 tile size) |
 
 The sprite data is 4 bytes:

@@ -62,6 +62,22 @@ namespace JUS.Tool.Graphics
     }
 
     /// <summary>
+    /// Format of the color encoding in DSIG palettes.
+    /// </summary>
+    public enum DigColorFormat
+    {
+        /// <summary>
+        /// BGR555 with no transparency.
+        /// </summary>
+        Bgr555 = 0,
+
+        /// <summary>
+        /// ABGR555 with one bit transparency.
+        /// </summary>
+        Abgr555 = 4,
+    }
+
+    /// <summary>
     /// Image format.
     /// </summary>
     public class Dig : IndexedPaletteImage
@@ -102,7 +118,8 @@ namespace JUS.Tool.Graphics
             Width = dig.Width;
             Height = dig.Height;
             OriginalSize = dig.OriginalSize;
-            UnknownValue7 = dig.UnknownValue7;
+            FormatColorEncoding = dig.FormatColorEncoding;
+            ActualColorEncodingFormat = dig.ActualColorEncodingFormat;
             UnknownBlockValue = dig.UnknownBlockValue;
             CompressedSegments = dig.CompressedSegments.ToArray();
             Pixels = dig.Pixels.ToArray();
@@ -190,9 +207,14 @@ namespace JUS.Tool.Graphics
         public DigDataFormat DataFormat { get; set; }
 
         /// <summary>
-        /// Gets or sets the unknown value at position 7.
+        /// Gets or sets the palette color encoding as specified in the DSIG binary format.
         /// </summary>
-        public byte UnknownValue7 { get; set; }
+        public DigColorFormat FormatColorEncoding { get; set; }
+
+        /// <summary>
+        /// Gets or sets the actual palette encoding format that DSTX may overwrite.
+        /// </summary>
+        public DigColorFormat ActualColorEncodingFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the unknown value from compressed blocks in version 2.

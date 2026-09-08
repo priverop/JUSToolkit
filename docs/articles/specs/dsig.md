@@ -17,7 +17,7 @@ games only handles version 2 when the flags value is `0x40`.
 | 0x04   | byte       | Version: 1 or 2                                   |
 | 0x05   | byte       | Flags                                             |
 | 0x06   | byte       | Number of palettes                                |
-| 0x07   | byte       | Unknown (0 or 4)                                  |
+| 0x07   | byte       | Color encoding                                    |
 | 0x08   | ushort     | Image width or block info length / 4 in format 4  |
 | 0x0A   | ushort     | Image height or block data length / 4 in format 4 |
 | 0x0C   | bgr555[][] | Palettes                                          |
@@ -63,8 +63,16 @@ And there is one additional unknown implementation with name `NCG2`.
 
 ### Palettes
 
-Every palette has 16 colors. Each color is a 16-bits value with BGR555 encoding.
-In 8bpp, the palettes are combined into one.
+Every palette has 16 colors. In 8bpp, the palettes are combined into one.
+
+The encoding of the color is in the header with two possible values:
+
+- 0: BGR555 encoding
+- 1: ABGR1555 encoding
+
+In the case of DSIG inside of a DSTX with type 4 (komas), the DSIG always 
+use ABGR1555 color encoding, even when the DSIG header says otherwise. This 
+may be related to the DSTX header value at 0xA always set to 1 in this case.
 
 The game finds the first and last non-null color (`0x0000` for black) across the
 full block of palettes.
@@ -90,5 +98,3 @@ with the number of segments plus one (the 32-bits of the count).
 
 In the version 2 of DSIG files, there is a 32-bits integer before the pixel data
 which is unknown.
-
-This format uses the color encoding ABGR555 for the palette.

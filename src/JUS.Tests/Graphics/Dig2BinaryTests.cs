@@ -66,15 +66,30 @@ public class Dig2BinaryTests
         }
 
         // exclude 0x83 which has the dig in another file
-        dstx.Stream.Position = 5;
-        bool hasDsig = (dstx.Stream.ReadByte() & 0x80) == 0;
+        var reader = new DataReader(dstx.Stream);
+        reader.Stream.Position = 5;
+        byte dstxType = reader.ReadByte();
+        bool hasDsig = (dstxType & 0x80) == 0;
         if (!hasDsig) {
             Assert.Pass("DSIG in separate file");
         }
 
+        bool supportAlpha = false;
+        if (dstxType is 4) {
+            reader.Stream.Position = 0x0A;
+            supportAlpha = reader.ReadUInt16() == 1;
+        }
+
         using BinaryFormat originalDsig = ExtractDsigData(dstxBinary.Stream);
-        Dig dig = new Binary2Dig().Convert(originalDsig);
+        Dig dig = new Binary2Dig(supportAlpha).Convert(originalDsig);
         BinaryFormat generatedStream = new Dig2Binary().Convert(dig);
+
+        if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
+            // Because our LZSS compressor doesn't generate the same input, we can't compare it.
+            Assert.That(generatedStream.Stream.Length, Is.LessThanOrEqualTo(originalDsig.Stream.Length));
+            AssertEquivalentPixels(dig, generatedStream);
+            return;
+        }
 
         bool areIdentical = generatedStream.Stream.Compare(originalDsig.Stream);
 #if DEBUG
@@ -94,5 +109,12 @@ public class Dig2BinaryTests
             ushort dsigOffset = reader.ReadUInt16();
             return new BinaryFormat(dstx.Slice(dsigOffset));
         }
+    }
+
+    private static void AssertEquivalentPixels(Dig original, BinaryFormat generated)
+    {
+        Dig generatedDig = new Binary2Dig().Convert(generated);
+
+        Assert.That(generatedDig, Is.EqualTo(original).UsingPropertiesComparer());
     }
 }

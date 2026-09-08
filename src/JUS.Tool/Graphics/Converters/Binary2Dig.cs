@@ -35,6 +35,28 @@ namespace JUS.Tool.Graphics.Converters
     /// </summary>
     public class Binary2Dig : IConverter<IBinary, Dig>
     {
+        private readonly bool forceSupportAlpha;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Binary2Dig"/> class without
+        /// overwriting the support of alpha channels.
+        /// </summary>
+        public Binary2Dig()
+        {
+            forceSupportAlpha = false;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Binary2Dig"/> class.
+        /// </summary>
+        /// <param name="forceSupportAlpha">
+        /// Value that specifies whether the palette color encoding follows the DSIG header value or uses ABGR1555.
+        /// </param>
+        public Binary2Dig(bool forceSupportAlpha)
+        {
+            this.forceSupportAlpha = forceSupportAlpha;
+        }
+
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a <see cref="Dig"/>.
         /// </summary>
@@ -57,16 +79,21 @@ namespace JUS.Tool.Graphics.Converters
             var bpp = (DigBpp)(flags & 0x0F);
             var dataFormat = (DigDataFormat)(flags >> 4);
             byte paletteCount = reader.ReadByte();
-            byte unk07 = reader.ReadByte();
+            var colorFormat = (DigColorFormat)reader.ReadByte();
             ushort field08 = reader.ReadUInt16();
             ushort field0A = reader.ReadUInt16();
 
             // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
             int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
             int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
+            DigColorFormat actualColorFormat = forceSupportAlpha ? DigColorFormat.Abgr555 : colorFormat;
+            IColorEncoding colorEncoding = actualColorFormat switch {
+                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
+                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
+                _ => throw new FormatException($"Unknown color format: {colorFormat}"),
+            };
 
             // The format 4 (compressed block) seems to use the alpha bit
-            IColorEncoding colorEncoding = dataFormat is DigDataFormat.CompressedBlocks ? Abgr555Encoding.Instance : Bgr555Encoding.Instance;
             var palettes = new Collection<IPalette>();
             for (int i = 0; i < actualPaletteCount; i++) {
                 Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, colorsPerPalette);
@@ -122,7 +149,8 @@ namespace JUS.Tool.Graphics.Converters
                 Width = width,
                 Height = height,
                 OriginalSize = originalSize,
-                UnknownValue7 = unk07,
+                FormatColorEncoding = colorFormat,
+                ActualColorEncodingFormat = actualColorFormat,
                 Pixels = pixels,
                 Palettes = palettes,
                 UnknownBlockValue = unkBlockValue,

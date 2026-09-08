@@ -1,4 +1,5 @@
 ﻿using JUS.Tool.Framework;
+using SceneGate.Ekona.Compression;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -36,8 +37,7 @@ namespace JUS.Tool.Graphics.Converters
                 ? dig.Palettes.Count
                 : (int)Math.Ceiling(dig.Palettes[0].Colors.Count / 16.0);
             writer.Write((byte)formatPaletteCount);
-
-            writer.Write(dig.UnknownValue7);
+            writer.Write((byte)dig.FormatColorEncoding);
 
             if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
                 writer.WriteTimes(0x00, 4); // placeholder
@@ -46,7 +46,11 @@ namespace JUS.Tool.Graphics.Converters
                 writer.Write((ushort)dig.OriginalSize.Height);
             }
 
-            IColorEncoding colorEncoding = dig.DataFormat is DigDataFormat.CompressedBlocks ? Abgr555Encoding.Instance : Bgr555Encoding.Instance;
+            IColorEncoding colorEncoding = dig.ActualColorEncodingFormat switch {
+                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
+                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
+                _ => throw new FormatException($"Unknown color encoding: {dig.ActualColorEncodingFormat}"),
+            };
             foreach (IPalette c in dig.Palettes) {
                 writer.Write(colorEncoding.Encode(c.Colors));
             }
@@ -74,11 +78,19 @@ namespace JUS.Tool.Graphics.Converters
 
             // TODO: compress for format compressed image
             IndexedPixel[] pixels = dig.DataFormat switch {
-                DigDataFormat.Linear or DigDataFormat.CompressedBlocks => dig.Pixels,
+                DigDataFormat.Linear or DigDataFormat.CompressedImage => dig.Pixels,
                 DigDataFormat.Tiled => new TileSwizzling<IndexedPixel>(dig.Width).Swizzle(dig.Pixels),
                 _ => throw new FormatException("Invalid format"),
             };
-            writer.Write(encoder.Encode(pixels));
+            byte[] encodedPixels = encoder.Encode(pixels);
+
+            if (dig.DataFormat is DigDataFormat.CompressedImage) {
+                using var inputCompression = new MemoryStream(encodedPixels);
+                using Stream outputCompression = new LzssEncoder().Convert(inputCompression);
+                outputCompression.WriteTo(writer.Stream);
+            } else {
+                writer.Write(encodedPixels);
+            }
         }
 
         private static void WriteCompressedBlocks(DataWriter writer, Dig dig)
