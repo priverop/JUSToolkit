@@ -9,6 +9,7 @@ using Yarhl.IO;
 namespace JUS.Tests.Graphics;
 
 [TestFixture]
+[Parallelizable(ParallelScope.Children)]
 public class Dig2BinaryTests
 {
     private const int CompressedMargin = 512;
@@ -48,22 +49,21 @@ public class Dig2BinaryTests
         Dig dig = new Binary2Dig().Convert(originalBinary);
         BinaryFormat generatedStream = new Dig2Binary().Convert(dig);
 
-        if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
-            // Because our LZSS compressor doesn't generate the same input, we can't compare it.
-            Assert.That(generatedStream.Stream.Length, Is.LessThanOrEqualTo(originalBinary.Stream.Length + CompressedMargin));
-            AssertEquivalentPixels(dig, generatedStream);
-            return;
-        }
-
-        bool areIdentical = generatedStream.Stream.Compare(originalBinary.Stream);
+        try {
+            if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
+                AssertEquivalentCompressedPixels(originalBinary, dig, generatedStream);
+            } else {
+                Assert.That(
+                    generatedStream.Stream.Compare(originalBinary.Stream),
+                    Is.True,
+                    $"DSIG (v{dig.Version}/{dig.DataFormat}) are not identical");
+            }
+        } catch {
 #if DEBUG
-        if (!areIdentical) {
             TestDataBase.WriteFailedData(generatedStream.Stream, $"actual_{node.Name}");
             TestDataBase.WriteFailedData(originalBinary.Stream, $"expected_{node.Name}");
-        }
 #endif
-
-        Assert.That(areIdentical, Is.True);
+        }
     }
 
     [TestCaseSource(nameof(GetDstxNodes))]
@@ -93,22 +93,21 @@ public class Dig2BinaryTests
         Dig dig = new Binary2Dig(supportAlpha).Convert(originalDsig);
         BinaryFormat generatedStream = new Dig2Binary().Convert(dig);
 
-        if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
-            // Because our LZSS compressor doesn't generate the same input, we can't compare it.
-            Assert.That(generatedStream.Stream.Length, Is.LessThanOrEqualTo(originalDsig.Stream.Length + CompressedMargin));
-            AssertEquivalentPixels(dig, generatedStream);
-            return;
-        }
-
-        bool areIdentical = generatedStream.Stream.Compare(originalDsig.Stream);
+        try {
+            if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
+                AssertEquivalentCompressedPixels(originalDsig, dig, generatedStream);
+            } else {
+                Assert.That(
+                    generatedStream.Stream.Compare(originalDsig.Stream),
+                    Is.True,
+                    $"DSIG (v{dig.Version}/{dig.DataFormat}) are not identical");
+            }
+        } catch {
 #if DEBUG
-        if (!areIdentical) {
             TestDataBase.WriteFailedData(generatedStream.Stream, $"actual_{dstx.Name}");
             TestDataBase.WriteFailedData(originalDsig.Stream, $"expected_{dstx.Name}");
-        }
 #endif
-
-        Assert.That(areIdentical, Is.True);
+        }
 
         return;
         static BinaryFormat ExtractDsigData(Stream dstx)
@@ -120,10 +119,26 @@ public class Dig2BinaryTests
         }
     }
 
-    private static void AssertEquivalentPixels(Dig original, BinaryFormat generated)
+    private static void AssertEquivalentCompressedPixels(IBinary original, Dig dig, BinaryFormat generated)
     {
-        Dig generatedDig = new Binary2Dig().Convert(generated);
+        // We can't compare compressed pixels because LZSS algorithm is different
+        // Assert data before compression except in compressed blocks because the header has the compression length
+        if (dig.DataFormat is DigDataFormat.CompressedImage || generated.Stream.Length == original.Stream.Length) {
+            int pixelsDataOffset = 0xC + (dig.Palettes.Sum(p => p.Colors.Count) * 2);
+            if (dig.Version == 2 && dig.DataFormat is DigDataFormat.CompressedBlocks) {
+                pixelsDataOffset += 4;
+            }
 
-        Assert.That(generatedDig, Is.EqualTo(original).UsingPropertiesComparer());
+            DataStream originalComparable = original.Stream.Slice(0, pixelsDataOffset);
+            DataStream generatedComparable = generated.Stream.Slice(0, pixelsDataOffset);
+            Assert.That(generatedComparable.Compare(originalComparable), Is.True, "Raw data is not equal");
+        }
+
+        // Files should not be bigger as they may cause RAM issues.
+        Assert.That(generated.Stream.Length, Is.LessThanOrEqualTo(original.Stream.Length + CompressedMargin));
+
+        // Deserialize and check we have the same pixels (assuming deserializer is perfect)
+        Dig generatedDig = new Binary2Dig().Convert(generated);
+        Assert.That(generatedDig, Is.EqualTo(dig).UsingPropertiesComparer());
     }
 }

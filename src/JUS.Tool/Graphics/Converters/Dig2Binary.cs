@@ -1,5 +1,4 @@
-﻿using JUS.Tool.Framework;
-using SceneGate.Ekona.Compression;
+﻿using SceneGate.Ekona.Compression;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -27,33 +26,8 @@ namespace JUS.Tool.Graphics.Converters
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
 
-            writer.Write(Dig.Stamp, false);
-            writer.Write(dig.Version);
-
-            int flags = ((int)dig.DataFormat << 4) | (int)dig.Bpp;
-            writer.Write((byte)flags);
-
-            int formatPaletteCount = dig.Bpp == DigBpp.Bpp4
-                ? dig.Palettes.Count
-                : (int)Math.Ceiling(dig.Palettes[0].Colors.Count / 16.0);
-            writer.Write((byte)formatPaletteCount);
-            writer.Write((byte)dig.FormatColorEncoding);
-
-            if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
-                writer.WriteTimes(0x00, 4); // placeholder for block infos
-            } else {
-                writer.Write((ushort)dig.OriginalSize.Width);
-                writer.Write((ushort)dig.OriginalSize.Height);
-            }
-
-            IColorEncoding colorEncoding = dig.ActualColorEncodingFormat switch {
-                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
-                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
-                _ => throw new FormatException($"Unknown color encoding: {dig.ActualColorEncodingFormat}"),
-            };
-            foreach (IPalette c in dig.Palettes) {
-                writer.Write(colorEncoding.Encode(c.Colors));
-            }
+            WriteHeader(writer, dig);
+            WritePalettes(writer, dig);
 
             if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
                 if (dig.Version != 1) {
@@ -68,13 +42,46 @@ namespace JUS.Tool.Graphics.Converters
             return binary;
         }
 
+        private static void WriteHeader(DataWriter writer, Dig dig)
+        {
+            writer.Write(Dig.Stamp, false);
+            writer.Write(dig.Version);
+
+            int flags = ((int)dig.DataFormat << 4) | (int)dig.Bpp;
+            writer.Write((byte)flags);
+
+            int formatPaletteCount = dig.Bpp == DigBpp.Bpp4
+                ? dig.Palettes.Count
+                : (int)Math.Ceiling(dig.Palettes[0].Colors.Count / 16.0);
+            writer.Write((byte)formatPaletteCount);
+            writer.Write((byte)dig.FormatColorEncoding);
+
+            if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
+                writer.WriteTimes(0x00, 4); // placeholder for block infos
+            } else if (dig.HasValidSize) {
+                writer.Write((ushort)dig.Width);
+                writer.Write((ushort)dig.Height);
+            } else {
+                // Ignore current image size, and write what it was originally
+                writer.Write((ushort)dig.OriginalSize.Width);
+                writer.Write((ushort)dig.OriginalSize.Height);
+            }
+        }
+
+        private static void WritePalettes(DataWriter writer, Dig dig)
+        {
+            IColorEncoding colorEncoding = dig.ActualColorEncodingFormat.GetColorEncoding();
+            foreach (IPalette c in dig.Palettes) {
+                byte[] encodedColors = colorEncoding.Encode(c.Colors);
+                writer.Write(encodedColors);
+            }
+        }
+
         private static void WriteIndexedPixels(Stream stream, Dig dig)
         {
-            IndexedPixel[] pixels = dig.DataFormat switch {
-                DigDataFormat.Linear or DigDataFormat.CompressedImage => dig.Pixels,
-                DigDataFormat.Tiled => new TileSwizzling<IndexedPixel>(dig.Width).Swizzle(dig.Pixels),
-                _ => throw new FormatException("Invalid format"),
-            };
+            IndexedPixel[] pixels = dig.DataFormat is DigDataFormat.Tiled
+                ? new TileSwizzling<IndexedPixel>(dig.Width).Swizzle(dig.Pixels)
+                : dig.Pixels;
             byte[] encodedPixels = dig.Bpp.GetPixelEncoding().Encode(pixels);
 
             if (dig.DataFormat is DigDataFormat.CompressedImage) {
@@ -114,7 +121,10 @@ namespace JUS.Tool.Graphics.Converters
             }
 
             int infoLength = 4 + (4 * dig.BlocksInfo.Length);
-            int dataLength = (int)(writer.Stream.Length - basePosition + 4);
+            int dataLength = (int)(writer.Stream.Length - basePosition);
+            if (dig.Version != 1) {
+                dataLength += 4;
+            }
 
             writer.Stream.Position = 0x08;
             writer.Write((ushort)(infoLength / 4));

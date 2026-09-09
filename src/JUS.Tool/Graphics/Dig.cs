@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using JUS.Tool.Framework;
 using JUS.Tool.Utils;
+using Texim.Colors;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -125,6 +127,7 @@ namespace JUS.Tool.Graphics
             DataFormat = dig.DataFormat;
             Width = dig.Width;
             Height = dig.Height;
+            HasValidSize = dig.HasValidSize;
             OriginalSize = dig.OriginalSize;
             FormatColorEncoding = dig.FormatColorEncoding;
             ActualColorEncodingFormat = dig.ActualColorEncodingFormat;
@@ -233,6 +236,11 @@ namespace JUS.Tool.Graphics
         /// Gets or sets the information about the blocks, if any.
         /// </summary>
         public DigBlockInfo[] BlocksInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the format stores a width and height that matches the pixel count.
+        /// </summary>
+        public bool HasValidSize { get; set; }
 
         /// <summary>
         /// Gets or sets the original size in the binary format that doesn't match the pixel count.
@@ -376,6 +384,15 @@ namespace JUS.Tool.Graphics
                 DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
                 DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
                 _ => throw new FormatException($"Invalid bpp: {bpp}"),
+            };
+        }
+
+        extension(DigColorFormat format)
+        {
+            public IColorEncoding GetColorEncoding() => format switch {
+                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
+                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
+                _ => throw new FormatException($"Unknown color encoding: {format}"),
             };
         }
     }

@@ -92,35 +92,20 @@ namespace JUS.Tool.Graphics.Converters
 
             (IndexedPixel[] pixels, DigBlockInfo[] blocks) = ReadImageData(source.Stream, bpp, dataFormat);
 
-            // In the case of compressed blocks, there isn't the concept of width. We generate an always valid one.
-            int width, height;
-            if (dataFormat == DigDataFormat.CompressedBlocks) {
-                width = 8;
-                height = pixels.Length / width;
-            } else {
-                width = field08;
-                height = field0A;
-            }
-
-            // DSIG inside DTX may have width and height values that doesn't represent the amount of pixels.
-            // These images do not really have a size, as they have segments to reconstruct a different image.
-            // We calculate a valid size for them based on a minimal width (tile width).
-            var originalSize = new Size(width, height);
-            if (dataFormat != DigDataFormat.CompressedBlocks && (width * height) != pixels.Length) {
-                width = 8;
-                height = pixels.Length / width;
-            }
+            (bool validSize, Size imageSize) = GetValidImageSize(field08, field0A, dataFormat, pixels.Length);
+            Size originalSize = dataFormat is DigDataFormat.CompressedBlocks ? Size.Empty : new Size(field08, field0A);
 
             if (dataFormat is DigDataFormat.Tiled) {
-                pixels = new TileSwizzling<IndexedPixel>(width).Unswizzle(pixels);
+                pixels = new TileSwizzling<IndexedPixel>(imageSize.Width).Unswizzle(pixels);
             }
 
             var dig = new Dig {
                 Version = version,
                 Bpp = bpp,
                 DataFormat = dataFormat,
-                Width = width,
-                Height = height,
+                Width = imageSize.Width,
+                Height = imageSize.Height,
+                HasValidSize = validSize,
                 OriginalSize = originalSize,
                 FormatColorEncoding = colorFormat,
                 ActualColorEncodingFormat = actualColorFormat,
@@ -132,16 +117,34 @@ namespace JUS.Tool.Graphics.Converters
             return dig;
         }
 
+        private static (bool, Size) GetValidImageSize(ushort field08, ushort field0A, DigDataFormat dataFormat, int pixelCount)
+        {
+            // In the case of compressed blocks, there isn't the concept of width. We generate an always valid one.
+            if (dataFormat == DigDataFormat.CompressedBlocks) {
+                return (true, new Size(8, pixelCount / 8));
+            }
+
+            int width = field08;
+            int height = field0A;
+            bool validSize = (width * height) == pixelCount;
+
+            // DSIG inside DTX may have width and height values that doesn't represent the amount of pixels.
+            // These images do not really have a size, as they have segments to reconstruct a different image.
+            // We calculate a valid size for them based on a minimal width (tile width).
+            if (!validSize) {
+                width = 8;
+                height = pixelCount / width;
+            }
+
+            return (validSize, new Size(width, height));
+        }
+
         private static Collection<IPalette> ReadPalettes(DataReader reader, int paletteCount, DigColorFormat colorFormat, DigBpp bpp)
         {
             // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
             int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
             int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
-            IColorEncoding colorEncoding = colorFormat switch {
-                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
-                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
-                _ => throw new FormatException($"Unknown color format: {colorFormat}"),
-            };
+            IColorEncoding colorEncoding = colorFormat.GetColorEncoding();
 
             var palettes = new Collection<IPalette>();
             for (int i = 0; i < actualPaletteCount; i++) {
@@ -155,24 +158,24 @@ namespace JUS.Tool.Graphics.Converters
         private static (IndexedPixel[], DigBlockInfo[]) ReadImageData(Stream stream, DigBpp bpp, DigDataFormat format)
         {
             if (format is DigDataFormat.CompressedImage) {
-                // Decompress full block, and read as lineal.
+                // Decompress full block.
                 using Stream compressed = stream.Slice(stream.Position);
                 using Stream decompressed = new LzssDecoder().Convert(compressed);
                 decompressed.Position = 0;
-                return ReadImageData(decompressed, bpp, DigDataFormat.Linear);
+                return (ReadPixels(decompressed, bpp), []);
             }
 
             if (format is DigDataFormat.CompressedBlocks) {
-                // Read each block, decompress them, and read as lineal.
-                byte[][] compressedSegments = ReadCompressedBlocks(stream);
+                // Read each block and decompress them.
+                IndexedPixel[][] pixelBlocks = ReadCompressedBlocks(stream, bpp);
 
+                // Join every block into a single pixel array, but keep its start pixel and length
+                // so we can recreate the same blocks when writing.
                 List<IndexedPixel> mergedPixels = [];
                 List<DigBlockInfo> blocks = [];
-                for (int i = 0; i < compressedSegments.Length; i++) {
-                    using var blockData = new MemoryStream(compressedSegments[i]);
-                    (IndexedPixel[] blockPixels, _) = ReadImageData(blockData, bpp, DigDataFormat.CompressedImage);
-                    blocks.Add(new DigBlockInfo(i, mergedPixels.Count, blockPixels.Length));
-                    mergedPixels.AddRange(blockPixels);
+                for (int i = 0; i < pixelBlocks.Length; i++) {
+                    blocks.Add(new DigBlockInfo(i, mergedPixels.Count, pixelBlocks[i].Length));
+                    mergedPixels.AddRange(pixelBlocks[i]);
                 }
 
                 return (mergedPixels.ToArray(), blocks.ToArray());
@@ -192,24 +195,28 @@ namespace JUS.Tool.Graphics.Converters
             return bpp.GetPixelEncoding().Decode(data);
         }
 
-        private static byte[][] ReadCompressedBlocks(Stream stream)
+        private static IndexedPixel[][] ReadCompressedBlocks(Stream stream, DigBpp bpp)
         {
             var reader = new DataReader(stream);
             long basePosition = reader.Stream.Position;
             int count = reader.ReadInt32();
-            byte[][] compressedBlocks = new byte[count][];
 
+            IIndexedPixelEncoding pixelEncoding = bpp.GetPixelEncoding();
+            var blocks = new IndexedPixel[count][];
             for (int i = 0; i < count; i++) {
                 ushort encodedOffset = reader.ReadUInt16();
+                long blockPosition = basePosition + (encodedOffset * 4);
                 ushort length = reader.ReadUInt16();
 
-                long blockPosition = basePosition + (encodedOffset * 4);
-                using (reader.Stream.EnterWithPosition(blockPosition)) {
-                    compressedBlocks[i] = reader.ReadBytes(length);
-                }
+                using DataStream compressed = reader.Stream.Slice(blockPosition, length);
+                using Stream decompressed = new LzssDecoder().Convert(compressed);
+
+                decompressed.Position = 0;
+                byte[] decompressedData = decompressed.ReadBytes((int)decompressed.Length);
+                blocks[i] = pixelEncoding.Decode(decompressedData);
             }
 
-            return compressedBlocks;
+            return blocks;
         }
     }
 }
