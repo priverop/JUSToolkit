@@ -101,16 +101,16 @@ namespace JUS.CLI.JUS.Rom
 
             foreach (var digGroup in filesGroupedByDig) {
                 string[] atmNames = digGroup.Select(x => ContainerLocations[x.Name][1]).ToArray();
-                Node[] pngs = digGroup.ToArray();
+                Node[] pngs = [.. digGroup];
 
                 foreach (Node png in pngs) {
                     png.Name = StringFunctions.GetOriginalName(png.Name);
                 }
 
-                originalAlar.TransformWith(new Png2Alar3(pngs, digGroup.Key, atmNames, false));
+                _ = originalAlar.TransformWith(new Png2Alar3(pngs, digGroup.Key, atmNames, false));
             }
 
-            originalAlar.TransformWith(new Alar3ToBinary());
+            _ = originalAlar.TransformWith(new Alar3ToBinary());
         }
     }
 }
