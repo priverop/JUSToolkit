@@ -96,10 +96,18 @@ namespace JUS.CLI.JUS.Rom
 
             originalAlar.TransformWith<Binary2Alar3>();
 
-            foreach (Node fileToInsert in filesToInsert) {
-                string[] imageInfo = ContainerLocations[fileToInsert.Name];
-                fileToInsert.Name = StringFunctions.GetOriginalName(fileToInsert.Name);
-                originalAlar.TransformWith(new Png2Alar3(fileToInsert, imageInfo[0], imageInfo[1]));
+            // Some images can share the same dig, so they have to be inserted together
+            var filesGroupedByDig = filesToInsert.GroupBy(x => ContainerLocations[x.Name][0]);
+
+            foreach (var digGroup in filesGroupedByDig) {
+                string[] atmNames = digGroup.Select(x => ContainerLocations[x.Name][1]).ToArray();
+                Node[] pngs = digGroup.ToArray();
+
+                foreach (Node png in pngs) {
+                    png.Name = StringFunctions.GetOriginalName(png.Name);
+                }
+
+                originalAlar.TransformWith(new Png2Alar3(pngs, digGroup.Key, atmNames, false));
             }
 
             originalAlar.TransformWith(new Alar3ToBinary());
