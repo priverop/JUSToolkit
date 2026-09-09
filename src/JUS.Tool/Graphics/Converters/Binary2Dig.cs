@@ -70,10 +70,7 @@ namespace JUS.Tool.Graphics.Converters
             source.Stream.Position = 0;
 
             // Header
-            if (reader.ReadString(4) != Dig.Stamp) {
-                throw new FormatException("Invalid stamp");
-            }
-
+            FormatException.ThrowIfNotEqual(reader.ReadString(4), Dig.Stamp, "stamp");
             byte version = reader.ReadByte();
             byte flags = reader.ReadByte();
             var bpp = (DigBpp)(flags & 0x0F);
@@ -83,42 +80,23 @@ namespace JUS.Tool.Graphics.Converters
             ushort field08 = reader.ReadUInt16();
             ushort field0A = reader.ReadUInt16();
 
-            // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
-            int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
-            int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
+            // Palette
+            // DSIG inside DSTX type 4 use ABGR555 no matter what the header says
             DigColorFormat actualColorFormat = forceSupportAlpha ? DigColorFormat.Abgr555 : colorFormat;
-            IColorEncoding colorEncoding = actualColorFormat switch {
-                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
-                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
-                _ => throw new FormatException($"Unknown color format: {colorFormat}"),
-            };
-
-            // The format 4 (compressed block) seems to use the alpha bit
-            var palettes = new Collection<IPalette>();
-            for (int i = 0; i < actualPaletteCount; i++) {
-                Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, colorsPerPalette);
-                palettes.Add(new Palette(colors));
-            }
+            Collection<IPalette> palettes = ReadPalettes(reader, paletteCount, actualColorFormat, bpp);
 
             uint unkBlockValue = 0;
             if (version != 1 && dataFormat is DigDataFormat.CompressedBlocks) {
                 unkBlockValue = reader.ReadUInt32();
             }
 
-            Stream pixelData = reader.Stream.Slice(reader.Stream.Position);
-            if (dataFormat is DigDataFormat.CompressedImage) {
-                pixelData = new LzssDecoder().Convert(pixelData);
-            }
+            (IndexedPixel[] pixels, DigBlockInfo[] blocks) = ReadImageData(source.Stream, bpp, dataFormat);
 
-            long pixelCount = bpp == DigBpp.Bpp4 ? pixelData.Length * 2 : pixelData.Length;
-
-            // In the case of compressed blocks, there isn't the concept of width.
-            // We generate an always valid one.
+            // In the case of compressed blocks, there isn't the concept of width. We generate an always valid one.
             int width, height;
             if (dataFormat == DigDataFormat.CompressedBlocks) {
-                // FUTURE: recalculate by pixel count after decompressing the blocks.
                 width = 8;
-                height = (int)(pixelCount / width);
+                height = pixels.Length / width;
             } else {
                 width = field08;
                 height = field0A;
@@ -128,18 +106,13 @@ namespace JUS.Tool.Graphics.Converters
             // These images do not really have a size, as they have segments to reconstruct a different image.
             // We calculate a valid size for them based on a minimal width (tile width).
             var originalSize = new Size(width, height);
-            if (dataFormat != DigDataFormat.CompressedBlocks && (width * height) != pixelCount) {
+            if (dataFormat != DigDataFormat.CompressedBlocks && (width * height) != pixels.Length) {
                 width = 8;
-                height = (int)(pixelCount / width);
+                height = pixels.Length / width;
             }
 
-            byte[][] compressedSegments = [];
-            IndexedPixel[] pixels = [];
-            if (dataFormat is DigDataFormat.CompressedBlocks) {
-                compressedSegments = ReadCompressedBlocks(reader);
-            } else {
-                pixelData.Position = 0;
-                pixels = ReadPixels(pixelData, width, height, bpp, dataFormat);
+            if (dataFormat is DigDataFormat.Tiled) {
+                pixels = new TileSwizzling<IndexedPixel>(width).Unswizzle(pixels);
             }
 
             var dig = new Dig {
@@ -154,34 +127,74 @@ namespace JUS.Tool.Graphics.Converters
                 Pixels = pixels,
                 Palettes = palettes,
                 UnknownBlockValue = unkBlockValue,
-                CompressedSegments = compressedSegments,
+                BlocksInfo = blocks,
             };
             return dig;
         }
 
-        private static IndexedPixel[] ReadPixels(Stream stream, int width, int height, DigBpp bpp, DigDataFormat format)
+        private static Collection<IPalette> ReadPalettes(DataReader reader, int paletteCount, DigColorFormat colorFormat, DigBpp bpp)
         {
-            if (width == 0 || height == 0) {
+            // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
+            int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
+            int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
+            IColorEncoding colorEncoding = colorFormat switch {
+                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
+                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
+                _ => throw new FormatException($"Unknown color format: {colorFormat}"),
+            };
+
+            var palettes = new Collection<IPalette>();
+            for (int i = 0; i < actualPaletteCount; i++) {
+                Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, colorsPerPalette);
+                palettes.Add(new Palette(colors));
+            }
+
+            return palettes;
+        }
+
+        private static (IndexedPixel[], DigBlockInfo[]) ReadImageData(Stream stream, DigBpp bpp, DigDataFormat format)
+        {
+            if (format is DigDataFormat.CompressedImage) {
+                // Decompress full block, and read as lineal.
+                using Stream compressed = stream.Slice(stream.Position);
+                using Stream decompressed = new LzssDecoder().Convert(compressed);
+                decompressed.Position = 0;
+                return ReadImageData(decompressed, bpp, DigDataFormat.Linear);
+            }
+
+            if (format is DigDataFormat.CompressedBlocks) {
+                // Read each block, decompress them, and read as lineal.
+                byte[][] compressedSegments = ReadCompressedBlocks(stream);
+
+                List<IndexedPixel> mergedPixels = [];
+                List<DigBlockInfo> blocks = [];
+                for (int i = 0; i < compressedSegments.Length; i++) {
+                    using var blockData = new MemoryStream(compressedSegments[i]);
+                    (IndexedPixel[] blockPixels, _) = ReadImageData(blockData, bpp, DigDataFormat.CompressedImage);
+                    blocks.Add(new DigBlockInfo(i, mergedPixels.Count, blockPixels.Length));
+                    mergedPixels.AddRange(blockPixels);
+                }
+
+                return (mergedPixels.ToArray(), blocks.ToArray());
+            }
+
+            IndexedPixel[] pixels = ReadPixels(stream, bpp);
+            return (pixels, []);
+        }
+
+        private static IndexedPixel[] ReadPixels(Stream stream, DigBpp bpp)
+        {
+            if (stream.EndOfStream) {
                 return [];
             }
 
-            IIndexedPixelEncoding pixelEncoding = bpp switch {
-                DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
-                DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
-                _ => throw new FormatException($"Unsupported BPP {bpp}"),
-            };
-
-            IndexedPixel[] pixels = pixelEncoding.DecodeExactly(stream, width * height);
-
-            if (format is DigDataFormat.Tiled) {
-                return new TileSwizzling<IndexedPixel>(width).Unswizzle(pixels);
-            }
-
-            return pixels;
+            byte[] data = stream.ReadBytes((int)(stream.Length - stream.Position));
+            return bpp.GetPixelEncoding().Decode(data);
         }
 
-        private static byte[][] ReadCompressedBlocks(DataReader reader)
+        private static byte[][] ReadCompressedBlocks(Stream stream)
         {
+            var reader = new DataReader(stream);
             long basePosition = reader.Stream.Position;
             int count = reader.ReadInt32();
             byte[][] compressedBlocks = new byte[count][];

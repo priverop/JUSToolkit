@@ -78,6 +78,14 @@ namespace JUS.Tool.Graphics
     }
 
     /// <summary>
+    /// Information about a compressed DSIG type 4 block.
+    /// </summary>
+    /// <param name="Index">The block index.</param>
+    /// <param name="PixelStart">The index of the first pixel in the block.</param>
+    /// <param name="PixelCount">The number of pixels in the block.</param>
+    public sealed record DigBlockInfo(int Index, int PixelStart, int PixelCount);
+
+    /// <summary>
     /// Image format.
     /// </summary>
     public class Dig : IndexedPaletteImage
@@ -102,7 +110,7 @@ namespace JUS.Tool.Graphics
         /// </summary>
         public Dig()
         {
-            CompressedSegments = [];
+            BlocksInfo = [];
         }
 
         /// <summary>
@@ -121,7 +129,7 @@ namespace JUS.Tool.Graphics
             FormatColorEncoding = dig.FormatColorEncoding;
             ActualColorEncodingFormat = dig.ActualColorEncodingFormat;
             UnknownBlockValue = dig.UnknownBlockValue;
-            CompressedSegments = dig.CompressedSegments.ToArray();
+            BlocksInfo = dig.BlocksInfo.ToArray();
             Pixels = dig.Pixels.ToArray();
             Palettes = new Collection<IPalette>(dig.Palettes);
         }
@@ -222,9 +230,9 @@ namespace JUS.Tool.Graphics
         public uint UnknownBlockValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the compressed image segments from compressed block format.
+        /// Gets or sets the information about the blocks, if any.
         /// </summary>
-        public byte[][] CompressedSegments { get; set; }
+        public DigBlockInfo[] BlocksInfo { get; set; }
 
         /// <summary>
         /// Gets or sets the original size in the binary format that doesn't match the pixel count.
@@ -357,6 +365,18 @@ namespace JUS.Tool.Graphics
         {
             for (int i = 0; i < Pixels.Length; i++)
                 Pixels[i] = new IndexedPixel(Pixels[i].ColorIndex, Pixels[i].Alpha, paletteIndex);
+        }
+    }
+
+    internal static class DigExtensions
+    {
+        extension(DigBpp bpp)
+        {
+            public IIndexedPixelEncoding GetPixelEncoding() => bpp switch {
+                DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
+                DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
+                _ => throw new FormatException($"Invalid bpp: {bpp}"),
+            };
         }
     }
 }

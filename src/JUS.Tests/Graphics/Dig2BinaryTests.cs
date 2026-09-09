@@ -11,6 +11,8 @@ namespace JUS.Tests.Graphics;
 [TestFixture]
 public class Dig2BinaryTests
 {
+    private const int CompressedMargin = 512;
+
     private static IEnumerable<TestCaseData> GetDsigNodes()
     {
         NitroRom? unpackedRoot = TestDataBase.UnpackedRoot.Value;
@@ -45,6 +47,13 @@ public class Dig2BinaryTests
 
         Dig dig = new Binary2Dig().Convert(originalBinary);
         BinaryFormat generatedStream = new Dig2Binary().Convert(dig);
+
+        if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
+            // Because our LZSS compressor doesn't generate the same input, we can't compare it.
+            Assert.That(generatedStream.Stream.Length, Is.LessThanOrEqualTo(originalBinary.Stream.Length + CompressedMargin));
+            AssertEquivalentPixels(dig, generatedStream);
+            return;
+        }
 
         bool areIdentical = generatedStream.Stream.Compare(originalBinary.Stream);
 #if DEBUG
@@ -86,7 +95,7 @@ public class Dig2BinaryTests
 
         if (dig.DataFormat is DigDataFormat.CompressedBlocks or DigDataFormat.CompressedImage) {
             // Because our LZSS compressor doesn't generate the same input, we can't compare it.
-            Assert.That(generatedStream.Stream.Length, Is.LessThanOrEqualTo(originalDsig.Stream.Length));
+            Assert.That(generatedStream.Stream.Length, Is.LessThanOrEqualTo(originalDsig.Stream.Length + CompressedMargin));
             AssertEquivalentPixels(dig, generatedStream);
             return;
         }

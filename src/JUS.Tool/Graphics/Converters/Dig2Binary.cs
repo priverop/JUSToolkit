@@ -40,7 +40,7 @@ namespace JUS.Tool.Graphics.Converters
             writer.Write((byte)dig.FormatColorEncoding);
 
             if (dig.DataFormat is DigDataFormat.CompressedBlocks) {
-                writer.WriteTimes(0x00, 4); // placeholder
+                writer.WriteTimes(0x00, 4); // placeholder for block infos
             } else {
                 writer.Write((ushort)dig.OriginalSize.Width);
                 writer.Write((ushort)dig.OriginalSize.Height);
@@ -62,59 +62,58 @@ namespace JUS.Tool.Graphics.Converters
 
                 WriteCompressedBlocks(writer, dig);
             } else {
-                WriteIndexedPixels(writer, dig);
+                WriteIndexedPixels(writer.Stream, dig);
             }
 
             return binary;
         }
 
-        private static void WriteIndexedPixels(DataWriter writer, Dig dig)
+        private static void WriteIndexedPixels(Stream stream, Dig dig)
         {
-            IIndexedPixelEncoding encoder = dig.Bpp switch {
-                DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
-                DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
-                _ => throw new FormatException("Invalid bpp"),
-            };
-
-            // TODO: compress for format compressed image
             IndexedPixel[] pixels = dig.DataFormat switch {
                 DigDataFormat.Linear or DigDataFormat.CompressedImage => dig.Pixels,
                 DigDataFormat.Tiled => new TileSwizzling<IndexedPixel>(dig.Width).Swizzle(dig.Pixels),
                 _ => throw new FormatException("Invalid format"),
             };
-            byte[] encodedPixels = encoder.Encode(pixels);
+            byte[] encodedPixels = dig.Bpp.GetPixelEncoding().Encode(pixels);
 
             if (dig.DataFormat is DigDataFormat.CompressedImage) {
                 using var inputCompression = new MemoryStream(encodedPixels);
                 using Stream outputCompression = new LzssEncoder().Convert(inputCompression);
-                outputCompression.WriteTo(writer.Stream);
+                outputCompression.WriteTo(stream);
             } else {
-                writer.Write(encodedPixels);
+                stream.Write(encodedPixels);
             }
         }
 
         private static void WriteCompressedBlocks(DataWriter writer, Dig dig)
         {
             long basePosition = writer.Stream.Position;
-            writer.Write(dig.CompressedSegments.Length);
+            writer.Write(dig.BlocksInfo.Length);
 
             // prefill table
-            writer.WriteTimes(0x00, 4 * dig.CompressedSegments.Length);
+            writer.WriteTimes(0x00, 4 * dig.BlocksInfo.Length);
             writer.Stream.Position = basePosition + 4;
 
             // Write table entry and block
-            foreach (byte[] block in dig.CompressedSegments) {
+            foreach (DigBlockInfo block in dig.BlocksInfo) {
+                // Compress
+                ReadOnlySpan<IndexedPixel> blockPixels = dig.Pixels.AsSpan(block.PixelStart, block.PixelCount);
+                byte[] encodedPixels = dig.Bpp.GetPixelEncoding().Encode(blockPixels);
+                using var inputCompression = new MemoryStream(encodedPixels);
+                using Stream outputCompression = new LzssEncoder().Convert(inputCompression);
+
                 ushort encodedOffset = (ushort)((writer.Stream.Length - basePosition) / 4);
                 writer.Write(encodedOffset);
-                writer.Write((ushort)block.Length);
+                writer.Write((ushort)outputCompression.Length);
 
                 using (writer.Stream.EnterWithPosition(0, SeekOrigin.End)) {
-                    writer.Write(block);
+                    outputCompression.WriteTo(writer.Stream);
                     writer.WritePadding(0x00, 4);
                 }
             }
 
-            int infoLength = 4 + (4 * dig.CompressedSegments.Length);
+            int infoLength = 4 + (4 * dig.BlocksInfo.Length);
             int dataLength = (int)(writer.Stream.Length - basePosition + 4);
 
             writer.Stream.Position = 0x08;
