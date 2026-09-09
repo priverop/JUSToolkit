@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Buffers.Binary;
+using System.Drawing;
 using Texim.Colors;
 using Texim.Fonts;
 using Texim.Images;
@@ -28,6 +29,7 @@ public class AlFont2Binary : IConverter<AlFont, BinaryFormat>
         writer.Write((byte)source.Features);
 
         // Table info
+        GlyphGroup[] groups = ComputeGroups(source);
         int cellWidth = source.Features.HasFlag(AlFontFeatures.ImageGrid)
             ? source.BoundingBox.Width + (Binary2AlFont.BorderSize * 2)
             : source.BoundingBox.Width;
@@ -38,9 +40,9 @@ public class AlFont2Binary : IConverter<AlFont, BinaryFormat>
         writer.Write((byte)cellWidth);
         writer.Write((byte)cellHeight);
         writer.Write((ushort)source.GlyphsPerRow);
-        writer.Write((ushort)source.Groups.Count);
+        writer.Write((ushort)groups.Length);
 
-        foreach (AlFontGlyphGroup group in source.Groups) {
+        foreach (GlyphGroup group in groups) {
             writer.Write(group.StartGlyph);
             writer.Write(group.EndGlyph);
             writer.Write((ushort)group.StartImageIndex);
@@ -85,6 +87,52 @@ public class AlFont2Binary : IConverter<AlFont, BinaryFormat>
         }
 
         return binary;
+    }
+
+    private static GlyphGroup[] ComputeGroups(AlFont font)
+    {
+        IIndexedGlyph[] sortedGlyphs = font.Glyphs.OrderBy(g => g.Index).ToArray();
+        if (sortedGlyphs.Length == 0) {
+            return [];
+        }
+
+        List<GlyphGroup> groups = [];
+        GlyphGroup currentGroup = CreateGroup(sortedGlyphs[0]);
+        groups.Add(currentGroup);
+
+        int lastIndex = sortedGlyphs[0].Index;
+        for (int i = 1; i < sortedGlyphs.Length; i++) {
+            ushort encodedCodepoint = GetEncodedCodepoint(sortedGlyphs[i].CodePoint);
+            bool continuesSequence = lastIndex + 1 == sortedGlyphs[i].Index
+                && currentGroup.EndGlyph + 1 == encodedCodepoint;
+
+            if (continuesSequence) {
+                currentGroup.EndGlyph++;
+                lastIndex++;
+            } else {
+                currentGroup = CreateGroup(sortedGlyphs[i]);
+                groups.Add(currentGroup);
+                lastIndex = sortedGlyphs[i].Index;
+            }
+        }
+
+        return groups.ToArray();
+
+        static GlyphGroup CreateGroup(IIndexedGlyph firstGlyph) =>
+            new(firstGlyph.Index, GetEncodedCodepoint(firstGlyph.CodePoint));
+
+        static ushort GetEncodedCodepoint(int codepoint)
+        {
+            // Bug in the .NET implementation of shift-jis.
+            if (codepoint == 0x2127) {
+                return 0x8280;
+            }
+
+            string utf16Encoded = char.ConvertFromUtf32(codepoint);
+            Span<byte> sjisEncoded = stackalloc byte[2];
+            Binary2AlFont.CharEncoding.GetBytes(utf16Encoded, sjisEncoded);
+            return BinaryPrimitives.ReadUInt16BigEndian(sjisEncoded);
+        }
     }
 
     private static void WriteBitmap(DataWriter writer, AlFont font, IndexedImage fontImage)
@@ -171,5 +219,14 @@ public class AlFont2Binary : IConverter<AlFont, BinaryFormat>
                 image.Pixels[imageIdx] = new IndexedPixel(colorIdx);
             }
         }
+    }
+
+    private sealed class GlyphGroup(int index, ushort firstGlyph)
+    {
+        public ushort StartGlyph { get; set; } = firstGlyph;
+
+        public ushort EndGlyph { get; set; } = firstGlyph;
+
+        public int StartImageIndex { get; set; } = index;
     }
 }

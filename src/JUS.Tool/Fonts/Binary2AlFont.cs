@@ -17,7 +17,7 @@ namespace JUS.Tool.Fonts;
 /// </summary>
 public class Binary2AlFont : IConverter<IBinary, AlFont>
 {
-    private static readonly Encoding CharEncoding = Encoding.GetEncoding("shift-jis");
+    internal static readonly Encoding CharEncoding = Encoding.GetEncoding("shift-jis");
     internal const int BorderSize = 1;
 
     /// <inheritdoc />
@@ -52,16 +52,16 @@ public class Binary2AlFont : IConverter<IBinary, AlFont>
             ushort startEncodedChar = reader.ReadUInt16();
             ushort endEncodedChar = reader.ReadUInt16();
             ushort glyphStart = reader.ReadUInt16();
-            font.Groups.Add(new AlFontGlyphGroup {
-                StartGlyph = startEncodedChar,
-                EndGlyph = endEncodedChar,
-                StartImageIndex = glyphStart,
-            });
 
             for (ushort g = startEncodedChar; g <= endEncodedChar; g++) {
-                BinaryPrimitives.WriteUInt16LittleEndian(sjisEncoded, g);
+                BinaryPrimitives.WriteUInt16BigEndian(sjisEncoded, g);
                 string glyphChar = CharEncoding.GetString(sjisEncoded);
                 int codepoint = char.ConvertToUtf32(glyphChar, 0);
+
+                // Bug in the .NET implementation of shift-jis...
+                if (g == 0x8280) {
+                    codepoint = 0x2127;
+                }
 
                 var glyph = new IndexedGlyph {
                     Index = glyphStart + (g - startEncodedChar),
