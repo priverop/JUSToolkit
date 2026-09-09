@@ -63,6 +63,7 @@ public class Dig2BinaryTests
             TestDataBase.WriteFailedData(generatedStream.Stream, $"actual_{node.Name}");
             TestDataBase.WriteFailedData(originalBinary.Stream, $"expected_{node.Name}");
 #endif
+            throw;
         }
     }
 
@@ -107,6 +108,7 @@ public class Dig2BinaryTests
             TestDataBase.WriteFailedData(generatedStream.Stream, $"actual_{dstx.Name}");
             TestDataBase.WriteFailedData(originalDsig.Stream, $"expected_{dstx.Name}");
 #endif
+            throw;
         }
 
         return;
