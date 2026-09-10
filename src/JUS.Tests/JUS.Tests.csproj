@@ -22,6 +22,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="YamlDotNet" />
+    <ProjectReference Include="..\JUS.CLI\JUS.CLI.csproj" />
   </ItemGroup>
 
 </Project>

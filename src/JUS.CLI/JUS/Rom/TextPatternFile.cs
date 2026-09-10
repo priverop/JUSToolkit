@@ -33,7 +33,7 @@ namespace JUS.CLI.JUS.Rom
         private static readonly List<(Regex Pattern, string)> PatternList =
         [
             (new Regex(@"^bin-.*-.*\.bin$"), "/bin/InfoDeck.aar"), // "{container}/bin/deck/{file.Name}"
-            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/deck/{file.Name}"
         ];
 
         /// <inheritdoc/>
@@ -58,35 +58,36 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, string alarPath, Node[] filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}");
-            Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
+            Node containerNode = Navigator.SearchNode(gameNode, $"data{alarPath}");
+            Console.WriteLine($"Inserting text with patterns in: {containerNode.Path}");
 
-            containerNode.TransformWith<Binary2Alar3>();
+            containerNode.TransformWith<Binary2Alar>();
             foreach (Node fileToInsert in filesToInsert) {
-                string parent = GetParentName(fileToInsert.Name);
+                string[] parents = GetParents(fileToInsert.Name);
                 string filename = StringFunctions.GetOriginalName(fileToInsert.Name);
 
                 // Soft-clone so if we dispose the input, the stream still exists.
-                containerNode.Children[parent]
+                containerNode.Children[parents[0]]
+                    .Children[parents[1]]
                     .Children[filename]
-                    .ChangeFormat(new BinaryFormat(new DataStream(fileToInsert.Stream)));
+                    .ChangeFormat(new BinaryFormat(fileToInsert.Stream.AsDataStream()));
             }
 
-            _ = containerNode.TransformWith(new Alar3ToBinary());
+            _ = containerNode.TransformWith(new AlarToBinary());
         }
 
         /// <summary>
-        /// Gets the directory name of the file (parent). "bin-deck-bb.bin" will return "deck".
+        /// Gets the directories name of the file (parent). "bin-deck-bb.bin" will return "bin", "deck".
         /// </summary>
         /// <param name="name">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
         /// <returns>The directory name. If the input string is null or empty, the original string is returned.</returns>
-        private static string GetParentName(string name)
+        private static string[] GetParents(string name)
         {
             // Regular expression to capture the second word
-            var regex = new Regex(@"^[^-]+-([^-]+)-");
+            var regex = new Regex(@"^([^-]+)-([^-]+)-");
             Match match = regex.Match(name);
 
-            return match.Groups[1].Value;
+            return [match.Groups[1].Value, match.Groups[2].Value];
         }
     }
 }

@@ -62,9 +62,9 @@ namespace JUS.CLI.JUS.Rom
         {
             foreach (Node file in files) {
                 if (TextLocations.TryGetValue(file.Name, out string? value)) {
-                    Node toReplace = Navigator.SearchNode(gameNode, $"/root/data{value}/{file.Name}");
+                    Node toReplace = Navigator.SearchNode(gameNode, $"data{value}/{file.Name}");
                     toReplace.ChangeFormat(file.Format);
-                    Console.WriteLine($"File replaced: /root/data{value}/{file.Name}");
+                    Console.WriteLine($"File replaced: {toReplace.Path}");
                 }
             }
         }
