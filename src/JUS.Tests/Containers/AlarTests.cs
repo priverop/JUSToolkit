@@ -45,7 +45,7 @@ public class AlarTests
     {
         TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-        IBinary? original = Navigator.SearchNode(Root.Value.Data, containerPath)?.GetFormatAs<IBinary>();
+        IBinary? original = Navigator.GetNode(Root.Value.Data, containerPath)?.GetFormatAs<IBinary>();
         Assert.That(original, Is.Not.Null);
 
         AssertGeneratesIdentical(original);
@@ -56,13 +56,13 @@ public class AlarTests
     {
         TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-        IBinary? parentBinary = Navigator.SearchNode(Root.Value.Data, parentContainerPath)
+        IBinary? parentBinary = Navigator.GetNode(Root.Value.Data, parentContainerPath)
             ?.GetFormatAs<IBinary>();
         Assert.That(parentBinary, Is.Not.Null);
 
         NodeContainerFormat parent = new Binary2Alar().Convert(parentBinary);
 
-        IBinary? original = Navigator.SearchNode(parent.Root, childContainerPath)
+        IBinary? original = Navigator.GetNode(parent.Root, childContainerPath)
             ?.GetFormatAs<IBinary>();
         Assert.That(original, Is.Not.Null);
 
@@ -79,6 +79,7 @@ public class AlarTests
 
         Alar container = new Binary2Alar().Convert(original);
         BinaryFormat actual = new AlarToBinary().Convert(container);
+        Assert.That(actual, Is.Not.Null);
 
         byte[] originalData = new byte[(int)original.Stream.Length];
         original.Stream.Position = 0;

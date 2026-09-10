@@ -36,9 +36,9 @@ namespace JUS.Tool.Graphics
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Altm"/> class cloning another Almt object.
+        /// Initializes a new instance of the <see cref="Altm"/> class cloning another Altm object.
         /// </summary>
-        /// <param name="atm">Almt object to clone.</param>
+        /// <param name="atm">Altm object to clone.</param>
         public Altm(Altm atm)
         {
             Magic = atm.Magic;
@@ -57,9 +57,9 @@ namespace JUS.Tool.Graphics
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Altm"/> class cloning another Almt and the ScreenMap properties.
+        /// Initializes a new instance of the <see cref="Altm"/> class cloning another Altm and the ScreenMap properties.
         /// </summary>
-        /// <param name="atm">Almt object to clone.</param>
+        /// <param name="atm">Altm object to clone.</param>
         /// <param name="screenMap">ScreenMap object to clone.</param>
         public Altm(Altm atm, ITileMap screenMap)
             : this(atm)

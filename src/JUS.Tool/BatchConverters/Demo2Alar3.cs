@@ -184,6 +184,8 @@ namespace JUS.Tool.BatchConverters
             // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(mergedImage, newImage!);
 
+            newDig.CheckMaxTiles(dig.Name);
+
             BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
 
             BinaryFormat compressedDig = digIsCompressed ?

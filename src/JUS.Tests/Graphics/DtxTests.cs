@@ -208,7 +208,7 @@ namespace JUS.Tests.Graphics
             pngNode.Stream.Position = 0;
 
             // Import
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
             pngNode.TransformWith<StandardBinaryImage2RgbImage>()
                 .TransformWith(new RgbImage2IndexedPaletteImage(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();

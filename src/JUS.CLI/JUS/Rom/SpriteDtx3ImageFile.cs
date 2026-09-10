@@ -70,7 +70,7 @@ namespace JUS.CLI.JUS.Rom
                 ? directory
                 : Path.GetFileNameWithoutExtension(parentName);
 
-            Node parentAlar = Navigator.SearchNode(gameNode, $"/root/data/{parentDirectory}/{parentName}") ?? throw new FormatException($"Container not found /root/data/{parentDirectory}/{parentName}");
+            Node parentAlar = Navigator.GetNode(gameNode, $"/root/data/{parentDirectory}/{parentName}") ?? throw new FormatException($"Container not found /root/data/{parentDirectory}/{parentName}");
 
             Console.WriteLine($"/root/data/{parentDirectory}/{parentName} found.");
 

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using JUS.Tool.Utils;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -47,6 +48,16 @@ namespace JUS.Tool.Graphics
         /// The Magic ID of the file.
         /// </summary>
         public const string STAMP = "DSIG";
+
+        /// <summary>
+        /// 10 bits for the tile index.
+        /// </summary>
+        public const int MaxTiles = 1024;
+
+        /// <summary>
+        /// Pixels in a tile (8x8).
+        /// </summary>
+        public const int PixelsPerTile = 64;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dig"/> class.
@@ -206,6 +217,18 @@ namespace JUS.Tool.Graphics
                     int outIdx = ((yPos + 128 + y) * Width) + xPos + 128 + x;
                     Pixels[outIdx] = pixel;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the image has more than MaxTiles.
+        /// </summary>
+        /// <param name="name">Name of the file.</param>
+        public void CheckMaxTiles(string name)
+        {
+            int tiles = Pixels.Length / PixelsPerTile;
+            if (tiles > MaxTiles) {
+                Logger.DisplayError($"MaxTiles ({MaxTiles}) reached in {name}");
             }
         }
 

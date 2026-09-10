@@ -167,7 +167,7 @@ namespace JUS.Tests.Containers
 
             // Tenemos que comprobar si se ha introducido correctamente
             // Obtenemos el fichero del alar3 y comprobamos el size
-            Node newFile = Navigator.SearchNode(alar.Root, internalPath);
+            Node newFile = Navigator.GetNode(alar.Root, internalPath);
             Assert.That(newFile.Stream.Length, Is.EqualTo(fileOriginal.Stream.Length));
         }
 

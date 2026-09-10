@@ -58,7 +58,7 @@ namespace JUS.CLI.JUS.Rom
 
         private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
         {
-            Node containerNode = Navigator.SearchNode(gameNode, $"/root/data{alarPath}");
+            Node containerNode = Navigator.GetNode(gameNode, $"/root/data{alarPath}");
 
             Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
             Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>();

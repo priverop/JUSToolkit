@@ -18,10 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using FluentAssertions;
+using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
+using JUS.Tool.Utils;
 using NUnit.Framework;
-using Texim.Images;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -31,6 +32,114 @@ namespace JUS.Tests.Graphics
     [TestFixture]
     public class DigTests
     {
+        private static readonly Lazy<Node> TopMenuContainer = new(UnpackTopMenuContainer);
+
+        private static Node UnpackTopMenuContainer()
+        {
+            return TestDataBase.ReadSoftware()
+                .Data
+                .Children["topmenu"]
+                .Children["topmenu.aar"]
+                .TransformWith(new Binary2Alar());
+        }
+
+        private static IEnumerable<TestCaseData> GetDigNodes()
+        {
+            if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
+                return [];
+            }
+
+            return Navigator.IterateNodes(TopMenuContainer.Value, NavigationMode.DepthFirst)
+                .Where(n => n.Name == "top_bg01.dig")
+                .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
+        }
+
+        [TestCaseSource(nameof(GetDigNodes))]
+        public void TwoWaysIdenticalDigImage(Node dig)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
+
+            string atmName = Path.ChangeExtension(dig.Name, ".atm");
+            Node atm = dig.Parent!.Children[atmName];
+
+            AssertTwoWaysIdenticalDigImage(dig, atm);
+        }
+
+        private static void AssertTwoWaysIdenticalDigImage(Node dig, Node atm)
+        {
+            // Export Dig + ATM
+            using BinaryFormat originalPng = new BinaryDig2Bitmap(atm).Convert(dig.GetFormatAs<IBinary>());
+
+            // Import png
+            using var pngNode = new Node("png", originalPng);
+            NodeContainerFormat transformedFiles = new Png2DigAtm(dig, atm, true).Convert(pngNode);
+
+            // Export new Dig + ATM
+            Node newDig = transformedFiles.Root.Children[dig.Name];
+            Node newAtm = transformedFiles.Root.Children[atm.Name];
+
+            using BinaryFormat finalPng = new BinaryDig2Bitmap(newAtm).Convert(newDig.GetFormatAs<IBinary>());
+
+            // Are the PNGs equal?
+            bool hasSameLength = originalPng.Stream.Length == finalPng.Stream.Length;
+            if (!hasSameLength) {
+                string testCaseName = Path.GetFileNameWithoutExtension(dig.Name);
+                TestDataBase.WriteFailedData(originalPng.Stream, $"expected_{testCaseName}.png");
+                TestDataBase.WriteFailedData(finalPng.Stream, $"actual_{testCaseName}.png");
+            }
+
+            finalPng.Stream.Length.Should().Be(originalPng.Stream.Length);
+            finalPng.Stream.Compare(originalPng.Stream).Should().BeTrue();
+        }
+
+        [TestCaseSource(nameof(GetDigNodes))]
+        public void ImportEmptyPalettes(Node dig)
+        {
+            TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
+
+            string atmName = Path.ChangeExtension(dig.Name, ".atm");
+            Node atm = dig.Parent!.Children[atmName];
+
+            AssertImportEmptyPalettes(dig, atm);
+        }
+
+        private static void AssertImportEmptyPalettes(Node dig, Node atm)
+        {
+            // Export Dig + ATM into a PNG
+            using var originalPng = new BinaryDig2Bitmap(atm).Convert(dig.GetFormatAs<IBinary>());
+
+            // Import PNG
+            using var pngNode = new Node("png", originalPng);
+            NodeContainerFormat transformedFiles = new Png2DigAtm(dig, atm, true).Convert(pngNode);
+
+            Node newDigNode = transformedFiles.Root.Children[dig.Name];
+            Node newAtmNode = transformedFiles.Root.Children[atm.Name];
+
+            Dig newDig = newDigNode
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Dig>()
+                .GetFormatAs<Dig>();
+            Altm newAtm = newAtmNode
+                .TransformWith<LzssDecompression>()
+                .TransformWith<Binary2Altm>()
+                .GetFormatAs<Altm>();
+
+            // The DIG files have a lot of empty palettes (all colors are 0,0,0: black).
+            // In order to import PNGs with black pixels, Texim looks for that black color, and finds
+            // the first palette (which is empty, all black).
+            // We fixed this, so we shouldn't have empty palettes linked in the map.
+
+            // First we find the palettes the map is using:
+            IEnumerable<byte> usedPalettes = newAtm.Maps.Select(m => m.PaletteIndex).Distinct();
+            // Let's now iterate these palettes, and check for empty-palettes (all black):
+            IEnumerable<byte> blackPalettes = usedPalettes.Where(index =>
+                newDig.Palettes[index].Colors.All(color => color.Red == 0 && color.Green == 0 && color.Blue == 0
+                )
+            );
+
+            _ = blackPalettes.Should().BeEmpty();
+        }
+
         public static IEnumerable<TestCaseData> GetFiles()
         {
             string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
@@ -64,7 +173,7 @@ namespace JUS.Tests.Graphics
         [TestCaseSource(nameof(GetFiles))]
         public void TwoWaysIdenticalDigStream(string infoPath, string digPath, string atmPath)
         {
-            Assert.Ignore();
+            Assert.Ignore("Imported Dig are smaller, we neet to test with PNGs instead");
             TestDataBase.IgnoreIfFileDoesNotExist(digPath);
 
             using Node node = NodeFactory.FromFile(digPath, FileOpenMode.Read);

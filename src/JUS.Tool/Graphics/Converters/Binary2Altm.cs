@@ -54,7 +54,7 @@ namespace JUS.Tool.Graphics.Converters
             altm.TileSize = new System.Drawing.Size(altm.TileSizeW, altm.TileSizeH);
 
             altm.Width = altm.TileSizeW * altm.NumTileW;
-            altm.Height = (altm.TileSizeH * altm.NumTileH) + 8;
+            altm.Height = altm.TileSizeH * altm.NumTileH;
 
             altm.BgMode = NitroBackgroundMode.Text;
 
