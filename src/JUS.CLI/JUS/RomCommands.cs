@@ -155,7 +155,8 @@ namespace JUS.CLI.JUS
         private static void ExportNode(Node container, string outputPath, ILogger logger)
         {
             foreach (Node child in Navigator.IterateNodes(container)) {
-                if (child.IsContainer) {
+                if (child.Format is not IBinary) {
+                    logger.LogDebug("Skipping non binary child {NodePath}", child.Path);
                     continue;
                 }
 

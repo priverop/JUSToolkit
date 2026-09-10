@@ -54,6 +54,44 @@
             ]
           }
         ]
+      },
+      {
+        Name: fonts,
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: DSFont.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: DSFont.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: js8font.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: js8font.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: jskfont.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: jskfont.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: jskfont_q.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: jskfont_q.png,
+            Format: Yarhl.IO.BinaryFormat
+          }
+        ]
       }
     ]
   },

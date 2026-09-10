@@ -17,9 +17,11 @@ public class JusAssetsExporter(string? languageCode) : IConverter<NodeContainerF
 
         bool createPoTemplates = string.IsNullOrEmpty(languageCode);
         NodeContainerFormat exportedTextNodes = new JusTextAssetsExporter(createPoTemplates).Convert(source);
-        var texts = new Node(languageCode ?? "templates");
-        texts.Add(exportedTextNodes.Root.Children);
+        var texts = new Node(languageCode ?? "templates", exportedTextNodes);
 
-        return new NodeContainerFormat([texts]);
+        NodeContainerFormat exportedFontNodes = new JusFontAssetsExporter().Convert(source);
+        var fonts = new Node("fonts", exportedFontNodes);
+
+        return new NodeContainerFormat([texts, fonts]);
     }
 }
