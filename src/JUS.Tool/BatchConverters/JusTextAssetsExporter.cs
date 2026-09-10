@@ -26,7 +26,54 @@ public class JusTextAssetsExporter(bool createTemplate): IConverter<NodeContaine
         var decks = new Node("deck");
         decks.Add(ExportDecks(source.Root));
 
-        return new NodeContainerFormat([decks]);
+        IEnumerable<Node> infoDecks = ExportInfoDeck(source.Root);
+
+        return new NodeContainerFormat([decks, ..infoDecks]);
+    }
+
+    private IEnumerable<Node> ExportInfoDeck(Node root)
+    {
+        logger.LogDebug("Reading InfoDeck");
+        using NodeContainerFormat container = root
+            .Children["data"]
+            .Children["bin"]
+            .Children["InfoDeck.aar"]
+            .GetFormatAs<IBinary>()
+            .ConvertWith(new Binary2Alar());
+
+        var exportedDecks = new Node("InfoDeck");
+        Node deck = container.Root.Children["bin"].Children["deck"];
+        foreach (Node deckNode in deck.Children) {
+            if (deckNode.Stream.Length == 0) {
+                logger.LogTrace("Ignoring empty file: {Name}", deckNode.Name);
+                continue;
+            }
+
+            logger.LogDebug("Exporting InfoDeck / deck: {Name}", deckNode.Name);
+            BinaryTextFormat po = deckNode.GetFormatAs<IBinary>()
+                .ConvertWith<IBinary, InfoDeckDeck>(new Binary2InfoDeckDeck())
+                .ConvertWith<InfoDeckDeck, Po>(new InfoDeckDeck2Po())
+                .ConvertWith(new Po2Binary());
+            exportedDecks.Add(new Node($"bin-deck-{deckNode.Name}.po", po));
+        }
+
+        var exportedInfos = new Node("InfoDeck-Info");
+        Node info = container.Root.Children["bin"].Children["info"];
+        foreach (Node infoNode in info.Children) {
+            if (infoNode.Stream.Length == 0) {
+                logger.LogTrace("Ignoring empty file: {Name}", infoNode.Name);
+                continue;
+            }
+
+            logger.LogDebug("Exporting InfoDeck / info: {Name}", infoNode.Name);
+            BinaryTextFormat po = infoNode.GetFormatAs<IBinary>()
+                .ConvertWith<IBinary, InfoDeckInfo>(new Binary2InfoDeckInfo())
+                .ConvertWith<InfoDeckInfo, Po>(new InfoDeckInfo2Po())
+                .ConvertWith(new Po2Binary());
+            exportedInfos.Add(new Node($"bin-info-{infoNode.Name}.po", po));
+        }
+
+        return [exportedDecks, exportedInfos];
     }
 
     private IEnumerable<Node> ExportDecks(Node root)
@@ -46,22 +93,21 @@ public class JusTextAssetsExporter(bool createTemplate): IConverter<NodeContaine
             NodeContainerFormat deckContainer = new();
             NodeContainerFormat pDeckContainer = new();
 
-            foreach (Node deck in parent.Children.ToArray()) {
-
+            foreach (Node node in parent.Children) {
                 // Use PDeck or Deck converters and ignore empty files.
-                if (deck.Name[0] == 'p') {
-                    deck.TransformWith(new Binary2PDeck());
-                    if (deck.GetFormatAs<PDeck>().Name.Length > 0) {
-                        pDeckContainer.Root.Add(deck);
+                if (node.Name[0] == 'p') {
+                    PDeck pdeck = new Binary2PDeck().Convert(node.GetFormatAs<IBinary>());
+                    if (pdeck.Name.Length > 0) {
+                        pDeckContainer.Root.Add(new Node(node.Name, pdeck));
                     } else {
-                        logger.LogDebug("Ignoring empty PDeck: {Path}", deck.Path);
+                        logger.LogDebug("Ignoring empty PDeck: {Path}", node.Path);
                     }
                 } else {
-                    deck.TransformWith(new Binary2Deck());
-                    if (deck.GetFormatAs<Deck>().Name.Length > 0) {
-                        deckContainer.Root.Add(deck);
+                    Deck deck = new Binary2Deck().Convert(node.GetFormatAs<IBinary>());
+                    if (deck.Name.Length > 0) {
+                        deckContainer.Root.Add(new Node(node.Name, deck));
                     } else {
-                        logger.LogDebug("Ignoring empty Deck: {Path}", deck.Path);
+                        logger.LogDebug("Ignoring empty Deck: {Path}", node.Path);
                     }
                 }
             }

@@ -39,7 +39,7 @@ public class JusAssetsExporterTests
         return Verifier.Verify(actual)
             .UseDirectory(TestDataBase.VerifyResourcesPath)
             .AddExtraSettings(settings => {
-                settings.Converters.Add(new NodeVerifyJsonConverter(depth: 3, serializeFormat: false));
+                settings.Converters.Add(new NodeVerifyJsonConverter(depth: 3, maxChildren: 10, serializeFormat: false));
             });
     }
 }

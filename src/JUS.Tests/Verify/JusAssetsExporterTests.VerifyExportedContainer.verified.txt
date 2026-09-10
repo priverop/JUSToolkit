@@ -52,6 +52,100 @@
                 Format: Yarhl.IO.BinaryTextFormat
               }
             ]
+          },
+          {
+            Name: InfoDeck,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bin-deck-bb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bc.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bl.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bu.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-cb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-ct.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-db.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-dg.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-dn.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-ds.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 32 node(s) more */
+            ]
+          },
+          {
+            Name: InfoDeck-Info,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bin-info-bb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-bc.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-bl.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-bu.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-cb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-ct.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-db.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-dg.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-dn.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-ds.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 32 node(s) more */
+            ]
           }
         ]
       },
