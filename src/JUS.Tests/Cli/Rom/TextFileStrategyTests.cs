@@ -36,7 +36,7 @@ public class TextFileStrategyTests
 
         strategy.Import(software.Root, [input]);
 
-        Node imported = Navigator.SearchNode(software.Root, expectedReplacedPath);
+        Node imported = Navigator.GetNode(software.Root, expectedReplacedPath);
         Assert.That(imported.Format, Is.InstanceOf(typeof(MyNewFormat)));
     }
 

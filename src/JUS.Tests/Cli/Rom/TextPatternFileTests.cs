@@ -36,8 +36,8 @@ public class TextPatternFileTests
 
         strategy.Import(software.Root, [input]);
 
-        Navigator.SearchNode(software.Root, containerPath).TransformWith(new Binary2Alar());
-        Node imported = Navigator.SearchNode(software.Root, expectedReplacedPath);
+        Navigator.GetNode(software.Root, containerPath).TransformWith(new Binary2Alar());
+        Node imported = Navigator.GetNode(software.Root, expectedReplacedPath);
         byte[] importedData = imported.Stream.ReadBytes(2);
         Assert.That(importedData, Is.EqualTo([0xCA, 0xFE]));
     }

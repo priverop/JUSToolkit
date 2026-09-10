@@ -157,8 +157,8 @@ namespace JUS.CLI.JUS.Graphics
             Node pngNode = NodeFactory.FromFile(input, FileOpenMode.Read);
 
             // Get the IndexedPixels
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
-            pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
+            pngNode.TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 
             // Update the original base image
@@ -225,9 +225,11 @@ namespace JUS.CLI.JUS.Graphics
                 var converter = new Dtx4ToBitmap(shapes, komaFormat, komaElement.KomaName);
                 using BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>());
 
+                string manga = komaElement.KomaName.Split('_')[0];
+
                 string outputFilePath = Path.Combine(
                     output,
-                    $"{komaElement.KShapeGroupId}",
+                    manga,
                     komaElement.KomaName + ".png");
 
                 png.Stream.WriteTo(outputFilePath);
@@ -312,7 +314,7 @@ namespace JUS.CLI.JUS.Graphics
             Node pngNode = NodeFactory.FromFile(png, FileOpenMode.Read);
 
             // Get the IndexedPixels
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0], -1);
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
             pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
             IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
 

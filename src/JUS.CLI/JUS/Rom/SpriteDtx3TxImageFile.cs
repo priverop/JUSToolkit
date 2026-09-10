@@ -20,31 +20,43 @@
 using System.Text.RegularExpressions;
 using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
+using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
+using Texim.Formats.ImageSharp.Images;
+using Texim.Images;
+using Texim.Images.Quantization;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
     /// <summary>
-    /// Strategy to import DTX3 sprites. These sprites are usually inside a parent .aar and child .aar.
-    /// Filename format: parent.aar-child.aar-name.dtx-sp_NN.png, or parent.aar-name.dtx-sp_NN.png
-    /// when the .dtx hangs directly from the parent .aar (jquiz question images, pause, error_2d).
+    /// Strategy to import the base image of DTX3TX sprites. These sprites are usually inside a
+    /// parent .aar and child .aar.
+    /// Filename format: parent[-child.aar]-name.dtx-tx.png,
+    /// Optional parent[-child.aar]-name.dtx-tx.yaml next to the PNG rewrites the segments.
     /// </summary>
-    public class SpriteDtx3ImageFile : IFileImportStrategy
+    public class SpriteDtx3TxImageFile : IFileImportStrategy
     {
-        private static readonly Regex FilenamePattern = new(@"^[^-]+\.aar-([^-]+\.aar-)?[^-]+\.dtx-sp_\d+\.png$", RegexOptions.Compiled);
+        private static readonly Regex FilenamePattern = new(@"^[^-]+-([^-]+\.aar-)?[^-]+\.dtx-tx\.(png|yaml)$", RegexOptions.Compiled);
 
         // The importer assumes the /data/parent directory name is the same as the parent.aar file.
         // This is not the case for some of the .aar.
         private static readonly Dictionary<string, string> ParentLocations = new() {
             { "button.aar", "Common" },
+            { "challenge_3d.aar", "Commu" },
             { "commu_pack.aar", "Commu" },
             { "error_2d.aar", "Commu" },
+            { "get.aar", "battle" },
             { "jquiz_pack.aar", "jquiz" },
+            { "ko.aar", "battle" },
+            { "marker_b.aar", "battle" },
+            { "marker_t.aar", "battle" },
             { "pause.aar", "battle" },
+            { "set.aar", "battle" },
             { "title_icon_2d.aar", "Common" },
+            { "tutorial_a.aar", "battle" },
         };
 
         /// <inheritdoc/>
@@ -69,7 +81,7 @@ namespace JUS.CLI.JUS.Rom
                 ? directory
                 : Path.GetFileNameWithoutExtension(parentName);
 
-            Node parentAlar = Navigator.GetNode(gameNode, $"/root/data/{parentDirectory}/{parentName}") ?? throw new FormatException($"Container not found /root/data/{parentDirectory}/{parentName}");
+            Node parentAlar = Navigator.GetNode(gameNode, $"/root/data/{parentDirectory}/{parentName}");
 
             Console.WriteLine($"/root/data/{parentDirectory}/{parentName} found.");
 
@@ -96,43 +108,69 @@ namespace JUS.CLI.JUS.Rom
             Node container = FindByName(parentAlar, childName);
             Console.WriteLine($"{childName} found.");
 
-            container.TransformWith<Binary2Alar>();
+            _ = container.TransformWith<Binary2Alar>();
             foreach (var dtxGroup in files.GroupBy(DtxOf)) {
                 ProcessDtx(container, dtxGroup.Key, dtxGroup);
             }
 
-            container.TransformWith<AlarToBinary>();
+            container.TransformWith(new Alar2ToBinary());
         }
 
         private static void ProcessDtx(Node containerAlar, string dtxName, IEnumerable<Node> files)
         {
-            Node dtxNode = FindByName(containerAlar, dtxName);
+            Node dtx = FindByName(containerAlar, dtxName);
+            Console.WriteLine($"Importing texture into: {dtxName}.");
 
-            Console.WriteLine($"Importing sprites into: {dtxName}.");
-
-            bool isCompressed = CompressionUtils.IsCompressed(dtxNode);
+            bool isCompressed = CompressionUtils.IsCompressed(dtx);
             if (isCompressed) {
-                _ = dtxNode.TransformWith<LzssDecompression>();
+                _ = dtx.TransformWith<LzssDecompression>();
             }
 
-            _ = dtxNode.TransformWith<BinaryToDtx3>();
+            // We need the original for the Dtx3TxToBinary converter
+            DataStream decompressedDtx = dtx.Stream.AsDataStream();
+            _ = dtx.TransformWith<BinaryToDtx3>();
 
-            // Rename to match game names
-            using var pngs = new NodeContainerFormat();
-            foreach (Node file in files) {
-                file.Name = SpriteOf(file);
-                pngs.Root.Add(new Node(file.Name, new BinaryFormat(new DataStream(file.Stream))));
+            Dig originalImage = dtx.Children["image"].GetFormatAs<Dig>();
+
+            if (originalImage.Swizzling != DigSwizzling.Linear) {
+                throw new FormatException($"{dtxName} is not a Dtx3Tx.");
             }
 
-            _ = dtxNode.TransformWith(new Png2Dtx3(pngs))
-                .TransformWith<Dtx3ToBinary>();
+            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
+
+            using var pngNode = new Node(dtxName, new BinaryFormat(PngOf(files, dtxName).Stream));
+            _ = pngNode.TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
+
+            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
+
+            var updatedImage = new Dig(originalImage) {
+                Pixels = newImage.Pixels.ToArray(),
+            };
+
+            dtx.Children["image"].ChangeFormat(updatedImage);
+
+            // Optional YAML
+            Node? yaml = files.FirstOrDefault(f => Path.GetExtension(f.Name) == ".yaml");
+
+            Dtx3TxToBinary converter;
+
+            if (yaml is null) {
+                converter = new Dtx3TxToBinary(decompressedDtx);
+            } else {
+                var reader = new TextDataReader(yaml.Stream);
+                reader.Stream.Position = 0;
+
+                converter = new Dtx3TxToBinary(decompressedDtx, BinaryToDtx3.DeserializeYaml(reader.ReadToEnd()));
+            }
+
+            dtx.TransformWith(converter);
             if (isCompressed) {
-                _ = dtxNode.TransformWith<LzssCompression>();
+                dtx.TransformWith(new LzssCompression());
             }
         }
 
-        // filename: parent.aar[-child.aar]-name.dtx-sp_NN.png
-        private static string ParentOf(Node file) => file.Name.Split('-')[0];
+        // filename: parent[-child.aar]-name.dtx-tx.png|yaml
+        private static string ParentOf(Node file) => file.Name.Split('-')[0] + ".aar";
 
         // Null when the .dtx has no child.aar.
         private static string? ChildOf(Node file)
@@ -143,7 +181,11 @@ namespace JUS.CLI.JUS.Rom
 
         private static string DtxOf(Node file) => file.Name.Split('-')[^2];
 
-        private static string SpriteOf(Node file) => file.Name.Split('-')[^1];
+        private static Node PngOf(IEnumerable<Node> files, string dtxName)
+        {
+            return files.FirstOrDefault(f => Path.GetExtension(f.Name) == ".png")
+                ?? throw new FormatException($"Missing the .png image of {dtxName}.");
+        }
 
         private static Node FindByName(Node container, string name)
         {

@@ -26,6 +26,7 @@ using Texim.Formats.ImageSharp.Images;
 using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.Tool.BatchConverters
 {
@@ -81,7 +82,7 @@ namespace JUS.Tool.BatchConverters
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
             }
 
-            // Obtaining the original Dig and Almts
+            // Obtaining the original Dig and Altms
             Node dig = Navigator.IterateNodes(originalAlar.Root).FirstOrDefault(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
             Node atmFull = Navigator.IterateNodes(originalAlar.Root).FirstOrDefault(n => n.Name == AtmNames[0]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[0]);
             Node atmM = Navigator.IterateNodes(originalAlar.Root).FirstOrDefault(n => n.Name == AtmNames[1]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[1]);
@@ -149,14 +150,14 @@ namespace JUS.Tool.BatchConverters
                 }
 
                 // New Atm: original atm changing height, width and maps
-                atms[i].TransformWith<Binary2Almt>();
-                Almt originalAtm = atms[i].GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
+                atms[i].TransformWith<Binary2Altm>();
+                Altm originalAtm = atms[i].GetFormatAs<Altm>() ?? throw new FormatException("Invalid atm file");
 
-                var newAtm = new Almt(originalAtm, map);
+                var newAtm = new Altm(originalAtm, map);
                 atms[i].ChangeFormat(newAtm);
 
                 // Export ATM
-                atms[i].TransformWith(new Almt2Binary());
+                atms[i].TransformWith(new Altm2Binary());
                 if (atmIsCompressed) {
                     atms[i].TransformWith<LzssCompression>();
                 }
@@ -164,6 +165,9 @@ namespace JUS.Tool.BatchConverters
 
             // New Dig: original dig changing height, width and pixels
             var newDig = new Dig(mergedImage, newImage!);
+
+            newDig.CheckMaxTiles(dig.Name);
+
             dig.ChangeFormat(newDig)
                 .TransformWith<Dig2Binary>();
 

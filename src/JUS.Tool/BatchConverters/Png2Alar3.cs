@@ -18,14 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.Tool.Containers;
-using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
-using JUS.Tool.Utils;
-using Texim.Images;
-using Texim.Formats.ImageSharp.Images;
-using Texim.TileMaps;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.Tool.BatchConverters
 {
@@ -95,75 +91,19 @@ namespace JUS.Tool.BatchConverters
                 throw new FormatException("Invalid png file");
             }
 
-            // Obtaining the original Dig and Almt
+            // Obtaining the original Dig and Altm
             Node dig = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
             Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmName) ?? throw new FormatException("Atm doesn't exist: " + AtmName);
 
-            // Transform the PNG into the new Dig and Almt (we need the original dig + atm)
-            Transform(Image, dig, atm);
+            // Transform the PNG into the new Dig and Altm (we need the original dig + atm)
+            var converter = new Png2DigAtm(dig, atm, true);
+
+            NodeContainerFormat transformedFiles = converter.Convert(Image);
+
+            dig.ChangeFormat(transformedFiles.Root.Children[dig.Name].Format);
+            atm.ChangeFormat(transformedFiles.Root.Children[atm.Name].Format);
 
             return originalAlar;
-        }
-
-        // TODO: Igual esto podría ser un conversor nuevo? para reutilizarlo
-        private void Transform(Node png, Node dig, Node atm)
-        {
-            // Original Dig
-            bool digIsCompressed = CompressionUtils.IsCompressed(dig);
-            if (digIsCompressed) {
-                dig.TransformWith<LzssDecompression>();
-            }
-
-            dig.TransformWith<Binary2Dig>();
-            Dig originalDig = dig.GetFormatAs<Dig>() ?? throw new FormatException("Invalid dig file");
-
-            // Original Atm
-            bool atmIsCompressed = CompressionUtils.IsCompressed(atm);
-            if (atmIsCompressed) {
-                atm.TransformWith<LzssDecompression>();
-            }
-
-            atm.TransformWith<Binary2Almt>();
-            Almt originalAtm = atm.GetFormatAs<Almt>() ?? throw new FormatException("Invalid atm file");
-
-            // Transform PNG into a RgbImage (Pixels + Map) using the Dig Palette
-            var compressionParams = new RgbImageMapCompressionParams {
-                Palettes = originalDig,
-            };
-
-            png.Stream.Position = 0;
-            MapCompressedIndexedImage compressed = png
-                .TransformWith<StandardBinaryImage2RgbImage>()
-                .TransformWith(new RgbImageMapCompression(compressionParams))
-                .GetFormatAs<MapCompressedIndexedImage>();
-
-            var newImage = new IndexedImage {
-                Width = 8,
-                Height = compressed.Tiles.Length / 8,
-                Pixels = compressed.Tiles,
-            };
-            ITileMap map = compressed.Map;
-
-            // New Dig: original dig changing height, width and pixels
-            var newDig = new Dig(originalDig, newImage);
-
-            if (TransparentTile) {
-                newDig = newDig.InsertTransparentTile(map);
-            }
-
-            dig.ChangeFormat(newDig)
-                .TransformWith<Dig2Binary>();
-            if (digIsCompressed) {
-                dig.TransformWith<LzssCompression>();
-            }
-
-            // New Atm: original atm changing height, width and maps
-            var newAtm = new Almt(originalAtm, map);
-            atm.ChangeFormat(newAtm)
-                .TransformWith<Almt2Binary>();
-            if (atmIsCompressed) {
-                atm.TransformWith<LzssCompression>();
-            }
         }
     }
 }

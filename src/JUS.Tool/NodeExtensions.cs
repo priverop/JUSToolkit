@@ -23,7 +23,7 @@ public static class NodeExtensions
                 }
 
                 string relativePath = Path.GetRelativePath(inputRoot.Path, inputChild.Path);
-                Node? containerChild = Navigator.SearchNodeOrDefault(node, relativePath);
+                Node? containerChild = Navigator.GetNodeOrDefault(node, relativePath);
                 if (containerChild is null) {
                     Logger.DisplayError($"{relativePath} node not found in the container");
                     continue;

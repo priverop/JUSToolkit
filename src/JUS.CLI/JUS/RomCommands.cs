@@ -35,6 +35,7 @@ namespace JUS.CLI.JUS
             new MenuImageFile(),
             new RawContainerFile(),
             new SpriteDtx3ImageFile(),
+            new SpriteDtx3TxImageFile(),
             new TextFile(),
             new TextContainerFile(),
             new TextPatternFile(),
@@ -99,12 +100,12 @@ namespace JUS.CLI.JUS
             Node fontNode = NodeFactory.FromFile(font, FileOpenMode.Read);
 
             // Regular Font
-            Node toReplace = Navigator.SearchNode(gameNode, "/root/data/font/jskfont.aft");
+            Node toReplace = Navigator.GetNode(gameNode, "/root/data/font/jskfont.aft");
             toReplace.ChangeFormat(fontNode.Format);
             Console.WriteLine("File replaced: /root/data/font/jskfont.aft");
 
             // JQuiz Font
-            Node toReplace_q = Navigator.SearchNode(gameNode, "/root/data/font/jskfont_q.aft");
+            Node toReplace_q = Navigator.GetNode(gameNode, "/root/data/font/jskfont_q.aft");
             toReplace_q.ChangeFormat(fontNode.Format);
             Console.WriteLine("File replaced: /root/data/font/jskfont_q.aft");
 

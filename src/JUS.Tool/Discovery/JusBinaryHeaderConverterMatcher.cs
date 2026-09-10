@@ -21,8 +21,7 @@ public sealed class JusBinaryHeaderConverterMatcher : IConverterMatcher
         HeaderFormat.Create<Binary2Alar3>("ALAR", 3, null),
         HeaderFormat.Create<LzssDecompression>("DSCP", null, null),
         // Graphics
-        HeaderFormat.Create<Binary2Almt>("ALMT", null, null),
-        HeaderFormat.Create<Binary2Almt>("ALTM", null, null),
+        HeaderFormat.Create<Binary2Altm>("ALTM", null, null),
         HeaderFormat.Create<Binary2Dig>("DSIG", null, null),
         HeaderFormat.Create<BinaryToDtx3>("DSTX", 1, 3),
         HeaderFormat.Create<BinaryDtx4ToSpriteImage>("DSTX", 1, 4),
