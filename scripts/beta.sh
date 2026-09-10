@@ -20,18 +20,15 @@ fi
 # ---------
 # VARIABLES
 # ---------
-# Absolute path for the beta root directory. 
+# Absolute path for the beta root directory.
 # In this directory we will have the Weblate git repository, a folder for the generated .bin and another folder for the Demos (DEMO_PATH).
-BETA_PATH='/' # -------------------> Modify this
+BETA_PATH='/' # -------------------------> MODIFY THIS ONE
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Absolute Path of the JUSToolKit
 JUS_PATH="$BASE_DIR/src/JUS.CLI"
-# Absolute path for the beta root directory. 
-# In this directory we will have the Weblate git repository, a folder for the generated .bin and another folder for the Demos (DEMO_PATH).
-BETA_PATH='/' # -------------------------> MODIFY THIS ONE
 # Weblate git directory
 GIT_REPO_PATH=$BETA_PATH'/jus-translation-repo'
 # Directory where the demo will be saved
@@ -39,7 +36,7 @@ DEMO_PATH=$BETA_PATH'/demos'
 
 # Emulator path
 EMULATOR_PATH=melonDS.AppImage # MacOS: /Applications/melonDS.app/Contents/MacOS/melonDS
-# Path of the English ROM
+# Path of the Japanese ROM
 ROM_PATH=$JUS_PATH/bin/Debug/net10.0/jump_jp.nds
 
 # Don't modify:
@@ -60,7 +57,7 @@ fi
 find $DEMO_PATH -name "new_game*.nds" -exec rm -f {} \;
 
 # Create the directory for the bin files
-mkdir -p "$BETA_PATH/new_rom" 
+mkdir -p "$BETA_PATH/new_rom"
 # Backup the rom
 cp "$ROM_PATH" "$DEMO_PATH/new_game.nds"
 

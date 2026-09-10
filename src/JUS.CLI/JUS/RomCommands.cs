@@ -29,7 +29,7 @@ namespace JUS.CLI.JUS
     /// </summary>
     public static class RomCommands
     {
-        private static readonly IFileImportStrategy[] Strategies =
+        internal static readonly IFileImportStrategy[] Strategies =
         [
             new DemoImageFile(),
             new MenuImageFile(),

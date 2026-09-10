@@ -3,8 +3,7 @@ using NUnit.Framework;
 
 namespace JUS.Tests.Cli.Rom;
 
-[TestFixture]
-public class TextPatternFileTests : BaseContainerStrategyTests<TextPatternFile>
+public class DemoImageFileTests : BaseContainerStrategyTests<DemoImageFile>
 {
     [TestCaseSource(nameof(GetMatchTestsFilenames))]
     public override void AssertMatchesReturnsExcepted(string inputPath)
@@ -25,12 +24,10 @@ public class TextPatternFileTests : BaseContainerStrategyTests<TextPatternFile>
     }
 
     private static IEnumerable<TestCaseData> GetMatchTestsFilenames() => [
-        new("InfoDeck_bin/bin-deck-bb.bin"),
-        new("deck_bin/deck-jadv-000.bin"),
+        new("InfoDeck_bin/demo-bb_m_00.bin"),
     ];
 
     private static IEnumerable<TestCaseData> GetImportedFilenames() => [
-        new("InfoDeck_bin/bin-deck-bb.bin", "data/bin/InfoDeck.aar/bin/deck/bb.bin"),
-        new("deck_bin/deck-jadv-000.bin", "data/deck/Deck.aar/deck/jadv/000.bin"),
+        new("InfoDeck_bin/demo-bb_m_00.bin", "data/bin/InfoDeck.aar/bin/deck/bb.bin"),
     ];
 }
