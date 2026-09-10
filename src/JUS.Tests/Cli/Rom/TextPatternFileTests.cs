@@ -19,18 +19,19 @@ public class TextPatternFileTests : BaseContainerStrategyTests<TextPatternFile>
     }
 
     [TestCaseSource(nameof(GetImportedFilenames))]
-    public override void AssertImportModifyExpectedNode(string inputPath, string expectedAssetPath)
+    public override void AssertImportRawModifyExpectedNode(string inputPath, string expectedAssetPath)
     {
-        base.AssertImportModifyExpectedNode(inputPath, expectedAssetPath);
+        base.AssertImportRawModifyExpectedNode(inputPath, expectedAssetPath);
     }
 
     private static IEnumerable<TestCaseData> GetMatchTestsFilenames() => [
         new("InfoDeck_bin/bin-deck-bb.bin"),
-        new("deck_bin/deck-jadv-000.bin"),
+        new("deck_bin/jard_p/deck-jard-p000.bin"),
     ];
 
     private static IEnumerable<TestCaseData> GetImportedFilenames() => [
         new("InfoDeck_bin/bin-deck-bb.bin", "data/bin/InfoDeck.aar/bin/deck/bb.bin"),
-        new("deck_bin/deck-jadv-000.bin", "data/deck/Deck.aar/deck/jadv/000.bin"),
+        new("deck_bin/jadv/deck-jadv-000.bin", "data/deck/Deck.aar/deck/jadv/000.bin"),
+        new("deck_bin/jard_p/deck-jard-p000.bin", "data/deck/Deck.aar/deck/jard/p000.bin"),
     ];
 }
