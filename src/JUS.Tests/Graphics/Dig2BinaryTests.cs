@@ -76,7 +76,7 @@ public class Dig2BinaryTests
         }
 
         // exclude 0x83 which has the dig in another file
-        var reader = new DataReader(dstx.Stream);
+        var reader = new DataReader(dstxBinary.Stream);
         reader.Stream.Position = 5;
         byte dstxType = reader.ReadByte();
         bool hasDsig = (dstxType & 0x80) == 0;

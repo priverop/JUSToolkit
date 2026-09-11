@@ -68,7 +68,7 @@ Every palette has 16 colors. In 8bpp, the palettes are combined into one.
 The encoding of the color is in the header with two possible values:
 
 - 0: BGR555 encoding
-- 1: ABGR1555 encoding
+- 4: ABGR1555 encoding
 
 In the case of DSIG inside of a DSTX with type 4 (komas), the DSIG always 
 use ABGR1555 color encoding, even when the DSIG header says otherwise. This 

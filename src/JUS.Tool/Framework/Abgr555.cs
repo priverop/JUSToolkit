@@ -4,7 +4,7 @@ using Texim.Colors;
 namespace JUS.Tool.Framework;
 
 /// <summary>
-/// BGR555 color encoding: 5 bits per channel in blue, green, red order, with
+/// ABGR555 color encoding: 5 bits per channel in blue, green, red order, with
 /// one bit for alpha chanel. Encoded in little-endian format.
 /// </summary>
 public class Abgr555Encoding : LinealByteColorEncoding
