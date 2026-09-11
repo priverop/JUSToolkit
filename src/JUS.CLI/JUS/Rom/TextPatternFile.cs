@@ -18,10 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Text.RegularExpressions;
-using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Utils;
 using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace JUS.CLI.JUS.Rom
 {
@@ -33,7 +33,7 @@ namespace JUS.CLI.JUS.Rom
         private static readonly List<(Regex Pattern, string)> PatternList =
         [
             (new Regex(@"^bin-.*-.*\.bin$"), "/bin/InfoDeck.aar"), // "{container}/bin/deck/{file.Name}"
-            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/bin/deck/{file.Name}"
+            (new Regex(@"^deck-.*-.*\.bin$"), "/deck/Deck.aar"), // "{container}/deck/{file.Name}"
         ];
 
         /// <inheritdoc/>
@@ -52,38 +52,43 @@ namespace JUS.CLI.JUS.Rom
             foreach (var containerGroup in filesGroupedByContainer) {
                 string alarPath = containerGroup.Key;
 
-                ProcessContainer(gameNode, alarPath, containerGroup);
+                ProcessContainer(gameNode, alarPath, containerGroup.ToArray());
             }
         }
 
-        private static void ProcessContainer(Node gameNode, string alarPath, IEnumerable<Node> filesToInsert)
+        private static void ProcessContainer(Node gameNode, string alarPath, Node[] filesToInsert)
         {
-            Node containerNode = Navigator.GetNode(gameNode, $"/root/data{alarPath}");
+            Node containerNode = Navigator.GetNode(gameNode, $"data{alarPath}");
 
             Console.WriteLine($"Inserting text with patterns in: /root/data{alarPath}");
-            Alar alar = containerNode.TransformWith<Binary2Alar3>().GetFormatAs<Alar>();
+            containerNode.TransformWith<Binary2Alar>();
 
             foreach (Node fileToInsert in filesToInsert) {
-                string parent = GetParentName(fileToInsert.Name);
-                fileToInsert.Name = StringFunctions.GetOriginalName(fileToInsert.Name);
-                alar.InsertModification(fileToInsert, parent);
-            }
-            _ = containerNode.TransformWith(new Alar3ToBinary());
+                string[] parents = GetParents(fileToInsert.Name);
+                string filename = StringFunctions.GetOriginalName(fileToInsert.Name);
 
+                // Soft-clone so if we dispose the input, the stream still exists.
+                containerNode.Children[parents[0]]
+                    .Children[parents[1]]
+                    .Children[filename]
+                    .ChangeFormat(new BinaryFormat(fileToInsert.Stream.AsDataStream()));
+            }
+
+            _ = containerNode.TransformWith(new AlarToBinary());
         }
 
         /// <summary>
-        /// Gets the directory name of the file (parent). "bin-deck-bb.bin" will return "deck".
+        /// Gets the directories name of the file (parent). "bin-deck-bb.bin" will return "bin", "deck".
         /// </summary>
         /// <param name="name">The string containing potentially "bin-deck-", "bin-info-", "deck-play"... prefixes.</param>
         /// <returns>The directory name. If the input string is null or empty, the original string is returned.</returns>
-        private static string GetParentName(string name)
+        private static string[] GetParents(string name)
         {
             // Regular expression to capture the second word
-            var regex = new Regex(@"^[^-]+-([^-]+)-");
+            var regex = new Regex(@"^([^-]+)-([^-]+)-");
             Match match = regex.Match(name);
 
-            return match.Groups[1].Value;
+            return [match.Groups[1].Value, match.Groups[2].Value];
         }
     }
 }

@@ -1,3 +1,4 @@
+﻿using JUS.Tool.Containers;
 using JUS.Tool.Containers.Converters;
 using JUS.Tool.Texts.Converters;
 using JUS.Tool.Texts.Formats;
@@ -41,7 +42,7 @@ namespace JUS.Tests.Texts
             }
 
             return Navigator.IterateNodes(DeckContainer.Value, NavigationMode.DepthFirst)
-                .Where(n => !n.IsContainer && n.Name[0] != 'p')
+                .Where(n => !n.IsContainer && n.Name[0] != 'p' && n.Name != Alar.InfoNodeName)
                 .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
 

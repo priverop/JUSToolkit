@@ -27,16 +27,19 @@ namespace JUS.Tool.Containers.Converters
     /// Converts an ALAR container into a binary ALAR v3 format.
     /// </summary>
     public class Alar3ToBinary :
-    IConverter<Alar, BinaryFormat>
+    IConverter<NodeContainerFormat, BinaryFormat>
     {
         /// <inheritdoc/>
-        public BinaryFormat Convert(Alar alar)
+        public BinaryFormat Convert(NodeContainerFormat alar)
         {
             ArgumentNullException.ThrowIfNull(alar);
 
+            AlarInfo info = alar.Root.Children[Alar.InfoNodeName]?.GetFormatAs<AlarInfo>()
+                ?? throw new FormatException("Missing info node");
+
             // Iterate in the expected order and pre-compute all container paths,
             // so we can calculate the section lengths.
-            FileEntry[] entries = GetContainerEntries(alar.Root);
+            FileEntry[] entries = GetContainerEntries(alar.Root, info);
 
             int fileInfoTableOffset = 0x12;
             int fileInfoTableLength = entries.Length * 2;
@@ -45,18 +48,18 @@ namespace JUS.Tool.Containers.Converters
             int fileInfoSectionLength = entries.Sum(e => e.EncodedInfoLength);
             int fileDataSectionOffset = fileInfoSectionOffset + fileInfoSectionLength;
 
-            bool useHashV1 = !alar.Features.HasFlag(AlarFormatFeatures.PathHashV2);
+            bool useHashV1 = !info.Features.HasFlag(AlarFormatFeatures.PathHashV2);
 
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
 
             // Write the header
             writer.Write(Alar.FormatId, false);
-            writer.Write(alar.Version);
-            writer.Write((byte)alar.Features);
+            writer.Write(info.Version);
+            writer.Write((byte)info.Features);
             writer.Write((ushort)entries.Length);
-            writer.Write(alar.FirstFileId);
-            writer.Write(alar.LastFileId);
+            writer.Write(info.FirstFileId);
+            writer.Write(info.LastFileId);
             writer.Write((ushort)fileDataSectionOffset);
 
             // Pre-fill info table and info section so we can write everything at the same time
@@ -101,17 +104,17 @@ namespace JUS.Tool.Containers.Converters
             return Path.GetRelativePath(rootPath, childPath).Replace('\\', '/');
         }
 
-        private static FileEntry[] GetContainerEntries(Node root)
+        private static FileEntry[] GetContainerEntries(Node root, AlarInfo info)
         {
             List<FileEntry> entries = [];
             foreach (Node node in Navigator.IterateNodes(root, NavigationMode.DepthFirst)) {
-                if (node.IsContainer) {
+                if (node.IsContainer || node.Name == Alar.InfoNodeName) {
                     continue;
                 }
 
                 string containerPath = GetRelativeChildPath(root.Path, node.Path);
-                AlarFile fileInfo = node.GetFormatAs<AlarFile>()
-                    ?? throw new FormatException($"Unexpected file format for {node.Path}");
+                AlarFileInfo fileInfo = info.FilesMetadata.FirstOrDefault(m => m.Path == containerPath)
+                    ?? throw new FormatException($"Cannot find metadata for {node.Path}");
                 entries.Add(new FileEntry(node.Stream, fileInfo, containerPath));
             }
 
@@ -119,7 +122,7 @@ namespace JUS.Tool.Containers.Converters
         }
 
 
-        private sealed record FileEntry(Stream Data, AlarFile FileInfo, string ContainerPath)
+        private sealed record FileEntry(Stream Data, AlarFileInfo FileInfo, string ContainerPath)
         {
             /// <summary>
             /// Gets the binary encoded length of the path, assuming ASCII characters and a null-terminator.

@@ -105,47 +105,32 @@ namespace JUS.CLI.JUS.Rom
         // Process child.aar (Alar2, usually compressed)
         private static void ProcessChildContainer(Node parentAlar, string childName, IEnumerable<Node> files)
         {
-            Node originalChild = FindByName(parentAlar, childName);
-
+            Node container = FindByName(parentAlar, childName);
             Console.WriteLine($"{childName} found.");
 
-            // Clone the node to avoid changing the original (AlarFile).
-            using var workingChild = new Node(childName, (BinaryFormat)new BinaryFormat(originalChild.Stream).DeepClone());
-            bool isCompressed = CompressionUtils.IsCompressed(workingChild);
-
-            _ = workingChild.TransformWith<Binary2Alar>();
-            workingChild.Tags[Alar.CompressionTag] = isCompressed;
-
+            _ = container.TransformWith<Binary2Alar>();
             foreach (var dtxGroup in files.GroupBy(DtxOf)) {
-                ProcessDtx(workingChild, dtxGroup.Key, dtxGroup);
+                ProcessDtx(container, dtxGroup.Key, dtxGroup);
             }
 
-            BinaryFormat childBinary = new AlarToBinary().Convert(workingChild.GetFormatAs<Alar>());
-
-            using var newChild = new Node(childName, childBinary);
-            parentAlar.GetFormatAs<Alar>().InsertModification(newChild);
+            container.TransformWith(new Alar2ToBinary());
         }
 
         private static void ProcessDtx(Node containerAlar, string dtxName, IEnumerable<Node> files)
         {
-            Node originalDtx = FindByName(containerAlar, dtxName);
-
+            Node dtx = FindByName(containerAlar, dtxName);
             Console.WriteLine($"Importing texture into: {dtxName}.");
 
-            // Clone the node to avoid changing the original (AlarFile)
-            using var workingDtx = new Node(dtxName, (BinaryFormat)new BinaryFormat(originalDtx.Stream).DeepClone());
-            bool isCompressed = CompressionUtils.IsCompressed(workingDtx);
-
+            bool isCompressed = CompressionUtils.IsCompressed(dtx);
             if (isCompressed) {
-                _ = workingDtx.TransformWith<LzssDecompression>();
+                _ = dtx.TransformWith<LzssDecompression>();
             }
 
             // We need the original for the Dtx3TxToBinary converter
-            var decompressedDtx = (BinaryFormat)new BinaryFormat(workingDtx.Stream).DeepClone();
+            DataStream decompressedDtx = dtx.Stream.AsDataStream();
+            _ = dtx.TransformWith<BinaryToDtx3>();
 
-            _ = workingDtx.TransformWith<BinaryToDtx3>();
-
-            Dig originalImage = workingDtx.Children["image"].GetFormatAs<Dig>();
+            Dig originalImage = dtx.Children["image"].GetFormatAs<Dig>();
 
             if (originalImage.Swizzling != DigSwizzling.Linear) {
                 throw new FormatException($"{dtxName} is not a Dtx3Tx.");
@@ -162,7 +147,7 @@ namespace JUS.CLI.JUS.Rom
                 Pixels = newImage.Pixels.ToArray(),
             };
 
-            workingDtx.Children["image"].ChangeFormat(updatedImage);
+            dtx.Children["image"].ChangeFormat(updatedImage);
 
             // Optional YAML
             Node? yaml = files.FirstOrDefault(f => Path.GetExtension(f.Name) == ".yaml");
@@ -178,14 +163,10 @@ namespace JUS.CLI.JUS.Rom
                 converter = new Dtx3TxToBinary(decompressedDtx, BinaryToDtx3.DeserializeYaml(reader.ReadToEnd()));
             }
 
-            BinaryFormat dtxBinary = converter.Convert(workingDtx.GetFormatAs<NodeContainerFormat>());
-
-            BinaryFormat compressedDtx = isCompressed ?
-                new LzssCompression().Convert(dtxBinary) :
-                dtxBinary;
-
-            using var newDtx = new Node(dtxName, compressedDtx);
-            containerAlar.GetFormatAs<Alar>().InsertModification(newDtx);
+            dtx.TransformWith(converter);
+            if (isCompressed) {
+                dtx.TransformWith(new LzssCompression());
+            }
         }
 
         // filename: parent[-child.aar]-name.dtx-tx.png|yaml

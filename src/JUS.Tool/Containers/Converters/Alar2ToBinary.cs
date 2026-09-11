@@ -26,45 +26,54 @@ namespace JUS.Tool.Containers.Converters
     /// <summary>
     /// Converts an ALAR container into a binary ALAR v2 format.
     /// </summary>
-    public class Alar2ToBinary : IConverter<Alar, BinaryFormat>
+    public class Alar2ToBinary : IConverter<NodeContainerFormat, BinaryFormat>
     {
         private DataWriter writer = null!;
 
         /// <inheritdoc/>
-        public BinaryFormat Convert(Alar alar)
+        public BinaryFormat Convert(NodeContainerFormat alar)
         {
             ArgumentNullException.ThrowIfNull(alar);
+
+            AlarInfo info = alar.Root.Children[Alar.InfoNodeName]?.GetFormatAs<AlarInfo>()
+                ?? throw new FormatException("Missing info node");
 
             var binary = new BinaryFormat();
             writer = new DataWriter(binary.Stream);
 
-            WriteHeader(alar);
+            WriteHeader(alar, info);
 
             // Pre-fill the file info table so we can write the file data (and know the offset)
-            int fileInfoTableLength = alar.Root.Children.Count * 0x10;
+            int fileInfoTableLength = (alar.Root.Children.Count - 1) * 0x10;
             writer.WriteTimes(0x00, fileInfoTableLength);
 
             writer.Stream.Position = 0x10;
             foreach (Node child in alar.Root.Children) {
-                WriteFile(child);
+                if (child.Name == Alar.InfoNodeName) {
+                    continue;
+                }
+
+                WriteFile(child, info);
             }
 
             return binary;
         }
 
-        private void WriteHeader(Alar alar)
+        private void WriteHeader(NodeContainerFormat alar, AlarInfo info)
         {
             writer.Write(Alar.FormatId, false);
-            writer.Write(alar.Version);
-            writer.Write((byte)alar.Features);
-            writer.Write((ushort)alar.Root.Children.Count);
-            writer.Write(alar.FirstFileId);
-            writer.Write(alar.LastFileId);
+            writer.Write(info.Version);
+            writer.Write((byte)info.Features);
+            writer.Write((ushort)(alar.Root.Children.Count - 1)); // without the _info node
+            writer.Write(info.FirstFileId);
+            writer.Write(info.LastFileId);
         }
 
-        private void WriteFile(Node child)
+        private void WriteFile(Node child, AlarInfo info)
         {
-            AlarFile fileInfo = child.GetFormatAs<AlarFile>() ?? throw new FormatException("Invalid format");
+            AlarFileInfo fileInfo = info.FilesMetadata.FirstOrDefault(m => m.Path != null && child.Path.EndsWith(m.Path))
+                ?? throw new FormatException("Cannot find node metadata");
+
             bool hasFilename = (fileInfo.Flags >> 31) == 1;
 
             uint nameLength = hasFilename ? 0x24u : 0x00;
