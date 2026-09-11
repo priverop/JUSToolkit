@@ -31,7 +31,7 @@ public class AlFont2BinaryTests
     public void GeneratesIdentical(Node fontNode)
     {
         if (fontNode.Name == "DSFont.aft") {
-            Assert.Ignore("It has unmaped characters that won't get exported, so we can't get them when importing");
+            Assert.Ignore("It has unmapped characters that won't get exported, so we can't get them when importing");
         } else if (fontNode.Name == "js8font.aft") {
             // It has additional 0x00 bytes at the end... we remove them so we can compare the actual font data.
             fontNode.Stream.SetLength(0x4488);
@@ -42,13 +42,7 @@ public class AlFont2BinaryTests
         AlFont font = new Binary2AlFont().Convert(originalBinary);
         BinaryFormat generatedBinary = new AlFont2Binary().Convert(font);
 
-        bool areIdentical = generatedBinary.Stream.Compare(originalBinary.Stream);
-        if (!areIdentical) {
-            originalBinary.Stream.WriteTo($"expected_{fontNode.Name}");
-            generatedBinary.Stream.WriteTo($"actual_{fontNode.Name}");
-        }
-
-        Assert.That(areIdentical, Is.True);
+        TestDataBase.AssertEqualStreams(originalBinary.Stream, generatedBinary.Stream, fontNode.Name);
     }
 
     [TestCaseSource(nameof(GetFonts))]
@@ -87,7 +81,7 @@ public class AlFont2BinaryTests
         // Write
         BinaryFormat generatedBinary = new AlFont2Binary().Convert(importedFont);
 
-        Assert.That(generatedBinary.Stream.Compare(originalBinary.Stream), Is.True);
+        TestDataBase.AssertEqualStreams(originalBinary.Stream, generatedBinary.Stream, fontNode.Name);
         return;
 
         static void YamlConfigure(DeserializerBuilder b) => b
@@ -133,8 +127,8 @@ public class AlFont2BinaryTests
             .Convert(font)
             .ConvertWith(new RgbImage2BinaryPng());
 
-        Assert.That(generatedFontYaml.Stream.Compare(fontYaml.Stream), Is.True);
-        Assert.That(generatedFontImage.Stream.Compare(fontPngImage.Stream), Is.True);
+        TestDataBase.AssertEqualStreams(fontYaml.Stream, generatedFontYaml.Stream, "dsfont.yml");
+        TestDataBase.AssertEqualStreams(fontPngImage.Stream, generatedFontImage.Stream, "dsfont.png");
         return;
 
         static void YamlConfigure(DeserializerBuilder b) => b

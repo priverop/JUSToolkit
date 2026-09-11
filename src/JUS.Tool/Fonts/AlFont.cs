@@ -20,11 +20,6 @@ public class AlFont : BitmapFont
     public int GlyphsPerRow { get; set; }
 
     /// <summary>
-    /// Gets or sets the mapping of glyphs in the indexed font image.
-    /// </summary>
-    public List<AlFontGlyphGroup> Groups { get; set; } = [];
-
-    /// <summary>
     /// Gets or sets the font palette.
     /// </summary>
     public IPaletteCollection Palettes { get; set; } = new PaletteCollection();
