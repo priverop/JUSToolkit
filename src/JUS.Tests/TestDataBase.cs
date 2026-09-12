@@ -130,5 +130,17 @@ namespace JUS.Tests
             stream?.WriteTo(path);
         }
 
+        public static void AssertEqualStreams(Stream expected, Stream actual, string name)
+        {
+            bool areIdentical = expected.Compare(actual);
+        #if DEBUG
+            if (!areIdentical) {
+                WriteFailedData(expected, $"expected_{name}");
+                WriteFailedData(actual, $"actual_{name}");
+            }
+        #endif
+
+            Assert.That(areIdentical, Is.True, $"Streams {name} are not identical");
+        }
     }
 }
