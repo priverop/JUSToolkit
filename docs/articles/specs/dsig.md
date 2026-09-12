@@ -12,17 +12,23 @@ There are two known versions of the formats, each with different variants. This
 games only handles version 2 when the flags value is `0x40`.
 
 | Offset | Type       | Description                                       |
-| ------ | ---------- | ------------------------------------------------- |
+| ------ | ---------- |---------------------------------------------------|
 | 0x00   | char[4]    | Format ID: `DSIG`                                 |
 | 0x04   | byte       | Version: 1 or 2                                   |
 | 0x05   | byte       | Flags                                             |
 | 0x06   | byte       | Number of palettes                                |
-| 0x07   | byte       | Metadata length? (v2 is 4, otherwise 0)           |
+| 0x07   | byte       | Color encoding                                    |
 | 0x08   | ushort     | Image width or block info length / 4 in format 4  |
 | 0x0A   | ushort     | Image height or block data length / 4 in format 4 |
 | 0x0C   | bgr555[][] | Palettes                                          |
-| ...    | uint       | (only v2 with format 4) Metadata?                 |
+| ...    | uint       | Unknown (only v2 with format 4)                   |
 | ...    | byte[]     | Indexed pixels                                    |
+
+> [!NOTE]  
+> If the DSIG contains segments for a DSTX sprite, the _width_ and _height_
+> may contain invalid values. This is because the DSIG won't actually contain
+> any full image, but the DSTX will contain the segment instructions to 
+> reconstruct.
 
 ### Flags
 
@@ -31,11 +37,11 @@ games only handles version 2 when the flags value is `0x40`.
   - 1 -> 8bpp.
 - Bit 4-7: image format.
   - 0 -> not supported.
-  - 1 -> tiled.
+  - 1 -> tiled (tiles of 8x8).
   - 2 -> texture atlas (lineal).
   - 3 -> unknown.
   - 4 -> compressed sprite.
-  - 5 -> unknown.
+  - 5 -> compressed texture atlas (Nitro LZSS with header).
 
 The game provides an implementation for the following combination of flags, and
 gives it a name:
@@ -57,8 +63,16 @@ And there is one additional unknown implementation with name `NCG2`.
 
 ### Palettes
 
-Every palette has 16 colors. Each color is a 16-bits value with BGR555 encoding.
-In 8bpp, the palettes are combined into one.
+Every palette has 16 colors. In 8bpp, the palettes are combined into one.
+
+The encoding of the color is in the header with two possible values:
+
+- 0: BGR555 encoding
+- 4: ABGR1555 encoding
+
+In the case of DSIG inside of a DSTX with type 4 (komas), the DSIG always 
+use ABGR1555 color encoding, even when the DSIG header says otherwise. This 
+may be related to the DSTX header value at 0xA always set to 1 in this case.
 
 The game finds the first and last non-null color (`0x0000` for black) across the
 full block of palettes.

@@ -1,5 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using JUS.Tool.Framework;
 using JUS.Tool.Utils;
+using Texim.Colors;
 using Texim.Images;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -24,10 +28,15 @@ namespace JUS.Tool.Graphics
     }
 
     /// <summary>
-    /// Swizzling of a <see cref="Dig"/> image.
+    /// Format of the data of an <see cref="Dig"/> image.
     /// </summary>
-    public enum DigSwizzling
+    public enum DigDataFormat
     {
+        /// <summary>
+        /// Invalid image format.
+        /// </summary>
+        None = 0,
+
         /// <summary>
         /// Tiled swizzling.
         /// </summary>
@@ -37,7 +46,46 @@ namespace JUS.Tool.Graphics
         /// Linear swizzling.
         /// </summary>
         Linear = 2,
+
+        /// <summary>
+        /// Unknown format, not used on this game.
+        /// </summary>
+        Unknown3 = 3,
+
+        /// <summary>
+        /// Blocks of compressed data.
+        /// </summary>
+        CompressedBlocks = 4,
+
+        /// <summary>
+        /// One block of compressed data.
+        /// </summary>
+        CompressedImage = 5,
     }
+
+    /// <summary>
+    /// Format of the color encoding in DSIG palettes.
+    /// </summary>
+    public enum DigColorFormat
+    {
+        /// <summary>
+        /// BGR555 with no transparency.
+        /// </summary>
+        Bgr555 = 0,
+
+        /// <summary>
+        /// ABGR555 with one bit transparency.
+        /// </summary>
+        Abgr555 = 4,
+    }
+
+    /// <summary>
+    /// Information about a compressed DSIG type 4 block.
+    /// </summary>
+    /// <param name="Index">The block index.</param>
+    /// <param name="PixelStart">The index of the first pixel in the block.</param>
+    /// <param name="PixelCount">The number of pixels in the block.</param>
+    public sealed record DigBlockInfo(int Index, int PixelStart, int PixelCount);
 
     /// <summary>
     /// Image format.
@@ -47,7 +95,7 @@ namespace JUS.Tool.Graphics
         /// <summary>
         /// The Magic ID of the file.
         /// </summary>
-        public const string STAMP = "DSIG";
+        public const string Stamp = "DSIG";
 
         /// <summary>
         /// 10 bits for the tile index.
@@ -64,6 +112,7 @@ namespace JUS.Tool.Graphics
         /// </summary>
         public Dig()
         {
+            BlocksInfo = [];
         }
 
         /// <summary>
@@ -73,18 +122,21 @@ namespace JUS.Tool.Graphics
         [SetsRequiredMembers]
         public Dig(Dig dig)
         {
-            Unknown = dig.Unknown;
-            ImageFormat = dig.ImageFormat;
-            NumPaletteLines = dig.NumPaletteLines;
+            Version = dig.Version;
+            Bpp = dig.Bpp;
+            DataFormat = dig.DataFormat;
             Width = dig.Width;
             Height = dig.Height;
-            Pixels = dig.Pixels;
-            PaletteStart = dig.PaletteStart;
-            PixelsStart = dig.PixelsStart;
-            Bpp = dig.Bpp;
-            Swizzling = dig.Swizzling;
-            foreach (IPalette p in dig.Palettes) {
-                Palettes.Add(p);
+            HasValidSize = dig.HasValidSize;
+            OriginalSize = dig.OriginalSize;
+            FormatColorEncoding = dig.FormatColorEncoding;
+            ActualColorEncodingFormat = dig.ActualColorEncodingFormat;
+            UnknownBlockValue = dig.UnknownBlockValue;
+            BlocksInfo = dig.BlocksInfo.ToArray();
+            Pixels = dig.Pixels.ToArray();
+            Palettes = new Collection<IPalette>();
+            foreach (IPalette palette in dig.Palettes) {
+                Palettes.Add(new Palette(palette.Colors));
             }
         }
 
@@ -92,7 +144,7 @@ namespace JUS.Tool.Graphics
         /// Initializes a new instance of the <see cref="Dig"/> class cloning the indexed image.
         /// </summary>
         /// <param name="dig">Dig object to clone.</param>
-        /// <param name="image">IndexedImage object to clone.</param>
+        /// <param name="image">Indexed image object to clone.</param>
         [SetsRequiredMembers]
         public Dig(Dig dig, IIndexedImage image)
             : this(dig)
@@ -154,39 +206,50 @@ namespace JUS.Tool.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the first byte of the format. Maybe the Type?.
+        /// Gets or sets the format version.
         /// </summary>
-        public byte Unknown { get; set; }
+        public byte Version { get; set; }
 
         /// <summary>
-        /// Gets or sets the ImageFormat.
-        /// </summary>
-        public byte ImageFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the NumPaletteLines.
-        /// </summary>
-        public ushort NumPaletteLines { get; set; }
-
-        /// <summary>
-        /// Gets or sets the PaletteStart value.
-        /// </summary>
-        public uint PaletteStart { get; set; }
-
-        /// <summary>
-        /// Gets or sets the PixelsStart value.
-        /// </summary>
-        public uint PixelsStart { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Bpp mode.
+        /// Gets or sets the bits per pixel (pixel encoding).
         /// </summary>
         public DigBpp Bpp { get; set; }
 
         /// <summary>
-        /// Gets or sets the Swizzling mode.
+        /// Gets or sets the format of the pixel data.
         /// </summary>
-        public DigSwizzling Swizzling { get; set; }
+        public DigDataFormat DataFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the palette color encoding as specified in the DSIG binary format.
+        /// </summary>
+        public DigColorFormat FormatColorEncoding { get; set; }
+
+        /// <summary>
+        /// Gets or sets the actual palette encoding format that DSTX may overwrite.
+        /// </summary>
+        public DigColorFormat ActualColorEncodingFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unknown value from compressed blocks in version 2.
+        /// </summary>
+        public uint UnknownBlockValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets the information about the blocks, if any.
+        /// </summary>
+        public DigBlockInfo[] BlocksInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the format stores a width and height that matches the pixel count.
+        /// </summary>
+        public bool HasValidSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the original size in the binary format that doesn't match the pixel count.
+        /// </summary>
+        /// <remarks>Probably the size before DSTX compression.</remarks>
+        public Size OriginalSize { get; set; }
 
         /// <summary>
         /// Paste a <see cref="Dig"/> subimage into this <see cref="Dig"/>.
@@ -313,6 +376,27 @@ namespace JUS.Tool.Graphics
         {
             for (int i = 0; i < Pixels.Length; i++)
                 Pixels[i] = new IndexedPixel(Pixels[i].ColorIndex, Pixels[i].Alpha, paletteIndex);
+        }
+    }
+
+    internal static class DigExtensions
+    {
+        extension(DigBpp bpp)
+        {
+            public IIndexedPixelEncoding GetPixelEncoding() => bpp switch {
+                DigBpp.Bpp4 => Indexed4BppEncoding.Instance,
+                DigBpp.Bpp8 => Indexed8BppEncoding.Instance,
+                _ => throw new FormatException($"Invalid bpp: {bpp}"),
+            };
+        }
+
+        extension(DigColorFormat format)
+        {
+            public IColorEncoding GetColorEncoding() => format switch {
+                DigColorFormat.Bgr555 => Bgr555Encoding.Instance,
+                DigColorFormat.Abgr555 => Abgr555Encoding.Instance,
+                _ => throw new FormatException($"Unknown color encoding: {format}"),
+            };
         }
     }
 }

@@ -17,6 +17,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using System.Collections.ObjectModel;
+using System.Drawing;
+using JUS.Tool.Framework;
+using SceneGate.Ekona.Compression;
 using Texim.Colors;
 using Texim.Palettes;
 using Texim.Pixels;
@@ -30,6 +35,28 @@ namespace JUS.Tool.Graphics.Converters
     /// </summary>
     public class Binary2Dig : IConverter<IBinary, Dig>
     {
+        private readonly bool forceSupportAlpha;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Binary2Dig"/> class without
+        /// overwriting the support of alpha channels.
+        /// </summary>
+        public Binary2Dig()
+        {
+            forceSupportAlpha = false;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Binary2Dig"/> class.
+        /// </summary>
+        /// <param name="forceSupportAlpha">
+        /// Value that specifies whether the palette color encoding follows the DSIG header value or uses ABGR1555.
+        /// </param>
+        public Binary2Dig(bool forceSupportAlpha)
+        {
+            this.forceSupportAlpha = forceSupportAlpha;
+        }
+
         /// <summary>
         /// Converts a <see cref="BinaryFormat"/> (file) to a <see cref="Dig"/>.
         /// </summary>
@@ -37,87 +64,159 @@ namespace JUS.Tool.Graphics.Converters
         /// <returns><see cref="Dig"/>.</returns>
         public Dig Convert(IBinary source)
         {
-            if (source is null) {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             var reader = new DataReader(source.Stream);
             source.Stream.Position = 0;
 
-            if (reader.ReadString(4) != Dig.STAMP) {
-                throw new FormatException("Invalid stamp");
+            // Header
+            FormatException.ThrowIfNotEqual(reader.ReadString(4), Dig.Stamp, "stamp");
+            byte version = reader.ReadByte();
+            byte flags = reader.ReadByte();
+            var bpp = (DigBpp)(flags & 0x0F);
+            var dataFormat = (DigDataFormat)(flags >> 4);
+            byte paletteCount = reader.ReadByte();
+            var colorFormat = (DigColorFormat)reader.ReadByte();
+            ushort field08 = reader.ReadUInt16();
+            ushort field0A = reader.ReadUInt16();
+
+            // Palette
+            // DSIG inside DSTX type 4 use ABGR555 no matter what the header says
+            DigColorFormat actualColorFormat = forceSupportAlpha ? DigColorFormat.Abgr555 : colorFormat;
+            Collection<IPalette> palettes = ReadPalettes(reader, paletteCount, actualColorFormat, bpp);
+
+            uint unkBlockValue = 0;
+            if (version != 1 && dataFormat is DigDataFormat.CompressedBlocks) {
+                unkBlockValue = reader.ReadUInt32();
             }
 
-            byte unknown = reader.ReadByte();
-            byte imageFormat = reader.ReadByte();
-            ushort numPaletteLines = reader.ReadUInt16();
-            int width = reader.ReadUInt16();
-            int height = reader.ReadUInt16();
-            uint pixelsStart = (uint)((numPaletteLines * 0x20) + 0xC);
-            var bpp = (DigBpp)(imageFormat & 0x0F);
-            var swizzling = (DigSwizzling)(imageFormat >> 4);
-            IIndexedPixelEncoding pixelEncoding;
-            int colorsPerPalette;
-            int numPalettes;
+            (IndexedPixel[] pixels, DigBlockInfo[] blocks) = ReadImageData(source.Stream, bpp, dataFormat);
 
-            switch (bpp) {
-                case DigBpp.Bpp4:
-                    pixelEncoding = Indexed4BppEncoding.Instance;
-                    colorsPerPalette = 16;
-                    numPalettes = numPaletteLines;
-                    break;
-                case DigBpp.Bpp8:
-                    pixelEncoding = Indexed8BppEncoding.Instance;
-                    colorsPerPalette = 256;
-                    numPalettes = ((numPaletteLines - 1) / 16) + 1;
-                    break;
-                default:
-                    throw new FormatException("Invalid bpp");
+            (bool validSize, Size imageSize) = GetValidImageSize(field08, field0A, dataFormat, pixels.Length);
+            Size originalSize = dataFormat is DigDataFormat.CompressedBlocks ? Size.Empty : new Size(field08, field0A);
+
+            if (dataFormat is DigDataFormat.Tiled) {
+                pixels = new TileSwizzling<IndexedPixel>(imageSize.Width).Unswizzle(pixels);
             }
-
-            // Some tiled digs have fake size params
-            if (swizzling == DigSwizzling.Tiled) {
-                width = 8;
-                height = bpp switch {
-                    DigBpp.Bpp4 => (int)(source.Stream.Length - pixelsStart) / 4,
-                    DigBpp.Bpp8 => (int)(source.Stream.Length - pixelsStart) / 8,
-                    _ => throw new FormatException("Invalid bpp"),
-                };
-            }
-
-            var palettes = new PaletteCollection();
-
-            for (int i = 0; i < numPalettes; i++) {
-                palettes.Palettes.Add(new Palette(reader.ReadColors<Bgr555Encoding>(colorsPerPalette)));
-            }
-
-            source.Stream.Position = pixelsStart;
-
-            IndexedPixel[] pixels = swizzling switch {
-                DigSwizzling.Tiled => new TileSwizzling<IndexedPixel>(width)
-                    .Unswizzle(pixelEncoding.DecodeExactly(source.Stream, width * height)),
-
-                DigSwizzling.Linear => pixelEncoding.DecodeExactly(source.Stream, width * height),
-
-                _ => throw new FormatException("Invalid swizzling"),
-            };
 
             var dig = new Dig {
-                Unknown = unknown,
-                ImageFormat = imageFormat,
-                NumPaletteLines = numPaletteLines,
-                Width = width,
-                Height = height,
-                Pixels = pixels,
-                PixelsStart = pixelsStart,
+                Version = version,
                 Bpp = bpp,
-                Swizzling = swizzling,
+                DataFormat = dataFormat,
+                Width = imageSize.Width,
+                Height = imageSize.Height,
+                HasValidSize = validSize,
+                OriginalSize = originalSize,
+                FormatColorEncoding = colorFormat,
+                ActualColorEncodingFormat = actualColorFormat,
+                Pixels = pixels,
+                Palettes = palettes,
+                UnknownBlockValue = unkBlockValue,
+                BlocksInfo = blocks,
             };
-            foreach (IPalette p in palettes.Palettes) {
-                dig.Palettes.Add(p);
+            return dig;
+        }
+
+        private static (bool, Size) GetValidImageSize(ushort field08, ushort field0A, DigDataFormat dataFormat, int pixelCount)
+        {
+            // In the case of compressed blocks, there isn't the concept of width. We generate an always valid one.
+            if (dataFormat == DigDataFormat.CompressedBlocks) {
+                return (true, new Size(8, pixelCount / 8));
             }
 
-            return dig;
+            int width = field08;
+            int height = field0A;
+            bool validSize = (width * height) == pixelCount;
+
+            // DSIG inside DTX may have width and height values that doesn't represent the amount of pixels.
+            // These images do not really have a size, as they have segments to reconstruct a different image.
+            // We calculate a valid size for them based on a minimal width (tile width).
+            if (!validSize) {
+                width = 8;
+                height = pixelCount / width;
+            }
+
+            return (validSize, new Size(width, height));
+        }
+
+        private static Collection<IPalette> ReadPalettes(DataReader reader, int paletteCount, DigColorFormat colorFormat, DigBpp bpp)
+        {
+            // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
+            int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
+            int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
+            IColorEncoding colorEncoding = colorFormat.GetColorEncoding();
+
+            var palettes = new Collection<IPalette>();
+            for (int i = 0; i < actualPaletteCount; i++) {
+                Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, colorsPerPalette);
+                palettes.Add(new Palette(colors));
+            }
+
+            return palettes;
+        }
+
+        private static (IndexedPixel[], DigBlockInfo[]) ReadImageData(Stream stream, DigBpp bpp, DigDataFormat format)
+        {
+            if (format is DigDataFormat.CompressedImage) {
+                // Decompress full block.
+                using Stream compressed = stream.Slice(stream.Position);
+                using Stream decompressed = new LzssDecoder().Convert(compressed);
+                decompressed.Position = 0;
+                return (ReadPixels(decompressed, bpp), []);
+            }
+
+            if (format is DigDataFormat.CompressedBlocks) {
+                // Read each block and decompress them.
+                IndexedPixel[][] pixelBlocks = ReadCompressedBlocks(stream, bpp);
+
+                // Join every block into a single pixel array, but keep its start pixel and length
+                // so we can recreate the same blocks when writing.
+                List<IndexedPixel> mergedPixels = [];
+                List<DigBlockInfo> blocks = [];
+                for (int i = 0; i < pixelBlocks.Length; i++) {
+                    blocks.Add(new DigBlockInfo(i, mergedPixels.Count, pixelBlocks[i].Length));
+                    mergedPixels.AddRange(pixelBlocks[i]);
+                }
+
+                return (mergedPixels.ToArray(), blocks.ToArray());
+            }
+
+            IndexedPixel[] pixels = ReadPixels(stream, bpp);
+            return (pixels, []);
+        }
+
+        private static IndexedPixel[] ReadPixels(Stream stream, DigBpp bpp)
+        {
+            if (stream.EndOfStream) {
+                return [];
+            }
+
+            byte[] data = stream.ReadBytes((int)(stream.Length - stream.Position));
+            return bpp.GetPixelEncoding().Decode(data);
+        }
+
+        private static IndexedPixel[][] ReadCompressedBlocks(Stream stream, DigBpp bpp)
+        {
+            var reader = new DataReader(stream);
+            long basePosition = reader.Stream.Position;
+            int count = reader.ReadInt32();
+
+            IIndexedPixelEncoding pixelEncoding = bpp.GetPixelEncoding();
+            var blocks = new IndexedPixel[count][];
+            for (int i = 0; i < count; i++) {
+                ushort encodedOffset = reader.ReadUInt16();
+                long blockPosition = basePosition + (encodedOffset * 4);
+                ushort length = reader.ReadUInt16();
+
+                using DataStream compressed = reader.Stream.Slice(blockPosition, length);
+                using Stream decompressed = new LzssDecoder().Convert(compressed);
+
+                decompressed.Position = 0;
+                byte[] decompressedData = decompressed.ReadBytes((int)decompressed.Length);
+                blocks[i] = pixelEncoding.Decode(decompressedData);
+            }
+
+            return blocks;
         }
     }
 }

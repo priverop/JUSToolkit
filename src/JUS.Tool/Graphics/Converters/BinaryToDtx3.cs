@@ -57,20 +57,20 @@ namespace JUS.Tool.Graphics.Converters
             for (int i = 0; i < numSprites; i++) {
                 Sprite sprite = ReadSprite(reader);
 
-                switch (image.Swizzling) {
-                    case DigSwizzling.Tiled:
+                switch (image.DataFormat) {
+                    case DigDataFormat.Tiled:
                         for (int j = 0; j < sprite.Segments.Count; j++) {
                             sprite.Segments[j].Layer = sprite.Segments.Count - j;
                         }
 
                         sprites.Root.Add(new Node($"sp_{i:00}", sprite));
                         break;
-                    case DigSwizzling.Linear:
+                    case DigDataFormat.Linear:
                         sprites.Root.Add(new Node($"tx_{i:00}", CreateTexture(sprite, image)));
                         spriteCollection.Add(sprite);
                         break;
                     default:
-                        throw new FormatException("Invalid swizzling");
+                        throw new FormatException("Invalid data format");
                 }
             }
 
