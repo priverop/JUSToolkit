@@ -148,6 +148,24 @@
             ]
           },
           {
+            Name: jgalaxy,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: jgalaxy-jgalaxy.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: jgalaxy-battle.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: jgalaxy-mission.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+            ]
+          },
+          {
             Name: jquiz,
             Format: Yarhl.FileSystem.NodeContainerFormat,
             Children: [

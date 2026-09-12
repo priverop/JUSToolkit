@@ -27,8 +27,9 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
         strategies = [
             new DeckExportStrategy(createTemplate),
             new InfoDeckExportStrategy(createTemplate),
+            new JGalaxyTextExportStrategy(createTemplate),
+            new JQuizTextExportStrategy(),
             new FontExportStrategy(),
-            new JQuizExportStrategy(),
         ];
     }
 

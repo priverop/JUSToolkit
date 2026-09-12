@@ -8,11 +8,11 @@ using Yarhl.IO;
 namespace JUS.Tool.BatchConverters.Strategies;
 
 /// <summary>
-/// Strategy to export jquiz_pack.aar container.
+/// Strategy to export texts from jquiz_pack.aar container.
 /// </summary>
-public class JQuizExportStrategy : IAssetExportStrategy
+public class JQuizTextExportStrategy : IAssetExportStrategy
 {
-    private readonly ILogger<JQuizExportStrategy> logger = JusLoggerFactory.Instance.CreateLogger<JQuizExportStrategy>();
+    private readonly ILogger<JQuizTextExportStrategy> logger = JusLoggerFactory.Instance.CreateLogger<JQuizTextExportStrategy>();
 
     /// <inheritdoc />
     public AssetFormatKind ExportFormat => AssetFormatKind.Text;
