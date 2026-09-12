@@ -42,6 +42,53 @@
             ]
           },
           {
+            Name: unicos,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: ability_t.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bgm.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: chr_b_t.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: chr_s_t.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: clearlst.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: commwin.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: demo.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: infoname.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: komatxt.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: location.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 5 node(s) more */
+            ]
+          },
+          {
             Name: InfoDeck-Info,
             Format: Yarhl.FileSystem.NodeContainerFormat,
             Children: [

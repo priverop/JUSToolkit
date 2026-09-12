@@ -30,6 +30,7 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
             new JGalaxyTextExportStrategy(createTemplate),
             new JQuizTextExportStrategy(),
             new TutorialExportStrategy(createTemplate),
+            new LooseTextsExportStrategy(createTemplate),
             new FontExportStrategy(),
         ];
     }
