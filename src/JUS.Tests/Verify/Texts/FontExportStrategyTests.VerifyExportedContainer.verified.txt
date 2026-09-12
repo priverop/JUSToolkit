@@ -7,9 +7,9 @@
       Format: {
         Stream: Yarhl.IO.DataStream,
         Offset: 0x0,
-        Position: 0x91ED,
-        Length: 0x91ED,
-        SHA256: D366B8DF8D0FC572D26924638702C837904C75A8A7D444E95AC73C455488992A
+        Position: 0x8188,
+        Length: 0x8188,
+        SHA256: F294B9F741432512E867C5CF0E241B876C0209B6EF22CACE6C26C669513DFE05
       }
     },
     {
@@ -27,9 +27,9 @@
       Format: {
         Stream: Yarhl.IO.DataStream,
         Offset: 0x0,
-        Position: 0xE1DD,
-        Length: 0xE1DD,
-        SHA256: 96D9C68E1E47726725494426803FCA9EDFBE672A966EC60B8386C48356DFE9F6
+        Position: 0xC702,
+        Length: 0xC702,
+        SHA256: C1634D073AC39CD8569843F2F7D2C41B434207E9C0092654B721B8C7ED0AE94C
       }
     },
     {
@@ -47,9 +47,9 @@
       Format: {
         Stream: Yarhl.IO.DataStream,
         Offset: 0x0,
-        Position: 0x46965,
-        Length: 0x46965,
-        SHA256: 92147DB549586ADA93323609AF436CCD4C043215DB92754457977F886386A866
+        Position: 0x38A66,
+        Length: 0x38A66,
+        SHA256: AFAE78CE1707CE07AC562BB6091885B12DD6A41599B60826785E3087472B4879
       }
     },
     {
@@ -67,9 +67,9 @@
       Format: {
         Stream: Yarhl.IO.DataStream,
         Offset: 0x0,
-        Position: 0x4947E,
-        Length: 0x4947E,
-        SHA256: 45F893889057A07F27829C7079188EABB9ACB8461C99C30F39FE3A140C3EE0DF
+        Position: 0x3B692,
+        Length: 0x3B692,
+        SHA256: B617ABA818EA7911B679C56746471DC78917E34013E0D37EA7A6EBE304AB6E7E
       }
     },
     {
