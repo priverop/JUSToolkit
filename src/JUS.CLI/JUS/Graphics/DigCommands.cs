@@ -96,60 +96,21 @@ namespace JUS.CLI.JUS.Graphics
                 throw new FormatException("Number of input PNGs does not match number of provided ATMs.");
             }
 
-            // 1 - Get the DIG
-            Dig mergedImage = NodeFactory.FromFile(dig)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<Binary2Dig>()
-                .GetFormatAs<Dig>();
+            Node originalDig = NodeFactory.FromFile(dig, FileOpenMode.Read);
 
-            var compressionParams = new RgbImageMapCompressionParams {
-                Palettes = mergedImage,
-            };
-
-            IndexedImage? newImage = null;
-
-            // 2 - Iterate the input PNGs
+            var originalAtms = new Node[atm.Length];
+            var pngs = new Node[input.Length];
             for (int i = 0; i < input.Length; i++) {
-                // Transform the PNG into RgbImage (Pixels + Map) using the palette of the original DIG
-                MapCompressedIndexedImage compressed = NodeFactory.FromFile(input[i], FileOpenMode.Read)
-                    .TransformWith<StandardBinaryImage2RgbImage>()
-                    .TransformWith(new RgbImageMapCompression(compressionParams))
-                    .GetFormatAs<MapCompressedIndexedImage>();
-
-                newImage = new IndexedImage {
-                    Width = 8,
-                    Height = compressed.Tiles.Length / 8,
-                    Pixels = compressed.Tiles,
-                };
-                ITileMap map = compressed.Map;
-
-                // 3 - Clone original
-                mergedImage = new Dig(mergedImage, newImage);
-
-                if (insertTransparent && i == 0) {
-                    mergedImage = mergedImage.InsertTransparentTile(map);
-                }
-
-                compressionParams = new RgbImageMapCompressionParams {
-                    MergeImage = mergedImage,
-                    Palettes = mergedImage,
-                };
-
-                // New Atm: original atm changing height, width and maps
-                Altm originalAtm = NodeFactory.FromFile(atm[i], FileOpenMode.Read)
-                    .TransformWith<Binary2Altm>()
-                    .GetFormatAs<Altm>();
-                var newAtm = new Altm(originalAtm, map);
-
-                // Export ATM
-                new Altm2Binary().Convert(newAtm)
-                    .Stream.WriteTo(Path.Combine(output, Path.GetFileName(atm[i])));
+                originalAtms[i] = NodeFactory.FromFile(atm[i], FileOpenMode.Read);
+                pngs[i] = NodeFactory.FromFile(input[i], FileOpenMode.Read);
             }
 
-            // New Dig: original dig changing height, width and pixels
-            var newDig = new Dig(mergedImage, newImage!);
-            new Dig2Binary().Convert(newDig)
-                .Stream.WriteTo(Path.Combine(output, Path.GetFileName(dig)));
+            var converter = new Png2DigAtm(originalDig, originalAtms, insertTransparent);
+            NodeContainerFormat transformedFiles = converter.Convert(pngs);
+
+            foreach (Node file in transformedFiles.Root.Children) {
+                file.Stream.WriteTo(Path.Combine(output, file.Name));
+            }
 
             Console.WriteLine("Done!");
         }
