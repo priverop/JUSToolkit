@@ -29,6 +29,7 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
             new InfoDeckExportStrategy(createTemplate),
             new JGalaxyTextExportStrategy(createTemplate),
             new JQuizTextExportStrategy(),
+            new TutorialExportStrategy(createTemplate),
             new FontExportStrategy(),
         ];
     }
@@ -57,8 +58,11 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
                     AssetFormatKind.Image => images,
                     _ => throw new NotSupportedException(),
                 };
-                IEnumerable<Node> exported = strategy.Export(asset);
-                output.Add(exported);
+
+                // Create a temporary node to hold the output, then move with merge strategy
+                using Node exported = new("out");
+                exported.Add(strategy.Export(asset));
+                exported.GetFormatAs<NodeContainerFormat>().MoveChildrenTo(output, true);
             }
         }
 

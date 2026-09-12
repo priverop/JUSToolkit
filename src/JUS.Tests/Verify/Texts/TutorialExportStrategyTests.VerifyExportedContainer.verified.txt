@@ -1,0 +1,40 @@
+﻿{
+  Name: root,
+  Format: Yarhl.FileSystem.NodeContainerFormat,
+  Children: [
+    {
+      Name: tutorial,
+      Format: Yarhl.FileSystem.NodeContainerFormat,
+      Children: [
+        {
+          Name: tutorial.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        },
+        {
+          Name: tutorial0.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        },
+        {
+          Name: tutorial1.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        },
+        {
+          Name: tutorial2.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        },
+        {
+          Name: tutorial3.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        },
+        {
+          Name: tutorial4.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        },
+        {
+          Name: tutorial5.bin.po,
+          Format: Yarhl.IO.BinaryTextFormat
+        }
+      ]
+    }
+  ]
+}

@@ -8,50 +8,37 @@
         Format: Yarhl.FileSystem.NodeContainerFormat,
         Children: [
           {
-            Name: InfoDeck,
+            Name: tutorial,
             Format: Yarhl.FileSystem.NodeContainerFormat,
             Children: [
               {
-                Name: bin-deck-bb.bin.po,
+                Name: tutorial0.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               },
               {
-                Name: bin-deck-bc.bin.po,
+                Name: tutorial1.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               },
               {
-                Name: bin-deck-bl.bin.po,
+                Name: tutorial2.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               },
               {
-                Name: bin-deck-bu.bin.po,
+                Name: tutorial3.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               },
               {
-                Name: bin-deck-cb.bin.po,
+                Name: tutorial4.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               },
               {
-                Name: bin-deck-ct.bin.po,
+                Name: tutorial5.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               },
               {
-                Name: bin-deck-db.bin.po,
-                Format: Yarhl.IO.BinaryTextFormat
-              },
-              {
-                Name: bin-deck-dg.bin.po,
-                Format: Yarhl.IO.BinaryTextFormat
-              },
-              {
-                Name: bin-deck-dn.bin.po,
-                Format: Yarhl.IO.BinaryTextFormat
-              },
-              {
-                Name: bin-deck-ds.bin.po,
+                Name: tutorial.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               }
-              /* 32 node(s) more */
             ]
           },
           {
@@ -96,6 +83,53 @@
               },
               {
                 Name: bin-info-ds.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 32 node(s) more */
+            ]
+          },
+          {
+            Name: InfoDeck,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bin-deck-bb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bc.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bl.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bu.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-cb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-ct.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-db.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-dg.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-dn.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-ds.bin.po,
                 Format: Yarhl.IO.BinaryTextFormat
               }
               /* 32 node(s) more */
@@ -219,15 +253,11 @@
         Format: Yarhl.FileSystem.NodeContainerFormat,
         Children: [
           {
-            Name: DSFont.yml,
-            Format: Yarhl.IO.BinaryTextFormat
-          },
-          {
             Name: DSFont.png,
             Format: Yarhl.IO.BinaryFormat
           },
           {
-            Name: js8font.yml,
+            Name: DSFont.yml,
             Format: Yarhl.IO.BinaryTextFormat
           },
           {
@@ -235,7 +265,7 @@
             Format: Yarhl.IO.BinaryFormat
           },
           {
-            Name: jskfont.yml,
+            Name: js8font.yml,
             Format: Yarhl.IO.BinaryTextFormat
           },
           {
@@ -243,12 +273,16 @@
             Format: Yarhl.IO.BinaryFormat
           },
           {
-            Name: jskfont_q.yml,
+            Name: jskfont.yml,
             Format: Yarhl.IO.BinaryTextFormat
           },
           {
             Name: jskfont_q.png,
             Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: jskfont_q.yml,
+            Format: Yarhl.IO.BinaryTextFormat
           }
         ]
       },
