@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.Tool.Containers.Converters;
-using NUnit.Framework;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -79,6 +78,15 @@ namespace JUS.Tests
             return NodeFactory.FromFile(path, FileOpenMode.Read)
                 .TransformWith(new Binary2NitroRom())
                 .GetFormatAs<NitroRom>();
+        }
+
+        public static IEnumerable<Node> ReadAndGetChildren(string path)
+        {
+            if (!File.Exists(SoftwareNitroRomPath)) {
+                return [];
+            }
+
+            return Navigator.GetNode(ReadSoftware().Root, path).Children;
         }
 
         private static NitroRom? ReadAndUnpackRoot()
