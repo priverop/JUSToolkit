@@ -134,7 +134,10 @@ namespace JUS.Tool.Graphics
             UnknownBlockValue = dig.UnknownBlockValue;
             BlocksInfo = dig.BlocksInfo.ToArray();
             Pixels = dig.Pixels.ToArray();
-            Palettes = new Collection<IPalette>(dig.Palettes);
+            Palettes = new Collection<IPalette>();
+            foreach (IPalette palette in dig.Palettes) {
+                Palettes.Add(new Palette(palette.Colors));
+            }
         }
 
         /// <summary>

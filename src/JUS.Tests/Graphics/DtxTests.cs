@@ -218,6 +218,7 @@ namespace JUS.Tests.Graphics
             }
 
             // Linear image to Tiled image (how the DTX stores them)
+            // See the DtxCommand for information about why we do swizzling here.
             IndexedPixel[] tiledPixels = new TileSwizzling<IndexedPixel>(48).Swizzle(segmentedImage);
 
             // Update image with the new changes

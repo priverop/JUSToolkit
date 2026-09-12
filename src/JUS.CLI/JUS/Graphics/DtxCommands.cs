@@ -341,7 +341,11 @@ namespace JUS.CLI.JUS.Graphics
                 segmentedImage.AddRange(segmentImage.Pixels);
             }
 
-            // Linear image to Tiled image (how the DTX stores them)
+            // We do swizzling now, instead of waiting the Dig2Binary converter to do it because the game
+            // does swizzling with width 48 (segments width), but the converter will do it with the image width 8.
+            // Providing the swizzled pixels now, and letting Dig2Binary do swizzling again it's not an issue because
+            // swizzling with width 8 (and tile size 8x8) does nothing. So when the Dig2Binary converter swizzles a second time
+            // with the image width of 8, it will get the same pixels as give it now swizzled at 48.
             IndexedPixel[] tiledPixels = new TileSwizzling<IndexedPixel>(48).Swizzle(segmentedImage);
 
             // Update image with the new changes
@@ -349,7 +353,6 @@ namespace JUS.CLI.JUS.Graphics
                 Pixels = tiledPixels.ToArray(),
                 Width = 8,
                 Height = tiledPixels.Length / 8,
-                DataFormat = DigDataFormat.Linear,
             }.InsertTransparentTile();
 
             dtx4.Children["image"].ChangeFormat(updatedImage);
