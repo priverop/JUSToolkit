@@ -32,6 +32,7 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
             new TutorialExportStrategy(createTemplate),
             new LooseTextsExportStrategy(createTemplate),
             new FontExportStrategy(),
+            new ComicImagesExportStrategy(),
         ];
     }
 

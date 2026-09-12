@@ -40,7 +40,7 @@ public abstract class BaseExportStrategyTests(bool includeHash)
         return Verifier.Verify(exports)
             .UseDirectory(TestDataBase.VerifyTextsPath)
             .AddExtraSettings(settings => {
-                settings.Converters.Add(new NodeVerifyJsonConverter(serializeFormat: includeHash));
+                settings.Converters.Add(new NodeVerifyJsonConverter(serializeFormat: includeHash, maxChildren: 20));
                 if (includeHash) {
                     settings.Converters.Add(new BinaryFormatVerifyJsonConverter());
                 }

@@ -335,7 +335,56 @@
       },
       {
         Name: images,
-        Format: Yarhl.FileSystem.NodeContainerFormat
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: comics,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bb_02.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_n_00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_m_00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_03.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_04.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_n_01.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_m_01.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_05.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_06.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_n_02.png,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 883 node(s) more */
+            ]
+          }
+        ]
       }
     ]
   },
