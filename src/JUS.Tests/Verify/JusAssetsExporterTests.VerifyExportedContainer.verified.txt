@@ -338,6 +338,53 @@
         Format: Yarhl.FileSystem.NodeContainerFormat,
         Children: [
           {
+            Name: menus,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: menu-Commu-battle_sel.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-code.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-friend_co00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-matchmake.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-sure02.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-top_right.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-watch_battle.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-database-story_bg1.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-database-story_bg0.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-database-playing.png,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 18 node(s) more */
+            ]
+          },
+          {
             Name: comics,
             Format: Yarhl.FileSystem.NodeContainerFormat,
             Children: [

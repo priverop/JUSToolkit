@@ -6,9 +6,9 @@ using Yarhl.TestFramework.Verify.Converters;
 namespace JUS.Tests.Batch;
 
 [TestFixture]
-public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
+public class MenuImagesExportStrategyTests() : BaseExportStrategyTests(true)
 {
-    private static IEnumerable<TestCaseData> TutorialAssets {
+    private static IEnumerable<TestCaseData> MenuAsset {
         get {
             if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
                 return [];
@@ -16,23 +16,24 @@ public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash
 
             NitroRom rom = TestDataBase.ReadSoftware();
             IEnumerable<Node> nodes = [
-                rom.Data.Children["deckmake"].Children["tutorial.bin"],
-                ..rom.Data.Children["battle"].Children
-                    .Where(n => n.Name.StartsWith("tutorial") && n.Extension == ".bin"),
+                rom.Data.Children["Commu"].Children["commu_pack.aar"],
+                rom.Data.Children["database"].Children["database.aar"],
+                // rom.Data.Children["deckcheck"].Children["deckcheck.aar"],
+                rom.Data.Children["input"].Children["input.aar"],
             ];
             return nodes.Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
     }
 
-    protected override IAssetExportStrategy CreateStrategy() => new TutorialExportStrategy(false);
+    protected override IAssetExportStrategy CreateStrategy() => new MenuImagesExportStrategy();
 
-    [TestCaseSource(nameof(TutorialAssets))]
+    [TestCaseSource(nameof(MenuAsset))]
     public void ExportedContainerAreNotDisposed(Node asset)
     {
         base.AssertExportedContainerAreNotDisposed(asset);
     }
 
-    [TestCaseSource(nameof(TutorialAssets))]
+    [TestCaseSource(nameof(MenuAsset))]
     public void StrategyMatches(Node asset)
     {
         base.AssertStrategyMatches(asset);
@@ -46,7 +47,7 @@ public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash
         // To simplify the verification we export all at once
         IAssetExportStrategy strategy = CreateStrategy();
         var root = new Node("root");
-        foreach (Node asset in TutorialAssets.Select(t => (t.Arguments[0] as Node)!)) {
+        foreach (Node asset in MenuAsset.Select(t => (t.Arguments[0] as Node)!)) {
             Node output = new("out");
             output.Add(strategy.Export(asset));
             output.GetFormatAs<NodeContainerFormat>().MoveChildrenTo(root, true);
@@ -55,7 +56,8 @@ public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash
         return Verifier.Verify(root)
             .UseDirectory(TestDataBase.VerifyTextsPath)
             .AddExtraSettings(settings => {
-                settings.Converters.Add(new NodeVerifyJsonConverter(serializeFormat: false));
+                settings.Converters.Add(new NodeVerifyJsonConverter());
+                settings.Converters.Add(new BinaryFormatVerifyJsonConverter());
             });
     }
 }

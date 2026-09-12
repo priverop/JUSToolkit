@@ -1,0 +1,292 @@
+﻿{
+  Name: root,
+  Format: Yarhl.FileSystem.NodeContainerFormat,
+  Children: [
+    {
+      Name: menus,
+      Format: Yarhl.FileSystem.NodeContainerFormat,
+      Children: [
+        {
+          Name: menu-Commu-battle_sel.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xA4B,
+            Length: 0xA4B,
+            SHA256: 1B50245613CA11B6114BDC9B2C095CC415F3D25B0D9B352385F00E8C6AC3251B
+          }
+        },
+        {
+          Name: menu-Commu-code.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x1E95,
+            Length: 0x1E95,
+            SHA256: 2BEFDA13DE6729A8E882DA9B158EA1502746C9921F03BE1543092FCEBC725F0B
+          }
+        },
+        {
+          Name: menu-Commu-friend_co00.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x13DC,
+            Length: 0x13DC,
+            SHA256: 721F47AB54218DE20430FE4156D1DE02137C8298423FDB07CBC8E5DF30ED6B0F
+          }
+        },
+        {
+          Name: menu-Commu-matchmake.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xF87,
+            Length: 0xF87,
+            SHA256: 81571B60002785E4510F05FB4F382D95E1C34672B6758943F53E0E7A6D82D3BB
+          }
+        },
+        {
+          Name: menu-Commu-sure02.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x1B38,
+            Length: 0x1B38,
+            SHA256: 4B1C4110D2C7AB72DFA33517BEB4853D148AD921C57771940B8A9BF827E56CE0
+          }
+        },
+        {
+          Name: menu-Commu-top_right.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x318B,
+            Length: 0x318B,
+            SHA256: 94CCC49BB9187C73A57F4CE5B16074AB0B52CA27422F10340E23884B21DB9E27
+          }
+        },
+        {
+          Name: menu-Commu-watch_battle.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x2A22,
+            Length: 0x2A22,
+            SHA256: F54C42495FFCC2E63F1F590D8F0E55F16569CCB9ED66BC5807DDF9CD2903DF75
+          }
+        },
+        {
+          Name: menu-database-story_bg1.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xF10,
+            Length: 0xF10,
+            SHA256: 34A8609DF285DE8234A14F38C7992A3C670E068514011686920A2DCF2E563C2E
+          }
+        },
+        {
+          Name: menu-database-story_bg0.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xA7A,
+            Length: 0xA7A,
+            SHA256: 0A915AE09E70AA5A3D6028418D506CE00EDB486577AC2189DA5223E826E47797
+          }
+        },
+        {
+          Name: menu-database-playing.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x9D2,
+            Length: 0x9D2,
+            SHA256: 4DE2A75906F25583B73E64D61F219BF33DE549ADF72D47382F7C4F28BC10CACD
+          }
+        },
+        {
+          Name: menu-database-personal_bg2.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x1F65,
+            Length: 0x1F65,
+            SHA256: 23C1E81A1F00E1FF7CEF8C86B9DCDD41EB68258465159141C4F6DF9AFAE2FBCC
+          }
+        },
+        {
+          Name: menu-database-personal_bg.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x2295,
+            Length: 0x2295,
+            SHA256: BA877327A3ED4DA702DC222EFF3323F75335C881F71F1CF5610038F69B568658
+          }
+        },
+        {
+          Name: menu-database-list_bg2.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xEFE,
+            Length: 0xEFE,
+            SHA256: 5150C28C4876681575661BBF2215597CC23FD37B6314674806F2847F0A4153D0
+          }
+        },
+        {
+          Name: menu-database-list_bg1.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xF6F,
+            Length: 0xF6F,
+            SHA256: 929E08255235465F864DD7FF641568F66AB0E7E39758C1FAC9BD91A19E385229
+          }
+        },
+        {
+          Name: menu-database-list_bg0.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xF23,
+            Length: 0xF23,
+            SHA256: 1991FEB532FBADEE867CAD715F226EA5827F81C380AB2A0487C3090CCD260D11
+          }
+        },
+        {
+          Name: menu-database-list.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x40A,
+            Length: 0x40A,
+            SHA256: 6C67D25715B8B6EBFA94BAB2EFC301E656E296B1A9BA7B03E6B35426606748DF
+          }
+        },
+        {
+          Name: menu-database-home_bg.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x15E4,
+            Length: 0x15E4,
+            SHA256: DA20B4D4C9B20832446266CF9C871876AC181D4F41A1A2B7BAADBBF45E331A26
+          }
+        },
+        {
+          Name: menu-input-txt_bg3.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xBEA,
+            Length: 0xBEA,
+            SHA256: A77A9AB32E3AC4BC059450E9C77567C9ACA7C4727FF64E8D3D295A789752CADE
+          }
+        },
+        {
+          Name: menu-input-txt_bg2.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x66B,
+            Length: 0x66B,
+            SHA256: 5F2DAC29138DC4917141E3464ADD47E3355CA94D2742F50802D917501314C399
+          }
+        },
+        {
+          Name: menu-input-txt_bg1.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x53C,
+            Length: 0x53C,
+            SHA256: 150F2EA47D4099D798063E07A9E39AEBFB0AA992DEBD006FF3258E4A063384C6
+          }
+        },
+        {
+          Name: menu-input-txt_bg0.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x53D,
+            Length: 0x53D,
+            SHA256: 863AD33E34983574D9CEA130ADB85D4CF7FD3786726142EFD13F02419315E584
+          }
+        },
+        {
+          Name: menu-input-mode_bg3.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x758,
+            Length: 0x758,
+            SHA256: 4866C55DF39BD5EC6615240E415D8C93487EE45C4DAA22E6EB2D84166EF5770F
+          }
+        },
+        {
+          Name: menu-input-mode_bg2.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xFD5,
+            Length: 0xFD5,
+            SHA256: C15A63A777934F31ACBF814E3835C67C5F0DC5829EE580B2D9362A2E150CCCC1
+          }
+        },
+        {
+          Name: menu-input-mode_bg1.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xEF8,
+            Length: 0xEF8,
+            SHA256: CA4688D6BB52C7CC715647871FF4FBF78318D1091D7B3A163BB4CB3BE1DB8577
+          }
+        },
+        {
+          Name: menu-input-mode_bg0.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0xBA0,
+            Length: 0xBA0,
+            SHA256: 721A64A771F55B0F4BAC8CC05BBFE423387B6EFBB32FC96635EBDFC8A47B3916
+          }
+        },
+        {
+          Name: menu-input-input_font.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x5829,
+            Length: 0x5829,
+            SHA256: C7410158FD41E2DC04D340DB917E266EBE687B3F49AB87D6DCA85EEB01CC3E04
+          }
+        },
+        {
+          Name: menu-input-input_bg1.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x958,
+            Length: 0x958,
+            SHA256: E9674269A0B724D4529B418B7BE85EC4FAC0332F334C99638081343EAA617559
+          }
+        },
+        {
+          Name: menu-input-input_bg0.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x8DD,
+            Length: 0x8DD,
+            SHA256: 6A52EC2585DED7BF55A299BFB0D749B5B2BB4AA7F96D4B06718BA1706D75B484
+          }
+        }
+      ]
+    }
+  ]
+}
