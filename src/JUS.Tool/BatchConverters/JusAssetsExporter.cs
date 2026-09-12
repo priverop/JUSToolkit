@@ -1,5 +1,4 @@
-﻿using JUS.Tests.Batch;
-using JUS.Tool.BatchConverters.Strategies;
+﻿using JUS.Tool.BatchConverters.Strategies;
 using JUS.Tool.Utils;
 using Microsoft.Extensions.Logging;
 using Yarhl.FileFormat;
@@ -35,6 +34,7 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
             new FontExportStrategy(),
             new ComicImagesExportStrategy(),
             new MenuImagesExportStrategy(),
+            new SpritesExportStrategy(),
         ];
     }
 

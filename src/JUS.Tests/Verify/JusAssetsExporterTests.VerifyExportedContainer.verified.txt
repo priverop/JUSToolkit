@@ -338,6 +338,53 @@
         Format: Yarhl.FileSystem.NodeContainerFormat,
         Children: [
           {
+            Name: sprites,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: pause.aar-pause.dtx-sp_00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_01.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_02.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_03.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_04.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_05.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_06.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_07.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_08.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_09.png,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 4157 node(s) more */
+            ]
+          },
+          {
             Name: menus,
             Format: Yarhl.FileSystem.NodeContainerFormat,
             Children: [
@@ -381,7 +428,7 @@
                 Name: menu-database-playing.png,
                 Format: Yarhl.IO.BinaryFormat
               }
-              /* 18 node(s) more */
+              /* 56 node(s) more */
             ]
           },
           {
