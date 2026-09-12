@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.Tool.Containers.Converters;
-using NUnit.Framework;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -30,6 +29,21 @@ namespace JUS.Tests
     /// </summary>
     public static class TestDataBase
     {
+        public static string VerifyTextsPath => Path.Combine(VerifyResourcesPath, "Texts");
+
+        public static string VerifyResourcesPath {
+            get {
+                string programDir = AppDomain.CurrentDomain.BaseDirectory;
+                string path = Path.Combine(
+                    programDir,
+                    "..", // framework -> configuration
+                    "..", // -> bin
+                    "..", // -> project
+                    "Verify");
+                return Path.GetFullPath(path);
+            }
+        }
+
         public static Lazy<NitroRom?> UnpackedRoot { get; } = new(ReadAndUnpackRoot);
 
         public static string RootFromOutputPath {
@@ -64,6 +78,15 @@ namespace JUS.Tests
             return NodeFactory.FromFile(path, FileOpenMode.Read)
                 .TransformWith(new Binary2NitroRom())
                 .GetFormatAs<NitroRom>();
+        }
+
+        public static IEnumerable<Node> ReadAndGetChildren(string path)
+        {
+            if (!File.Exists(SoftwareNitroRomPath)) {
+                return [];
+            }
+
+            return Navigator.GetNode(ReadSoftware().Root, path).Children;
         }
 
         private static NitroRom? ReadAndUnpackRoot()

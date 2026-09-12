@@ -1,0 +1,209 @@
+﻿[
+  {
+    Name: comics,
+    Format: Yarhl.FileSystem.NodeContainerFormat,
+    Children: [
+      {
+        Name: bb_02.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x7150,
+          Length: 0x7150,
+          SHA256: 9EC7C33FB899D1FBCC86A03B1E95E40044432E8616E64DE4076283573DD0A685
+        }
+      },
+      {
+        Name: bb_n_00.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x2FCD,
+          Length: 0x2FCD,
+          SHA256: 58D0DE35B21BC7683A1AEB5D1366E24DCD6FDEDC0A24A05557AD3757755AC45F
+        }
+      },
+      {
+        Name: bb_m_00.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x7DC1,
+          Length: 0x7DC1,
+          SHA256: 3A81B67CD0651703CAC596E65F992C94439F1E9B0E607933A4ABC8FC50633AAA
+        }
+      },
+      {
+        Name: bb_03.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x9690,
+          Length: 0x9690,
+          SHA256: 98C66B8D827B141FF42AA1B459EE1F502CAE776CA5CA5C131BACCB9A3A8E3962
+        }
+      },
+      {
+        Name: bb_04.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x6F73,
+          Length: 0x6F73,
+          SHA256: 7FD155DEF23F6B4C91A3051799DDD5330611CA538AB4B9DE051885040EE3DF28
+        }
+      },
+      {
+        Name: bb_n_01.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x36C6,
+          Length: 0x36C6,
+          SHA256: 036C4946D73AD96A924F67877CAED8D40FA187BE002F1FEBF05B8365710F2E98
+        }
+      },
+      {
+        Name: bb_m_01.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x5C36,
+          Length: 0x5C36,
+          SHA256: 13A499A78886F343E5AAD5B1CC11817DE2DEEB8F25FF158D21AE473C15E4062E
+        }
+      },
+      {
+        Name: bb_05.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x7F4E,
+          Length: 0x7F4E,
+          SHA256: D4FA3F58B2FDE69C0E5969ED8AE58FE85E6017461909EC124E5A957BBE92BEE6
+        }
+      },
+      {
+        Name: bb_06.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x4C18,
+          Length: 0x4C18,
+          SHA256: FEB62D294456359DDA3D568B326D171FAB6F386DF4C67DF30A323D4F87AEBAE1
+        }
+      },
+      {
+        Name: bb_n_02.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x434,
+          Length: 0x434,
+          SHA256: FE1BA288E379B5CFFF4E3523A555BC297B7D60BE8325F2F3FC7F9193AF3BAD0D
+        }
+      },
+      {
+        Name: bb_m_02.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x827D,
+          Length: 0x827D,
+          SHA256: F6C3835CAD2572E52512D2D93E25F2A1514B159287A15CBC6CE3F6F43524A117
+        }
+      },
+      {
+        Name: bb_07.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x7C5B,
+          Length: 0x7C5B,
+          SHA256: CFF75D05575433DFBEBBF783B6F08695750564570017F9ABA504B47624DD515E
+        }
+      },
+      {
+        Name: bb_08.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x4DDC,
+          Length: 0x4DDC,
+          SHA256: B296926C598A00C2310B8BB0F4A96B5871220C961E472D3EAE053362D24185B2
+        }
+      },
+      {
+        Name: bb_n_03.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x291,
+          Length: 0x291,
+          SHA256: 85984D0B74815310A504E89F62A13E0FDD738971927C35D1ACEF468165C3740F
+        }
+      },
+      {
+        Name: bb_m_03.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0xAE23,
+          Length: 0xAE23,
+          SHA256: 56FAB274248A15C2175E1E8FA89486D1F382808E04F51E577E5F20F76164BE8F
+        }
+      },
+      {
+        Name: bb_09.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0xA3B2,
+          Length: 0xA3B2,
+          SHA256: 9906373ABB93AC8ABFAB3BDAE62075D9DFED1D7909DDD6FFE4DFC07781302D50
+        }
+      },
+      {
+        Name: bb_10.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x5E52,
+          Length: 0x5E52,
+          SHA256: 94550AFA6427019AE121983DF059F782E77CC8EB0BEC6457F13D96C9F1CABDA7
+        }
+      },
+      {
+        Name: bb_11.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x58E1,
+          Length: 0x58E1,
+          SHA256: 3C6C2BF0E735920D9F1CF5C6BDBF2CBB6A6EE7FACEE5CBD3ABFF514CD3C1D85A
+        }
+      },
+      {
+        Name: bb_c_00.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x7E8D,
+          Length: 0x7E8D,
+          SHA256: 2CD37927EF43C20CF8408A30189A237EDFDAF9718DC79A5C50255D1EFFA36289
+        }
+      },
+      {
+        Name: bb_c_01.png,
+        Format: {
+          Stream: Yarhl.IO.DataStream,
+          Offset: 0x0,
+          Position: 0x65D3,
+          Length: 0x65D3,
+          SHA256: F16A7B14C8F9D52280E68BC5A6AA6A9243B007927E447E7357960CDC1905CC11
+        }
+      }
+      /* 873 node(s) more */
+    ]
+  }
+]

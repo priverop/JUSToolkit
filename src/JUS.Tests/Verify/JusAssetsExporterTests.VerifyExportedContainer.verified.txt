@@ -1,0 +1,486 @@
+﻿{
+  Root: {
+    Name: root,
+    Format: Yarhl.FileSystem.NodeContainerFormat,
+    Children: [
+      {
+        Name: es,
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: tutorial,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: tutorial0.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: tutorial1.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: tutorial2.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: tutorial3.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: tutorial4.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: tutorial5.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: tutorial.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+            ]
+          },
+          {
+            Name: unicos,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: ability_t.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bgm.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: chr_b_t.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: chr_s_t.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: clearlst.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: commwin.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: demo.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: infoname.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: komatxt.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: location.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 5 node(s) more */
+            ]
+          },
+          {
+            Name: InfoDeck-Info,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bin-info-bb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-bc.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-bl.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-bu.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-cb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-ct.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-db.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-dg.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-dn.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-info-ds.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 32 node(s) more */
+            ]
+          },
+          {
+            Name: InfoDeck,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bin-deck-bb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bc.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bl.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-bu.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-cb.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-ct.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-db.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-dg.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-dn.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: bin-deck-ds.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+              /* 32 node(s) more */
+            ]
+          },
+          {
+            Name: deck,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: deck-jadv.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jard.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jard_p.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jarg.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-jarg_p.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-play.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-priv.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-smpl.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-smpl_p.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: deck-test.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+            ]
+          },
+          {
+            Name: jgalaxy,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: jgalaxy-jgalaxy.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: jgalaxy-battle.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              },
+              {
+                Name: jgalaxy-mission.bin.po,
+                Format: Yarhl.IO.BinaryTextFormat
+              }
+            ]
+          },
+          {
+            Name: jquiz,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: jquiz-00-Dr. Slump.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-01-Bobobo.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-02-Black Cat.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-03-Bleach.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-04-Buso Renkin.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-05-Cobra.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-06-Oliver y Benji.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-07-Dragon Ball.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-08-D. Gray-Man.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-09-Death Note.po,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 33 node(s) more */
+            ]
+          }
+        ]
+      },
+      {
+        Name: fonts,
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: DSFont.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: DSFont.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: js8font.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: js8font.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: jskfont.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: jskfont.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          },
+          {
+            Name: jskfont_q.png,
+            Format: Yarhl.IO.BinaryFormat
+          },
+          {
+            Name: jskfont_q.yml,
+            Format: Yarhl.IO.BinaryTextFormat
+          }
+        ]
+      },
+      {
+        Name: images,
+        Format: Yarhl.FileSystem.NodeContainerFormat,
+        Children: [
+          {
+            Name: sprites,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: pause.aar-pause.dtx-sp_00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_01.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_02.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_03.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_04.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_05.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_06.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_07.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_08.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: pause.aar-pause.dtx-sp_09.png,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 4157 node(s) more */
+            ]
+          },
+          {
+            Name: menus,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: menu-Commu-battle_sel.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-code.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-friend_co00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-matchmake.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-sure02.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-top_right.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-Commu-watch_battle.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-database-story_bg1.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-database-story_bg0.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: menu-database-playing.png,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 56 node(s) more */
+            ]
+          },
+          {
+            Name: comics,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: bb_02.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_n_00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_m_00.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_03.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_04.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_n_01.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_m_01.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_05.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_06.png,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: bb_n_02.png,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 883 node(s) more */
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  Disposed: false
+}

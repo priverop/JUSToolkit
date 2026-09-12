@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Yarhl" />
     <PackageReference Include="Yarhl.Media.Text" />
     <PackageReference Include="Texim" />

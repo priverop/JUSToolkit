@@ -18,3 +18,7 @@ launchSettings.json
 *.aar
 *.dig
 *.bin
+
+# Verify
+*.received.*
+*.received/

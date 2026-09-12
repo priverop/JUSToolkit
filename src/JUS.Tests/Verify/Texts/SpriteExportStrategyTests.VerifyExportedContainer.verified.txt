@@ -1,0 +1,113 @@
+﻿{
+  Name: root,
+  Format: Yarhl.FileSystem.NodeContainerFormat,
+  Children: [
+    {
+      Name: sprites,
+      Format: Yarhl.FileSystem.NodeContainerFormat,
+      Children: [
+        {
+          Name: pause.aar-pause.dtx-sp_00.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x4E2,
+            Length: 0x4E2,
+            SHA256: 26C054DB170941F658C7576023C176B0DF41433773333D6CF98DC6C526FB59CC
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_01.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x40F,
+            Length: 0x40F,
+            SHA256: 2E2B83121429F3BE7D4ED5FAF7BE8012546F51C8BD8D79DD513D921E525AFFEC
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_02.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x430,
+            Length: 0x430,
+            SHA256: 092E942117E82A1FF9138F44FAEAC83B547014DBC636548F428D0395C0D2E5AD
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_03.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x6F1,
+            Length: 0x6F1,
+            SHA256: D06A180AC8617659246F114D772A5CA36BD8C55C9D2F46F1E6D185F5DCEB712B
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_04.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x75D,
+            Length: 0x75D,
+            SHA256: E932E00546C358E8576EA7F40D4896C1EE7B34FBDC5314B63B55F991B0910538
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_05.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x75B,
+            Length: 0x75B,
+            SHA256: 92F004C83F5754A7DCEC2EBE14758B7E1923318AF7FE73EB85B537A6FFC20A36
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_06.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x6F6,
+            Length: 0x6F6,
+            SHA256: 681A3076C048AB81F12EB36FA84BBE30270A40E1AF5A54EBCD342325783718B2
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_07.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x525,
+            Length: 0x525,
+            SHA256: CC392AAF0362453D435761B28951E154BC1BEEAB9D60A7992B3F125AA7303483
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_08.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x604,
+            Length: 0x604,
+            SHA256: 5CA3CB400569498037843EF45F07DA4C362797B473B6FB2B4714A9DEDD964C8A
+          }
+        },
+        {
+          Name: pause.aar-pause.dtx-sp_09.png,
+          Format: {
+            Stream: Yarhl.IO.DataStream,
+            Offset: 0x0,
+            Position: 0x6E0,
+            Length: 0x6E0,
+            SHA256: 6196A70D72389174D5510E8234477C6DE1E4B981434ED688DDB72C0C5B7376DC
+          }
+        }
+        /* 4157 node(s) more */
+      ]
+    }
+  ]
+}

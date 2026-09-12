@@ -18,6 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using JUS.CLI.JUS.Rom;
+using JUS.Tool.BatchConverters;
+using JUS.Tool.Discovery;
+using JUS.Tool.Utils;
+using Microsoft.Extensions.Logging;
 using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -40,6 +44,37 @@ namespace JUS.CLI.JUS
             new TextContainerFile(),
             new TextPatternFile(),
         ];
+
+        /// <summary>
+        /// Export the game assets into editable formats.
+        /// </summary>
+        /// <param name="gamePath">Path to the game backup file.</param>
+        /// <param name="languageCode">Translation language or null for template files.</param>
+        /// <param name="outputDirectory">Output directory to write the files.</param>
+        /// <param name="verbosity">Logging verbosity</param>
+        public static void Export(string gamePath, string? languageCode, string outputDirectory, LogLevel verbosity)
+        {
+            AppLoggerFactory.MinimumLevel = verbosity;
+            JusLoggerFactory.Instance = AppLoggerFactory.GetFactory();
+            ILogger logger = AppLoggerFactory.CreateLogger(nameof(RomCommands));
+
+            logger.LogInformation("Reading input: {@Path}", gamePath);
+            using Node root = NodeFactory.FromFile(gamePath, FileOpenMode.Read)
+                .TransformWith(new Binary2NitroRom());
+
+            ProgramInfo info = root.GetFormatAs<NitroRom>().Information;
+            if (info.GameCode != SupportedSoftware.GameCode) {
+                throw new NotSupportedException($"Unsupported game code: {info.GameCode}");
+            }
+
+            logger.LogInformation("Converting to exportable format");
+            root.TransformWith(new JusAssetsExporter(languageCode));
+
+            logger.LogInformation("Exporting to file system");
+            ExportNode(root, outputDirectory, logger);
+
+            logger.LogInformation("Done!");
+        }
 
         /// <summary>
         /// Import files into the Rom.
@@ -115,6 +150,22 @@ namespace JUS.CLI.JUS
             gameNode.Stream.WriteTo(Path.Combine(output, "new_game_font.nds"));
 
             Console.WriteLine("Done!");
+        }
+
+        private static void ExportNode(Node container, string outputPath, ILogger logger)
+        {
+            foreach (Node child in Navigator.IterateNodes(container)) {
+                if (child.Format is not IBinary) {
+                    logger.LogDebug("Skipping non binary child {NodePath}", child.Path);
+                    continue;
+                }
+
+                string relative = Path.GetRelativePath(container.Path, child.Path);
+                string childOutput = Path.Combine(outputPath, relative);
+
+                logger.LogDebug("Writing {NodePath} into {LocalPath}", child.Path, childOutput);
+                child.Stream.WriteTo(childOutput);
+            }
         }
     }
 }
