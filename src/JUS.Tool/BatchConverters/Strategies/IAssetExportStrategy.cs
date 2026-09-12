@@ -8,6 +8,11 @@ namespace JUS.Tool.BatchConverters.Strategies;
 public interface IAssetExportStrategy
 {
     /// <summary>
+    /// Get the exported format of the strategy.
+    /// </summary>
+    AssetFormatKind ExportFormat { get; }
+
+    /// <summary>
     /// Determine if the asset can be exported with this strategy.
     /// </summary>
     /// <param name="asset">The asset to test.</param>

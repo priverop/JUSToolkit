@@ -20,6 +20,9 @@ public class DeckExportStrategy(bool createTemplate) : IAssetExportStrategy
     private readonly string extension = createTemplate ? ".pot" : ".po";
 
     /// <inheritdoc />
+    public AssetFormatKind ExportFormat => AssetFormatKind.Text;
+
+    /// <inheritdoc />
     public bool CanExport(Node asset) => asset.Path.EndsWith("data/deck/Deck.aar");
 
     /// <inheritdoc />

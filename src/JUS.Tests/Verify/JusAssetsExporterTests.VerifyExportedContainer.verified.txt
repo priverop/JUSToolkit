@@ -146,6 +146,53 @@
                 Format: Yarhl.IO.BinaryTextFormat
               }
             ]
+          },
+          {
+            Name: jquiz,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: jquiz-00-Dr. Slump.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-01-Bobobo.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-02-Black Cat.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-03-Bleach.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-04-Buso Renkin.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-05-Cobra.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-06-Oliver y Benji.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-07-Dragon Ball.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-08-D. Gray-Man.po,
+                Format: Yarhl.IO.BinaryFormat
+              },
+              {
+                Name: jquiz-09-Death Note.po,
+                Format: Yarhl.IO.BinaryFormat
+              }
+              /* 33 node(s) more */
+            ]
           }
         ]
       },

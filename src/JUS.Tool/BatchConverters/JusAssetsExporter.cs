@@ -28,6 +28,7 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
             new DeckExportStrategy(createTemplate),
             new InfoDeckExportStrategy(createTemplate),
             new FontExportStrategy(),
+            new JQuizExportStrategy(),
         ];
     }
 
@@ -41,20 +42,23 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
         var images = new Node("images");
 
         foreach (Node asset in Navigator.IterateNodes(source.Root)) {
-            logger.LogTrace("Exporting asset: {Path}", asset.Path);
-            IAssetExportStrategy? strategy = strategies.FirstOrDefault(s => s.CanExport(asset));
-            if (strategy is null) {
+            IAssetExportStrategy[] matchingStrategies = strategies.Where(s => s.CanExport(asset)).ToArray();
+            if (matchingStrategies.Length == 0) {
                 logger.LogInformation("Non-exportable asset: {Path}", asset.Path);
                 continue;
             }
 
-            Node output = strategy switch {
-                DeckExportStrategy or InfoDeckExportStrategy => texts,
-                FontExportStrategy => fonts,
-                _ => throw new NotSupportedException(),
-            };
-            IEnumerable<Node> exported = strategy.Export(asset);
-            output.Add(exported);
+            foreach (IAssetExportStrategy strategy in matchingStrategies) {
+                logger.LogTrace("Exporting asset: {Path} with {Type}", asset.Path, strategy.GetType().Name);
+                Node output = strategy.ExportFormat switch {
+                    AssetFormatKind.Text => texts,
+                    AssetFormatKind.Font => fonts,
+                    AssetFormatKind.Image => images,
+                    _ => throw new NotSupportedException(),
+                };
+                IEnumerable<Node> exported = strategy.Export(asset);
+                output.Add(exported);
+            }
         }
 
         return new NodeContainerFormat([texts, fonts, images]);

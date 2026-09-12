@@ -20,6 +20,9 @@ public class FontExportStrategy : IAssetExportStrategy
     private readonly ILogger<FontExportStrategy> logger = JusLoggerFactory.Instance.CreateLogger<FontExportStrategy>();
 
     /// <inheritdoc />
+    public AssetFormatKind ExportFormat => AssetFormatKind.Font;
+
+    /// <inheritdoc />
     public bool CanExport(Node asset) => asset.Parent?.Path.EndsWith("/data/font") ?? false;
 
     /// <inheritdoc />

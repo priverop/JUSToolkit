@@ -1,0 +1,180 @@
+﻿[
+  {
+    Name: jquiz,
+    Format: Yarhl.FileSystem.NodeContainerFormat,
+    Children: [
+      {
+        Name: jquiz-00-Dr. Slump.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-01-Bobobo.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-02-Black Cat.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-03-Bleach.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-04-Buso Renkin.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-05-Cobra.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-06-Oliver y Benji.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-07-Dragon Ball.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-08-D. Gray-Man.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-09-Death Note.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-10-Dr. Slump.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-11-Eyeshield 21.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-12-Gintama.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-13-Hunter x Hunter.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-14-El puno de la estrella del norte.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-15-Hoshin Engi.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-16-Ichigo 100%.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-17-I's.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-18-JoJo's Bizarre Adventure.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-19-Shonen Jump.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-20-Kochikame.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-21-Musculman.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-22-Midori no Makibao.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-23-Muhyo y Roji.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-24-Naruto.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-25-Nube, el maestro del infierno.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-26-Ninku.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-27-Nogami Neuro, el Detective Demoniaco.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-28-Sakigake!! Otokojuku.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-29-One Piece.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-30-Pyu to Fuku! Jaguar.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-31-Rokudenashi Blues.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-32-Ruroni Kenshin, el guerrero samurai.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-33-Slam Dunk.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-34-Shaman King.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-35-Los caballeros del Zodiaco.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-36-Jungle King Tar-chan.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-37-Tottemo! Luckyman.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-38-The Prince of Tennis.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-39-Tutor Hitman Reborn!.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-40-Taizo Mote King Saga.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-41-Yu Yu Hakusho.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-42-Yu-Gi-Oh!.po,
+        Format: Yarhl.IO.BinaryFormat
+      }
+    ]
+  }
+]
