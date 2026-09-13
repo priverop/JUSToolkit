@@ -477,6 +477,63 @@
               }
               /* 883 node(s) more */
             ]
+          },
+          {
+            Name: koma,
+            Format: Yarhl.FileSystem.NodeContainerFormat,
+            Children: [
+              {
+                Name: es,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 33 children */
+              },
+              {
+                Name: is,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 8 children */
+              },
+              {
+                Name: ig,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 15 children */
+              },
+              {
+                Name: tr,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 28 children */
+              },
+              {
+                Name: ct,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 11 children */
+              },
+              {
+                Name: gt,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 38 children */
+              },
+              {
+                Name: kn,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 32 children */
+              },
+              {
+                Name: kk,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 38 children */
+              },
+              {
+                Name: cb,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 9 children */
+              },
+              {
+                Name: oj,
+                Format: Yarhl.FileSystem.NodeContainerFormat
+/* max depth reached, additional 25 children */
+              }
+              /* 32 node(s) more */
+            ]
           }
         ]
       }

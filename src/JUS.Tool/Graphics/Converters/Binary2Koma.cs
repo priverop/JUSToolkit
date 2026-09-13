@@ -25,7 +25,7 @@ namespace JUS.Tool.Graphics.Converters
     /// <summary>
     /// Converts between BinaryFormat and Koma.
     /// </summary>
-    public class Binary2Koma : IConverter<BinaryFormat, Koma>
+    public class Binary2Koma : IConverter<IBinary, Koma>
     {
         private const int EntrySize = 12;
 
@@ -34,7 +34,7 @@ namespace JUS.Tool.Graphics.Converters
         /// </summary>
         /// <param name="source">BinaryFormat (file) to convert.</param>
         /// <returns>Koma Node.</returns>
-        public Koma Convert(BinaryFormat source)
+        public Koma Convert(IBinary source)
         {
             if (source is null) {
                 throw new ArgumentNullException(nameof(source));

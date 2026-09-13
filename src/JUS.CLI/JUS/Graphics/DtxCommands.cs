@@ -22,7 +22,6 @@ using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Formats.ImageSharp.Images;
-using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
 using Texim.Palettes;
@@ -207,7 +206,7 @@ namespace JUS.CLI.JUS.Graphics
 
             Node komas = NodeFactory.FromFile(container)
                 .TransformWith<Binary2Alar3>()
-                .Children["koma"] ?? throw new FormatException("Invalid container file");
+                .Children["koma"];
 
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
@@ -225,7 +224,7 @@ namespace JUS.CLI.JUS.Graphics
                     continue;
                 }
 
-                var converter = new Dtx4ToBitmap(shapes, komaFormat, komaElement.KomaName);
+                var converter = new Dtx4ToBitmap(shapes, komaElement);
                 using BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>());
 
                 string manga = komaElement.KomaName.Split('_')[0];
@@ -270,9 +269,12 @@ namespace JUS.CLI.JUS.Graphics
 
             string dtxName = Path.GetFileNameWithoutExtension(dtx);
 
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == dtxName)
+                ?? throw new FormatException($"Can't find '{dtxName}' in the koma.bin");
+
             using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
-                .TransformWith(new Dtx4ToBitmap(shapes, komaFormat, dtxName));
+                .TransformWith(new Dtx4ToBitmap(shapes, komaElement));
 
             dtx4.Stream.WriteTo(Path.Combine(output, dtxName + ".png"));
 

@@ -22,12 +22,9 @@ using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
-using NUnit.Framework;
 using Texim.Formats.ImageSharp.Images;
-using Texim.Games.Nitro.Sprites;
 using Texim.Images;
 using Texim.Images.Quantization;
-using Texim.Palettes;
 using Texim.Pixels;
 using Texim.Sprites;
 using Yarhl.FileSystem;
@@ -122,7 +119,7 @@ namespace JUS.Tests.Graphics
                     continue;
                 }
 
-                var converter = new Dtx4ToBitmap(shapes, komaFormat, komaElement.KomaName);
+                var converter = new Dtx4ToBitmap(shapes, komaElement);
                 BinaryFormat png = converter.Convert(dtx.GetFormatAs<IBinary>());
 
                 // If the child Node komaElement.KShapeGroupId does not exist, then we create it
@@ -158,9 +155,11 @@ namespace JUS.Tests.Graphics
 
             string dtxName = Path.GetFileNameWithoutExtension(dtxPath);
 
+            KomaElement komaElement = komaFormat.First(n => n.KomaName == dtxName)
+                ?? throw new FormatException($"Can't find '{dtxName}' in the koma.bin");
             using Node dtx4 = NodeFactory.FromFile(dtxPath, FileOpenMode.Read)
                 .TransformWith<LzssDecompression>()
-                .TransformWith(new Dtx4ToBitmap(shapes, komaFormat, dtxName));
+                .TransformWith(new Dtx4ToBitmap(shapes, komaElement));
 
             dtx4.Stream.Should().MatchInfo(info);
         }

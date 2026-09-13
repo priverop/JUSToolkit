@@ -52,6 +52,7 @@ public class SpritesExportStrategy : IAssetExportStrategy
         "/data/result/result.aar",
         "/data/stageselect/stageselect.aar",
         "/data/title/title.aar",
+        // "/data/chr/ChrArc.aar",
     ];
 
     /// <inheritdoc />

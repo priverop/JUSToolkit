@@ -35,6 +35,7 @@ public class JusAssetsExporter : IConverter<NodeContainerFormat, NodeContainerFo
             new ComicImagesExportStrategy(),
             new MenuImagesExportStrategy(),
             new SpritesExportStrategy(),
+            new KomaExportStrategy(),
         ];
     }
 
