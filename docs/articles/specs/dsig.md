@@ -63,7 +63,9 @@ And there is one additional unknown implementation with name `NCG2`.
 
 ### Palettes
 
-Every palette has 16 colors. In 8bpp, the palettes are combined into one.
+Every palette as defined in the binary format has 16 colors. If the image is 
+8bpp, then the actual palettes should up-to 256 colors. The last palette may
+have less than 256 colors.
 
 The encoding of the color is in the header with two possible values:
 
