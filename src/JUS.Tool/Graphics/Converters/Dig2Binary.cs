@@ -52,7 +52,7 @@ namespace JUS.Tool.Graphics.Converters
 
             int formatPaletteCount = dig.Bpp == DigBpp.Bpp4
                 ? dig.Palettes.Count
-                : (int)Math.Ceiling(dig.Palettes[0].Colors.Count / 16.0);
+                : dig.Palettes.Sum(p => p.Colors.Count) / 16;
             writer.Write((byte)formatPaletteCount);
             writer.Write((byte)dig.FormatColorEncoding);
 

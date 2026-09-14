@@ -141,15 +141,23 @@ namespace JUS.Tool.Graphics.Converters
 
         private static Collection<IPalette> ReadPalettes(DataReader reader, int paletteCount, DigColorFormat colorFormat, DigBpp bpp)
         {
-            // Palettes have always 16 colors per palette, but in 8bpp they are combined into a single big palette
-            int colorsPerPalette = bpp == DigBpp.Bpp8 ? paletteCount * 16 : 16;
-            int actualPaletteCount = bpp == DigBpp.Bpp8 ? 1 : paletteCount;
+            // Palettes have always 16 colors per palette, but in 8bpp it's used as 256 colors
+            int totalColors = paletteCount * 16;
+            int colorsPerPalette = bpp == DigBpp.Bpp8 ? Math.Min(256, totalColors) : 16;
+            int actualPaletteCount = (int)Math.Ceiling((float)totalColors / colorsPerPalette);
             IColorEncoding colorEncoding = colorFormat.GetColorEncoding();
 
+            int readColors = 0;
             var palettes = new Collection<IPalette>();
             for (int i = 0; i < actualPaletteCount; i++) {
-                Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, colorsPerPalette);
+                // But in 8bpp not every palette may have the 256 colors, last one may have less.
+                int paletteColors = readColors + colorsPerPalette > totalColors
+                    ? (totalColors - readColors)
+                    : colorsPerPalette;
+
+                Rgb[] colors = colorEncoding.DecodeExactly(reader.Stream, paletteColors);
                 palettes.Add(new Palette(colors));
+                readColors += paletteColors;
             }
 
             return palettes;
