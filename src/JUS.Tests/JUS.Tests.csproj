@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Verify.NUnit" />
+    <PackageReference Include="Yarhl.TestFramework.Verify" />
     <ProjectReference Include="../JUS.Tool/JUS.Tool.csproj" />
 
     <PackageReference Include="coverlet.collector">

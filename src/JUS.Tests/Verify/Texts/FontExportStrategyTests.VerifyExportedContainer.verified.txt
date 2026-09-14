@@ -1,0 +1,86 @@
+﻿{
+  Name: root,
+  Format: Yarhl.FileSystem.NodeContainerFormat,
+  Children: [
+    {
+      Name: DSFont.yml,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x8188,
+        Length: 0x8188,
+        SHA256: F294B9F741432512E867C5CF0E241B876C0209B6EF22CACE6C26C669513DFE05
+      }
+    },
+    {
+      Name: DSFont.png,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x212E,
+        Length: 0x212E,
+        SHA256: 8236955F833BDC5735E059D6A9DF37F1110143BB5C16C574A70F4ECA6977D400
+      }
+    },
+    {
+      Name: js8font.yml,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0xC702,
+        Length: 0xC702,
+        SHA256: C1634D073AC39CD8569843F2F7D2C41B434207E9C0092654B721B8C7ED0AE94C
+      }
+    },
+    {
+      Name: js8font.png,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x3662,
+        Length: 0x3662,
+        SHA256: 2DC6A082F70430FDC9BFCCBB182DC3427D51CA54F6A2EDC657B8C11B753CCBA6
+      }
+    },
+    {
+      Name: jskfont.yml,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x38A66,
+        Length: 0x38A66,
+        SHA256: AFAE78CE1707CE07AC562BB6091885B12DD6A41599B60826785E3087472B4879
+      }
+    },
+    {
+      Name: jskfont.png,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x4712A,
+        Length: 0x4712A,
+        SHA256: 315BB0881E0E9F262E1B124205228DB318E387CA42AD37CBB779155A0FDF2919
+      }
+    },
+    {
+      Name: jskfont_q.yml,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x3B692,
+        Length: 0x3B692,
+        SHA256: B617ABA818EA7911B679C56746471DC78917E34013E0D37EA7A6EBE304AB6E7E
+      }
+    },
+    {
+      Name: jskfont_q.png,
+      Format: {
+        Stream: Yarhl.IO.DataStream,
+        Offset: 0x0,
+        Position: 0x4AF82,
+        Length: 0x4AF82,
+        SHA256: 5A8F6250DC0D3ED9A6599F3EF3716BEB04BC46329692FCBF02070AB89A93E083
+      }
+    }
+  ]
+}

@@ -32,24 +32,20 @@ namespace JUS.Tool.Graphics.Converters
     public class Dtx4ToBitmap : IConverter<IBinary, BinaryFormat>
     {
         private readonly KShapeSprites shapes;
-        private readonly Koma koma;
-        private readonly string dtxName;
+        private readonly KomaElement koma;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dtx4ToBitmap"/> class.
         /// </summary>
         /// <param name="shapes">The KShape sprite collection.</param>
         /// <param name="koma">The Koma format with element mappings.</param>
-        /// <param name="dtxName">The DTX file name (without extension) to look up in Koma.</param>
-        public Dtx4ToBitmap(KShapeSprites shapes, Koma koma, string dtxName)
+        public Dtx4ToBitmap(KShapeSprites shapes, KomaElement koma)
         {
             ArgumentNullException.ThrowIfNull(shapes);
             ArgumentNullException.ThrowIfNull(koma);
-            ArgumentNullException.ThrowIfNull(dtxName);
 
             this.shapes = shapes;
             this.koma = koma;
-            this.dtxName = dtxName;
         }
 
         /// <summary>
@@ -70,10 +66,7 @@ namespace JUS.Tool.Graphics.Converters
             IndexedPaletteImage image = dtx4.Root.Children["image"].GetFormatAs<IndexedPaletteImage>();
 
             // We ignore the sprite info from the DSTX and we take the one from the kshape
-            KomaElement komaElement = koma.First(n => n.KomaName == dtxName)
-                ?? throw new FormatException($"Can't find '{dtxName}' in the koma.bin");
-
-            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+            Sprite sprite = shapes.GetSprite(koma.KShapeGroupId, koma.KShapeElementId);
 
             var spriteParams = new Sprite2IndexedImageParams {
                 RelativeCoordinates = SpriteRelativeCoordinatesKind.TopLeft,

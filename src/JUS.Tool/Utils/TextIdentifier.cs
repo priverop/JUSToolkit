@@ -57,6 +57,14 @@ namespace JUS.Tool.Utils
         };
 
         /// <summary>
+        /// Determines if the file with the given name is supported by this instance and has text.
+        /// </summary>
+        /// <param name="filename">The name of the file to test.</param>
+        /// <returns>Value indicating whether the file has text and it's known.</returns>
+        public static bool HasText(string filename) =>
+            IsInfoDeckFormat(filename) || IsInfoDeckInfoFormat(filename) || BinDictionary.ContainsKey(filename);
+
+        /// <summary>
         /// Returns the format name of the .bin file.
         /// </summary>
         /// <param name="fileName">The name of the file we want to check.</param>

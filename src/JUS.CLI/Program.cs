@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.CommandLine;
+using NLog;
 
 namespace JUS.CLI
 {
@@ -36,7 +37,10 @@ namespace JUS.CLI
             var rootCommand = new RootCommand("Convert files from Jump Ultimate Stars! game") {
                 JUS.CommandLine.CreateCommand(),
             };
-            return rootCommand.Parse(args).Invoke();
+            int result = rootCommand.Parse(args).Invoke();
+
+            LogManager.Shutdown();
+            return result;
         }
     }
 }

@@ -1,0 +1,89 @@
+﻿[
+  {
+    Name: jquiz,
+    Format: Yarhl.FileSystem.NodeContainerFormat,
+    Children: [
+      {
+        Name: jquiz-00-Dr. Slump.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-01-Bobobo.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-02-Black Cat.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-03-Bleach.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-04-Buso Renkin.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-05-Cobra.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-06-Oliver y Benji.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-07-Dragon Ball.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-08-D. Gray-Man.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-09-Death Note.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-10-Dr. Slump.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-11-Eyeshield 21.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-12-Gintama.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-13-Hunter x Hunter.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-14-El puno de la estrella del norte.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-15-Hoshin Engi.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-16-Ichigo 100%.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-17-I's.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-18-JoJo's Bizarre Adventure.po,
+        Format: Yarhl.IO.BinaryFormat
+      },
+      {
+        Name: jquiz-19-Shonen Jump.po,
+        Format: Yarhl.IO.BinaryFormat
+      }
+      /* 23 node(s) more */
+    ]
+  }
+]
