@@ -28,13 +28,12 @@ struct Dsig {
     u8 version;
     DsigFlags flags;
     u8 paletteCount;
+    u8 colorEncoding; // 0: BGR555, 4: ABGR555
 
     if (flags.format == 4) {
-        u8 metadataLength; // tbc
         u16 blockInfoLength; // divided by 4
         u16 blockDataLength; // divided by 4
     } else {
-        u8 reserved;
         u16 width;
         u16 height;
     }

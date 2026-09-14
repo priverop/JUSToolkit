@@ -31,6 +31,8 @@ public static class SupportedSoftware
         return info is null ? null : GameCode == info.GameCode;
 
         static ProgramInfo? GetProgramInfo(Node node) =>
-            node.Children["system"]?.Children["info"]?.Format as ProgramInfo;
+            node.Children.GetOrDefault("system")
+                ?.Children.GetOrDefault("info")
+                ?.Format as ProgramInfo;
     }
 }

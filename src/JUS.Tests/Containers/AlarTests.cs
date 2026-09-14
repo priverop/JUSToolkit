@@ -13,7 +13,7 @@ public class AlarTests
 {
     private static readonly Lazy<NitroRom> Root = new(TestDataBase.ReadSoftware);
 
-    public static IEnumerable<TestCaseData> GetLevel1Paths()
+    private static IEnumerable<TestCaseData> GetLevel1Paths()
     {
         if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
             return [];
@@ -21,10 +21,10 @@ public class AlarTests
 
         return Navigator.IterateNodes(Root.Value.Data, NavigationMode.DepthFirst)
             .Where(n => !n.IsContainer && n.Name.EndsWith(".aar"))
-            .Select(n => new TestCaseData(n.Path));
+            .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
     }
 
-    public static IEnumerable<TestCaseData> GetLevel2Paths()
+    private static IEnumerable<TestCaseData> GetLevel2Paths()
     {
         if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
             return [];
@@ -36,36 +36,15 @@ public class AlarTests
                 NodeContainerFormat alar = new Binary2Alar().Convert(n.GetFormatAs<IBinary>());
                 return Navigator.IterateNodes(alar.Root, NavigationMode.DepthFirst)
                     .Where(c => !c.IsContainer && c.Name.EndsWith(".aar"))
-                    .Select(c => new TestCaseData(n.Path, c.Path));
+                    .Select(c => new TestCaseData(c).SetArgDisplayNames($"{n.Path}{c.Path}"));
             });
     }
 
     [TestCaseSource(nameof(GetLevel1Paths))]
-    public void GenerateIdenticalContainerLevel1(string containerPath)
-    {
-        TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
-
-        IBinary? original = Navigator.GetNode(Root.Value.Data, containerPath)?.GetFormatAs<IBinary>();
-        Assert.That(original, Is.Not.Null);
-
-        AssertGeneratesIdentical(original);
-    }
-
     [TestCaseSource(nameof(GetLevel2Paths))]
-    public void GenerateIdenticalContainerLevel2(string parentContainerPath, string childContainerPath)
+    public void GenerateIdenticalContainers(Node container)
     {
-        TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
-
-        IBinary? parentBinary = Navigator.GetNode(Root.Value.Data, parentContainerPath)
-            ?.GetFormatAs<IBinary>();
-        Assert.That(parentBinary, Is.Not.Null);
-
-        NodeContainerFormat parent = new Binary2Alar().Convert(parentBinary);
-
-        IBinary? original = Navigator.GetNode(parent.Root, childContainerPath)
-            ?.GetFormatAs<IBinary>();
-        Assert.That(original, Is.Not.Null);
-
+        IBinary original = container.GetFormatAs<IBinary>();
         AssertGeneratesIdentical(original);
     }
 

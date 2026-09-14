@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using FluentAssertions;
-using JUS.Tool.Containers.Converters;
 using JUS.Tool.Graphics;
 using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
@@ -30,26 +29,26 @@ using Yarhl.IO;
 namespace JUS.Tests.Graphics
 {
     [TestFixture]
-    public class DigTests
+    public class Png2DigAtmTests
     {
-        private static readonly Lazy<Node> TopMenuContainer = new(UnpackTopMenuContainer);
+        private static readonly Lazy<Node?> TopMenuContainer = new(UnpackTopMenuContainer);
 
-        private static Node UnpackTopMenuContainer()
+        private static Node? UnpackTopMenuContainer()
         {
-            return TestDataBase.ReadSoftware()
-                .Data
+            return TestDataBase.UnpackedRoot.Value
+                ?.Data
                 .Children["topmenu"]
-                .Children["topmenu.aar"]
-                .TransformWith(new Binary2Alar());
+                .Children["topmenu.aar"];
         }
 
         private static IEnumerable<TestCaseData> GetDigNodes()
         {
-            if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
+            Node? topContainer = TopMenuContainer.Value;
+            if (topContainer is null) {
                 return [];
             }
 
-            return Navigator.IterateNodes(TopMenuContainer.Value, NavigationMode.DepthFirst)
+            return Navigator.IterateNodes(topContainer, NavigationMode.DepthFirst)
                 .Where(n => n.Name == "top_bg01.dig")
                 .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
@@ -138,52 +137,6 @@ namespace JUS.Tests.Graphics
             );
 
             _ = blackPalettes.Should().BeEmpty();
-        }
-
-        public static IEnumerable<TestCaseData> GetFiles()
-        {
-            string basePath = Path.Combine(TestDataBase.RootFromOutputPath, "Graphics");
-            string listPath = Path.Combine(basePath, "dig.txt");
-            return TestDataBase.ReadTestListFile(listPath)
-                .Select(line => line.Split(','))
-                .Select(data => new TestCaseData(
-                    Path.Combine(basePath, data[0]),
-                    Path.Combine(basePath, data[1]),
-                    Path.Combine(basePath, data[2]))
-                    .SetName($"({data[0]}, {data[1]}, {data[2]})"));
-        }
-
-        [TestCaseSource(nameof(GetFiles))]
-        public void DeserializeAndCheckFileHash(string infoPath, string digPath, string atmPath)
-        {
-            TestDataBase.IgnoreIfFileDoesNotExist(infoPath);
-            TestDataBase.IgnoreIfFileDoesNotExist(digPath);
-            TestDataBase.IgnoreIfFileDoesNotExist(atmPath);
-
-            var info = BinaryInfo.FromYaml(infoPath);
-
-            using Node mapsNode = NodeFactory.FromFile(atmPath, FileOpenMode.Read);
-
-            using Node pixelsPaletteNode = NodeFactory.FromFile(digPath, FileOpenMode.Read)
-                .TransformWith(new BinaryDig2Bitmap(mapsNode));
-
-            pixelsPaletteNode.Stream.Should().MatchInfo(info);
-        }
-
-        [TestCaseSource(nameof(GetFiles))]
-        public void TwoWaysIdenticalDigStream(string infoPath, string digPath, string atmPath)
-        {
-            Assert.Ignore("Imported Dig are smaller, we neet to test with PNGs instead");
-            TestDataBase.IgnoreIfFileDoesNotExist(digPath);
-
-            using Node node = NodeFactory.FromFile(digPath, FileOpenMode.Read);
-
-            Dig dig = node.GetFormatAs<IBinary>().ConvertWith(new Binary2Dig());
-            BinaryFormat generatedStream = dig.ConvertWith(new Dig2Binary());
-
-            var originalStream = new DataStream(node.Stream, 0, node.Stream.Length);
-            generatedStream.Stream.Length.Should().Be(originalStream.Length);
-            generatedStream.Stream.Compare(originalStream).Should().BeTrue();
         }
     }
 }

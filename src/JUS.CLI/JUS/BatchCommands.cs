@@ -97,7 +97,7 @@ namespace JUS.CLI.JUS
 
                                 Dig originalImage = dtx3.Children["image"].GetFormatAs<Dig>();
 
-                                if (originalImage.Swizzling == DigSwizzling.Linear) {
+                                if (originalImage.DataFormat == DigDataFormat.Linear) {
                                     BinaryFormat image = new IndexedImage2BinaryPng(originalImage).Convert(originalImage);
                                     image.Stream.WriteTo(Path.Combine(baseOutputPath, $"{originalAlarName}-{child.Name}-tx.png"));
                                 }
