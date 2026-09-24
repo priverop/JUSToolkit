@@ -63,6 +63,7 @@ namespace JUS.Tool.BatchConverters
         /// <summary>
         /// Initializes a new instance of the <see cref="Png2Alar3"/> class for
         /// multiple PNGs sharing the same Dig.
+        /// </summary>
         /// <param name="images">PNGs to insert.</param>
         /// <param name="digName">Name of the shared Dig.</param>
         /// <param name="atmNames">Name of each atm.</param>
@@ -102,8 +103,10 @@ namespace JUS.Tool.BatchConverters
         /// <returns><see cref="Alar"/>Alar3 with the PNG inserted.</returns>
         public Alar Convert(Alar originalAlar)
         {
-            foreach (Node image in Images) {
-                if (Path.GetExtension(image.Name) != ".png") {
+            foreach (Node image in Images)
+            {
+                if (Path.GetExtension(image.Name) != ".png")
+                {
                     throw new FormatException("Invalid png file");
                 }
             }
@@ -115,7 +118,8 @@ namespace JUS.Tool.BatchConverters
             var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
 
             var atm_clones = new NodeContainerFormat();
-            for (int i = 0; i < AtmNames.Length; i++) {
+            for (int i = 0; i < AtmNames.Length; i++)
+            {
                 Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[i]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[i]);
                 var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
                 atm_clones.Root.Add(new Node(atm.Name, atm_clone));
