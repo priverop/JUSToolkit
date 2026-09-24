@@ -74,7 +74,8 @@ namespace JUS.Tool.Graphics.Converters
         {
             ArgumentNullException.ThrowIfNull(pngs);
 
-            if (pngs.Root.Children.Count != originalAtms.Length) {
+            if (pngs.Root.Children.Count != originalAtms.Length)
+            {
                 throw new FormatException("Number of pngs and atms is different.");
             }
 
@@ -87,20 +88,23 @@ namespace JUS.Tool.Graphics.Converters
 
             // Convert PNG into a RgbImage (Pixels + Map) using the Dig Palette
             int paletteIndexStart = FirstNonBlackPaletteIndex(dig);
-            var compressionParams = new RgbImageMapCompressionParams {
+            var compressionParams = new RgbImageMapCompressionParams
+            {
                 Palettes = dig,
                 PaletteIndexStart = paletteIndexStart,
             };
 
             var transformedFiles = new NodeContainerFormat();
 
-            for (int i = 0; i < originalAtms.Length; i++) {
+            for (int i = 0; i < originalAtms.Length; i++)
+            {
                 Node png = pngs.Root.Children[i];
                 png.Stream.Position = 0;
                 RgbImage rgbImage = new StandardBinaryImage2RgbImage().Convert(png.GetFormatAs<IBinary>());
                 MapCompressedIndexedImage compressed = new RgbImageMapCompression(compressionParams).Convert(rgbImage);
 
-                var newImage = new IndexedImage {
+                var newImage = new IndexedImage
+                {
                     Width = 8,
                     Height = compressed.Tiles.Length / 8,
                     Pixels = compressed.Tiles,
@@ -110,11 +114,13 @@ namespace JUS.Tool.Graphics.Converters
                 // New Dig: original dig changing height, width and pixels
                 dig = new Dig(dig, newImage);
 
-                if (TransparentTile && i == 0) {
+                if (TransparentTile && i == 0)
+                {
                     dig = dig.InsertTransparentTile(map);
                 }
 
-                compressionParams = new RgbImageMapCompressionParams {
+                compressionParams = new RgbImageMapCompressionParams
+                {
                     MergeImage = dig,
                     Palettes = dig,
                     PaletteIndexStart = paletteIndexStart,
@@ -156,11 +162,13 @@ namespace JUS.Tool.Graphics.Converters
         /// <returns>The index of the first non-black palette, 0 if every palette is black.</returns>
         private static int FirstNonBlackPaletteIndex(IPaletteCollection palettes)
         {
-            for (int i = 0; i < palettes.Palettes.Count; i++) {
+            for (int i = 0; i < palettes.Palettes.Count; i++)
+            {
                 bool isBlack = palettes.Palettes[i].Colors
                     .All(color => color.Red == 0 && color.Green == 0 && color.Blue == 0);
 
-                if (!isBlack) {
+                if (!isBlack)
+                {
                     return i;
                 }
             }
