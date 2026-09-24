@@ -112,7 +112,7 @@ namespace JUS.Tool.BatchConverters
             }
 
             // Obtaining the original Dig and Altm
-            Node dig = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
+            Node dig = Navigator.IterateNodes(originalAlar.Root).FirstOrDefault(n => n.Name == DigName) ?? throw new FormatException("Dig doesn't exist: " + DigName);
 
             // Clone the nodes
             var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
@@ -120,7 +120,7 @@ namespace JUS.Tool.BatchConverters
             var atm_clones = new NodeContainerFormat();
             for (int i = 0; i < AtmNames.Length; i++)
             {
-                Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[i]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[i]);
+                Node atm = Navigator.IterateNodes(originalAlar.Root).FirstOrDefault(n => n.Name == AtmNames[i]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[i]);
                 var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
                 atm_clones.Root.Add(new Node(atm.Name, atm_clone));
             }
