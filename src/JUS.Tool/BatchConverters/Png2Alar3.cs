@@ -114,17 +114,17 @@ namespace JUS.Tool.BatchConverters
             // Clone the nodes
             var dig_clone = (BinaryFormat)new BinaryFormat(dig.Stream).DeepClone();
 
-            var atm_clones = new Node[AtmNames.Length];
+            var atm_clones = new NodeContainerFormat();
             for (int i = 0; i < AtmNames.Length; i++) {
                 Node atm = Navigator.IterateNodes(originalAlar.Root).First(n => n.Name == AtmNames[i]) ?? throw new FormatException("Atm doesn't exist: " + AtmNames[i]);
                 var atm_clone = (BinaryFormat)new BinaryFormat(atm.Stream).DeepClone();
-                atm_clones[i] = new Node(atm.Name, atm_clone);
+                atm_clones.Root.Add(new Node(atm.Name, atm_clone));
             }
 
             // Transform the PNGs into the new Dig and Altms (we need the original dig + atms)
             var converter = new Png2DigAtm(new Node(dig.Name, dig_clone), atm_clones, true);
 
-            NodeContainerFormat transformedFiles = converter.Convert(Images);
+            NodeContainerFormat transformedFiles = converter.Convert(new NodeContainerFormat(Images));
 
             originalAlar.InsertModification(transformedFiles);
 

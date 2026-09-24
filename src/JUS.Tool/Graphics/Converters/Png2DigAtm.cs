@@ -14,7 +14,7 @@ namespace JUS.Tool.Graphics.Converters
     /// </summary>
     public class Png2DigAtm :
         IConverter<Node, NodeContainerFormat>,
-        IConverter<Node[], NodeContainerFormat>
+        IConverter<NodeContainerFormat, NodeContainerFormat>
     {
         private readonly Node originalDig;
         private readonly Node[] originalAtms;
@@ -44,10 +44,10 @@ namespace JUS.Tool.Graphics.Converters
         /// <param name="dig">Original Dig, shared by all the atms.</param>
         /// <param name="atms">Original Atms (tilemaps).</param>
         /// <param name="insertTransparent">The first pixel of the image is transparent.</param>
-        public Png2DigAtm(Node dig, Node[] atms, bool insertTransparent)
+        public Png2DigAtm(Node dig, NodeContainerFormat atms, bool insertTransparent)
         {
             originalDig = dig;
-            originalAtms = atms;
+            originalAtms = atms.Root.Children.ToArray();
             TransparentTile = insertTransparent;
         }
 
@@ -61,20 +61,20 @@ namespace JUS.Tool.Graphics.Converters
         {
             ArgumentNullException.ThrowIfNull(png);
 
-            return Convert([png]);
+            return Convert(new NodeContainerFormat([png]));
         }
 
         /// <summary>
         /// Imports all the pngs into a single Dig + multiple Atms.
         /// </summary>
-        /// <param name="pngs">The Nodes with the pngs to import.</param>
+        /// <param name="pngs">The NFC with the pngs to import, in the same order as the atms.</param>
         /// <returns>NFC with the Dig and the Atms.</returns>
         /// <exception cref="ArgumentException">If pngs is null.</exception>
-        public NodeContainerFormat Convert(Node[] pngs)
+        public NodeContainerFormat Convert(NodeContainerFormat pngs)
         {
             ArgumentNullException.ThrowIfNull(pngs);
 
-            if (pngs.Length != originalAtms.Length) {
+            if (pngs.Root.Children.Count != originalAtms.Length) {
                 throw new FormatException("Number of pngs and atms is different.");
             }
 
@@ -94,9 +94,10 @@ namespace JUS.Tool.Graphics.Converters
 
             var transformedFiles = new NodeContainerFormat();
 
-            for (int i = 0; i < pngs.Length; i++) {
-                pngs[i].Stream.Position = 0;
-                RgbImage rgbImage = new StandardBinaryImage2RgbImage().Convert(pngs[i].GetFormatAs<IBinary>());
+            for (int i = 0; i < originalAtms.Length; i++) {
+                Node png = pngs.Root.Children[i];
+                png.Stream.Position = 0;
+                RgbImage rgbImage = new StandardBinaryImage2RgbImage().Convert(png.GetFormatAs<IBinary>());
                 MapCompressedIndexedImage compressed = new RgbImageMapCompression(compressionParams).Convert(rgbImage);
 
                 var newImage = new IndexedImage {

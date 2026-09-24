@@ -98,11 +98,11 @@ namespace JUS.CLI.JUS.Graphics
 
             Node originalDig = NodeFactory.FromFile(dig, FileOpenMode.Read);
 
-            var originalAtms = new Node[atm.Length];
-            var pngs = new Node[input.Length];
+            var originalAtms = new NodeContainerFormat();
+            var pngs = new NodeContainerFormat();
             for (int i = 0; i < input.Length; i++) {
-                originalAtms[i] = NodeFactory.FromFile(atm[i], FileOpenMode.Read);
-                pngs[i] = NodeFactory.FromFile(input[i], FileOpenMode.Read);
+                originalAtms.Root.Add(NodeFactory.FromFile(atm[i], FileOpenMode.Read));
+                pngs.Root.Add(NodeFactory.FromFile(input[i], FileOpenMode.Read));
             }
 
             var converter = new Png2DigAtm(originalDig, originalAtms, insertTransparent);
