@@ -123,7 +123,7 @@ namespace JUS.Tool.Graphics.Converters
                 // Atm
                 bool atmIsCompressed = CompressionUtils.IsCompressed(originalAtms[i]);
                 BinaryFormat uncompressedAtm = decompression.Convert(originalAtms[i].GetFormatAs<IBinary>());
-                Altm atm = new Binary2Altm().Convert(uncompressedAtm) ?? throw new FormatException("Invalid atm file");
+                Altm atm = new Binary2Altm().Convert(uncompressedAtm);
 
                 // New Atm: original atm changing height, width and maps
                 var newAtm = new Altm(atm, map);
