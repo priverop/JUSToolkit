@@ -12,10 +12,12 @@ namespace JUS.Tool.Graphics.Converters
     /// <summary>
     /// Converter to import a PNG image into a Dig + Atm.
     /// </summary>
-    public class Png2DigAtm : IConverter<Node, NodeContainerFormat>
+    public class Png2DigAtm :
+        IConverter<Node, NodeContainerFormat>,
+        IConverter<NodeContainerFormat, NodeContainerFormat>
     {
         private readonly Node originalDig;
-        private readonly Node originalAtm;
+        private readonly Node[] originalAtms;
 
         /// <summary>
         /// Gets or sets the first transparent pixel mode.
@@ -23,15 +25,29 @@ namespace JUS.Tool.Graphics.Converters
         public bool TransparentTile { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Png2DigAtm"/> converter.
+        /// Initializes a new instance of the <see cref="Png2DigAtm"/> converter for a single PNG.
         /// </summary>
         /// <param name="dig">Original Dig.</param>
-        /// <param name="atm">Original Atm.</param>
+        /// <param name="atm">Original Atm (tilemap).</param>
         /// <param name="insertTransparent">The first pixel of the image is transparent.</param>
         public Png2DigAtm(Node dig, Node atm, bool insertTransparent)
         {
             originalDig = dig;
-            originalAtm = atm;
+            originalAtms = [atm];
+            TransparentTile = insertTransparent;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Png2DigAtm"/> converter for multiple
+        /// PNGs sharing the same Dig.
+        /// </summary>
+        /// <param name="dig">Original Dig, shared by all the atms.</param>
+        /// <param name="atms">Original Atms (tilemaps).</param>
+        /// <param name="insertTransparent">The first pixel of the image is transparent.</param>
+        public Png2DigAtm(Node dig, NodeContainerFormat atms, bool insertTransparent)
+        {
+            originalDig = dig;
+            originalAtms = atms.Root.Children.ToArray();
             TransparentTile = insertTransparent;
         }
 
@@ -45,6 +61,24 @@ namespace JUS.Tool.Graphics.Converters
         {
             ArgumentNullException.ThrowIfNull(png);
 
+            return Convert(new NodeContainerFormat([png]));
+        }
+
+        /// <summary>
+        /// Imports all the pngs into a single Dig + multiple Atms.
+        /// </summary>
+        /// <param name="pngs">The NFC with the pngs to import, in the same order as the atms.</param>
+        /// <returns>NFC with the Dig and the Atms.</returns>
+        /// <exception cref="ArgumentException">If pngs is null.</exception>
+        public NodeContainerFormat Convert(NodeContainerFormat pngs)
+        {
+            ArgumentNullException.ThrowIfNull(pngs);
+
+            if (pngs.Root.Children.Count != originalAtms.Length)
+            {
+                throw new FormatException("Number of pngs and atms is different.");
+            }
+
             var decompression = new LzssDecompression();
 
             // Dig
@@ -52,56 +86,71 @@ namespace JUS.Tool.Graphics.Converters
             BinaryFormat uncompressedDig = decompression.Convert(originalDig.GetFormatAs<IBinary>());
             Dig dig = new Binary2Dig().Convert(uncompressedDig) ?? throw new FormatException("Invalid dig file");
 
-            // Atm
-            bool atmIsCompressed = CompressionUtils.IsCompressed(originalAtm);
-            BinaryFormat uncompressedAtm = decompression.Convert(originalAtm.GetFormatAs<IBinary>());
-            Altm atm = new Binary2Altm().Convert(uncompressedAtm) ?? throw new FormatException("Invalid atm file");
-
             // Convert PNG into a RgbImage (Pixels + Map) using the Dig Palette
-            var compressionParams = new RgbImageMapCompressionParams {
+            int paletteIndexStart = FirstNonBlackPaletteIndex(dig);
+            var compressionParams = new RgbImageMapCompressionParams
+            {
                 Palettes = dig,
-                PaletteIndexStart = FirstNonBlackPaletteIndex(dig),
+                PaletteIndexStart = paletteIndexStart,
             };
 
-            png.Stream.Position = 0;
-            RgbImage rgbImage = new StandardBinaryImage2RgbImage().Convert(png.GetFormatAs<IBinary>());
-            MapCompressedIndexedImage compressed = new RgbImageMapCompression(compressionParams).Convert(rgbImage);
+            var transformedFiles = new NodeContainerFormat();
 
-            var newImage = new IndexedImage {
-                Width = 8,
-                Height = compressed.Tiles.Length / 8,
-                Pixels = compressed.Tiles,
-            };
-            ITileMap map = compressed.Map;
+            for (int i = 0; i < originalAtms.Length; i++)
+            {
+                Node png = pngs.Root.Children[i];
+                png.Stream.Position = 0;
+                RgbImage rgbImage = new StandardBinaryImage2RgbImage().Convert(png.GetFormatAs<IBinary>());
+                MapCompressedIndexedImage compressed = new RgbImageMapCompression(compressionParams).Convert(rgbImage);
 
-            // New Dig: original dig changing height, width and pixels
-            var newDig = new Dig(dig, newImage);
+                var newImage = new IndexedImage
+                {
+                    Width = 8,
+                    Height = compressed.Tiles.Length / 8,
+                    Pixels = compressed.Tiles,
+                };
+                ITileMap map = compressed.Map;
 
-            if (TransparentTile) {
-                newDig = newDig.InsertTransparentTile(map);
+                // New Dig: original dig changing height, width and pixels
+                dig = new Dig(dig, newImage);
+
+                if (TransparentTile && i == 0)
+                {
+                    dig = dig.InsertTransparentTile(map);
+                }
+
+                compressionParams = new RgbImageMapCompressionParams
+                {
+                    MergeImage = dig,
+                    Palettes = dig,
+                    PaletteIndexStart = paletteIndexStart,
+                };
+
+                // Atm
+                bool atmIsCompressed = CompressionUtils.IsCompressed(originalAtms[i]);
+                BinaryFormat uncompressedAtm = decompression.Convert(originalAtms[i].GetFormatAs<IBinary>());
+                Altm atm = new Binary2Altm().Convert(uncompressedAtm);
+
+                // New Atm: original atm changing height, width and maps
+                var newAtm = new Altm(atm, map);
+                BinaryFormat binaryAtm = new Altm2Binary().Convert(newAtm);
+
+                BinaryFormat compressedAtm = atmIsCompressed ?
+                    new LzssCompression().Convert(binaryAtm) :
+                    binaryAtm;
+
+                transformedFiles.Root.Add(new Node(originalAtms[i].Name, compressedAtm));
             }
 
-            newDig.CheckMaxTiles(originalDig.Name);
+            dig.CheckMaxTiles(originalDig.Name);
 
-            BinaryFormat binaryDig = new Dig2Binary().Convert(newDig);
+            BinaryFormat binaryDig = new Dig2Binary().Convert(dig);
 
             BinaryFormat compressedDig = digIsCompressed ?
                 new LzssCompression().Convert(binaryDig) :
                 binaryDig;
 
-            var transformedFiles = new NodeContainerFormat();
-
             transformedFiles.Root.Add(new Node(originalDig.Name, compressedDig));
-
-            // New Atm: original atm changing height, width and maps
-            var newAtm = new Altm(atm, map);
-            BinaryFormat binaryAtm = new Altm2Binary().Convert(newAtm);
-
-            BinaryFormat compressedAtm = atmIsCompressed ?
-                new LzssCompression().Convert(binaryAtm) :
-                binaryAtm;
-
-            transformedFiles.Root.Add(new Node(originalAtm.Name, compressedAtm));
 
             return transformedFiles;
         }
@@ -113,11 +162,13 @@ namespace JUS.Tool.Graphics.Converters
         /// <returns>The index of the first non-black palette, 0 if every palette is black.</returns>
         private static int FirstNonBlackPaletteIndex(IPaletteCollection palettes)
         {
-            for (int i = 0; i < palettes.Palettes.Count; i++) {
+            for (int i = 0; i < palettes.Palettes.Count; i++)
+            {
                 bool isBlack = palettes.Palettes[i].Colors
                     .All(color => color.Red == 0 && color.Green == 0 && color.Blue == 0);
 
-                if (!isBlack) {
+                if (!isBlack)
+                {
                     return i;
                 }
             }
