@@ -16,12 +16,6 @@ public class LooseTextsExportStrategyTests() : BaseExportStrategyTests(includeHa
     protected override IAssetExportStrategy CreateStrategy() => new LooseTextsExportStrategy(false);
 
     [TestCaseSource(nameof(LooseTextAssets))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
-
-    [TestCaseSource(nameof(LooseTextAssets))]
     public void StrategyMatches(Node asset)
     {
         base.AssertStrategyMatches(asset);

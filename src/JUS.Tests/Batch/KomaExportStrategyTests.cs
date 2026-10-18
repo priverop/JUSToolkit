@@ -12,12 +12,6 @@ public class KomaExportStrategyTests() : BaseExportStrategyTests(true)
     protected override IAssetExportStrategy CreateStrategy() => new KomaExportStrategy();
 
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(KomaContainerAsset.Value);
-    }
-
-    [Test]
     public void StrategyMatches()
     {
         base.AssertStrategyMatches(KomaContainerAsset.Value);

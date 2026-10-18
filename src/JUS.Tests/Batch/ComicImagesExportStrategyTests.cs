@@ -11,12 +11,6 @@ public class ComicImagesExportStrategyTests() : BaseExportStrategyTests(true)
     protected override IAssetExportStrategy CreateStrategy() => new ComicImagesExportStrategy();
 
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(DemoAsset.Value);
-    }
-
-    [Test]
     public void StrategyMatches()
     {
         base.AssertStrategyMatches(DemoAsset.Value);

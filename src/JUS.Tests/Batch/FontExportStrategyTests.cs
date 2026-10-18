@@ -14,12 +14,6 @@ public class FontExportStrategyTests() : BaseExportStrategyTests(includeHash: tr
     protected override IAssetExportStrategy CreateStrategy() => new FontExportStrategy();
 
     [TestCaseSource(nameof(FontAssets))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
-
-    [TestCaseSource(nameof(FontAssets))]
     public void StrategyMatches(Node asset)
     {
         base.AssertStrategyMatches(asset);

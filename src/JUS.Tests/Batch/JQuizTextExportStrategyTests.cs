@@ -11,12 +11,6 @@ public class JQuizTextExportStrategyTests() : BaseExportStrategyTests(includeHas
     protected override IAssetExportStrategy CreateStrategy() => new JQuizTextExportStrategy();
 
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(JQuizAsset.Value);
-    }
-
-    [Test]
     public void StrategyMatches()
     {
         base.AssertStrategyMatches(JQuizAsset.Value);

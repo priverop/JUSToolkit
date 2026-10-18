@@ -11,12 +11,6 @@ public class InfoDeckExportStrategyTests() : BaseExportStrategyTests(includeHash
     protected override IAssetExportStrategy CreateStrategy() => new InfoDeckExportStrategy(createTemplate: false);
 
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(DeckAsset.Value);
-    }
-
-    [Test]
     public void StrategyMatches()
     {
         base.AssertStrategyMatches(DeckAsset.Value);

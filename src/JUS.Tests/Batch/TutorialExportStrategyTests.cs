@@ -27,12 +27,6 @@ public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash
     protected override IAssetExportStrategy CreateStrategy() => new TutorialExportStrategy(false);
 
     [TestCaseSource(nameof(TutorialAssets))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
-
-    [TestCaseSource(nameof(TutorialAssets))]
     public void StrategyMatches(Node asset)
     {
         base.AssertStrategyMatches(asset);

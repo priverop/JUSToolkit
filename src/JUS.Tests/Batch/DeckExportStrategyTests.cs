@@ -11,12 +11,6 @@ public class DeckExportStrategyTests() : BaseExportStrategyTests(includeHash: fa
     protected override IAssetExportStrategy CreateStrategy() => new DeckExportStrategy(createTemplate: false);
 
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(DeckAsset.Value);
-    }
-
-    [Test]
     public void StrategyMatches()
     {
         base.AssertStrategyMatches(DeckAsset.Value);

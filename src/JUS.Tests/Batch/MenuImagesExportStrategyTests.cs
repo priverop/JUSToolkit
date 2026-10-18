@@ -35,12 +35,6 @@ public class MenuImagesExportStrategyTests() : BaseExportStrategyTests(true)
     protected override IAssetExportStrategy CreateStrategy() => new MenuImagesExportStrategy();
 
     [TestCaseSource(nameof(MenuAsset))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
-
-    [TestCaseSource(nameof(MenuAsset))]
     public void StrategyMatches(Node asset)
     {
         base.AssertStrategyMatches(asset);

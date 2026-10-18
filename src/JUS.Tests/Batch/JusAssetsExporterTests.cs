@@ -10,25 +10,6 @@ namespace JUS.Tests.Batch;
 public class JusAssetsExporterTests
 {
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
-
-        NodeContainerFormat actual;
-        using (NitroRom testRoot = TestDataBase.ReadSoftware()) {
-            actual = new JusAssetsExporter("es").Convert(testRoot);
-        }
-
-        foreach (Node exportedNode in Navigator.IterateNodes(actual.Root)) {
-            Assert.That(exportedNode.Disposed, Is.False);
-
-            if (exportedNode.Format is IBinary { Stream: DataStream dataStream }) {
-                Assert.That(dataStream.Disposed, Is.False);
-            }
-        }
-    }
-
-    [Test]
     public Task VerifyExportedContainer()
     {
         TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);

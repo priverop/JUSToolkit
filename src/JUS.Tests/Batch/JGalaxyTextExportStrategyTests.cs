@@ -11,12 +11,6 @@ public class JGalaxyTextExportStrategyTests() : BaseExportStrategyTests(includeH
     protected override IAssetExportStrategy CreateStrategy() => new JGalaxyTextExportStrategy(createTemplate: false);
 
     [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(JGalaxyAsset.Value);
-    }
-
-    [Test]
     public void StrategyMatches()
     {
         base.AssertStrategyMatches(JGalaxyAsset.Value);

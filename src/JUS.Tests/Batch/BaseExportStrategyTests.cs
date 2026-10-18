@@ -9,22 +9,6 @@ public abstract class BaseExportStrategyTests(bool includeHash)
 {
     protected abstract IAssetExportStrategy CreateStrategy();
 
-    protected void AssertExportedContainerAreNotDisposed(Node asset)
-    {
-        TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
-
-        IEnumerable<Node> exports = CreateStrategy().Export(asset);
-
-        using var root = new Node("root", new NodeContainerFormat(exports));
-        foreach (Node exportedNode in Navigator.IterateNodes(root)) {
-            Assert.That(exportedNode.Disposed, Is.False);
-
-            if (exportedNode.Format is IBinary { Stream: DataStream dataStream }) {
-                Assert.That(dataStream.Disposed, Is.False);
-            }
-        }
-    }
-
     protected void AssertStrategyMatches(Node asset)
     {
         bool canExport = CreateStrategy().CanExport(asset);

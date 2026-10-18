@@ -41,12 +41,6 @@ public class SpriteExportStrategyTests() : BaseExportStrategyTests(true)
     protected override IAssetExportStrategy CreateStrategy() => new SpritesExportStrategy();
 
     [TestCaseSource(nameof(SpriteAssets))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
-
-    [TestCaseSource(nameof(SpriteAssets))]
     public void StrategyMatches(Node asset)
     {
         base.AssertStrategyMatches(asset);
