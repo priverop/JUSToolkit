@@ -15,7 +15,7 @@ public abstract class BaseExportStrategyTests(bool includeHash)
 
         IEnumerable<Node> exports = CreateStrategy().Export(asset);
 
-        var root = new Node("root", new NodeContainerFormat(exports));
+        using var root = new Node("root", new NodeContainerFormat(exports));
         foreach (Node exportedNode in Navigator.IterateNodes(root)) {
             Assert.That(exportedNode.Disposed, Is.False);
 
