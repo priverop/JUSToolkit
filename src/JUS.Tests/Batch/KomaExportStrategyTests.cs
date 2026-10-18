@@ -6,7 +6,7 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class KomaExportStrategyTests() : BaseExportStrategyTests(true)
 {
-    private static Lazy<Node> KomaContainerAsset => new(
+    private static Lazy<Node> KomaContainerAsset { get; } = new(
         () => TestDataBase.ReadSoftware().Data.Children["koma"].Children["koma.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new KomaExportStrategy();

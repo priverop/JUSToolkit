@@ -6,7 +6,7 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class InfoDeckExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
-    private static Lazy<Node> DeckAsset => new(() => TestDataBase.ReadSoftware().Data.Children["bin"].Children["InfoDeck.aar"]);
+    private static Lazy<Node> DeckAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["bin"].Children["InfoDeck.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new InfoDeckExportStrategy(createTemplate: false);
 

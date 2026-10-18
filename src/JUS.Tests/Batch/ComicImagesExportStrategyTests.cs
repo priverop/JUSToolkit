@@ -6,7 +6,7 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class ComicImagesExportStrategyTests() : BaseExportStrategyTests(true)
 {
-    private static Lazy<Node> DemoAsset => new(() => TestDataBase.ReadSoftware().Data.Children["demo"].Children["demo.aar"]);
+    private static Lazy<Node> DemoAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["demo"].Children["demo.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new ComicImagesExportStrategy();
 

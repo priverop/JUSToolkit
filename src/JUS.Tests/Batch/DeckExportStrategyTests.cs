@@ -6,7 +6,7 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class DeckExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
-    private static Lazy<Node> DeckAsset => new(() => TestDataBase.ReadSoftware().Data.Children["deck"].Children["Deck.aar"]);
+    private static Lazy<Node> DeckAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["deck"].Children["Deck.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new DeckExportStrategy(createTemplate: false);
 
