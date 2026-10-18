@@ -25,8 +25,6 @@ using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
 using Texim.Images.Quantization;
 using Texim.Palettes;
-using Texim.Pixels;
-using Texim.Sprites;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
@@ -302,27 +300,6 @@ namespace JUS.CLI.JUS.Graphics
             PathValidator.ValidateFile(koma);
             PathValidator.ValidateFile(kshape);
 
-            // First we get the original dtx
-            using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
-                .TransformWith<LzssDecompression>()
-                .TransformWith<BinaryDtx4ToSpriteImage>(); // NCF with sprite+image
-
-            // Get the image (dig) of the dtx to get the palette
-            Dig originalImage = dtx4.Children["image"].GetFormatAs<Dig>();
-
-            var palettes = new PaletteCollection();
-            foreach (IPalette p in originalImage.Palettes) {
-                palettes.Palettes.Add(p);
-            }
-
-            // Modified PNG to insert
-            Node pngNode = NodeFactory.FromFile(png, FileOpenMode.Read);
-
-            // Get the IndexedPixels
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
-            pngNode.TransformWith<StandardBinaryImage2RgbImage>().TransformWith(new StandardBinaryImage2IndexedPaletteImage(quantization));
-            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
-
             // Sprite from KShape
             KShapeSprites shapes = NodeFactory.FromFile(kshape)
                 .TransformWith<BinaryKShape2SpriteCollection>()
@@ -334,31 +311,14 @@ namespace JUS.CLI.JUS.Graphics
 
             KomaElement komaElement = komaFormat.First(n => n.KomaName == Path.GetFileNameWithoutExtension(dtx)) ?? throw new FormatException("Can't find the dtx in the koma.bin");
 
-            Sprite sprite = shapes.GetSprite(komaElement.KShapeGroupId, komaElement.KShapeElementId);
+            // Modified PNG to insert
+            using Node pngNode = NodeFactory.FromFile(png, FileOpenMode.Read);
 
-            // We need to create a new IndexedImage getting the segment pixels and adding them at the end of the image.
-            // Sorted image (the one we import) -> Unsorted image (the DTX store them like that)
-            var segmentedImage = new List<IndexedPixel>();
-            foreach (IImageSegment segment in sprite.Segments) {
-                IndexedImage segmentImage = newImage.SubImage(segment.ToRectangle());
-                segmentedImage.AddRange(segmentImage.Pixels);
-            }
-
-            // We do swizzling now, instead of waiting the Dig2Binary converter to do it because the game
-            // does swizzling with width 48 (segments width), but the converter will do it with the image width 8.
-            // Providing the swizzled pixels now, and letting Dig2Binary do swizzling again it's not an issue because
-            // swizzling with width 8 (and tile size 8x8) does nothing. So when the Dig2Binary converter swizzles a second time
-            // with the image width of 8, it will get the same pixels as give it now swizzled at 48.
-            IndexedPixel[] tiledPixels = new TileSwizzling<IndexedPixel>(48).Swizzle(segmentedImage);
-
-            // Update image with the new changes
-            Dig updatedImage = new Dig(originalImage) {
-                Pixels = tiledPixels.ToArray(),
-                Width = 8,
-                Height = tiledPixels.Length / 8,
-            }.InsertTransparentTile();
-
-            dtx4.Children["image"].ChangeFormat(updatedImage);
+            // First we get the original dtx and then we insert the png
+            using Node dtx4 = NodeFactory.FromFile(dtx, FileOpenMode.Read)
+                .TransformWith<LzssDecompression>()
+                .TransformWith<BinaryDtx4ToSpriteImage>() // NCF with sprite+image
+                .TransformWith(new Png2Dtx4(pngNode.GetFormatAs<IBinary>(), shapes, komaElement));
 
             // Export the new .dtx
             new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())

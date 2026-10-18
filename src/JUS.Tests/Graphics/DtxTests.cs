@@ -24,8 +24,6 @@ using JUS.Tool.Graphics.Converters;
 using JUS.Tool.Utils;
 using Texim.Formats.ImageSharp.Images;
 using Texim.Images;
-using Texim.Images.Quantization;
-using Texim.Pixels;
 using Texim.Sprites;
 using Yarhl.FileSystem;
 using Yarhl.IO;
@@ -204,32 +202,8 @@ namespace JUS.Tests.Graphics
                 .TransformWith(new Sprite2IndexedImage(spriteParams))
                 .TransformWith(new IndexedImage2BinaryPng(originalImage));
 
-            pngNode.Stream.Position = 0;
-
             // Import
-            var quantization = new FixedPaletteQuantization(originalImage.Palettes[0]);
-            pngNode.TransformWith<StandardBinaryImage2RgbImage>()
-                .TransformWith(new RgbImage2IndexedPaletteImage(quantization));
-            IndexedPaletteImage newImage = pngNode.GetFormatAs<IndexedPaletteImage>();
-
-            var segmentedImage = new List<IndexedPixel>();
-            foreach (IImageSegment segment in sprite.Segments) {
-                IndexedImage segmentImage = newImage.SubImage(segment.ToRectangle());
-                segmentedImage.AddRange(segmentImage.Pixels);
-            }
-
-            // Linear image to Tiled image (how the DTX stores them)
-            // See the DtxCommand for information about why we do swizzling here.
-            IndexedPixel[] tiledPixels = new TileSwizzling<IndexedPixel>(48).Swizzle(segmentedImage);
-
-            // Update image with the new changes
-            Dig updatedImage = new Dig(originalImage) {
-                Pixels = tiledPixels.ToArray(),
-                Width = 8,
-                Height = tiledPixels.Length / 8,
-            }.InsertTransparentTile();
-
-            dtx4.Children["image"].ChangeFormat(updatedImage);
+            dtx4.TransformWith(new Png2Dtx4(pngNode.GetFormatAs<IBinary>(), shapes, komaElement));
 
             Stream generatedStream = new Dtx4ToBinary().Convert(dtx4.GetFormatAs<NodeContainerFormat>())
                 .Stream;

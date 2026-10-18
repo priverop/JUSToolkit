@@ -36,6 +36,7 @@ namespace JUS.CLI.JUS
         private static readonly IFileImportStrategy[] Strategies =
         [
             new DemoImageFile(),
+            new KomaDtx4ImageFile(),
             new MenuImageFile(),
             new RawContainerFile(),
             new SpriteDtx3ImageFile(),

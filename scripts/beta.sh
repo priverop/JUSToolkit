@@ -168,10 +168,15 @@ echo '7 - JQuiz'
 ## IMAGES
 echo -e '\n\033[1;34m🖼  Importing images\033[0m'
 
+# KOMAS OLD
+# echo ''
+# echo 'KOMAS OLD'
+# ./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $IMAGES_DIRECTORY/ --output $DEMO_PATH
+
 # KOMAS
 echo ''
-echo 'KOMAS OLD'
-./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $IMAGES_DIRECTORY/ --output $DEMO_PATH
+echo 'KOMAS'
+./JUS.CLI jus game import --game $DEMO_PATH/new_game.nds --input $IMAGES_DIRECTORY/komas --output $DEMO_PATH
 
 # MENUS
 echo ''
