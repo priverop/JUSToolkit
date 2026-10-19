@@ -67,7 +67,7 @@ public class SpritesExportStrategy : IAssetExportStrategy
         logger.LogDebug("Reading sprites from: {Name}", asset.Name);
 
         // Unpack top container
-        NodeContainerFormat container = new Binary2Alar().Convert(asset.GetFormatAs<IBinary>());
+        using NodeContainerFormat container = new Binary2Alar().Convert(asset.GetFormatAs<IBinary>());
 
         // This iteration supports unpacking while processing the nodes
         Node exported = new("sprites");
