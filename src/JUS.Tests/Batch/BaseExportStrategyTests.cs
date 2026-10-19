@@ -7,6 +7,8 @@ namespace JUS.Tests.Batch;
 
 public abstract class BaseExportStrategyTests(bool includeHash)
 {
+    private IEnumerable<Node> exports = [];
+
     protected abstract IAssetExportStrategy CreateStrategy();
 
     protected void AssertStrategyMatches(Node asset)
@@ -19,7 +21,7 @@ public abstract class BaseExportStrategyTests(bool includeHash)
     {
         TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-        IEnumerable<Node> exports = CreateStrategy().Export(asset);
+        exports = CreateStrategy().Export(asset).ToList();
 
         return Verifier.Verify(exports)
             .UseDirectory(TestDataBase.VerifyTextsPath)
@@ -29,5 +31,15 @@ public abstract class BaseExportStrategyTests(bool includeHash)
                     settings.Converters.Add(new BinaryFormatVerifyJsonConverter());
                 }
             });
+    }
+
+    [TearDown]
+    public void DisposeExports()
+    {
+        foreach (Node node in exports) {
+            node.Dispose();
+        }
+
+        exports = [];
     }
 }
