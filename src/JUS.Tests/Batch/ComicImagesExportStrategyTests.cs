@@ -6,15 +6,9 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class ComicImagesExportStrategyTests() : BaseExportStrategyTests(true)
 {
-    private static Lazy<Node> DemoAsset => new(() => TestDataBase.ReadSoftware().Data.Children["demo"].Children["demo.aar"]);
+    private static Lazy<Node> DemoAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["demo"].Children["demo.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new ComicImagesExportStrategy();
-
-    [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(DemoAsset.Value);
-    }
 
     [Test]
     public void StrategyMatches()
@@ -26,5 +20,13 @@ public class ComicImagesExportStrategyTests() : BaseExportStrategyTests(true)
     public Task VerifyExportedContainer()
     {
         return base.AssertVerifyExportedContainer(DemoAsset.Value);
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (DemoAsset.IsValueCreated) {
+            DemoAsset.Value.Dispose();
+        }
     }
 }

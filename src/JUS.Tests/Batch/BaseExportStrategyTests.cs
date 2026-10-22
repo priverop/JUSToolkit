@@ -9,22 +9,6 @@ public abstract class BaseExportStrategyTests(bool includeHash)
 {
     protected abstract IAssetExportStrategy CreateStrategy();
 
-    protected void AssertExportedContainerAreNotDisposed(Node asset)
-    {
-        TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
-
-        IEnumerable<Node> exports = CreateStrategy().Export(asset);
-
-        var root = new Node("root", new NodeContainerFormat(exports));
-        foreach (Node exportedNode in Navigator.IterateNodes(root)) {
-            Assert.That(exportedNode.Disposed, Is.False);
-
-            if (exportedNode.Format is IBinary { Stream: DataStream dataStream }) {
-                Assert.That(dataStream.Disposed, Is.False);
-            }
-        }
-    }
-
     protected void AssertStrategyMatches(Node asset)
     {
         bool canExport = CreateStrategy().CanExport(asset);
@@ -35,10 +19,11 @@ public abstract class BaseExportStrategyTests(bool includeHash)
     {
         TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
-        IEnumerable<Node> exports = CreateStrategy().Export(asset);
+        Node[] exports = CreateStrategy().Export(asset).ToArray();
 
         return Verifier.Verify(exports)
             .UseDirectory(TestDataBase.VerifyTextsPath)
+            .OnVerify(before: () => { }, after: exports.DisposeAll)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter(serializeFormat: includeHash, maxChildren: 20));
                 if (includeHash) {

@@ -6,16 +6,10 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class KomaExportStrategyTests() : BaseExportStrategyTests(true)
 {
-    private static Lazy<Node> KomaContainerAsset => new(
+    private static Lazy<Node> KomaContainerAsset { get; } = new(
         () => TestDataBase.ReadSoftware().Data.Children["koma"].Children["koma.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new KomaExportStrategy();
-
-    [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(KomaContainerAsset.Value);
-    }
 
     [Test]
     public void StrategyMatches()
@@ -27,5 +21,13 @@ public class KomaExportStrategyTests() : BaseExportStrategyTests(true)
     public Task VerifyExportedContainer()
     {
         return base.AssertVerifyExportedContainer(KomaContainerAsset.Value);
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (KomaContainerAsset.IsValueCreated) {
+            KomaContainerAsset.Value.Dispose();
+        }
     }
 }

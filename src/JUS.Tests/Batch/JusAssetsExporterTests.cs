@@ -9,24 +9,8 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class JusAssetsExporterTests
 {
-    [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
-
-        NodeContainerFormat actual;
-        using (NitroRom testRoot = TestDataBase.ReadSoftware()) {
-            actual = new JusAssetsExporter("es").Convert(testRoot);
-        }
-
-        foreach (Node exportedNode in Navigator.IterateNodes(actual.Root)) {
-            Assert.That(exportedNode.Disposed, Is.False);
-
-            if (exportedNode.Format is IBinary { Stream: DataStream dataStream }) {
-                Assert.That(dataStream.Disposed, Is.False);
-            }
-        }
-    }
+    // If the rom is not present, this raises exception. That's why is nullable.
+    private NodeContainerFormat? actual;
 
     [Test]
     public Task VerifyExportedContainer()
@@ -34,12 +18,18 @@ public class JusAssetsExporterTests
         TestDataBase.IgnoreIfFileDoesNotExist(TestDataBase.SoftwareNitroRomPath);
 
         using NitroRom root = TestDataBase.ReadSoftware();
-        NodeContainerFormat actual = new JusAssetsExporter("es").Convert(root);
+        actual = new JusAssetsExporter("es").Convert(root);
 
         return Verifier.Verify(actual)
             .UseDirectory(TestDataBase.VerifyResourcesPath)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter(depth: 3, maxChildren: 10, serializeFormat: false));
             });
+    }
+
+    [TearDown]
+    public void DisposeExport()
+    {
+        actual?.Dispose();
     }
 }

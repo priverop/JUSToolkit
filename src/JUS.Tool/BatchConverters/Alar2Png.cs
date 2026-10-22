@@ -61,7 +61,7 @@ namespace JUS.Tool.BatchConverters
         {
             var transformedFiles = new NodeContainerFormat();
 
-            NodeContainerFormat alarNode = new Binary2Alar().Convert(alar);
+            using NodeContainerFormat alarNode = new Binary2Alar().Convert(alar);
 
             // Iterate alar
             foreach (Node child in Navigator.IterateNodes(alarNode.Root)) {

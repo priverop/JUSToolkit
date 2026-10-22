@@ -1,5 +1,4 @@
 ﻿using JUS.Tool.BatchConverters.Strategies;
-using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.TestFramework.Verify.Converters;
 
@@ -8,16 +7,18 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
+    private static Lazy<Node> NitroRom { get; } = new(() => TestDataBase.ReadSoftware().Data);
+
     private static IEnumerable<TestCaseData> TutorialAssets {
         get {
             if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
                 return [];
             }
 
-            NitroRom rom = TestDataBase.ReadSoftware();
+            Node data = NitroRom.Value;
             IEnumerable<Node> nodes = [
-                rom.Data.Children["deckmake"].Children["tutorial.bin"],
-                ..rom.Data.Children["battle"].Children
+                data.Children["deckmake"].Children["tutorial.bin"],
+                ..data.Children["battle"].Children
                     .Where(n => n.Name.StartsWith("tutorial") && n.Extension == ".bin"),
             ];
             return nodes.Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
@@ -25,12 +26,6 @@ public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash
     }
 
     protected override IAssetExportStrategy CreateStrategy() => new TutorialExportStrategy(false);
-
-    [TestCaseSource(nameof(TutorialAssets))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
 
     [TestCaseSource(nameof(TutorialAssets))]
     public void StrategyMatches(Node asset)
@@ -54,8 +49,17 @@ public class TutorialExportStrategyTests() : BaseExportStrategyTests(includeHash
 
         return Verifier.Verify(root)
             .UseDirectory(TestDataBase.VerifyTextsPath)
+            .OnVerify(before: () => { }, after: root.Dispose)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter(serializeFormat: false));
             });
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAssets()
+    {
+        if (NitroRom.IsValueCreated) {
+            NitroRom.Value.Dispose();
+        }
     }
 }

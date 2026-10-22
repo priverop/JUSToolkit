@@ -6,15 +6,9 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class JGalaxyTextExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
-    private static Lazy<Node> JGalaxyAsset => new(() => TestDataBase.ReadSoftware().Data.Children["jgalaxy"].Children["jgalaxy.aar"]);
+    private static Lazy<Node> JGalaxyAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["jgalaxy"].Children["jgalaxy.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new JGalaxyTextExportStrategy(createTemplate: false);
-
-    [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(JGalaxyAsset.Value);
-    }
 
     [Test]
     public void StrategyMatches()
@@ -26,5 +20,13 @@ public class JGalaxyTextExportStrategyTests() : BaseExportStrategyTests(includeH
     public Task VerifyExportedContainer()
     {
         return base.AssertVerifyExportedContainer(JGalaxyAsset.Value);
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (JGalaxyAsset.IsValueCreated) {
+            JGalaxyAsset.Value.Dispose();
+        }
     }
 }

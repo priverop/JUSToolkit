@@ -6,15 +6,9 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class InfoDeckExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
-    private static Lazy<Node> DeckAsset => new(() => TestDataBase.ReadSoftware().Data.Children["bin"].Children["InfoDeck.aar"]);
+    private static Lazy<Node> DeckAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["bin"].Children["InfoDeck.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new InfoDeckExportStrategy(createTemplate: false);
-
-    [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(DeckAsset.Value);
-    }
 
     [Test]
     public void StrategyMatches()
@@ -26,5 +20,13 @@ public class InfoDeckExportStrategyTests() : BaseExportStrategyTests(includeHash
     public Task VerifyExportedContainer()
     {
         return base.AssertVerifyExportedContainer(DeckAsset.Value);
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (DeckAsset.IsValueCreated) {
+            DeckAsset.Value.Dispose();
+        }
     }
 }

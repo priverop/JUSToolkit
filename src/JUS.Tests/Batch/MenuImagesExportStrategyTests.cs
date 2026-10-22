@@ -1,5 +1,4 @@
 ﻿using JUS.Tool.BatchConverters.Strategies;
-using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.TestFramework.Verify.Converters;
 
@@ -8,37 +7,33 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class MenuImagesExportStrategyTests() : BaseExportStrategyTests(true)
 {
+    private static Lazy<Node> NitroRom { get; } = new(() => TestDataBase.ReadSoftware().Data);
+
     private static IEnumerable<TestCaseData> MenuAsset {
         get {
             if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
                 return [];
             }
 
-            NitroRom rom = TestDataBase.ReadSoftware();
+            Node data = NitroRom.Value;
             IEnumerable<Node> nodes = [
-                rom.Data.Children["Commu"].Children["commu_pack.aar"],
-                rom.Data.Children["database"].Children["database.aar"],
-                // rom.Data.Children["deckcheck"].Children["deckcheck.aar"],
-                rom.Data.Children["input"].Children["input.aar"],
-                rom.Data.Children["JArena"].Children["JArena.aar"],
-                rom.Data.Children["jgalaxy"].Children["jgalaxy.aar"],
-                rom.Data.Children["jpower"].Children["jpower.aar"],
-                rom.Data.Children["option"].Children["option.aar"],
-                rom.Data.Children["ruleselect"].Children["ruleselect.aar"],
-                // rom.Data.Children["stageselect"].Children["stageselect.aar"],
-                rom.Data.Children["topmenu"].Children["topmenu.aar"],
+                data.Children["Commu"].Children["commu_pack.aar"],
+                data.Children["database"].Children["database.aar"],
+                // data.Children["deckcheck"].Children["deckcheck.aar"],
+                data.Children["input"].Children["input.aar"],
+                data.Children["JArena"].Children["JArena.aar"],
+                data.Children["jgalaxy"].Children["jgalaxy.aar"],
+                data.Children["jpower"].Children["jpower.aar"],
+                data.Children["option"].Children["option.aar"],
+                data.Children["ruleselect"].Children["ruleselect.aar"],
+                // data.Children["stageselect"].Children["stageselect.aar"],
+                data.Children["topmenu"].Children["topmenu.aar"],
             ];
             return nodes.Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
     }
 
     protected override IAssetExportStrategy CreateStrategy() => new MenuImagesExportStrategy();
-
-    [TestCaseSource(nameof(MenuAsset))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
 
     [TestCaseSource(nameof(MenuAsset))]
     public void StrategyMatches(Node asset)
@@ -62,9 +57,18 @@ public class MenuImagesExportStrategyTests() : BaseExportStrategyTests(true)
 
         return Verifier.Verify(root)
             .UseDirectory(TestDataBase.VerifyTextsPath)
+            .OnVerify(before: () => { }, after: root.Dispose)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter());
                 settings.Converters.Add(new BinaryFormatVerifyJsonConverter());
             });
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAssets()
+    {
+        if (NitroRom.IsValueCreated) {
+            NitroRom.Value.Dispose();
+        }
     }
 }

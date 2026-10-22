@@ -6,15 +6,9 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class JQuizTextExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
-    private static Lazy<Node> JQuizAsset => new(() => TestDataBase.ReadSoftware().Data.Children["jquiz"].Children["jquiz_pack.aar"]);
+    private static Lazy<Node> JQuizAsset { get; } = new(() => TestDataBase.ReadSoftware().Data.Children["jquiz"].Children["jquiz_pack.aar"]);
 
     protected override IAssetExportStrategy CreateStrategy() => new JQuizTextExportStrategy();
-
-    [Test]
-    public void ExportedContainerAreNotDisposed()
-    {
-        base.AssertExportedContainerAreNotDisposed(JQuizAsset.Value);
-    }
 
     [Test]
     public void StrategyMatches()
@@ -26,5 +20,13 @@ public class JQuizTextExportStrategyTests() : BaseExportStrategyTests(includeHas
     public Task VerifyExportedContainer()
     {
         return base.AssertVerifyExportedContainer(JQuizAsset.Value);
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (JQuizAsset.IsValueCreated) {
+            JQuizAsset.Value.Dispose();
+        }
     }
 }

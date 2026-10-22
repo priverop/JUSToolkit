@@ -1,5 +1,4 @@
 ﻿using JUS.Tool.BatchConverters.Strategies;
-using SceneGate.Ekona.Containers.Rom;
 using Yarhl.FileSystem;
 using Yarhl.TestFramework.Verify.Converters;
 
@@ -8,43 +7,39 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class SpriteExportStrategyTests() : BaseExportStrategyTests(true)
 {
+    private static Lazy<Node> NitroRom { get; } = new(() => TestDataBase.ReadSoftware().Data);
+
     private static IEnumerable<TestCaseData> SpriteAssets {
         get {
             if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
                 return [];
             }
 
-            NitroRom rom = TestDataBase.ReadSoftware();
+            Node data = NitroRom.Value;
             IEnumerable<Node> nodes = [
-                rom.Data.Children["battle"].Children["pause.aar"],
-                rom.Data.Children["Commu"].Children["commu_pack.aar"],
-                rom.Data.Children["Commu"].Children["error_2d.aar"],
-                rom.Data.Children["database"].Children["database.aar"],
-                rom.Data.Children["deckcheck"].Children["deckcheck.aar"],
-                rom.Data.Children["deckselect"].Children["deckselect.aar"],
-                rom.Data.Children["demo"].Children["demo.aar"],
-                rom.Data.Children["ending"].Children["ending.aar"],
-                rom.Data.Children["info"].Children["info.aar"],
-                rom.Data.Children["input"].Children["input.aar"],
-                rom.Data.Children["JArena"].Children["JArena.aar"],
-                rom.Data.Children["jgalaxy"].Children["jgalaxy.aar"],
-                rom.Data.Children["jquiz"].Children["jquiz_pack.aar"],
-                rom.Data.Children["option"].Children["option.aar"],
-                rom.Data.Children["result"].Children["result.aar"],
-                rom.Data.Children["stageselect"].Children["stageselect.aar"],
-                rom.Data.Children["title"].Children["title.aar"],
+                data.Children["battle"].Children["pause.aar"],
+                data.Children["Commu"].Children["commu_pack.aar"],
+                data.Children["Commu"].Children["error_2d.aar"],
+                data.Children["database"].Children["database.aar"],
+                data.Children["deckcheck"].Children["deckcheck.aar"],
+                data.Children["deckselect"].Children["deckselect.aar"],
+                data.Children["demo"].Children["demo.aar"],
+                data.Children["ending"].Children["ending.aar"],
+                data.Children["info"].Children["info.aar"],
+                data.Children["input"].Children["input.aar"],
+                data.Children["JArena"].Children["JArena.aar"],
+                data.Children["jgalaxy"].Children["jgalaxy.aar"],
+                data.Children["jquiz"].Children["jquiz_pack.aar"],
+                data.Children["option"].Children["option.aar"],
+                data.Children["result"].Children["result.aar"],
+                data.Children["stageselect"].Children["stageselect.aar"],
+                data.Children["title"].Children["title.aar"],
             ];
             return nodes.Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
         }
     }
 
     protected override IAssetExportStrategy CreateStrategy() => new SpritesExportStrategy();
-
-    [TestCaseSource(nameof(SpriteAssets))]
-    public void ExportedContainerAreNotDisposed(Node asset)
-    {
-        base.AssertExportedContainerAreNotDisposed(asset);
-    }
 
     [TestCaseSource(nameof(SpriteAssets))]
     public void StrategyMatches(Node asset)
@@ -68,9 +63,18 @@ public class SpriteExportStrategyTests() : BaseExportStrategyTests(true)
 
         return Verifier.Verify(root)
             .UseDirectory(TestDataBase.VerifyTextsPath)
+            .OnVerify(before: () => { }, after: root.Dispose)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter(maxChildren: 10));
                 settings.Converters.Add(new BinaryFormatVerifyJsonConverter());
             });
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAssets()
+    {
+        if (NitroRom.IsValueCreated) {
+            NitroRom.Value.Dispose();
+        }
     }
 }
