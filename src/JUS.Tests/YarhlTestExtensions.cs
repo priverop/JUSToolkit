@@ -32,5 +32,12 @@ namespace JUS.Tests
         public static BinaryFormatAssertions Should(this BinaryFormat binary) => new(binary);
 
         public static NodeAssertions Should(this Node node) => new(node);
+
+        public static void DisposeAll(this IEnumerable<Node> nodes)
+        {
+            foreach (Node node in nodes) {
+                node.Dispose();
+            }
+        }
     }
 }
