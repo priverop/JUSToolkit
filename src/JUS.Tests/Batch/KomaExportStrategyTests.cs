@@ -22,4 +22,12 @@ public class KomaExportStrategyTests() : BaseExportStrategyTests(true)
     {
         return base.AssertVerifyExportedContainer(KomaContainerAsset.Value);
     }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (KomaContainerAsset.IsValueCreated) {
+            KomaContainerAsset.Value.Dispose();
+        }
+    }
 }

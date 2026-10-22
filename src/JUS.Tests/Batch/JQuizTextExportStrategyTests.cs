@@ -21,4 +21,12 @@ public class JQuizTextExportStrategyTests() : BaseExportStrategyTests(includeHas
     {
         return base.AssertVerifyExportedContainer(JQuizAsset.Value);
     }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (JQuizAsset.IsValueCreated) {
+            JQuizAsset.Value.Dispose();
+        }
+    }
 }

@@ -21,4 +21,12 @@ public class JGalaxyTextExportStrategyTests() : BaseExportStrategyTests(includeH
     {
         return base.AssertVerifyExportedContainer(JGalaxyAsset.Value);
     }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (JGalaxyAsset.IsValueCreated) {
+            JGalaxyAsset.Value.Dispose();
+        }
+    }
 }

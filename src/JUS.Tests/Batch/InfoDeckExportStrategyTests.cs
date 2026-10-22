@@ -21,4 +21,12 @@ public class InfoDeckExportStrategyTests() : BaseExportStrategyTests(includeHash
     {
         return base.AssertVerifyExportedContainer(DeckAsset.Value);
     }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (DeckAsset.IsValueCreated) {
+            DeckAsset.Value.Dispose();
+        }
+    }
 }

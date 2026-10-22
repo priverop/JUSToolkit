@@ -21,4 +21,12 @@ public class ComicImagesExportStrategyTests() : BaseExportStrategyTests(true)
     {
         return base.AssertVerifyExportedContainer(DemoAsset.Value);
     }
+
+    [OneTimeTearDown]
+    public void DisposeAsset()
+    {
+        if (DemoAsset.IsValueCreated) {
+            DemoAsset.Value.Dispose();
+        }
+    }
 }
