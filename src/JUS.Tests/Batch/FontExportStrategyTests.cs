@@ -7,9 +7,18 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class FontExportStrategyTests() : BaseExportStrategyTests(includeHash: true)
 {
-    private static IEnumerable<TestCaseData> FontAssets =>
-        TestDataBase.ReadAndGetChildren("data/font")
-            .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
+    private static Lazy<Node> NitroRom { get; } = new(() => TestDataBase.ReadSoftware().Data);
+
+    private static IEnumerable<TestCaseData> FontAssets {
+        get {
+            if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
+                return [];
+            }
+
+            return NitroRom.Value.Children["font"].Children
+                .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
+        }
+    }
 
     protected override IAssetExportStrategy CreateStrategy() => new FontExportStrategy();
 
@@ -33,9 +42,18 @@ public class FontExportStrategyTests() : BaseExportStrategyTests(includeHash: tr
 
         return Verifier.Verify(exports)
             .UseDirectory(TestDataBase.VerifyTextsPath)
+            .OnVerify(before: () => { }, after: exports.Dispose)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter());
                 settings.Converters.Add(new BinaryFormatVerifyJsonConverter());
             });
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAssets()
+    {
+        if (NitroRom.IsValueCreated) {
+            NitroRom.Value.Dispose();
+        }
     }
 }

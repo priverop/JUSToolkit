@@ -8,10 +8,19 @@ namespace JUS.Tests.Batch;
 [TestFixture]
 public class LooseTextsExportStrategyTests() : BaseExportStrategyTests(includeHash: false)
 {
-    private static IEnumerable<TestCaseData> LooseTextAssets =>
-        TestDataBase.ReadAndGetChildren("data/bin")
-            .Where(n => TextIdentifier.HasText(n.Name))
-            .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
+    private static Lazy<Node> NitroRom { get; } = new(() => TestDataBase.ReadSoftware().Data);
+
+    private static IEnumerable<TestCaseData> LooseTextAssets {
+        get {
+            if (!File.Exists(TestDataBase.SoftwareNitroRomPath)) {
+                return [];
+            }
+
+            return NitroRom.Value.Children["bin"].Children
+                .Where(n => TextIdentifier.HasText(n.Name))
+                .Select(n => new TestCaseData(n).SetArgDisplayNames(n.Path));
+        }
+    }
 
     protected override IAssetExportStrategy CreateStrategy() => new LooseTextsExportStrategy(false);
 
@@ -38,8 +47,17 @@ public class LooseTextsExportStrategyTests() : BaseExportStrategyTests(includeHa
 
         return Verifier.Verify(root)
             .UseDirectory(TestDataBase.VerifyTextsPath)
+            .OnVerify(before: () => { }, after: root.Dispose)
             .AddExtraSettings(settings => {
                 settings.Converters.Add(new NodeVerifyJsonConverter(serializeFormat: false));
             });
+    }
+
+    [OneTimeTearDown]
+    public void DisposeAssets()
+    {
+        if (NitroRom.IsValueCreated) {
+            NitroRom.Value.Dispose();
+        }
     }
 }
